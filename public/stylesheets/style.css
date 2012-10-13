@@ -6,3 +6,16 @@ body {
 a {
   color: #00B7FF;
 }
+
+.dflow-node {
+  height: 100px;
+  width: 100px;
+  border:1px solid #aaaaaa;
+}
+
+#dflow-graph {
+  height: 1000px;
+  width: 1000px;
+  border:1px solid #aaaaaa;
+}
+
