@@ -1,11 +1,10 @@
 {
   "name": "dflow",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.2",
   "description": "dataflow programming for node.js",
   "main": "index.js",
   "scripts": {
-    "start": "node app"
+    "start": "node app",
     "test": "node_modules/.bin/mocha"
   },
   "dependencies": {
