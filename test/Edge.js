@@ -4,13 +4,14 @@ var assert = require('assert');
 
 var dflow = require('../index.js');
 
-var Graph = dflow.Graph;
+var Edge = dflow.Edge;
 
-describe('Graph', function () {
-  var graph = new Graph();
+describe('Edge', function () {
   it('requires task', function () {
     //var node = new Node();
     //assert.throws;
   });
 });
+
+
 
