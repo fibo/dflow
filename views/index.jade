@@ -1,5 +1,30 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  #dflow-graph
+    #node1(class='dflow-node', draggable='true')
+    #node2(class='dflow-node', draggable='true')
+
+  script
+    // TODO vedi http://jsbin.com/uzovu/1357
+    var dragItems = document.querySelectorAll('[draggable=true]');
+
+    for (var i = 0; i < dragItems.length; i++) {
+      var dragItem = dragItems[i];
+      dragItem.addEventListener('ondragstart', function (event) {
+        event.dataTransfer.setData('Testo', this.id);
+      });
+    }
+
+    var dflowGraph = document.getElementById('dflow-graph');
+    var cancel = function (event) {
+      event.preventDeafult();
+      return false;
+    }
+    dflowGraph.addEventListener('ondragenter', cancel);
+    dflowGraph.addEventListener('ondragover', cancel);
+    dflowGraph.addEventListener('ondrop', function (event) {
+      event.preventDeafult();
+      console.log(event.dataTransfer.getData('Testo'));
+    });
+

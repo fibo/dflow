@@ -7,9 +7,9 @@ var Edge = require('./lib/Edge.js');
 
 exports.Edge = Edge;
 
-var Edge = require('./lib/Edge.js');
+var Out = require('./lib/Out.js');
 
-exports.Edge = Edge;
+exports.Out = Out;
 
 var Graph = require('./lib/Graph.js');
 

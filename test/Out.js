@@ -8,7 +8,7 @@ var Out = dflow.Out;
 
 describe('Out', function () {
   it('requires task', function () {
-    //var node = new Node();
+    var _out = new Out();
     //assert.throws;
   });
 });
