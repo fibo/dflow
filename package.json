@@ -1,12 +1,28 @@
 {
-  "name": "application-name",
+  "name": "dflow",
   "version": "0.0.1",
   "private": true,
+  "description": "dataflow programming for node.js",
+  "main": "index.js",
   "scripts": {
     "start": "node app"
+    "test": "node_modules/.bin/mocha"
   },
   "dependencies": {
     "express": "3.0.0rc2",
     "jade": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fibo/dflow.git"
+  },
+  "keywords": [
+    "dataflow",
+    "visual"
+  ],
+  "author": "fibo",
+  "license": "BSD",
+  "devDependencies": {
+    "mocha": "1.4.2"
   }
 }
