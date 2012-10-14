@@ -1,5 +1,6 @@
 body {
-  padding: 50px;
+  padding: 10px;
+  margin: 10px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -8,12 +9,22 @@ a {
 }
 
 .dflow-node {
+  top: 10px;
+  left: 10px;
+  margin: 0px;
+  padding; 0px;
+  position: relative;
   height: 100px;
   width: 100px;
   border:1px solid #aaaaaa;
 }
 
 #dflow-graph {
+  top: 0px;
+  left: 0px;
+  margin: 0px;
+  padding; 0px;
+  position: relative;
   height: 1000px;
   width: 1000px;
   border:1px solid #aaaaaa;

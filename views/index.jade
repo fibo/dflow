@@ -3,28 +3,54 @@ extends layout
 block content
   #dflow-graph
     #node1(class='dflow-node', draggable='true')
-    #node2(class='dflow-node', draggable='true')
 
   script
     // TODO vedi http://jsbin.com/uzovu/1357
     var dragItems = document.querySelectorAll('[draggable=true]');
 
+    function getPosition(obj){
+    var topValue= 0,leftValue= 0;
+    while(obj){
+    leftValue+= obj.offsetLeft;
+    topValue+= obj.offsetTop;
+    obj= obj.offsetParent;
+    }
+    finalvalue = [leftValue , topValue];
+    return finalvalue;
+    }
+
+    var logEvent = function (event) { console.log(event); }
+    var cancel = function (event) {
+      event.preventDefault();
+      return false;
+    }
+
     for (var i = 0; i < dragItems.length; i++) {
       var dragItem = dragItems[i];
-      dragItem.addEventListener('ondragstart', function (event) {
-        event.dataTransfer.setData('Testo', this.id);
+      dragItem.addEventListener('dragstart', function (event) {
+        event.dataTransfer.setData('divId', this.id);
       });
+      dragItem.addEventListener('dragend', cancel);
     }
 
     var dflowGraph = document.getElementById('dflow-graph');
-    var cancel = function (event) {
-      event.preventDeafult();
-      return false;
-    }
-    dflowGraph.addEventListener('ondragenter', cancel);
-    dflowGraph.addEventListener('ondragover', cancel);
-    dflowGraph.addEventListener('ondrop', function (event) {
-      event.preventDeafult();
-      console.log(event.dataTransfer.getData('Testo'));
+    dflowGraph.addEventListener('dragenter', cancel);
+    dflowGraph.addEventListener('dragover', cancel);
+    dflowGraph.addEventListener('drop', function (event) {
+      event.preventDefault();
+      //console.log(event);
+      var divId = event.dataTransfer.getData('divId');
+      var div = document.getElementById(divId);
+      console.log(getPosition(dflowGraph));
+      //console.log(event.pageX);
+      //console.log(event.pageY);
+      var p = getPosition(dflowGraph);
+      var x = event.pageX-p[0];
+      var y = event.pageY-p[0];
+      div.style.left = x+'px';
+      div.style.top = y+'px';
+      // mi dice la posizione precedente
+      //console.log(getPosition(div));
+      var dflowGraph = document.getElementById('dflow-graph');
     });
 
