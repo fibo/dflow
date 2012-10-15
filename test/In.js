@@ -1,6 +1,5 @@
 
 var assert = require('assert');
-//var EventEmitter = require('events').EventEmitter;
 
 var dflow = require('../index.js');
 
@@ -15,7 +14,7 @@ describe('In', function () {
 
   describe('inheritance:', function () {
     it('is a Slot', function () {
-      var _in = new In();
+      var _in = new In({data:0});
       assert.ok(_in instanceof Slot);
     });
   });

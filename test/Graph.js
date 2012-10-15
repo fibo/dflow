@@ -5,6 +5,7 @@ var assert = require('assert');
 var dflow = require('../index.js');
 
 var Graph = dflow.Graph;
+var Node  = dflow.Node;
 
 describe('Graph', function () {
   describe('constructor:', function () {
@@ -20,9 +21,24 @@ describe('Graph', function () {
   });
 
   describe('getNodes()', function () {
+    it('', function () {
+    });
   });
 
-  describe('addNode(<Node>)', function () {
+  describe('addNode(<Object>)', function () {
+    it('coerces Object to Node', function () {
+      var graph = new Graph();
+      var arg = {
+        task: function () {
+          console.log('Hello world');
+        }
+      };
+      graph.addNode(arg);
+
+      var nodes = graph.getNodes();
+
+      assert.ok(nodes[0] instanceof Node);
+    });
   });
 });
 
