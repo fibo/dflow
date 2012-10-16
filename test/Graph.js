@@ -22,6 +22,19 @@ describe('Graph', function () {
 
   describe('getNodes()', function () {
     it('', function () {
+      var graph = new Graph();
+      var arg = {
+        task: function () {
+          console.log('Hello world');
+        }
+      };
+      graph.addNode(arg);
+      graph.addNode(arg);
+      graph.addNode(arg);
+
+      var nodes = graph.getNodes();
+
+      assert.equal(nodes.length, 3);
     });
   });
 
