@@ -25,7 +25,7 @@ describe('Graph', function () {
       var graph = new Graph();
       var arg = {
         task: function () {
-          console.log('Hello world');
+          graph.emit('task');
         }
       };
       graph.addNode(arg);
@@ -43,7 +43,7 @@ describe('Graph', function () {
       var graph = new Graph();
       var arg = {
         task: function () {
-          console.log('Hello world');
+          graph.emit('task');
         }
       };
       graph.addNode(arg);

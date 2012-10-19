@@ -2,7 +2,29 @@ extends layout
 
 block content
   #dflow-graph
+    canvas(id='dflow-canvas', width='100%', height='100%')
+
     #node1(class='dflow-node', draggable='true')
+    #dflow-cursor(class='dflow-node', draggable='true')
+      #dflow-add-graph(class='dflow-cursor-choice')
+       #dflow-add-node(class='dflow-cursor-choice')
+        #dflow-add-out(class='dflow-cursor-choice')
+         #dflow-add-in(class='dflow-cursor-choice')
+
+  script
+
+    var dflowCursor = document.getElementById('dflow-cursor');
+    var dflowGraph = document.getElementById('dflow-graph');
+
+    dflowCursor.addEventListener('click', function (event) {
+      event.stopPropagation();
+      console.log('click cursor');
+    });
+    dflowGraph.addEventListener('click', function () {
+      console.log('click graph');
+    });
+
+    console.log(dflowCursor);
 
   script
     // TODO vedi http://jsbin.com/uzovu/1357
