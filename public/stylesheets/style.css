@@ -17,6 +17,36 @@ a {
   z-index: -1;
 }
 
+.dflow-cursor-choice {
+  margin: 2px;
+  padding; 2px;
+  position: absolute;
+  height: 42px;
+  width: 42px;
+  border:1px solid #aaaaaa;
+  z-index: 0;
+}
+
+#dflow-add-graph {
+  left: 0;
+  top: 0;
+}
+
+#dflow-add-node {
+  left: 50px;
+  top: 0;
+}
+
+#dflow-add-in {
+  left: 0px;
+  top: 50px;
+}
+
+#dflow-add-out {
+  left: 50px;
+  top: 50px;
+}
+
 .dflow-node {
   top: 10px;
   left: 10px;
@@ -30,6 +60,7 @@ a {
 }
 
 #dflow-cursor {
+  display: inline;
   top: 100px;
   left: 100px;
   margin: 0;
@@ -37,7 +68,8 @@ a {
   position: absolute;
   height: 100px;
   width: 100px;
-  border:1px solid #aaaaaa;
+  /* border:1px solid #aaaaaa; */
+  border: 0;
   z-index: 0;
 }
 
