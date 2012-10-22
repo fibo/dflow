@@ -2,6 +2,7 @@ extends layout
 
 block content
   #dflow-graph
+    // TODO prova a disegnare nel canvas
     canvas(id='dflow-canvas', width='100%', height='100%')
 
     #node1(class='dflow-node', draggable='true')
@@ -16,8 +17,13 @@ block content
     // TODO vedi http://www.diffusedreality.com/content.html
 
     var dflowCursor = document.getElementById('dflow-cursor');
+    var dflowGraph = document.getElementById('dflow-graph');
+
+    var dflowAddNode = document.getElementById('dflow-add-node');
 
     var toggleDiv = function (div) {
+      // TODO ritorna true o false se e' visibile oppure no
+      // cosi si puo fare if(div.toggle())
       if (div.style.display == 'inline') {
         div.style.display = 'none';
       }
@@ -29,18 +35,37 @@ block content
       }
     }
 
-    var dflowGraph = document.getElementById('dflow-graph');
+    var addNode = function () {
+      var nodeDiv = document.createElement('div');
+      nodeDiv.className = 'dflow-node';
+      nodeDiv.style.left = dflowCursor.style.left;
+      nodeDiv.style.top = dflowCursor.style.top;
+      nodeDiv.style.height = 50 + 'px';
+      nodeDiv.style.width = 100 + 'px';
+      dflowGraph.appendChild(nodeDiv);
+    }
 
-    dflowCursor.addEventListener('click', function (event) {
+    dflowAddNode.addEventListener('click', function (event) {
       event.stopPropagation();
-      console.log('click cursor');
+      toggleDiv(dflowCursor);
+      addNode();
     });
 
     dflowGraph.addEventListener('click', function () {
-      console.log('click graph');
       toggleDiv(dflowCursor);
     });
 
+    window.addEvent('domready',function(){
+      $('dflow-cursor').makeDraggable();
+      //var myDrag = new Drag.Move('dflow-cursor',
+      //{container:'dflow-graph'}
+      //);
+    });
+
+    //new Drag.Move($('dflow-cursor'));
+    console.log($('dflow-cursor'));
+    console.log(MooTools);
+    /*
     // TODO vedi http://jsbin.com/uzovu/1357
     var dragItems = document.querySelectorAll('[draggable=true]');
 
@@ -69,25 +94,18 @@ block content
       });
       dragItem.addEventListener('dragend', cancel);
     }
-
-    var dflowGraph = document.getElementById('dflow-graph');
     dflowGraph.addEventListener('dragenter', cancel);
     dflowGraph.addEventListener('dragover', cancel);
     dflowGraph.addEventListener('drop', function (event) {
       event.preventDefault();
-      //console.log(event);
       var divId = event.dataTransfer.getData('divId');
       var div = document.getElementById(divId);
       console.log(getPosition(dflowGraph));
-      //console.log(event.pageX);
-      //console.log(event.pageY);
       var p = getPosition(dflowGraph);
       var x = event.pageX-p[0];
       var y = event.pageY-p[0];
       div.style.left = x+'px';
       div.style.top = y+'px';
-      // mi dice la posizione precedente
-      //console.log(getPosition(div));
-      var dflowGraph = document.getElementById('dflow-graph');
     });
+    */
 
