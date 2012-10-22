@@ -29,3 +29,5 @@ Posso creare quindi gli elementi, poi cliccarci dentro ed editarli.
 Sotto ci deve essere un canvas che aggiunge un po di grafica,
 ad esempio curve di bezier per i link
 
+Segna nel disclaimer che  dflow e' alpha e che per ora supporto solo chrome.
+

@@ -48,13 +48,9 @@ a {
 }
 
 .dflow-node {
-  top: 10px;
-  left: 10px;
   margin: 0;
   padding; 0;
   position: absolute;
-  height: 50px;
-  width: 100px;
   border:1px solid #aaaaaa;
   z-index: 0;
 }
