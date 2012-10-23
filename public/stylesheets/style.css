@@ -1,3 +1,4 @@
+
 body {
   padding: 0px;
   margin: 0px;
@@ -18,11 +19,11 @@ a {
 }
 
 .dflow-cursor-choice {
-  margin: 2px;
-  padding; 2px;
+  margin: 0;
+  padding; 0;
   position: absolute;
-  height: 42px;
-  width: 42px;
+  height: 24px;
+  width: 24px;
   border:1px solid #aaaaaa;
   z-index: 0;
 }
@@ -33,50 +34,49 @@ a {
 }
 
 #dflow-add-node {
-  left: 50px;
+  left: 25px;
   top: 0;
 }
 
 #dflow-add-in {
   left: 0px;
-  top: 50px;
+  top: 25px;
 }
 
 #dflow-add-out {
-  left: 50px;
-  top: 50px;
+  left: 25px;
+  top: 25px;
 }
 
 .dflow-node {
+  /* position: relative;
   margin: 0;
   padding; 0;
-  position: absolute;
   border:1px solid #aaaaaa;
+  */
   z-index: 0;
 }
 
 #dflow-cursor {
   display: inline;
-  top: 100px;
-  left: 100px;
   margin: 0;
   padding; 0;
   position: absolute;
-  height: 100px;
-  width: 100px;
+  height: 50px;
+  width: 50px;
   /* border:1px solid #aaaaaa; */
   border: 0;
   z-index: 0;
 }
 
 #dflow-graph {
-  top: 0;
+  top: 100px;
   left: 0;
   margin: 0;
   padding; 0;
-  position: relative;
+  position: absolute;
   border:1px solid #aaaaaa;
-  height: 100%;
+  height: 50%;
   width: 100%;
 }
 

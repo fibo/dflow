@@ -3,10 +3,11 @@
  * Module dependencies.
  */
 
-var express = require('express')
-  , routes = require('./routes')
-  , http = require('http')
-  , path = require('path');
+var express = require('express');
+var routes  = require('./routes');
+var http    = require('http');
+var path    = require('path');
+var sio     = require('socket.io');
 
 var app = express();
 
@@ -30,6 +31,11 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 
-http.createServer(app).listen(app.get('port'), function(){
+var server = http.createServer(app);
+
+server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
+
+var sio     = require('socket.io');
+var io = sio.listen(server);
