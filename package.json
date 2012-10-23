@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "start": "node app",
-    "test": "node_modules/.bin/mocha"
+    "test": "mocha --reporter nyan"
   },
   "dependencies": {
-    "express": "3.0.0rc2",
-    "jade": "*"
+    "express": "3.0.0rc4",
+    "jade": "*",
+    "socket.io-client": "0.9.10",
+    "socket.io": "0.9.10"
   },
   "repository": {
     "type": "git",
