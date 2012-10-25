@@ -49,11 +49,10 @@ a {
 }
 
 .dflow-node {
-  /* position: relative;
+  position: absolute;
   margin: 0;
   padding; 0;
   border:1px solid #aaaaaa;
-  */
   z-index: 0;
 }
 

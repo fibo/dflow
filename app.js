@@ -31,11 +31,22 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 
+app.get('/graph/:id', routes.graph);
+
 var server = http.createServer(app);
 
 server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
 
-var sio     = require('socket.io');
-var io = sio.listen(server);
+var io  = sio.listen(server);
+
+var _socket = io.sockets.on('connection', function (socket) {
+  socket.on('message', function (data) {
+    socket.broadcast.send(data);
+  });
+  socket.on('disconnect', function () {
+    //console.log('disconnect');
+  });
+});
+
