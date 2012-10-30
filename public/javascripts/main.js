@@ -33,7 +33,20 @@ var $addNode = $('dflow-add-node');
 var $cursor = $('dflow-cursor');
 var $graph = $('dflow-graph');
 
+var canvas = document.getElementById('dflow-canvas');
 var graph = document.getElementById('dflow-graph');
+
+canvas.width=400;
+var size = $graph.getSize();
+canvas.width = size.x;
+canvas.height = size.y;
+var context2d = canvas.getContext('2d');
+
+var rect = function () {
+context2d.fillStyle = "rgb(150,29,28)";
+context2d.fillRect(10,10,28,28);
+}
+
 
 // Put $cursor in the middle of $graph.
 $cursor.position({relativeTo:'dflow-graph'});
@@ -71,6 +84,8 @@ $addNode.addEvent('click',function(ev){
 
   var $node = $(nodeDivId);
   $node.makeDraggable({container:$graph});
+
+  rect();
 });
 
 $graph.addEvent('dblclick',function(ev){
