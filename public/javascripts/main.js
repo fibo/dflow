@@ -33,10 +33,14 @@ var $addNode = $('dflow-add-node');
 var $cursor = $('dflow-cursor');
 var $graph = $('dflow-graph');
 
+var doNothing = function () {}
+
 var socket = io.connect();
-socket.on('connect', function () { console.log('connect'); });
-socket.on('addNode', function () { console.log('addNode'); });
-socket.on('disconnect', function () { console.log('disconnect'); });
+socket.on('connect', doNothing);
+socket.on('addNode', function (node) {
+  addNode(node);
+});
+socket.on('disconnect', doNothing);
 
 var canvas = document.getElementById('dflow-canvas');
 var graph = document.getElementById('dflow-graph');
@@ -57,7 +61,22 @@ context2d.fillRect(10,10,28,28);
 $cursor.position({relativeTo:'dflow-graph'});
 $cursor.makeDraggable({container:$graph});
 
-var fakeId = 0;
+var addNode = function (nodeToJSON) {
+  var nodeDivId = 'node-' + nodeToJSON.id;
+  var nodeDiv = document.createElement('div');
+  nodeDiv.id = nodeDivId;
+  nodeDiv.className = 'dflow-node';
+  nodeDiv.style.left = 100 + 'px';
+  nodeDiv.style.top = 100 + 'px';
+  nodeDiv.style.height = 50 + 'px';
+  nodeDiv.style.width = 100 + 'px';
+  graph.appendChild(nodeDiv);
+
+  var $node = $(nodeDivId);
+  $node.makeDraggable({container:$graph});
+
+  rect();
+}
 
 $addNode.addEvent('click', function (ev) {
   ev.stop();
@@ -76,28 +95,15 @@ $addNode.addEvent('click', function (ev) {
   $graph.inject(newNode);
   newNode.show();
   */
-  fakeId++;
-  var nodeDivId = 'node-' + fakeId;
-  var nodeDiv = document.createElement('div');
-  nodeDiv.id = nodeDivId;
-  nodeDiv.className = 'dflow-node';
-  nodeDiv.style.left = 100 + 'px';
-  nodeDiv.style.top = 100 + 'px';
-  nodeDiv.style.height = 50 + 'px';
-  nodeDiv.style.width = 100 + 'px';
-  graph.appendChild(nodeDiv);
+  // Azz, mi da sempre 0, 0 console.log($cursor.getPosition());
 
-  var $node = $(nodeDivId);
-  $node.makeDraggable({container:$graph});
-
-  rect();
-
-  socket.emit('addNode', {id: nodeDivId});
+  // TODO passa la posizione.
+  var node = {};
+  socket.emit('addNode', node);
 });
 
 $graph.addEvent('dblclick', function (ev) {
   ev.stop();
   $cursor.toggle();
 });
-
 

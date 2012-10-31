@@ -25,6 +25,7 @@ describe('Slot', function () {
       // TODO ci sono altri tipi di dato in nodejs?
     });
   });
+
   describe('inheritance:', function () {
     it('is an EventEmitter', function () {
       var slot = new Slot(0);

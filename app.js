@@ -11,6 +11,9 @@ var sio     = require('socket.io');
 
 var app = express();
 
+// Create process.dflow global object.
+require('./index.js');
+
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
@@ -39,16 +42,20 @@ server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
 
-var io  = sio.listen(server);
+var io = sio.listen(server);
+
+var doNothing = function () {}
 
 var _socket = io.sockets.on('connection', function (socket) {
-  socket.on('addNode', function (data) {
-    //socket.broadcast.send(data);
-    console.log('addNode');
-    console.log(data);
+  socket.on('addNode', function (node) {
+    // TODO sarebbe da mettere in un try, nel catch ci metto la notifica
+    // al client che il nodo non e' stato creato.
+    var _node = process.dflow.root.addNode(node);
+    var _nodeToJSON = _node.toJSON();
+    socket.broadcast.emit('addNode', _nodeToJSON);
+    socket.emit('addNode', _nodeToJSON);
   });
-  socket.on('disconnect', function () {
-    //console.log('disconnect');
-  });
+
+  socket.on('disconnect', doNothing);
 });
 
