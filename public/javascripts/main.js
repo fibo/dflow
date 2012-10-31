@@ -33,6 +33,11 @@ var $addNode = $('dflow-add-node');
 var $cursor = $('dflow-cursor');
 var $graph = $('dflow-graph');
 
+var socket = io.connect();
+socket.on('connect', function () { console.log('connect'); });
+socket.on('addNode', function () { console.log('addNode'); });
+socket.on('disconnect', function () { console.log('disconnect'); });
+
 var canvas = document.getElementById('dflow-canvas');
 var graph = document.getElementById('dflow-graph');
 
@@ -50,11 +55,11 @@ context2d.fillRect(10,10,28,28);
 
 // Put $cursor in the middle of $graph.
 $cursor.position({relativeTo:'dflow-graph'});
-//$cursor.makeDraggable({container:$graph});
+$cursor.makeDraggable({container:$graph});
 
 var fakeId = 0;
 
-$addNode.addEvent('click',function(ev){
+$addNode.addEvent('click', function (ev) {
   ev.stop();
   $cursor.hide();
   /*
@@ -86,15 +91,13 @@ $addNode.addEvent('click',function(ev){
   $node.makeDraggable({container:$graph});
 
   rect();
+
+  socket.emit('addNode', {id: nodeDivId});
 });
 
-$graph.addEvent('dblclick',function(ev){
+$graph.addEvent('dblclick', function (ev) {
   ev.stop();
   $cursor.toggle();
 });
 
-var socket = io.connect();
-socket.on('connect', function () { console.log('connect'); });
-socket.on('message', function () { console.log('message'); });
-socket.on('disconnect', function () { console.log('disconnect'); });
 

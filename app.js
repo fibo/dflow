@@ -31,7 +31,7 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 
-app.get('/graph/:id', routes.graph);
+//app.get('/graph/:id', routes.graph);
 
 var server = http.createServer(app);
 
@@ -42,8 +42,10 @@ server.listen(app.get('port'), function(){
 var io  = sio.listen(server);
 
 var _socket = io.sockets.on('connection', function (socket) {
-  socket.on('message', function (data) {
-    socket.broadcast.send(data);
+  socket.on('addNode', function (data) {
+    //socket.broadcast.send(data);
+    console.log('addNode');
+    console.log(data);
   });
   socket.on('disconnect', function () {
     //console.log('disconnect');
