@@ -13,25 +13,16 @@ var dummy = {task: doNothing};
 
 describe('Node', function () {
   describe('constructor:', function () {
-    it('requires a task function', function () {
-      var newNode1 = function () { new Node(); }
-      assert.throws(newNode1, Error);
-
-      var newNode2 = function () { new Node({}); }
-      assert.throws(newNode2, Error);
-
-      var newNode3 = function () { new Node({task:'foo'}); }
-      assert.throws(newNode3, Error);
-
-      var newNode4 = function () { new Node(dummy); }
-      assert.doesNotThrow(newNode4, Error);
+    describe('arg task', function () {
+      it('defaults to a dummy function', function () {
+        var node = new Node();
+        assert.ok(node instanceof Node);
+      });
     });
 
     it('does not require ins and outs, which default to []', function () {
-      var newNode = function () { new Node(dummy); }
-      assert.doesNotThrow(newNode, Error);
+      var node = new Node();
 
-      var node = new Node(dummy);
       assert.deepEqual(node.getIns(), []);
       assert.deepEqual(node.getOuts(), []);
     });
@@ -48,5 +39,26 @@ describe('Node', function () {
       assert.ok(node instanceof EventEmitter);
     });
   });
+
+  describe('', function () {
+    it('', function () {
+    });
+  });
+
+  describe('getIns', function () {
+    it('', function () {
+    });
+  });
+
+  describe('getOuts', function () {
+    it('', function () {
+    });
+  });
+
+  describe('toJSON', function () {
+    it('', function () {
+    });
+  });
+
 });
 
