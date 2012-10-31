@@ -1,4 +1,7 @@
 
+var Element = require('./lib/Element.js');
+exports.Element = Element;
+
 var Node = require('./lib/Node.js');
 exports.Node = Node;
 
