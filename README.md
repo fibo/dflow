@@ -6,13 +6,17 @@ dataflow programming for node.js
 ## Description
 
 
-dflow is a minimal implementation of dataflow programming.
+`dflow` is a minimal implementation of dataflow programming.
 
 ## Synopsis
 
     require('dflow');
 
-    //process.dflow;
+    process.dflow.root.addNode({
+      task: function () {
+        console.log('hello world');
+      }
+    });
 
 ## Note
 
