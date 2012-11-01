@@ -47,13 +47,16 @@ var io = sio.listen(server);
 var doNothing = function () {}
 
 var _socket = io.sockets.on('connection', function (socket) {
-  socket.on('addNode', function (node) {
+  socket.on('addNode', function (node, fn) {
+    fn('ok');
     // TODO sarebbe da mettere in un try, nel catch ci metto la notifica
     // al client che il nodo non e' stato creato.
     var _node = process.dflow.root.addNode(node);
-    var _nodeToJSON = _node.toJSON();
-    socket.broadcast.emit('addNode', _nodeToJSON);
-    socket.emit('addNode', _nodeToJSON);
+    var id = _node.getId();
+    var nodeToJSON = {}; // _node.toJSON();
+    _node.draw = function (x) { console.log(x); }
+    socket.emit('addNode', id); // , function (d) { _node.draw(d) });
+    socket.broadcast.emit('addNode', id); // , function (d) { _node.draw(d); });
   });
 
   socket.on('disconnect', doNothing);
