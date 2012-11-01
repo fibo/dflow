@@ -21,7 +21,7 @@ describe('Element', function () {
     });
   });
 
-  describe('getId', function () {
+  describe('getId()', function () {
     it('returns the element id', function () {
       var element = new Element();
       assert.ok(typeof element.getId() == 'number');

@@ -46,7 +46,7 @@ describe('Out', function () {
     });
   });
 
-  describe('setData(<*>)', function () {
+  describe('setData(<Any>)', function () {
     it('accepts number', function () {
       var out1 = new Out();
       out1.setData(1);
@@ -60,7 +60,10 @@ describe('Out', function () {
       //assert.deepEqual(out1.getData(), data);
     });
   });
+
+  describe('toJSON()', function () {
+    it('', function () {
+    });
+  });
 });
-
-
 

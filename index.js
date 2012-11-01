@@ -5,9 +5,6 @@ exports.Element = Element;
 var Node = require('./lib/Node.js');
 exports.Node = Node;
 
-var Edge = require('./lib/Edge.js');
-exports.Edge = Edge;
-
 var In = require('./lib/In.js');
 exports.In = In;
 
