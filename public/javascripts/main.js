@@ -37,8 +37,12 @@ var doNothing = function () {}
 
 var socket = io.connect();
 socket.on('connect', doNothing);
-socket.on('addNode', function (node) {
+//socket.on('addNode', function (id, fn) {
+socket.on('addNode', function (id) {
+  var node = {};
+  node.id = id;
   addNode(node);
+  //fn(document);
 });
 socket.on('disconnect', doNothing);
 
@@ -99,7 +103,7 @@ $addNode.addEvent('click', function (ev) {
 
   // TODO passa la posizione.
   var node = {};
-  socket.emit('addNode', node);
+  socket.emit('addNode', node, function (foo) {console.log(foo);});
 });
 
 $graph.addEvent('dblclick', function (ev) {

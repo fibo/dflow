@@ -40,22 +40,25 @@ describe('Node', function () {
     });
   });
 
-  describe('', function () {
+  describe('getId()', function () {
+    it('', function () {
+      var node = new Node();
+      var id = node.getId();
+      assert.ok(typeof id == 'number');
+    });
+  });
+
+  describe('getIns()', function () {
     it('', function () {
     });
   });
 
-  describe('getIns', function () {
+  describe('getOuts()', function () {
     it('', function () {
     });
   });
 
-  describe('getOuts', function () {
-    it('', function () {
-    });
-  });
-
-  describe('toJSON', function () {
+  describe('toJSON()', function () {
     it('', function () {
     });
   });
