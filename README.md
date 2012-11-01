@@ -3,8 +3,11 @@ dflow
 
 dataflow programming for node.js
 
-## Description
+# Installation
 
+    npm install dflow
+
+# Description
 
 `dflow` is a minimal implementation of dataflow programming.
 
@@ -18,20 +21,23 @@ dataflow programming for node.js
       }
     });
 
-## Note
+    process.dflow.root.emit('task');
 
- * Avvio il server e creo la root che e' un elemento
- * Clicco e creo un elemento sul server e un div sul client,
-   dentro il div ci sono quattro tasti, con le scelte
-     * graph
-     * node
-     * in
-     * out
+# Documentation
 
-Posso creare quindi gli elementi, poi cliccarci dentro ed editarli.
+See the [Wiki] (https://github.com/fibo/dflow/wiki).
 
-Sotto ci deve essere un canvas che aggiunge un po di grafica,
-ad esempio curve di bezier per i link
+# Development
 
-Segna nel disclaimer che  dflow e' alpha e che per ora supporto solo chrome.
+## Testing
+
+Install mocha globally
+
+    npm install mocha -g
+
+Then run tests
+
+    npm test
+
+( and say hello to the nyan cat :)
 

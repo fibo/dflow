@@ -7,9 +7,9 @@ var dflow = require('../index.js');
 var Element = dflow.Element;
 var Node    = dflow.Node;
 
-var doNothing = function () {}
+var emptyTask = function () {}
 
-var dummy = {task: doNothing};
+var dummy = {task: emptyTask};
 
 describe('Node', function () {
   describe('constructor:', function () {
@@ -48,6 +48,16 @@ describe('Node', function () {
     });
   });
 
+  describe('runTask()', function () {
+    it('returns true if node run its task', function () {
+      var node = new Node();
+
+      node.emit('task');
+
+      assert.ok(node.runTask());
+    });
+  });
+
   describe('getIns()', function () {
     it('', function () {
     });
@@ -62,6 +72,5 @@ describe('Node', function () {
     it('', function () {
     });
   });
-
 });
 

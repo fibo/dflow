@@ -22,6 +22,11 @@ describe('Graph', function () {
   });
 
   describe('inheritance:', function () {
+    it('is a Node', function () {
+      var graph = new Graph();
+      assert.ok(graph instanceof Node);
+    });
+
     it('is an Element', function () {
       var graph = new Graph();
       assert.ok(graph instanceof Element);

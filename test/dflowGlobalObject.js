@@ -6,10 +6,16 @@ var pkg = require('../package.json');
 
 var Graph = dflow.Graph;
 
+var df = process.dflow;
+
 describe('process.dflow', function () {
-  describe('version', function () {
-    it('holds the package version number', function () {
-      assert.equal(process.dflow.version, pkg.version);
+  describe('info', function () {
+    var info = df.info;
+
+    describe('version', function () {
+      it('holds the package version number', function () {
+        assert.equal(info.version, pkg.version);
+      });
     });
   });
 

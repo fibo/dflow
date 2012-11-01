@@ -9,6 +9,8 @@ describe('synopsis', function () {
         console.log('hello world');
       }
     });
+
+    process.dflow.root.emit('task');
 });
 
 
