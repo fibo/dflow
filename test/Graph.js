@@ -1,11 +1,12 @@
 
 var assert = require('assert');
-//var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require('events').EventEmitter;
 
 var dflow = require('../index.js');
 
-var Graph = dflow.Graph;
-var Node  = dflow.Node;
+var Element = dflow.Element;
+var Graph   = dflow.Graph;
+var Node    = dflow.Node;
 
 describe('Graph', function () {
   describe('constructor:', function () {
@@ -20,37 +21,49 @@ describe('Graph', function () {
     });
   });
 
-  describe('getNodes()', function () {
-    it('', function () {
+  describe('inheritance:', function () {
+    it('is an Element', function () {
       var graph = new Graph();
-      var arg = {
-        task: function () {
-          graph.emit('task');
-        }
-      };
-      graph.addNode(arg);
-      graph.addNode(arg);
-      graph.addNode(arg);
+      assert.ok(graph instanceof Element);
+    });
+
+    it('is an EventEmitter', function () {
+      var graph = new Graph();
+      assert.ok(graph instanceof EventEmitter);
+    });
+  });
+
+  describe('getNodes()', function () {
+    it('returns the nodes in the graph', function () {
+      var graph = new Graph();
+
+      var node1 = graph.addNode();
+      var node2 = graph.addNode();
+      var node3 = graph.addNode();
 
       var nodes = graph.getNodes();
 
-      assert.equal(nodes.length, 3);
+      assert.deepEqual(graph.getNodes(), [node1, node2, node3]);
     });
   });
 
   describe('addNode(<Object>)', function () {
-    it('coerces Object to Node', function () {
+    it('creates an empty node if no arg is provided', function () {
       var graph = new Graph();
-      var arg = {
-        task: function () {
-          graph.emit('task');
-        }
-      };
-      graph.addNode(arg);
 
-      var nodes = graph.getNodes();
+      var node = graph.addNode();
 
-      assert.ok(nodes[0] instanceof Node);
+      assert.ok(node instanceof Node);
+    });
+  });
+
+  describe('delNode(<number>)', function () {
+    it('', function () {
+    });
+  });
+
+  describe('toJSON()', function () {
+    it('', function () {
     });
   });
 });
