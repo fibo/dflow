@@ -49,5 +49,10 @@ describe('In', function () {
     it('', function () {
     });
   });
+
+  describe('toJSON()', function () {
+    it('', function () {
+    });
+  });
 });
 
