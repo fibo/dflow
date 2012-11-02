@@ -20,7 +20,7 @@ describe('process.dflow', function () {
   });
 
   describe('root', function () {
-    var root = process.dflow.root;
+    var root = df.root;
 
     it('is a Graph', function () {
       assert.ok(root instanceof Graph);
@@ -28,6 +28,7 @@ describe('process.dflow', function () {
 
     it('has id = 0', function () {
       assert.equal(root.getId(), 0);
+      assert.ok(df.getElementById(0) === root);
     });
   });
 });

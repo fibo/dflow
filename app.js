@@ -14,6 +14,8 @@ var app = express();
 // Create process.dflow global object.
 require('./index.js');
 
+var df = process.dflow;
+
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
@@ -36,6 +38,8 @@ app.get('/', routes.index);
 
 //app.get('/graph/:id', routes.graph);
 
+//app.get('/graph/:id', routes.graph);
+
 var server = http.createServer(app);
 
 server.listen(app.get('port'), function(){
@@ -47,16 +51,21 @@ var io = sio.listen(server);
 var doNothing = function () {}
 
 var _socket = io.sockets.on('connection', function (socket) {
+  socket.on('draw', function (clientId, draw) {
+    console.log(clientId); // YES it works
+    var rootToJSON = df.root.toJSON();
+    draw(rootToJSON);
+  });
+
   socket.on('addNode', function (node, fn) {
-    fn('ok');
     // TODO sarebbe da mettere in un try, nel catch ci metto la notifica
     // al client che il nodo non e' stato creato.
     var _node = process.dflow.root.addNode(node);
     var id = _node.getId();
-    var nodeToJSON = {}; // _node.toJSON();
-    _node.draw = function (x) { console.log(x); }
-    socket.emit('addNode', id); // , function (d) { _node.draw(d) });
-    socket.broadcast.emit('addNode', id); // , function (d) { _node.draw(d); });
+    var nodeToJSON = _node.toJSON();
+    //_node.draw = function (x) { console.log(x); }
+    socket.emit('addNode', nodeToJSON); // , function (d) { _node.draw(d) });
+    socket.broadcast.emit('addNode', nodeToJSON); // , function (d) { _node.draw(d); });
   });
 
   socket.on('disconnect', doNothing);

@@ -35,21 +35,33 @@ var $graph = $('dflow-graph');
 
 var doNothing = function () {}
 
+var draw = function (rootToJSON) {
+
+    console.log(rootToJSON);
+  //for (var i in nodes) {
+  //  var node = nodes[i];
+    //addNode(nodes[i]);
+  //}
+}
+
 var socket = io.connect();
-socket.on('connect', doNothing);
+socket.on('connect', function () {
+});
 //socket.on('addNode', function (id, fn) {
-socket.on('addNode', function (id) {
-  var node = {};
-  node.id = id;
-  addNode(node);
+socket.on('addNode', function (nodeToJSON) {
+  addNode(nodeToJSON);
   //fn(document);
 });
 socket.on('disconnect', doNothing);
 
+  socket.emit('draw', 'myself', function (root) {
+    draw(root);
+  });
+
 var canvas = document.getElementById('dflow-canvas');
 var graph = document.getElementById('dflow-graph');
 
-canvas.width=400;
+//canvas.width=400;
 var size = $graph.getSize();
 canvas.width = size.x;
 canvas.height = size.y;
@@ -66,10 +78,14 @@ $cursor.position({relativeTo:'dflow-graph'});
 $cursor.makeDraggable({container:$graph});
 
 var addNode = function (nodeToJSON) {
-  var nodeDivId = 'node-' + nodeToJSON.id;
+  var id = nodeToJSON.id;
+
   var nodeDiv = document.createElement('div');
+  var nodeDivId = 'node-' + id;
+
   nodeDiv.id = nodeDivId;
   nodeDiv.className = 'dflow-node';
+  //nodeDiv.style.left = nodeToJSON.style.left;
   nodeDiv.style.left = 100 + 'px';
   nodeDiv.style.top = 100 + 'px';
   nodeDiv.style.height = 50 + 'px';
@@ -77,6 +93,7 @@ var addNode = function (nodeToJSON) {
   graph.appendChild(nodeDiv);
 
   var $node = $(nodeDivId);
+  $node.appendText('Node'+nodeToJSON.id);
   $node.makeDraggable({container:$graph});
 
   rect();
@@ -103,7 +120,7 @@ $addNode.addEvent('click', function (ev) {
 
   // TODO passa la posizione.
   var node = {};
-  socket.emit('addNode', node, function (foo) {console.log(foo);});
+  socket.emit('addNode', node);
 });
 
 $graph.addEvent('dblclick', function (ev) {

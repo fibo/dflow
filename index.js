@@ -17,16 +17,10 @@ exports.Graph = Graph;
 var Slot = require('./lib/Slot.js');
 exports.Slot = Slot;
 
-var dflow = {};
-
-var pkg = require('./package.json');
-dflow.info = {
-  version: pkg.version
-};
-
-dflow.elements = [];
+var dflow = require('./lib/Global.js');
 
 //Create a global dflow graph, a.k.a root.
 dflow.root = new Graph();
+
 process.dflow = dflow;
 
