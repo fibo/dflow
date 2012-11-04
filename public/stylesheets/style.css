@@ -9,6 +9,19 @@ a {
   color: #00B7FF;
 }
 
+#menu {
+  height: 50px;
+  width: 100%;
+}
+
+#container {
+  margin: 0;
+  padding; 0;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
 #dflow-canvas {
   position: relative;
   left: 0;
@@ -48,7 +61,7 @@ a {
   top: 25px;
 }
 
-.dflow-node {
+.dflow-box {
   position: absolute;
   margin: 0;
   padding; 0;
@@ -56,6 +69,15 @@ a {
   z-index: 0;
 }
 
+/*
+.dflow-node {
+  position: absolute;
+  margin: 0;
+  padding; 0;
+  border:1px solid #aaaaaa;
+  z-index: 0;
+}
+*/
 #dflow-cursor {
   margin: 0;
   padding; 0;
@@ -67,6 +89,7 @@ a {
   z-index: 0;
 }
 
+/*
 #dflow-graph {
   top: 100px;
   left: 0;
@@ -77,4 +100,4 @@ a {
   height: 50%;
   width: 100%;
 }
-
+*/
