@@ -2,10 +2,9 @@ extends layout
 
 block content
   #dflow-graph
-    // TODO prova a disegnare nel canvas
-    canvas(id='dflow-canvas', width='200', height='200')
+    canvas(id='dflow-canvas')
 
-    #dflow-cursor(class='dflow-node', draggable='true')
+    #dflow-cursor
       #dflow-add-graph(class='dflow-cursor-choice') G
       #dflow-add-node(class='dflow-cursor-choice') N
       #dflow-add-out(class='dflow-cursor-choice') O

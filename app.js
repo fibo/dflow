@@ -38,8 +38,6 @@ app.get('/', routes.index);
 
 //app.get('/graph/:id', routes.graph);
 
-//app.get('/graph/:id', routes.graph);
-
 var server = http.createServer(app);
 
 server.listen(app.get('port'), function(){
@@ -57,15 +55,11 @@ var _socket = io.sockets.on('connection', function (socket) {
     draw(rootToJSON);
   });
 
-  socket.on('addNode', function (node, fn) {
-    // TODO sarebbe da mettere in un try, nel catch ci metto la notifica
-    // al client che il nodo non e' stato creato.
-    var _node = process.dflow.root.addNode(node);
-    var id = _node.getId();
-    var nodeToJSON = _node.toJSON();
-    //_node.draw = function (x) { console.log(x); }
-    socket.emit('addNode', nodeToJSON); // , function (d) { _node.draw(d) });
-    socket.broadcast.emit('addNode', nodeToJSON); // , function (d) { _node.draw(d); });
+  socket.on('addNode', function (arg) {
+    var node = process.dflow.root.addNode(arg);
+    var nodeToJSON = node.toJSON();
+    socket.emit('addNode', nodeToJSON);
+    socket.broadcast.emit('addNode', nodeToJSON);
   });
 
   socket.on('disconnect', doNothing);
