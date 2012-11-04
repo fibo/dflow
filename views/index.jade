@@ -1,12 +1,12 @@
 extends layout
 
 block content
-  #dflow-graph
-    canvas(id='dflow-canvas')
+  script
 
-    #dflow-cursor
-      #dflow-add-graph(class='dflow-cursor-choice') G
-      #dflow-add-node(class='dflow-cursor-choice') N
-      #dflow-add-out(class='dflow-cursor-choice') O
-      #dflow-add-in(class='dflow-cursor-choice') I
+    var graph = new Graph({
+      id: 0,
+      parentId: 'container',
+      position: {x: 0, y: 0},
+      size: {height: '100%', width: '100%'}
+    });
 
