@@ -19,7 +19,7 @@ exports.Slot = Slot;
 
 var dflow = require('./lib/Global.js');
 
-//Create a global dflow graph, a.k.a root.
+// Create a global dflow graph, a.k.a root.
 dflow.root = new Graph();
 
 process.dflow = dflow;

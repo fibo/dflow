@@ -52,7 +52,7 @@ describe('Graph', function () {
     });
   });
 
-  describe('addNode(<Object>)', function () {
+  describe('addNode()', function () {
     it('creates an empty node if no arg is provided', function () {
       var graph = new Graph();
 
@@ -62,7 +62,7 @@ describe('Graph', function () {
     });
   });
 
-  describe('delNode(<number>)', function () {
+  describe('delNode()', function () {
     it('', function () {
     });
   });

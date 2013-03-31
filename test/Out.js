@@ -23,16 +23,11 @@ describe('Out', function () {
     it('', function () {
       var out1 = new Out({data: 1});
       assert.ok(out1.isON());
-
-      var out1 = new Out({data: 1});
-      assert.ok(out1.isON());
     });
   });
 
   describe('isOFF()', function () {
     it('', function () {
-      var out1 = new Out();
-      assert.ok(out1.isOFF());
     });
   });
 
@@ -41,12 +36,12 @@ describe('Out', function () {
     });
   });
 
-  describe('connectTo(<In>)', function () {
+  describe('connectTo()', function () {
     it('', function () {
     });
   });
 
-  describe('setData(<Any>)', function () {
+  describe('setData()', function () {
     it('accepts number', function () {
       var out1 = new Out();
       out1.setData(1);

@@ -21,7 +21,9 @@ describe('Slot', function () {
       var slot4 = new Slot({data:{}});
       assert.ok(slot4 instanceof Slot);
 
-      // TODO ha senso che data sia una funzione?
+      var slot5 = new Slot({data:function () {}});
+      assert.ok(slot5 instanceof Slot);
+
       // TODO ci sono altri tipi di dato in nodejs?
     });
   });
