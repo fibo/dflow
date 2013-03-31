@@ -48,13 +48,13 @@ describe('Node', function () {
     });
   });
 
-  describe('runTask()', function () {
+  describe('hasRunTask()', function () {
     it('returns true if node run its task', function () {
       var node = new Node();
 
       node.emit('task');
 
-      assert.ok(node.runTask());
+      assert.ok(node.hasRunTask());
     });
   });
 
