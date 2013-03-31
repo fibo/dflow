@@ -1,26 +1,28 @@
 
-var Element = require('./lib/Element.js');
-exports.Element = Element;
+// Keep dflow as minimal as possible. Less is more.
 
-var Node = require('./lib/Node.js');
-exports.Node = Node;
+var Element = require('./lib/Element.js')
+exports.Element = Element
 
-var In = require('./lib/In.js');
-exports.In = In;
+var Node = require('./lib/Node.js')
+exports.Node = Node
 
-var Out = require('./lib/Out.js');
-exports.Out = Out;
+var In = require('./lib/In.js')
+exports.In = In
 
-var Graph = require('./lib/Graph.js');
-exports.Graph = Graph;
+var Out = require('./lib/Out.js')
+exports.Out = Out
 
-var Slot = require('./lib/Slot.js');
-exports.Slot = Slot;
+var Graph = require('./lib/Graph.js')
+exports.Graph = Graph
 
-var dflow = require('./lib/Global.js');
+var Slot = require('./lib/Slot.js')
+exports.Slot = Slot
 
-// Create a global dflow graph, a.k.a root.
-dflow.root = new Graph();
+var dflow = require('./lib/Global.js')
 
-process.dflow = dflow;
+// Create a global dflow graph, a.k.a. root.
+dflow.root = new Graph()
+
+process.dflow = dflow
 
