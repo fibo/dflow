@@ -1,16 +1,15 @@
 
-var assert = require('assert');
+var assert = require('assert')
 
 describe('synopsis', function () {
-    require('../index.js');
+    require('../index.js')
 
     process.dflow.root.addNode({
       task: function () {
-        console.log('hello world');
+        console.log('hello world')
       }
-    });
+    })
 
-    process.dflow.root.emit('task');
-});
-
+    process.dflow.root.emit('task')
+})
 

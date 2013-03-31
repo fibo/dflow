@@ -1,31 +1,50 @@
 
-var assert = require('assert');
-var EventEmitter = require('events').EventEmitter;
+var assert       = require('assert')
+var EventEmitter = require('events').EventEmitter
 
-var dflow = require('../index.js');
+var dflow = require('../index.js')
 
-var Element = dflow.Element;
+var Element = dflow.Element
+
+var element = new Element()
 
 describe('Element', function () {
-  describe('constructor:', function () {
+  describe('Constructor', function () {
     it('works', function () {
-      var element = new Element();
-      assert.ok(element instanceof Element);
-    });
-  });
+      assert.ok(element instanceof Element)
+    })
+  })
 
-  describe('inheritance:', function () {
+  describe('Inheritance', function () {
     it('is an EventEmitter', function () {
-      var element = new Element();
-      assert.ok(element instanceof EventEmitter);
-    });
-  });
+      assert.ok(element instanceof EventEmitter)
+    })
+  })
 
-  describe('getId()', function () {
-    it('returns the element id', function () {
-      var element = new Element();
-      assert.ok(typeof element.getId() == 'number');
-    });
-  });
-});
+
+  describe('Methods', function () {
+    describe('clone()', function () {
+      it('returns a copy of the object', function () {
+      })
+    })
+
+    describe('getId()', function () {
+      it('returns the element id', function () {
+        assert.ok(typeof element.getId() === 'number')
+      })
+    })
+
+    describe('elemntToJSON()', function () {
+      it('returns element in JSON format', function () {
+        var json = {}
+        json.id = element.getId()
+        assert.deepEqual(element.toJSON(),json)
+      })
+    })
+
+    describe('toJSON()', function () {
+      it('is an alias of elementToJSON')
+    })
+  })
+})
 
