@@ -15,6 +15,14 @@ describe('Slot', function () {
       var slot = new Slot()
       assert.ok(slot instanceof Slot)
     })
+
+    describe('arguments', function () {
+      describe('data', function () {
+        it('defaults to undefined',function () {
+          assert.ok(typeof slot.getData() === 'undefined')
+        })
+      })
+    })
   })
 
   describe('Inheritance', function () {
@@ -25,22 +33,78 @@ describe('Slot', function () {
 
   describe('Methods', function () {
     describe('getData()', function () {
-      it('', function () {
+      it('returns the slot data', function () {
+        var data
+          , slot
+
+        data = 1
+        slot = new Slot({data: data})
+        assert.equal(slot.getData(), data)
+
+        data = 'xxx'
+        slot = new Slot({data: data})
+        assert.equal(slot.getData(), data)
       })
     })
 
-    describe('getName()', function () {
-      it('', function () {
+    describe('getType()', function () {
+      it('returns the slot data type', function () {
+        var data
+          , slot
+
+        data = 1
+        slot = new Slot({data: data})
+        assert.equal(slot.getType(), typeof data)
+
+        data = 'xxx'
+        slot = new Slot({data: data})
+        assert.equal(slot.getType(), typeof data)
       })
+    })
+
+    describe('setData()', function () {
+      it('set the slot data', function () {
+        var data
+          , slot
+
+        data = 1
+        slot = new Slot()
+        slot.setData(data)
+        assert.equal(slot.getData(), data)
+
+        data = 'xxx'
+        slot = new Slot()
+        slot.setData(data)
+        assert.equal(slot.getData(), data)
+      })
+
+      it('does not change data type', function() {
+        var dataNumber
+          , dataString
+          , slot
+
+        dataNumber = 1
+        dataString = 'xxx'
+        slot = new Slot({data: dataNumber})
+        slot.setData(dataString)
+        assert.equal(slot.getData(), dataNumber)
+      })
+
+      it('emits *data* events')
     })
 
     describe('slotToJSON()', function () {
       it('returns slot in JSON format', function () {
-        var slot = new Slot({data: 1, name: 'foo'})
+        var data = 1
+        var name = 'foo'
+        var slot = new Slot({
+          data: data,
+          name: name
+        })
         var json = {}
         json.id   = slot.getId()
-        json.data = slot.getData()
-        json.name = slot.getName()
+        json.data = data
+        json.name = name
         assert.deepEqual(slot.slotToJSON(),json)
       })
     })

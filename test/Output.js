@@ -14,6 +14,20 @@ describe('Output', function () {
       var output = new Output()
       assert.ok(output instanceof Output)
     })
+
+    describe('arguments', function () {
+      describe('init', function () {
+        it('defaults to true',function () {
+          assert.ok(output.isON())
+        })
+      })
+
+      describe('targets', function () {
+        it('defaults to []',function () {
+          assert.deepEqual(output.getTargets(), [])
+        })
+      })
+    })
   })
 
   describe('Inheritance', function () {
@@ -24,29 +38,25 @@ describe('Output', function () {
 
   describe('Methods', function () {
     describe('isON()', function () {
-      it('defaults to true', function () {
+      it('returns true if output is ON', function () {
         assert.ok(output.isON())
       })
     })
    
     describe('isOFF()', function () {
-      it('', function () {
-      })
+      it('returns true if output is OFF')
     })
    
     describe('getTargets()', function () {
-      it('', function () {
-      })
+      it('returns output targets')
     })
    
     describe('connectTo()', function () {
-      it('', function () {
-      })
+      it('connects output to an input target')
     })
    
     describe('outputToJSON()', function () {
-      it('', function () {
-      })
+      it('returns output in JSON format')
     })
 
     describe('toJSON()', function () {
