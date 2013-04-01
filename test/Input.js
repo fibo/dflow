@@ -15,7 +15,16 @@ describe('Input', function () {
       assert.ok(input instanceof Input)
     })
 
-    it('throws Error if no name and or no data is passed', function () {
+    describe('arguments', function () {
+      describe('source', function () {
+        it('defaults to undefined',function () {
+          assert.ok(typeof input.getSource() === 'undefined')
+        })
+
+        it('must be an Output')
+      })
+    })
+//    it('throws Error if no name and or no data is passed', function () {
       //var newIn1 = function () { new In() }
       //assert.throws(newIn1, Error)
       //var _in = new In({data:0,name:'xx'})console.log(_in.toJSON())
@@ -28,7 +37,7 @@ describe('Input', function () {
 
       //var newIn4 = function () { new In({name:'foo'}) }
       //assert.throws(newIn4, Error)
-    })
+ //   })
   })
 
   describe('Inheritance', function () {
@@ -37,23 +46,27 @@ describe('Input', function () {
     })
   })
 
-  describe('getSource()', function () {
-    it('', function () {
+  describe('Methods', function () {
+    describe('getData()', function () {
+      it('delegates to source.getData')
     })
-  })
 
-  describe('getData()', function () {
-    it('', function () {
+    describe('getSource()', function () {
+      it('returns the input source')
     })
-  })
 
-  describe('setData()', function () {
-    it('', function () {
+    describe('setSource()', function () {
+      it('sets input source')
     })
-  })
 
-  describe('toJSON()', function () {
-    it('', function () {
+    describe('inputToJSON()', function () {
+      it('returns input in JSON format')
+    })
+
+    describe('toJSON()', function () {
+      it('is an alias of inputToJSON', function () {
+        assert.ok(input.toJSON === input.inputToJSON)
+      })
     })
   })
 })

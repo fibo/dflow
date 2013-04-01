@@ -16,15 +16,22 @@ describe('Node', function () {
       assert.ok(node instanceof Node)
     })
 
-    describe('arg task', function () {
-      it('defaults to a dummy function')
-    })
+    describe('arguments', function () {
+      describe('task', function () {
+        it('defaults to an empty function')
+      })
 
-    it('does not require ins and outs, which default to []', function () {
-      var node = new Node()
+      describe('inputs', function () {
+        it('defaults to []', function () {
+          assert.deepEqual(node.getInputs(), [])
+        })
+      })
 
-      assert.deepEqual(node.getInputs(), [])
-      assert.deepEqual(node.getOutputs(), [])
+      describe('outputs', function () {
+        it('defaults to []', function () {
+          assert.deepEqual(node.getOutputs(), [])
+        })
+      })
     })
   })
 
@@ -34,36 +41,41 @@ describe('Node', function () {
     })
   })
 
-  describe('getId()', function () {
-    it('', function () {
-      var node = new Node()
-      var id = node.getId()
-      assert.ok(typeof id == 'number')
+  describe('Events', function () {})
+
+  describe('Methods', function () {
+    describe('getId()', function () {
+      it('', function () {
+        var node = new Node()
+        var id = node.getId()
+        assert.ok(typeof id == 'number')
+      })
     })
-  })
 
-  describe('hasRunTask()', function () {
-    it('returns true if node run its task', function () {
-      var node = new Node()
-
-      node.emit('task')
-
-      assert.ok(node.hasRunTask())
+    describe('hasRunTask()', function () {
+      it('returns true if node run its task', function () {
+        var node = new Node()
+        node.emit('task')
+        assert.ok(node.hasRunTask())
+      })
     })
-  })
 
-  describe('getIns()', function () {
-    it('', function () {
+    describe('getInputs()', function () {
+      it('returns the node inputs')
     })
-  })
 
-  describe('getOuts()', function () {
-    it('', function () {
+    describe('getOutputs()', function () {
+      it('returns the node outputs')
     })
-  })
 
-  describe('toJSON()', function () {
-    it('', function () {
+    describe('nodeToJSON()', function () {
+      it('returns the node in JSON format')
+    })
+
+    describe('toJSON()', function () {
+      it('is an alias of nodeToJSON', function () {
+        assert.ok(node.toJSON === node.nodeToJSON)
+      })
     })
   })
 })
