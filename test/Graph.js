@@ -13,63 +13,58 @@ var graph = new Graph()
 describe('Graph', function () {
   describe('Constructor', function () {
     it('requires no argument', function () {
+      var graph = new Graph()
       assert.ok(graph instanceof Graph)
     })
 
     it('nodes defaults to []', function () {
-      var graph = new Graph()
       assert.deepEqual(graph.getNodes(), [])
     })
   })
 
-  describe('inheritance:', function () {
+  describe('Inheritance', function () {
     it('is a Node', function () {
-      var graph = new Graph()
       assert.ok(graph instanceof Node)
     })
-
-    it('is an Element', function () {
-      var graph = new Graph()
-      assert.ok(graph instanceof Element)
-    })
-
-    it('is an EventEmitter', function () {
-      var graph = new Graph()
-      assert.ok(graph instanceof EventEmitter)
-    })
   })
 
-  describe('getNodes()', function () {
-    it('returns the nodes in the graph', function () {
-      var graph = new Graph()
-
-      var node1 = graph.addNode()
-      var node2 = graph.addNode()
-      var node3 = graph.addNode()
-
-      var nodes = graph.getNodes()
-
-      assert.deepEqual(graph.getNodes(), [node1, node2, node3])
+  describe('Methods', function () {
+    describe('getNodes()', function () {
+      it('returns the nodes in the graph', function () {
+        var graph = new Graph()
+   
+        var node1 = graph.addNode()
+        var node2 = graph.addNode()
+        var node3 = graph.addNode()
+   
+        assert.deepEqual(graph.getNodes(), [node1, node2, node3])
+      })
     })
-  })
-
-  describe('addNode()', function () {
-    it('creates an empty node if no arg is provided', function () {
-      var graph = new Graph()
-
-      var node = graph.addNode()
-
-      assert.ok(node instanceof Node)
+   
+    describe('addNode()', function () {
+      it('creates an empty node if no arg is provided', function () {
+        var graph = new Graph()
+   
+        var node = graph.addNode()
+   
+        assert.ok(node instanceof Node)
+      })
     })
-  })
-
-  describe('delNode()', function () {
-    it('', function () {
+   
+    describe('delNode()', function () {
+      it('', function () {
+      })
     })
-  })
+   
+    describe('graphToJSON()', function () {
+      it('', function () {
+      })
+    })
 
-  describe('toJSON()', function () {
-    it('', function () {
+    describe('toJSON()', function () {
+      it('is an alias of graphToJSON', function () {
+        assert.ok(graph.toJSON === graph.graphToJSON)
+      })
     })
   })
 })

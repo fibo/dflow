@@ -10,7 +10,8 @@ var output = new Output()
 
 describe('Output', function () {
   describe('Constructor', function () {
-    it('works', function () {
+    it('requires no argument', function () {
+      var output = new Output()
       assert.ok(output instanceof Output)
     })
   })
@@ -21,29 +22,37 @@ describe('Output', function () {
     })
   })
 
-  describe('isON()', function () {
-    it('defaults to true', function () {
-      assert.ok(output.isON())
+  describe('Methods', function () {
+    describe('isON()', function () {
+      it('defaults to true', function () {
+        assert.ok(output.isON())
+      })
     })
-  })
-
-  describe('isOFF()', function () {
-    it('', function () {
+   
+    describe('isOFF()', function () {
+      it('', function () {
+      })
     })
-  })
-
-  describe('getTargets()', function () {
-    it('', function () {
+   
+    describe('getTargets()', function () {
+      it('', function () {
+      })
     })
-  })
-
-  describe('connectTo()', function () {
-    it('', function () {
+   
+    describe('connectTo()', function () {
+      it('', function () {
+      })
     })
-  })
+   
+    describe('outputToJSON()', function () {
+      it('', function () {
+      })
+    })
 
-  describe('toJSON()', function () {
-    it('', function () {
+    describe('toJSON()', function () {
+      it('is an alias of outputToJSON', function () {
+        assert.ok(output.toJSON === output.outputToJSON)
+      })
     })
   })
 })
