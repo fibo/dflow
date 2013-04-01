@@ -11,25 +11,9 @@ var slot = new Slot()
 
 describe('Slot', function () {
   describe('Constructor', function () {
-    it('requires data arg', function () {
-// TODO aggiorna questi test, lo Slot ammette anche la mancanza di dato ora
-// però non posso cambiare il tipo di dato, a meno che non sia undefined
-      var slot1 = new Slot({data:2})
-      assert.ok(slot1 instanceof Slot)
-
-      var slot2 = new Slot({data:'xx'})
-      assert.ok(slot2 instanceof Slot)
-
-      var slot3 = new Slot({data:[]})
-      assert.ok(slot3 instanceof Slot)
-
-      var slot4 = new Slot({data:{}})
-      assert.ok(slot4 instanceof Slot)
-
-      var slot5 = new Slot({data:function () {}})
-      assert.ok(slot5 instanceof Slot)
-
-      // TODO ci sono altri tipi di dato in nodejs?
+    it('requires no arguments', function () {
+      var slot = new Slot()
+      assert.ok(slot instanceof Slot)
     })
   })
 
@@ -62,9 +46,10 @@ describe('Slot', function () {
     })
 
     describe('toJSON()', function () {
-      it('is an alias of slotToJSON')
+      it('is an alias of slotToJSON', function () {
+        assert.ok(slot.toJSON === slot.slotToJSON)
+      })
     })
-
   })
 })
 

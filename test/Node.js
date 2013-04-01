@@ -11,6 +11,11 @@ var node = new Node()
 
 describe('Node', function () {
   describe('Constructor', function () {
+    it('requires no argument', function () {
+      var node = new Node()
+      assert.ok(node instanceof Node)
+    })
+
     describe('arg task', function () {
       it('defaults to a dummy function')
     })
@@ -18,8 +23,8 @@ describe('Node', function () {
     it('does not require ins and outs, which default to []', function () {
       var node = new Node()
 
-      assert.deepEqual(node.getIns(), [])
-      assert.deepEqual(node.getOuts(), [])
+      assert.deepEqual(node.getInputs(), [])
+      assert.deepEqual(node.getOutputs(), [])
     })
   })
 
