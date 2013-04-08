@@ -15,7 +15,7 @@ dataflow programming for node.js
 
     require('dflow');
 
-    process.dflow.root.addNode({
+    process.dflow.root.pushNode({
       task: function () {
         console.log('hello world');
       }

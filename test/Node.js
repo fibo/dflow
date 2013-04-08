@@ -41,23 +41,38 @@ describe('Node', function () {
     })
   })
 
-  describe('Events', function () {})
-
   describe('Methods', function () {
-    describe('getId()', function () {
-      it('', function () {
-        var node = new Node()
-        var id = node.getId()
-        assert.ok(typeof id == 'number')
-      })
-    })
-
     describe('hasRunTask()', function () {
       it('returns true if node run its task', function () {
         var node = new Node()
+        assert.ok(! node.hasRunTask())
         node.emit('task')
         assert.ok(node.hasRunTask())
       })
+    })
+
+    describe('deleteInput()', function () {
+      it('removes an input from node')
+
+      it('coerces id to input')
+    })
+
+    describe('pushInput()', function () {
+      it('add an input to node')
+
+      it('coerces object to input')
+    })
+
+    describe('deleteOutput()', function () {
+      it('removes an output from node')
+
+      it('coerces id to output')
+    })
+
+    describe('pushOutput()', function () {
+      it('add an output to node')
+
+      it('coerces object to output')
     })
 
     describe('getInputs()', function () {
