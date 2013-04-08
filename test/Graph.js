@@ -34,35 +34,77 @@ describe('Graph', function () {
   })
 
   describe('Methods', function () {
-    describe('addNode()', function () {
+    describe('pushNode()', function () {
       it('creates an empty node if no arg is provided', function () {
         var graph = new Graph()
-        var node = graph.addNode()
+        var node = graph.pushNode()
         assert.ok(node instanceof Node)
       })
+
+      it('accepts a node as first argument', function () {
+        var graph = new Graph()
+        var node = new Node()
+        graph.pushNode(node)
+        var nodes = graph.getNodes()
+        assert.ok(node === nodes[0])
+      })
+
+      it('coerces object to node')
     })
 
     describe('getNodes()', function () {
       it('returns the nodes in the graph', function () {
         var graph = new Graph()
    
-        var node1 = graph.addNode()
+        var node1 = graph.pushNode()
         assert.deepEqual(graph.getNodes(), [node1])
 
-        var node2 = graph.addNode()
+        var node2 = new Node()
+        graph.pushNode(node2)
         assert.deepEqual(graph.getNodes(), [node1, node2])
 
-        var node3 = graph.addNode()
+        var node3 = graph.pushNode()
         assert.deepEqual(graph.getNodes(), [node1, node2, node3])
       })
     })
    
-    describe('delNode()', function () {
-      it('deletes given node')
+    describe('deleteNode()', function () {
+      it('deletes given node', function () {
+        var graph = new Graph()
+        var node = new Node()
+        graph.pushNode(node)
+        graph.deleteNode(node)
+        var nodes = graph.getNodes()
+        assert.deepEqual(nodes, [])
+      })
+
+      it('coerces id to node', function () {
+        var graph = new Graph()
+        var node = new Node()
+        graph.pushNode(node)
+        var nodeId = node.getId()
+        graph.deleteNode(nodeId)
+        var nodes = graph.getNodes()
+        assert.deepEqual(nodes, [])
+      })
     })
    
     describe('graphToJSON()', function () {
-      it('returns graph in JSON format')
+      it('returns graph in JSON format', function () {
+        var arg = {}
+          , json = {}
+        arg.name = json.name = 'myGraph'
+        json.inputs = []
+        json.outputs = []
+        var node = new Node()
+        arg.nodes = []
+        json.nodes = []
+        arg.nodes.push(node)
+        json.nodes.push(node.nodeToJSON())
+        var graph = new Graph(arg)
+        json.id = graph.getId()
+        assert.deepEqual(json, graph.graphToJSON())
+      })
     })
 
     describe('toJSON()', function () {
