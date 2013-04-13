@@ -16,12 +16,6 @@ describe('Output', function () {
     })
 
     describe('arguments', function () {
-      describe('init', function () {
-        it('defaults to true',function () {
-          assert.ok(output.isON())
-        })
-      })
-
       describe('targets', function () {
         it('defaults to []',function () {
           assert.deepEqual(output.getTargets(), [])
@@ -37,16 +31,10 @@ describe('Output', function () {
   })
 
   describe('Methods', function () {
-    describe('isON()', function () {
-      it('returns true if output is ON', function () {
-        assert.ok(output.isON())
-      })
+    describe('setTargets()', function () {
+      it('returns output targets')
     })
-   
-    describe('isOFF()', function () {
-      it('returns true if output is OFF')
-    })
-   
+
     describe('getTargets()', function () {
       it('returns output targets')
     })

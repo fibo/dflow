@@ -34,6 +34,26 @@ describe('Graph', function () {
   })
 
   describe('Methods', function () {
+    describe('getGraphs()', function () {
+      it('returns the graphs contained in the graph', function () {
+        var graph = new Graph()
+   
+        var graph1 = graph.pushGraph()
+        assert.deepEqual(graph.getGraphs(), [graph1])
+
+        var graph2 = new Graph()
+        graph.pushGraph(graph2)
+        assert.deepEqual(graph.getGraphs(), [graph1, graph2])
+
+        var graph3 = graph.pushGraph()
+        assert.deepEqual(graph.getGraphs(), [graph1, graph2, graph3])
+      })
+    })
+   
+    describe('getGraphById()', function () {
+      it('returns a subgraph given by its id')
+    })
+
     describe('getNodes()', function () {
       it('returns the nodes in the graph', function () {
         var graph = new Graph()
@@ -54,6 +74,27 @@ describe('Graph', function () {
       it('returns a node given by its id')
     })
 
+    describe('deleteGraph()', function () {
+      it('deletes given graph', function () {
+        var graph = new Graph()
+        var graph = new Graph()
+        graph.pushGraph(graph)
+        graph.deleteGraph(graph)
+        var graphs = graph.getGraphs()
+        assert.deepEqual(graphs, [])
+      })
+
+      it('coerces id to graph', function () {
+        var graph = new Graph()
+        var graph = new Graph()
+        graph.pushGraph(graph)
+        var graphId = graph.getId()
+        graph.deleteGraph(graphId)
+        var graphs = graph.getGraphs()
+        assert.deepEqual(graphs, [])
+      })
+    })
+   
     describe('deleteNode()', function () {
       it('deletes given node', function () {
         var graph = new Graph()
@@ -75,6 +116,24 @@ describe('Graph', function () {
       })
     })
    
+    describe('pushGraph()', function () {
+      it('creates an empty graph if no arg is provided', function () {
+        var graph = new Graph()
+        var subgraph = graph.pushGraph()
+        assert.ok(subgraph instanceof Graph)
+      })
+
+      it('accepts a graph as first argument', function () {
+        var graph = new Graph()
+        var subgraph = new Graph()
+        graph.pushGraph(subgraph)
+        var graphs = graph.getGraphs()
+        assert.ok(subgraph === graphs[0])
+      })
+
+      it('coerces object to graph')
+    })
+
     describe('pushNode()', function () {
       it('creates an empty node if no arg is provided', function () {
         var graph = new Graph()

@@ -46,6 +46,21 @@ describe('Element', function () {
       })
     })
 
+    describe('setName()', function () {
+      it('sets the element name', function () {
+        var element = new Element()
+        element.setName('Foo')
+        assert.equal(element.getName(), 'Foo')
+      })
+
+      it('checks argument string type', function () {
+        var element = new Element()
+        element.setName('FirstName')
+        element.setName({secondName:"is not a string"})
+        assert.equal(element.getName(), 'FirstName')
+      })
+    })
+
     describe('elementToJSON()', function () {
       it('returns element in JSON format', function () {
         var name = 'foo'
