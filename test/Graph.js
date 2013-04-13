@@ -34,24 +34,6 @@ describe('Graph', function () {
   })
 
   describe('Methods', function () {
-    describe('pushNode()', function () {
-      it('creates an empty node if no arg is provided', function () {
-        var graph = new Graph()
-        var node = graph.pushNode()
-        assert.ok(node instanceof Node)
-      })
-
-      it('accepts a node as first argument', function () {
-        var graph = new Graph()
-        var node = new Node()
-        graph.pushNode(node)
-        var nodes = graph.getNodes()
-        assert.ok(node === nodes[0])
-      })
-
-      it('coerces object to node')
-    })
-
     describe('getNodes()', function () {
       it('returns the nodes in the graph', function () {
         var graph = new Graph()
@@ -68,6 +50,10 @@ describe('Graph', function () {
       })
     })
    
+    describe('getNodeById()', function () {
+      it('returns a node given by its id')
+    })
+
     describe('deleteNode()', function () {
       it('deletes given node', function () {
         var graph = new Graph()
@@ -89,6 +75,24 @@ describe('Graph', function () {
       })
     })
    
+    describe('pushNode()', function () {
+      it('creates an empty node if no arg is provided', function () {
+        var graph = new Graph()
+        var node = graph.pushNode()
+        assert.ok(node instanceof Node)
+      })
+
+      it('accepts a node as first argument', function () {
+        var graph = new Graph()
+        var node = new Node()
+        graph.pushNode(node)
+        var nodes = graph.getNodes()
+        assert.ok(node === nodes[0])
+      })
+
+      it('coerces object to node')
+    })
+
     describe('graphToJSON()', function () {
       it('returns graph in JSON format', function () {
         var arg = {}
