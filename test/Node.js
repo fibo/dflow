@@ -75,8 +75,16 @@ describe('Node', function () {
       it('coerces object to output')
     })
 
+    describe('getInputById()', function () {
+      it('returns an input given by its id')
+    })
+
     describe('getInputs()', function () {
       it('returns the node inputs')
+    })
+
+    describe('getOutputById()', function () {
+      it('returns an output given by its id')
     })
 
     describe('getOutputs()', function () {
