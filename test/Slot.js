@@ -91,6 +91,12 @@ describe('Slot', function () {
       })
 
       it('emits *data* events')
+
+      it('has no effect if data is undefined', function () {
+        var slot = new Slot({data: 'a string'})
+        slot.setData(undefined)
+        assert.equal(slot.getData(), 'a string')
+      })
     })
 
     describe('slotToJSON()', function () {
