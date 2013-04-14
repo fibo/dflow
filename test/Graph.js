@@ -10,30 +10,32 @@ var Node    = dflow.Node
 var graph = new Graph()
 
 describe('Graph', function () {
-  describe('Constructor', function () {
+  describe('constructor:', function () {
     it('requires no argument', function () {
       var graph = new Graph()
       assert.ok(graph instanceof Graph)
     })
 
-    it('sets task argument')
-
-    describe('arguments', function () {
+    describe('arguments:', function () {
       describe('nodes', function () {
         it('defaults to []',function () {
           assert.deepEqual(graph.getNodes(), [])
         })
       })
+
+      describe('task', function () {
+        it('defaults to empty function')
+      })
     })
   })
 
-  describe('Inheritance', function () {
+  describe('inheritance:', function () {
     it('is a Node', function () {
       assert.ok(graph instanceof Node)
     })
   })
 
-  describe('Methods', function () {
+  describe('accessor', function () {
     describe('getGraphs()', function () {
       it('returns the graphs contained in the graph', function () {
         var graph = new Graph()
@@ -73,7 +75,9 @@ describe('Graph', function () {
     describe('getNodeById()', function () {
       it('returns a node given by its id')
     })
-
+  })
+   
+  describe('mutator', function () {
     describe('deleteGraph()', function () {
       it('deletes given graph', function () {
         var graph = new Graph()
@@ -94,7 +98,7 @@ describe('Graph', function () {
         assert.deepEqual(graphs, [])
       })
     })
-   
+
     describe('deleteNode()', function () {
       it('deletes given node', function () {
         var graph = new Graph()
@@ -151,7 +155,9 @@ describe('Graph', function () {
 
       it('coerces object to node')
     })
+  })
 
+  describe('method', function () {
     describe('graphToJSON()', function () {
       it('returns graph in JSON format', function () {
         var arg = {}

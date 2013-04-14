@@ -9,13 +9,13 @@ var Element = dflow.Element
 var element = new Element()
 
 describe('Element', function () {
-  describe('Constructor', function () {
+  describe('constructor:', function () {
     it('requires no argument', function () {
       var element = new Element()
       assert.ok(element instanceof Element)
     })
 
-    describe('arguments', function () {
+    describe('arguments:', function () {
       describe('name', function () {
         it('defaults to undefined',function () {
           assert.ok(typeof element.getName() === 'undefined')
@@ -25,13 +25,13 @@ describe('Element', function () {
       })
     })
   }) 
-  describe('Inheritance', function () {
+  describe('inheritance:', function () {
     it('is an EventEmitter', function () {
       assert.ok(element instanceof EventEmitter)
     })
   })
 
-  describe('Methods', function () {
+  describe('accessor', function () {
     describe('getId()', function () {
       it('returns the element id', function () {
         assert.ok(typeof element.getId() === 'number')
@@ -45,7 +45,9 @@ describe('Element', function () {
         assert.equal(element.getName(), name)
       })
     })
+  })
 
+  describe('mutator', function () {
     describe('setName()', function () {
       it('sets the element name', function () {
         var element = new Element()
@@ -60,7 +62,9 @@ describe('Element', function () {
         assert.equal(element.getName(), 'FirstName')
       })
     })
+  })
 
+  describe('method', function () {
     describe('elementToJSON()', function () {
       it('returns element in JSON format', function () {
         var name = 'foo'

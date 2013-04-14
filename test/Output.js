@@ -9,13 +9,13 @@ var Slot   = dflow.Slot
 var output = new Output()
 
 describe('Output', function () {
-  describe('Constructor', function () {
+  describe('constructor:', function () {
     it('requires no argument', function () {
       var output = new Output()
       assert.ok(output instanceof Output)
     })
 
-    describe('arguments', function () {
+    describe('arguments:', function () {
       describe('targets', function () {
         it('defaults to []',function () {
           assert.deepEqual(output.getTargets(), [])
@@ -24,25 +24,29 @@ describe('Output', function () {
     })
   })
 
-  describe('Inheritance', function () {
+  describe('inheritance:', function () {
     it('is a Slot', function () {
       assert.ok(output instanceof Slot)
     })
   })
 
-  describe('Methods', function () {
-    describe('setTargets()', function () {
+  describe('accessor', function () {
+    describe('getTargets()', function () {
       it('returns output targets')
     })
-
-    describe('getTargets()', function () {
+  })
+   
+  describe('mutator', function () {
+    describe('setTargets()', function () {
       it('returns output targets')
     })
    
     describe('connectTo()', function () {
       it('connects output to an input target')
     })
-   
+  })
+
+  describe('method', function () {
     describe('outputToJSON()', function () {
       it('returns output in JSON format')
     })

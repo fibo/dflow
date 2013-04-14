@@ -10,13 +10,13 @@ var Slot   = dflow.Slot
 var input = new Input()
 
 describe('Input', function () {
-  describe('Constructor', function () {
+  describe('constructor:', function () {
     it('requires no argument', function () {
       var input = new Input()
       assert.ok(input instanceof Input)
     })
 
-    describe('arguments', function () {
+    describe('arguments:', function () {
       describe('source', function () {
         it('defaults to undefined',function () {
           assert.ok(typeof input.getSource() === 'undefined')
@@ -33,13 +33,13 @@ describe('Input', function () {
     })
   })
 
-  describe('Inheritance', function () {
+  describe('inheritance:', function () {
     it('is a Slot', function () {
       assert.ok(input instanceof Slot)
     })
   })
 
-  describe('Methods', function () {
+  describe('accessor', function () {
     describe('getData()', function () {
       it('delegates to source.getData')
     })
@@ -63,7 +63,9 @@ describe('Input', function () {
         assert.ok(input.isConnected())
       })
     })
+  })
 
+  describe('mutator', function () {
     describe('setSource()', function () {
       it('sets input source', function () {
         var output = new Output()
@@ -74,7 +76,9 @@ describe('Input', function () {
 
       it('emits source')
     })
+  })
 
+  describe('method', function () {
     describe('inputToJSON()', function () {
       it('returns input in JSON format', function () {
         var json = {}
