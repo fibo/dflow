@@ -1,8 +1,6 @@
 
 var assert = require('assert')
 
-# TODO rinomina questo file in snippets e aggiungene altri
-
 describe('synopsis:', function () {
     require('../index.js')
 
