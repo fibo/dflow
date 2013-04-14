@@ -10,13 +10,13 @@ var Slot    = dflow.Slot
 var slot = new Slot()
 
 describe('Slot', function () {
-  describe('Constructor', function () {
+  describe('constructor:', function () {
     it('requires no arguments', function () {
       var slot = new Slot()
       assert.ok(slot instanceof Slot)
     })
 
-    describe('arguments', function () {
+    describe('arguments:', function () {
       describe('data', function () {
         it('defaults to undefined',function () {
           assert.ok(typeof slot.getData() === 'undefined')
@@ -25,13 +25,13 @@ describe('Slot', function () {
     })
   })
 
-  describe('Inheritance', function () {
+  describe('inheritance:', function () {
     it('is an Element', function () {
       assert.ok(slot instanceof Element)
     })
   })
 
-  describe('Methods', function () {
+  describe('accessor', function () {
     describe('getData()', function () {
       it('returns the slot data', function () {
         var data
@@ -61,7 +61,9 @@ describe('Slot', function () {
         assert.equal(slot.getType(), typeof data)
       })
     })
+  })
 
+  describe('mutator', function () {
     describe('setData()', function () {
       it('set the slot data', function () {
         var data
@@ -98,7 +100,9 @@ describe('Slot', function () {
         assert.equal(slot.getData(), 'a string')
       })
     })
+  })
 
+  describe('method', function () {
     describe('slotToJSON()', function () {
       it('returns slot in JSON format', function () {
         var data = 1

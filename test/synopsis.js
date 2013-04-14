@@ -1,7 +1,9 @@
 
 var assert = require('assert')
 
-describe('synopsis', function () {
+# TODO rinomina questo file in snippets e aggiungene altri
+
+describe('synopsis:', function () {
     require('../index.js')
 
     process.dflow.root.pushNode({

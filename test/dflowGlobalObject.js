@@ -7,7 +7,7 @@ var Graph = dflow.Graph
 
 var df = process.dflow
 
-describe('dflow global object', function () {
+describe('dflow global object:', function () {
   describe('info', function () {
     var info = df.info
 
