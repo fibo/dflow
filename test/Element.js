@@ -25,6 +25,7 @@ describe('Element', function () {
       })
     })
   }) 
+
   describe('inheritance:', function () {
     it('is an EventEmitter', function () {
       assert.ok(element instanceof EventEmitter)
