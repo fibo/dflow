@@ -1,11 +1,4 @@
 {
-  "name": "dflow",
-  "version": "0.1.0",
-  "main": "index.js",
-  "ignore": [
-    ".jshintrc",
-    "node_modules"
-  ],
   "dependencies": {
     "angular": "*"
   }

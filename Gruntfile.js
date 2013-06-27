@@ -1,16 +1,21 @@
 
+// TODO jade per generare l' html in modo he ci siano tutte le lib js 
+// aggiungere anche jshint e watch
+
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json')
     ,
     browserify: {
-      'client/js/dflow.js': ['lib/*.js']
+      'client/dflow.js': ['lib/*.js']
     }
     ,
     bower: {
       install: {
         options: {
-          targetDir: './client'
+	  cleanup: true,
+	  layout: 'byType',
+          targetDir: './client/lib'
         }
       }
     }
