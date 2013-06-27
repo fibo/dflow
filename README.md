@@ -29,6 +29,12 @@ See the [Wiki] (https://github.com/fibo/dflow/wiki).
 
 # Development
 
+## Grunt tasks
+
+    grunt
+
+    grunt bower:install
+
 ## Testing
 
 Install mocha globally
