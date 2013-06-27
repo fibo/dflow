@@ -8,10 +8,7 @@
     "test": "mocha --reporter nyan"
   },
   "dependencies": {
-    "express": "3.0.0rc4",
-    "jade": "*",
-    "socket.io-client": "0.9.10",
-    "socket.io": "0.9.10"
+    "express": "~3.3.0"
   },
   "repository": {
     "type": "git",
