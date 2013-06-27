@@ -21,6 +21,8 @@
   "author": "fibo",
   "license": "BSD",
   "devDependencies": {
-    "mocha": "1.4.2"
+    "mocha": "1.4.2",
+    "grunt": "~0.4.1",
+    "grunt-browserify": "~1.1.1"
   }
 }
