@@ -2,4 +2,4 @@ dflow Element
 =============
 
     class Element
-      constructor: (@id, @name) ->
+      constructor: (@name, @id) ->
