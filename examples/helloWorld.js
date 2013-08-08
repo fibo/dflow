@@ -3,7 +3,7 @@ module.exports = function () {
 
 var dflow = require('dflow');
 
-var Graph = dflow.DflowGraph();
+var DflowGraph = dflow.DflowGraph;
 
 var graph = new DflowGraph();
 

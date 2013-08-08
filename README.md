@@ -3,6 +3,8 @@ dflow
 
 dataflow programming for Node.js
 
+[![Build Status](https://travis-ci.org/fibo/dflow.png?branch=master)](https://travis-ci.org/fibo/dflow.png?branch=master)
+
 # Installation
 
     npm install dflow
@@ -15,7 +17,7 @@ dataflow programming for Node.js
 
     var dflow = require('dflow');
 
-    var Graph = dflow.DflowGraph();
+    var DflowGraph = dflow.DflowGraph;
 
     var graph = new DflowGraph();
 
