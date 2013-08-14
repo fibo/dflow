@@ -12,6 +12,6 @@ module.exports = function () {
 
     root.runTask(); // will print "Hello World"
 
-    // TODO consoleLog.should.be.eql('Hello World')
+    consoleLog.should.be.eql('Hello World')
 };
 
