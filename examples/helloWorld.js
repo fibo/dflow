@@ -5,10 +5,10 @@ module.exports = function () {
 
     var root = require('dflow').root;
 
-    var id1 = root.createArguments('Hello', 'World');
-    var id2 = root.createFunction(function (a, b) {consoleLog = a + ' ' +b;});
+    var id1 = root.createSlot('Hello', 'World');
+    var id2 = root.createTask(function (a, b) {consoleLog = a + ' ' +b;});
 
-    root.createEdge(id1, id2);
+    root.createEdge([id1, id2]);
 
     root.runTask(); // will print "Hello World"
 
