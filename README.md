@@ -15,16 +15,12 @@ dataflow programming for Node.js
 
 # Hello world
 
-    var dflow = require('dflow');
+    var root = require('dflow').root;
 
-    var DflowGraph = dflow.DflowGraph;
+    var id1 = root.createArguments('Hello', 'World');
+    var id2 = root.createFunction(function (a, b) {console.log(a + ' ' +b);});
 
-    var graph = new DflowGraph();
+    root.createEdge(id1, id2);
 
-    var id1 = graph.createNode('Hello World');
-    var id2 = graph.createNode(function (msg) {console.log(msg);});
-
-    graph.createEdge(id1, id2);
-
-    graph.run();
+    root.runTask(); // will print "Hello World"
 

@@ -1,15 +1,14 @@
 
 // Keep dflow as minimal as possible. Less is more.
 
-var iper = require('iper')
+exports.DflowEdge     = require('./lib/DflowEdge')
+exports.DflowGraph    = require('./lib/DflowGraph')
+exports.DflowInput    = require('./lib/DflowInput')
+exports.DflowOutput   = require('./lib/DflowOutput')
+exports.DflowScenario = require('./lib/DflowScenario')
+exports.DflowTask     = require('./lib/DflowTask')
 
-var IperGraph = iper.IperGraph
-
-var root = new IperGraph()
-
-exports.root = root
-
-exports.DflowEdge  = require('./lib/DflowEdge.js')
-exports.DflowGraph = require('./lib/DflowGraph.js')
-exports.DflowNode  = require('./lib/DflowNode.js')
+var dflowRoot = require('./lib/dflowRoot')
+function getDflowRoot() { return dflowRoot }
+Object.defineProperty(exports, 'root', {get: getDflowRoot})
 
