@@ -1,17 +1,20 @@
 
 dflow = require '../index'
 
+DflowGraph    = dflow.DflowGraph
 DflowScenario = dflow.DflowScenario
-DflowModule = dflow.DflowModule
+DflowTask     = dflow.DflowTask
+
+graph = new DflowGraph()
 
 describe 'DflowScenario', ->
   describe 'inheritance', ->
-    it 'is a DflowModule', ->
+    it 'is a DflowTask', ->
+      scenario = new DflowScenario(graph)
+      scenario.should.be.instanceOf DflowTask
 
   describe 'constructor', ->
-    it 'has signature ()', ->
-
-    it 'defaults modules to {}', ->
-
-    it 'defaults edges to {}', ->
+    it 'has signature (graph)', ->
+      scenario = new DflowScenario(graph)
+      scenario.should.be.instanceOf DflowScenario
 

@@ -1,17 +1,17 @@
 
 module.exports = function () {
 
-var dflow = require('dflow');
+    var consoleLog
 
-var DflowGraph = dflow.DflowGraph;
+    var root = require('dflow').root;
 
-var graph = new DflowGraph();
+    var id1 = root.createArguments('Hello', 'World');
+    var id2 = root.createFunction(function (a, b) {consoleLog = a + ' ' +b;});
 
-var id1 = graph.createNode('Hello World');
-var id2 = graph.createNode(function (msg) {console.log(msg);});
+    root.createEdge(id1, id2);
 
-graph.createEdge(id1, id2);
+    root.runTask(); // will print "Hello World"
 
-graph.run();
-
+    // TODO consoleLog.should.be.eql('Hello World')
 };
+
