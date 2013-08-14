@@ -63,22 +63,10 @@ module.exports = <span class="function"><span class="keyword">function</span> <s
 
     root.createEdge([id1, id2]);
 
-    root.runTask(); <span class="comment">// will print "Hello World"</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p>TODO consoleLog.should.be.eql(&#39;Hello World&#39;)</p>
+    root.runTask(); <span class="comment">// will print "Hello World"</span>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>};</pre></div></div>
+    consoleLog.should.be.eql(<span class="string">'Hello World'</span>)
+};</pre></div></div>
             
         </li>
         
