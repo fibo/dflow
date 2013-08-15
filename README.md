@@ -1,7 +1,9 @@
 dflow
 =====
 
-dataflow programming for node.js
+dataflow programming for Node.js
+
+[![Build Status](https://travis-ci.org/fibo/dflow.png?branch=master)](https://travis-ci.org/fibo/dflow.png?branch=master)
 
 # Installation
 
@@ -11,39 +13,14 @@ dataflow programming for node.js
 
 `dflow` is a minimal implementation of dataflow programming.
 
-## Synopsis
+# Hello world
 
-    require('dflow');
+    var root = require('dflow').root;
 
-    process.dflow.root.pushNode({
-      task: function () {
-        console.log('hello world');
-      }
-    });
+    var id1 = root.createSlot('Hello', 'World');
+    var id2 = root.createTask(function (a, b) {console.log(a + ' ' +b);});
 
-    process.dflow.root.emit('task');
+    root.createEdge([id1, id2]);
 
-# Documentation
-
-See the [Wiki] (https://github.com/fibo/dflow/wiki).
-
-# Development
-
-## Grunt tasks
-
-    grunt
-
-    grunt bower:install
-
-## Testing
-
-Install mocha globally
-
-    npm install mocha -g
-
-Then run tests
-
-    npm test
-
-( and say hello to the nyan cat :)
+    root.runTask(); // will print "Hello World"
 
