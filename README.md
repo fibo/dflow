@@ -24,15 +24,3 @@ dataflow programming for Node.js
 
     root.runTask(); // will print "Hello World"
 
-# Development
-
-## How to update a wiki page
-
-clone wiki repo
-
-    git clone git@github:fibo/dflow.wiki
-
-generate markdown for a class
-
-    node_modules\.bin\mocha --require should -R markdown test\DflowTask.js > ..\dflow.wiki\DflowTask.md
-
