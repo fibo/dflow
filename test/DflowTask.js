@@ -15,14 +15,14 @@ graph = new DflowGraph();
 emptyTask = function() {};
 
 describe('DflowTask', function() {
-  describe('inheritance', function() {
+  describe('Inheritance', function() {
     return it('is an IperNode', function() {
       var task;
       task = new DflowTask(graph, emptyTask);
       return task.should.be.instanceOf(IperNode);
     });
   });
-  describe('constructor', function() {
+  describe('Constructor', function() {
     it('has signature (graph, task)', function() {
       var task;
       task = new DflowTask(graph, emptyTask);
@@ -30,7 +30,7 @@ describe('DflowTask', function() {
     });
     return it('has signature (graph, {task: task, inputs: {...}, outputs: {...})', function() {});
   });
-  return describe('methods', function() {
+  return describe('Methods', function() {
     return describe('#runTask()', function() {
       return it('runs task passing a reference to the DflowTask instance', function() {});
     });

@@ -8,12 +8,12 @@ DflowTask     = dflow.DflowTask
 graph = new DflowGraph()
 
 describe 'DflowScenario', ->
-  describe 'inheritance', ->
+  describe 'Inheritance', ->
     it 'is a DflowTask', ->
       scenario = new DflowScenario(graph)
       scenario.should.be.instanceOf DflowTask
 
-  describe 'constructor', ->
+  describe 'Constructor', ->
     it 'has signature (graph)', ->
       scenario = new DflowScenario(graph)
       scenario.should.be.instanceOf DflowScenario

@@ -19,7 +19,7 @@ emptyTask = function() {};
 task = new DflowTask(graph, emptyTask);
 
 describe('DflowOutput', function() {
-  describe('inheritance', function() {
+  describe('Inheritance', function() {
     it('is an IperNode', function() {
       var output;
       output = new DflowOutput(task);
@@ -31,7 +31,7 @@ describe('DflowOutput', function() {
       }).should.throwError();
     });
   });
-  return describe('constructor', function() {
+  return describe('Constructor', function() {
     return it('has signature (task)', function() {});
   });
 });
