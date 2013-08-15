@@ -13,11 +13,11 @@ emptyTask = () ->
 task = new DflowTask(graph, emptyTask)
 
 describe 'DflowInput', ->
-  describe 'inheritance', ->
+  describe 'Inheritance', ->
     it 'is an IperNode', ->
       input = new DflowInput(task)
       input.should.be.instanceOf IperNode
 
-  describe 'constructor', ->
+  describe 'Constructor', ->
     it 'has signature (task, data, meta)', ->
 

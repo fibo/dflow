@@ -13,7 +13,7 @@ emptyTask = () ->
 task = new DflowTask(graph, emptyTask)
 
 describe 'DflowOutput', ->
-  describe 'inheritance', ->
+  describe 'Inheritance', ->
     it 'is an IperNode', ->
       output = new DflowOutput(task)
       output.should.be.instanceOf IperNode
@@ -23,7 +23,7 @@ describe 'DflowOutput', ->
          new DflowOutput('not a task', data)
       ).should.throwError()
 
-  describe 'constructor', ->
+  describe 'Constructor', ->
     it 'has signature (task)', ->
       # data = 'foo'
       # meta =
