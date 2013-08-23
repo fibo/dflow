@@ -25,6 +25,10 @@ describe 'DflowTask', ->
     it 'has signature (graph, {task: task, inputs: {...}, outputs: {...}})', ->
 
   describe 'Methods', ->
+    describe '#createInput()', ->
+
+    describe '#createOutput()', ->
+
     describe '#runTask()', ->
       it 'runs task passing a reference to the DflowTask instance', ->
         # checkSelf = (self) ->

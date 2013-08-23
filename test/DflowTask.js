@@ -31,6 +31,8 @@ describe('DflowTask', function() {
     return it('has signature (graph, {task: task, inputs: {...}, outputs: {...}})', function() {});
   });
   return describe('Methods', function() {
+    describe('#createInput()', function() {});
+    describe('#createOutput()', function() {});
     return describe('#runTask()', function() {
       return it('runs task passing a reference to the DflowTask instance', function() {});
     });
