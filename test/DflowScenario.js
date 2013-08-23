@@ -18,7 +18,7 @@ describe('DflowScenario', function() {
       return scenario.should.be.instanceOf(DflowTask);
     });
   });
-  return describe('Constructor', function() {
+  describe('Constructor', function() {
     it('has signature (graph)', function() {
       var scenario;
       scenario = new DflowScenario(graph);
@@ -27,8 +27,14 @@ describe('DflowScenario', function() {
     return it('has signature ()', function() {
       var scenario;
       scenario = new DflowScenario();
-      scenario.should.be.instanceOf(DflowScenario);
-      return console.log(scenario.createSlot);
+      return scenario.should.be.instanceOf(DflowScenario);
     });
+  });
+  return describe('Methods', function() {
+    describe('createEdge', function() {
+      return it('has signature (sourceAndTargetIds)', function() {});
+    });
+    describe('createSlot', function() {});
+    return describe('createTask', function() {});
   });
 });

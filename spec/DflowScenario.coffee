@@ -21,4 +21,11 @@ describe 'DflowScenario', ->
     it 'has signature ()', ->
       scenario = new DflowScenario()
       scenario.should.be.instanceOf DflowScenario
-      console.log(scenario.createSlot)
+
+  describe 'Methods', ->
+    describe 'createEdge', ->
+      it 'has signature (sourceAndTargetIds)', ->
+
+    describe 'createSlot', ->
+
+    describe 'createTask', ->
