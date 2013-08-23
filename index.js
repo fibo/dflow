@@ -9,7 +9,3 @@ exports.DflowScenario = require('./lib/DflowScenario')
 exports.DflowSlot     = require('./lib/DflowSlot')
 exports.DflowTask     = require('./lib/DflowTask')
 
-var dflowRoot = require('./lib/dflowRoot')
-function getDflowRoot() { return dflowRoot }
-Object.defineProperty(exports, 'root', {get: getDflowRoot})
-

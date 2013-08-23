@@ -56,17 +56,32 @@ module.exports = <span class="function"><span class="keyword">function</span> <s
 
     <span class="keyword">var</span> consoleLog
 
-    <span class="keyword">var</span> root = require(<span class="string">'dflow'</span>).root;
+    <span class="keyword">var</span> dflow = require(<span class="string">'dflow'</span>);
+    <span class="keyword">var</span> DflowScenario = dflow.DflowScenario;
 
-    <span class="keyword">var</span> id1 = root.createSlot(<span class="string">'Hello'</span>, <span class="string">'World'</span>);
-    <span class="keyword">var</span> id2 = root.createTask(<span class="function"><span class="keyword">function</span> <span class="params">(a, b)</span> {</span>consoleLog = a + <span class="string">' '</span> +b;});
+    <span class="keyword">var</span> df = <span class="keyword">new</span> DflowScenario();
 
-    root.createEdge([id1, id2]);
+    <span class="keyword">var</span> id1 = df.createSlot(<span class="string">'Hello'</span>, <span class="string">'World'</span>);
+    <span class="keyword">var</span> id2 = df.createTask(<span class="function"><span class="keyword">function</span> <span class="params">(a, b)</span> {</span>consoleLog = a + <span class="string">' '</span> + b;});
 
-    root.runTask(); <span class="comment">// will print "Hello World"</span>
+    df.createEdge([id1, id2]);
 
-    consoleLog.should.be.eql(<span class="string">'Hello World'</span>)
-};</pre></div></div>
+    df.runTask(); <span class="comment">// will print "Hello World"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>TODO consoleLog.should.be.eql(&#39;Hello World&#39;)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>};</pre></div></div>
             
         </li>
         

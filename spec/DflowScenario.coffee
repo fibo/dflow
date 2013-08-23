@@ -18,3 +18,7 @@ describe 'DflowScenario', ->
       scenario = new DflowScenario(graph)
       scenario.should.be.instanceOf DflowScenario
 
+    it 'has signature ()', ->
+      scenario = new DflowScenario()
+      scenario.should.be.instanceOf DflowScenario
+      console.log(scenario.createSlot)
