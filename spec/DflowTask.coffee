@@ -22,7 +22,7 @@ describe 'DflowTask', ->
       task = new DflowTask(graph, emptyTask)
       task.should.be.instanceOf IperNode
 
-    it 'has signature (graph, {task: task, inputs: {...}, outputs: {...})', ->
+    it 'has signature (graph, {task: task, inputs: {...}, outputs: {...}})', ->
 
   describe 'Methods', ->
     describe '#runTask()', ->

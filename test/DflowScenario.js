@@ -19,10 +19,16 @@ describe('DflowScenario', function() {
     });
   });
   return describe('Constructor', function() {
-    return it('has signature (graph)', function() {
+    it('has signature (graph)', function() {
       var scenario;
       scenario = new DflowScenario(graph);
       return scenario.should.be.instanceOf(DflowScenario);
+    });
+    return it('has signature ()', function() {
+      var scenario;
+      scenario = new DflowScenario();
+      scenario.should.be.instanceOf(DflowScenario);
+      return console.log(scenario.createSlot);
     });
   });
 });

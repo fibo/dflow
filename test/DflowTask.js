@@ -28,7 +28,7 @@ describe('DflowTask', function() {
       task = new DflowTask(graph, emptyTask);
       return task.should.be.instanceOf(IperNode);
     });
-    return it('has signature (graph, {task: task, inputs: {...}, outputs: {...})', function() {});
+    return it('has signature (graph, {task: task, inputs: {...}, outputs: {...}})', function() {});
   });
   return describe('Methods', function() {
     return describe('#runTask()', function() {
