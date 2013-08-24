@@ -1,4 +1,4 @@
-var DflowGraph, DflowOutput, DflowTask, IperNode, dflow, emptyTask, graph, iper, task;
+var DflowGraph, DflowOutput, DflowPin, DflowTask, dflow, emptyTask, graph, iper, task;
 
 dflow = require('../index');
 
@@ -8,9 +8,9 @@ DflowGraph = dflow.DflowGraph;
 
 DflowOutput = dflow.DflowOutput;
 
-DflowTask = dflow.DflowTask;
+DflowPin = dflow.DflowPin;
 
-IperNode = iper.IperNode;
+DflowTask = dflow.DflowTask;
 
 graph = new DflowGraph();
 
@@ -20,22 +20,24 @@ task = new DflowTask(graph, emptyTask);
 
 describe('DflowOutput', function() {
   describe('Inheritance', function() {
-    it('is an IperNode', function() {
-      var output;
-      output = new DflowOutput(task, 'out');
-      return output.should.be.instanceOf(IperNode);
-    });
-    return it('checks that task is an IperNode', function() {
-      return (function() {
-        return new DflowOutput('not a task', data);
-      }).should.throwError();
+    return it('is a DflowPin', function() {
+      var output, prop;
+      prop = {
+        name: 'foo',
+        value: 2
+      };
+      output = new DflowOutput(task, prop);
+      return output.should.be.instanceOf(DflowPin);
     });
   });
   return describe('Constructor', function() {
-    return it('has signature (task, name)', function() {
-      var name, output;
-      name = 'foo';
-      output = new DflowOutput(task, name);
+    return it('has signature (task, prop)', function() {
+      var output, prop;
+      prop = {
+        name: 'foo',
+        value: 2
+      };
+      output = new DflowOutput(task, prop);
       return output.should.be.instanceOf(DflowOutput);
     });
   });
