@@ -22,7 +22,7 @@ describe('DflowOutput', function() {
   describe('Inheritance', function() {
     it('is an IperNode', function() {
       var output;
-      output = new DflowOutput(task);
+      output = new DflowOutput(task, 'out');
       return output.should.be.instanceOf(IperNode);
     });
     return it('checks that task is an IperNode', function() {
@@ -32,6 +32,11 @@ describe('DflowOutput', function() {
     });
   });
   return describe('Constructor', function() {
-    return it('has signature (task)', function() {});
+    return it('has signature (task, name)', function() {
+      var name, output;
+      name = 'foo';
+      output = new DflowOutput(task, name);
+      return output.should.be.instanceOf(DflowOutput);
+    });
   });
 });

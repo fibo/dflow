@@ -22,11 +22,16 @@ describe('DflowInput', function() {
   describe('Inheritance', function() {
     return it('is an IperNode', function() {
       var input;
-      input = new DflowInput(task);
+      input = new DflowInput(task, 'in');
       return input.should.be.instanceOf(IperNode);
     });
   });
   return describe('Constructor', function() {
-    return it('has signature (task, data, meta)', function() {});
+    it('has signature (task, name)', function() {
+      var input;
+      input = new DflowInput(task, 'in');
+      return input.should.be.instanceOf(IperNode);
+    });
+    return it('has signature (task, {name: , ...})', function() {});
   });
 });
