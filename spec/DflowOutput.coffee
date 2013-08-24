@@ -15,7 +15,7 @@ task = new DflowTask(graph, emptyTask)
 describe 'DflowOutput', ->
   describe 'Inheritance', ->
     it 'is an IperNode', ->
-      output = new DflowOutput(task)
+      output = new DflowOutput(task, 'out')
       output.should.be.instanceOf IperNode
 
     it 'checks that task is an IperNode', ->
@@ -24,10 +24,8 @@ describe 'DflowOutput', ->
       ).should.throwError()
 
   describe 'Constructor', ->
-    it 'has signature (task)', ->
-      # data = 'foo'
-      # meta =
-      #   name: 'example input'
-      # input = new DflowInput(task, data, meta)
-      # input.should.be.instanceOf DflowInput
+    it 'has signature (task, name)', ->
+      name = 'foo'
+      output = new DflowOutput(task, name)
+      output.should.be.instanceOf DflowOutput
 
