@@ -36,7 +36,21 @@ describe('DflowPin', function() {
       }).should.throwError();
     });
   });
-  return describe('Constructor', function() {
+  describe('Constructor', function() {
     return it('has signature (task, prop)', function() {});
+  });
+  return describe('Attribute', function() {
+    return describe('#isEmpty', function() {
+      return it('is a boolean that indicates if pin value is null', function() {
+        var pin, prop;
+        prop = {
+          name: 'foo'
+        };
+        pin = new DflowPin(task, prop);
+        pin.isEmpty.should.be["true"];
+        pin.value = 'bar';
+        return pin.isEmpty.should.be["false"];
+      });
+    });
   });
 });

@@ -21,31 +21,36 @@ describe 'DflowSlot', ->
       slot = new DflowSlot(graph)
       slot.should.be.instanceOf DflowSlot
 
-    it 'has signature (graph, data)', ->
-      data = 'foo'
-      slot = new DflowSlot(graph, data)
+    it 'defaults #in and #out to empty pins', ->
+      slot = new DflowSlot(graph)
+
+      slot.in.isEmpty.should.be.true
+      slot.out.isEmpty.should.be.true
+
+    it 'has signature (graph, value)', ->
+      value = 'foo'
+      slot = new DflowSlot(graph, value)
       slot.should.be.instanceOf DflowSlot
 
   describe 'Attributes', ->
-    data = 'foo'
-    slot = new DflowSlot(graph, data)
+    value = 'foo'
+    slot = new DflowSlot(graph, value)
 
     describe '#in', ->
       it 'is a DflowInput', ->
-        #slot.in.should.be.instanceOf DflowInput
+        slot.in.should.be.instanceOf DflowInput
 
-      it 'is filled with data', ->
-        #slot.in.value.should.eql data
+      it 'is filled with value', ->
+        slot.in.value.should.eql value
 
     describe '#out', ->
       it 'is a DflowOutput', ->
-        #slot.out.should.be.instanceOf DflowOutput
+        slot.out.should.be.instanceOf DflowOutput
 
-      it 'is filled with data', ->
-        #slot.out.value.should.eql data
+      it 'is filled with input value', ->
+        slot.out.value.should.eql value
 
-  describe 'Methods', ->
-    describe '#runTask()', ->
-      it 'fills out.data with in.data', ->
-        data = 'foo'
-        slot = new DflowSlot(graph, data)
+        value = 'bar'
+        slot.in.value = value
+        slot.out.value.should.eql value
+

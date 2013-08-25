@@ -31,3 +31,15 @@ describe 'DflowPin', ->
   describe 'Constructor', ->
     it 'has signature (task, prop)', ->
 
+  describe 'Attribute', ->
+    describe '#isEmpty', ->
+      it 'is a boolean that indicates if pin value is null', ->
+        prop =
+          name: 'foo'
+
+        pin = new DflowPin(task, prop)
+        pin.isEmpty.should.be.true
+
+        pin.value = 'bar'
+        pin.isEmpty.should.be.false
+
