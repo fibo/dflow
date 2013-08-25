@@ -30,32 +30,40 @@ describe('DflowSlot', function() {
       slot = new DflowSlot(graph);
       return slot.should.be.instanceOf(DflowSlot);
     });
-    return it('has signature (graph, data)', function() {
-      var data, slot;
-      data = 'foo';
-      slot = new DflowSlot(graph, data);
+    it('defaults #in and #out to empty pins', function() {
+      var slot;
+      slot = new DflowSlot(graph);
+      slot["in"].isEmpty.should.be["true"];
+      return slot.out.isEmpty.should.be["true"];
+    });
+    return it('has signature (graph, value)', function() {
+      var slot, value;
+      value = 'foo';
+      slot = new DflowSlot(graph, value);
       return slot.should.be.instanceOf(DflowSlot);
     });
   });
-  describe('Attributes', function() {
-    var data, slot;
-    data = 'foo';
-    slot = new DflowSlot(graph, data);
+  return describe('Attributes', function() {
+    var slot, value;
+    value = 'foo';
+    slot = new DflowSlot(graph, value);
     describe('#in', function() {
-      it('is a DflowInput', function() {});
-      return it('is filled with data', function() {});
+      it('is a DflowInput', function() {
+        return slot["in"].should.be.instanceOf(DflowInput);
+      });
+      return it('is filled with value', function() {
+        return slot["in"].value.should.eql(value);
+      });
     });
     return describe('#out', function() {
-      it('is a DflowOutput', function() {});
-      return it('is filled with data', function() {});
-    });
-  });
-  return describe('Methods', function() {
-    return describe('#runTask()', function() {
-      return it('fills out.data with in.data', function() {
-        var data, slot;
-        data = 'foo';
-        return slot = new DflowSlot(graph, data);
+      it('is a DflowOutput', function() {
+        return slot.out.should.be.instanceOf(DflowOutput);
+      });
+      return it('is filled with input value', function() {
+        slot.out.value.should.eql(value);
+        value = 'bar';
+        slot["in"].value = value;
+        return slot.out.value.should.eql(value);
       });
     });
   });
