@@ -13,6 +13,9 @@ module.exports = (grunt) ->
       example:
         files: ['examples/*.js']
         tasks: ['mochacli', 'docco']
+      jshint:
+        files: ['index.js', 'lib/*js']
+        tasks: 'jshint'
     coffee:
       compile:
         options:
@@ -37,9 +40,10 @@ module.exports = (grunt) ->
       all: ['test/*.js']
 
   grunt.loadNpmTasks 'grunt-contrib-coffee'
+  grunt.loadNpmTasks 'grunt-contrib-jshint'
+  grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-docco-multi'
   grunt.loadNpmTasks 'grunt-mocha-cli'
-  grunt.loadNpmTasks 'grunt-contrib-watch'
 
   grunt.registerTask 'default', ['coffee', 'mochacli']
 
