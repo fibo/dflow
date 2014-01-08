@@ -4,12 +4,11 @@
   "description": "dataflow programming for node.js",
   "main": "index.js",
   "scripts": {
-    "start": "node app",
-    "test": "mocha --require should --reporter nyan"
+    "test": "mocha --bail --require should --reporter nyan"
   },
   "dependencies": {
     "iper": "0.0.5",
-    "underscore": "~1.5.1"
+    "underscore": "~1.5.2"
   },
   "repository": {
     "type": "git",
