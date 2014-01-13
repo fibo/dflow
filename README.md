@@ -7,7 +7,11 @@ dataflow programming for Node.js
 
 # Installation
 
-    npm install dflow
+With [npm](https://npmjs.org/) do
+
+```bash
+npm install dflow
+```
 
 # Description
 
@@ -26,4 +30,8 @@ dataflow programming for Node.js
     df.createEdge([id1, id2]);
 
     df.runTask(); // will print "Hello World"
+
+# License
+
+[MIT](http://fibo.mit-license.org/)
 
