@@ -1,7 +1,7 @@
 {
   "name": "dflow",
   "version": "0.1.0",
-  "description": "dataflow programming for node.js",
+  "description": "dataflow programming",
   "main": "index.js",
   "scripts": {
     "test": "mocha --bail --require should --reporter nyan"
