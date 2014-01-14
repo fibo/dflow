@@ -31,6 +31,10 @@ npm install dflow
 
     df.runTask(); // will print "Hello World"
 
+# Development
+
+See [Development.md](https://github.com/fibo/dflow/blob/master/Development.md)
+
 # License
 
 [MIT](http://fibo.mit-license.org/)
