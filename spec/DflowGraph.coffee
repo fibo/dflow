@@ -10,12 +10,11 @@ graph = new DflowGraph()
 
 describe 'DflowGraph', ->
   describe 'Inheritance', ->
-    it 'is an IperGraph', ->
-      graph = new IperGraph()
-      graph.should.be.instanceOf IperGraph
+    it 'is an IperGraph'
 
   describe 'Constructor', ->
-    it 'has signature ()', ->
-      graph = new DflowGraph()
-      graph.should.be.instanceOf DflowGraph
+
+  describe 'Attributes', ->
+
+  describe 'Methods', ->
 

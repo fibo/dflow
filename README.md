@@ -17,19 +17,7 @@ npm install dflow
 
 `dflow` is a minimal implementation of dataflow programming.
 
-# Hello world
-
-    var dflow = require('dflow');
-    var DflowScenario = dflow.DflowScenario;
-
-    var df = new DflowScenario();
-
-    var id1 = df.createSlot('Hello', 'World');
-    var id2 = df.createTask(function (a, b) {console.log = a + ' ' + b;});
-
-    df.createEdge([id1, id2]);
-
-    df.runTask(); // will print "Hello World"
+> Less is more
 
 # Development
 
