@@ -20,7 +20,7 @@ var IperNode = iper.IperNode
 
 function DflowNode () {
 
-  IperNode.call(this)
+  IperNode.apply(this, arguments)
 
 //
 // ## Attributes
