@@ -12,15 +12,9 @@ graph = new DflowGraph();
 
 describe('DflowGraph', function() {
   describe('Inheritance', function() {
-    return it('is an IperGraph', function() {
-      graph = new IperGraph();
-      return graph.should.be.instanceOf(IperGraph);
-    });
+    return it('is an IperGraph');
   });
-  return describe('Constructor', function() {
-    return it('has signature ()', function() {
-      graph = new DflowGraph();
-      return graph.should.be.instanceOf(DflowGraph);
-    });
-  });
+  describe('Constructor', function() {});
+  describe('Attributes', function() {});
+  return describe('Methods', function() {});
 });
