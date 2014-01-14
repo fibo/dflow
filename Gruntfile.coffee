@@ -1,9 +1,6 @@
 module.exports = (grunt) ->
   grunt.initConfig
     watch:
-      coffee:
-        files: ['spec/*.coffee']
-        tasks: 'coffee'
       mochacli:
         files: ['test/*.js', 'lib/*.js']
         tasks: 'mochacli'
@@ -16,15 +13,6 @@ module.exports = (grunt) ->
       jshint:
         files: ['index.js', 'lib/*js']
         tasks: 'jshint'
-    coffee:
-      compile:
-        options:
-          bare: true
-        expand: true
-        cwd: 'spec'
-        src: ['*.coffee']
-        dest: 'test'
-        ext: '.js'
     docco:
       examples:
         src: ['examples/*.js']
@@ -39,11 +27,10 @@ module.exports = (grunt) ->
         bail: true
       all: ['test/*.js']
 
-  grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-jshint'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-docco-multi'
   grunt.loadNpmTasks 'grunt-mocha-cli'
 
-  grunt.registerTask 'default', ['coffee', 'mochacli']
+  grunt.registerTask 'default', ['mochacli']
 
