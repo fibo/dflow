@@ -29,6 +29,9 @@
     "grunt-mocha-cli": "~1.0.6",
     "grunt-contrib-watch": "~0.5.1",
     "grunt-docco-multi": "0.0.2",
-    "grunt-contrib-jshint": "~0.6.3"
+    "grunt-contrib-jshint": "~0.6.3",
+    "gulp-util": "~2.2.10",
+    "gulp": "~3.3.2",
+    "gulp-mocha": "~0.3.0"
   }
 }
