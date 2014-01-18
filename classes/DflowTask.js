@@ -1,39 +1,19 @@
 
-//
-// # DflowTask
-//
+function DflowTask (graph, obj) {
+  this.graph = graph
 
-var iper = require('iper')
+  if (typeof obj.task !== 'function')
+    throw new TypeError()
 
-var IperGraph = iper.IperGraph
-
-var DflowInput = require('./DflowInput')
-  , DflowOutput = require('./DflowOutput')
-
-//
-// ## Constructor
-//
-
-function DflowTask () {
-
-//
-// ## Attributes
-//
-
-//
-// ### graph
-//
-// Is an instance of IperGraph
-//
-
-  var graph = new IperGraph()
-
-  Object.defineProperty(this, 'graph', {
-    enumerable: false,
-    value: graph
-  })
-
+  this.task = obj.task
+  this.inputs = obj.inputs
+  this.outputs = obj.outputs
 }
+
+function createInput () {
+  this.graph.createTaskInput.apply(arguments)
+}
+DflowTask.prototype.createInput = createInput
 
 module.exports = DflowTask
 

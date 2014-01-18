@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "iper": "0.0.5",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "inherits": "~2.0.1"
   },
   "repository": {
     "type": "git",
@@ -19,10 +20,12 @@
     "visual"
   ],
   "author": "fibo",
-  "license": [ {
-    "type": "MIT",
-    "url": "http://fibo.mit-license.org/"
-} ],
+  "license": [
+    {
+      "type": "MIT",
+      "url": "http://fibo.mit-license.org/"
+    }
+  ],
   "devDependencies": {
     "mocha": "~1.12.0",
     "should": "~1.2.2"
