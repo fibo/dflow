@@ -3,14 +3,12 @@
 // # DflowTask
 //
 
-var DflowNode = require('./DflowNode')
-  , inherits = require('inherits')
+var iper = require('iper')
 
-//
-// ## Inheritance
-//
-// *DflowTask* inherits from [DflowNode](http://www.g14n.info/dflow/classes/DflowNode.html)
-//
+var IperGraph = iper.IperGraph
+
+var DflowInput = require('./DflowInput')
+  , DflowOutput = require('./DflowOutput')
 
 //
 // ## Constructor
@@ -18,16 +16,24 @@ var DflowNode = require('./DflowNode')
 
 function DflowTask () {
 
-  DflowNode.call(this)
-
 //
 // ## Attributes
 //
 
+//
+// ### graph
+//
+// Is an instance of IperGraph
+//
+
+  var graph = new IperGraph()
+
+  Object.defineProperty(this, 'graph', {
+    enumerable: false,
+    value: graph
+  })
 
 }
-
-inherits(DflowTask, DflowNode)
 
 module.exports = DflowTask
 

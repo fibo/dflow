@@ -3,7 +3,7 @@
 // # DflowEdge
 //
 
-var iper = require('iper')
+var iper     = require('iper')
   , inherits = require('inherits')
 
 var IperEdge = iper.IperEdge

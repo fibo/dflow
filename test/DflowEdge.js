@@ -1,12 +1,12 @@
 
 var dflow = require('../index')
 
-var DflowInput = dflow.DflowInput
+var DflowEdge = dflow.DflowEdge
   , DflowTask  = dflow.DflowTask
 
-//var input = new DflowInput(task)
+//var input = new DflowEdge(task)
 
-describe('DflowInput', function () {
+describe('DflowEdge', function () {
   describe('Constructor', function () {})
 
   describe('Attributes', function () {})

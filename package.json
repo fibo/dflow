@@ -1,16 +1,14 @@
 {
   "name": "dflow",
   "version": "0.1.0",
-  "description": "dataflow programming",
+  "description": "Dataflow programming",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --bail --require should --reporter nyan"
+    "test": "mocha --bail --reporter nyan"
   },
   "dependencies": {
     "iper": "0.0.5",
-    "underscore": "~1.5.2",
-    "inherits": "~2.0.1",
-    "strict-mode": "0.0.1"
+    "underscore": "~1.5.2"
   },
   "repository": {
     "type": "git",
@@ -21,17 +19,12 @@
     "visual"
   ],
   "author": "fibo",
-  "license": "http://fibo.mit-license.org/",
+  "license": [ {
+    "type": "MIT",
+    "url": "http://fibo.mit-license.org/"
+} ],
   "devDependencies": {
     "mocha": "~1.12.0",
-    "grunt": "~0.4.1",
-    "should": "~1.2.2",
-    "grunt-mocha-cli": "~1.0.6",
-    "grunt-contrib-watch": "~0.5.1",
-    "grunt-docco-multi": "0.0.2",
-    "grunt-contrib-jshint": "~0.6.3",
-    "gulp-util": "~2.2.10",
-    "gulp": "~3.3.2",
-    "gulp-mocha": "~0.3.0"
+    "should": "~1.2.2"
   }
 }
