@@ -1,22 +1,52 @@
-var DflowGraph, DflowTask, IperNode, dflow, graph, iper;
 
-dflow = require('../index');
+var dflow  = require('../index')
+  , iper   = require('iper')
+  , should = require('should')
 
-iper = require('iper');
+var DflowEdge = dflow.DflowEdge
+  , DflowTask  = dflow.DflowTask
 
-IperNode = iper.IperNode;
+var defaultTask = new DflowTask()
 
-DflowTask = dflow.DflowTask;
+describe('DflowTask', function () {
+  describe('Constructor', function () {
+    it('has signature `()`', function () {
+      var task = new DflowTask()
 
-DflowGraph = dflow.DflowGraph;
+      task.should.be.instanceOf(DflowTask)
+    })
 
-graph = new DflowGraph();
+    it('has signature `(graph)`')/*, function () {
+      var task = new DflowTask(graph)
 
-describe('DflowTask', function() {
-  describe('Inheritance', function() {
-    return it('is an IperNode');
-  });
-  describe('Constructor', function() {});
-  describe('Attributes', function() {});
-  return describe('Methods', function() {});
-});
+      task.should.be.instanceOf(DflowTask)
+    })*/
+  })
+
+  describe('Attributes', function () {
+    describe('#graph', function () {
+      it('defaults to an empty IperGraph')/*, function () {
+        var graph = defaultTask.graph
+
+        graph.should.be.instanceOf(IperGraph)
+
+        graph.isEmpty.should.be(true)
+      })*/
+    })
+  })
+
+  describe('Methods', function() {
+    describe('#createInput()', function () {})
+
+    describe('#createTask()', function () {
+      it('has signature `(function)`')/*, function () {
+        var task = new DflowTask()
+
+        task.should.be.instanceOf(DflowTask)
+      })*/
+
+      it('has signature `(taskName)`')
+    })
+  })
+})
+
