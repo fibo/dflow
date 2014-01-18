@@ -1,12 +1,4 @@
 
-//
-// # DflowOutput
-//
-
-//
-// ## Constructor
-//
-
 function DflowOutput () {
 
 

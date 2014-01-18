@@ -3,50 +3,51 @@ var dflow  = require('../index')
   , iper   = require('iper')
   , should = require('should')
 
-var DflowEdge = dflow.DflowEdge
+var DflowGraph = dflow.DflowGraph
   , DflowTask  = dflow.DflowTask
 
-var defaultTask = new DflowTask()
+var graph = new DflowGraph()
+
+var obj = {
+  task: function () {},
+  inputs: [],
+  outputs: []
+}
+
+var task = new DflowTask(graph, obj)
 
 describe('DflowTask', function () {
   describe('Constructor', function () {
-    it('has signature `()`', function () {
-      var task = new DflowTask()
 
+    it('has signature `(graph, {task, inputs, outputs})`', function () {
       task.should.be.instanceOf(DflowTask)
     })
-
-    it('has signature `(graph)`')/*, function () {
-      var task = new DflowTask(graph)
-
-      task.should.be.instanceOf(DflowTask)
-    })*/
   })
 
   describe('Attributes', function () {
     describe('#graph', function () {
-      it('defaults to an empty IperGraph')/*, function () {
-        var graph = defaultTask.graph
+      it('is a DflowGraph', function () {
+        task.graph.should.be.instanceOf(DflowGraph)
+      })
+    })
 
-        graph.should.be.instanceOf(IperGraph)
+    describe('#task', function () {
+      it('is a Function', function () {
+        task.task.should.be.a.Function
 
-        graph.isEmpty.should.be(true)
-      })*/
+        ;(function () {
+          var task2 = new DflowTask(graph, {
+            task: 'not a function',
+            inputs: [],
+            outputs: []
+          })
+        }).should.throwError()
+      })
     })
   })
 
   describe('Methods', function() {
     describe('#createInput()', function () {})
-
-    describe('#createTask()', function () {
-      it('has signature `(function)`')/*, function () {
-        var task = new DflowTask()
-
-        task.should.be.instanceOf(DflowTask)
-      })*/
-
-      it('has signature `(taskName)`')
-    })
   })
 })
 
