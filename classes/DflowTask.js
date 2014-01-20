@@ -5,6 +5,7 @@ function DflowTask (graph, obj) {
   if (typeof obj.task !== 'function')
     throw new TypeError()
 
+  this.info = obj.info
   this.task = obj.task
   this.inputs = obj.inputs
   this.outputs = obj.outputs
