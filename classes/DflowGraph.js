@@ -3,9 +3,15 @@ var iper = require('iper')
 
 var IperGraph = iper.IperGraph
 
+var DflowHost = require('./DflowHost')
 var DflowTask = require('./DflowTask')
 
-function DflowGraph () {
+function DflowGraph (host) {
+
+  if (! (host instanceof DflowHost))
+    throw new TypeError('Not a DflowHost instance')
+
+  Object.defineProperty(this, 'host', {value: host})
 
   this.graph = new IperGraph()
 

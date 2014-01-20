@@ -4,11 +4,17 @@ var dflow  = require('../index')
   , should = require('should')
 
 var DflowGraph = dflow.DflowGraph
+  , DflowHost  = dflow.DflowHost
   , DflowTask  = dflow.DflowTask
 
-var graph = new DflowGraph()
+var host = new DflowHost()
+var graph = new DflowGraph(host)
 
 var obj = {
+  info: {
+    pkg: 'Foo',
+    name: 'Bar'
+  },
   task: function () {},
   inputs: [],
   outputs: []
@@ -18,8 +24,7 @@ var task = new DflowTask(graph, obj)
 
 describe('DflowTask', function () {
   describe('Constructor', function () {
-
-    it('has signature `(graph, {task, inputs, outputs})`', function () {
+    it('has signature `(graph, {task, inputs, outputs, info})`', function () {
       task.should.be.instanceOf(DflowTask)
     })
   })
