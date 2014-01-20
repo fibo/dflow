@@ -11,33 +11,25 @@ function DflowPackageFunction () {
 inherits(DflowPackageFunction, DflowPackage)
 
 function DflowTaskApply () {
-  DflowTask.call(this, {
-    info: {
-      name = 'Apply'
-    },
-
-    inputs = [{
-      name: 'func'
-    },
-    {
-      name: 'context'
-    },
-    {
-      name: 'args'
-    }],
-
-    outputs: [{
-      name: 'ret'
-    }]
-  )
+  DflowTask.apply(this, arguments)
 }
 
 inherits(DflowTaskApply, DflowTask)
 
-DflowTaskApply.prototype.task = function () {
-  var args = this.getInput('args')
-    , context = this.getInput('context')
-    , func = this.getInput('func')
+DflowTaskApply.prototype.init = function applyInit () {
+  this.name = 'apply'
+
+  this.createInput({ name: 'args', data: [] })
+  this.createInput({ name: 'context', data: null })
+  this.createInput({ name: 'func', data: function () })
+
+  this.createOutput({ name: 'ret' })
+}
+
+DflowTaskApply.prototype.task = function applyTask () {
+  var args    = this.getInput('args').data
+    , context = this.getInput('context').data
+    , func    = this.getInput('func').data
 
   var ret = this.getOutput('ret')
 
