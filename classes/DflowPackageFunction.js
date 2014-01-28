@@ -21,7 +21,7 @@ DflowTaskApply.prototype.init = function applyInit () {
 
   this.createInput({ name: 'args', data: [] })
   this.createInput({ name: 'context', data: null })
-  this.createInput({ name: 'func', data: function () })
+  this.createInput({ name: 'func', data: function () {} })
 
   this.createOutput({ name: 'ret' })
 }
