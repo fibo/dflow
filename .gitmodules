@@ -1,3 +1,0 @@
-[submodule "docs/src/common"]
-	path = docs/src/common
-	url = git@github.com:fibo/docs-common.git
