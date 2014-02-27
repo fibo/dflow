@@ -5,16 +5,9 @@ pkg = require('../package.json')
 
 docpadConfig = {
   templateData: {
-    site: {
-      description: pkg.description
-      title:       pkg.name
-      keywords:    pkg.keywords
-    }
+    pkg: pkg
   }
 }
 
 module.exports = docpadConfig
-
-
-
 
