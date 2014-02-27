@@ -22,7 +22,7 @@
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+            <!--span class="icon-bar"></span-->
           </button>
           <span class="navbar-brand"><%= @site.title %></span>
         </div>
@@ -30,7 +30,7 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="./">Home</a></li>
             <li><a href="./api.html">api</a></li>
-            <li><a href="./spec.html">spec</a></li>
+            <!--li><a href="./spec.html">spec</a></li-->
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <!-- li class="dropdown">
@@ -58,6 +58,21 @@
     <%- @content %>
   </div>
 
-  <%- @partial('analytics', {gaId: 'UA-12635045-12'}) %>
+  <!-- Start of Google Analytics tracking code -->
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12635045-12']);
+    _gaq.push(['_trackPageview']);
+
+   (function() {
+     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+   })();
+
+  </script>
+  <!-- End of Google Analytics tracking code -->
+
 </body>
 </html>
