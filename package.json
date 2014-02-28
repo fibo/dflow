@@ -4,7 +4,7 @@
   "description": "Dataflow programming",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --bail --reporter nyan"
+    "test": "mocha --bail --require should --reporter min"
   },
   "dependencies": {
     "iper": "0.0.5",
@@ -32,5 +32,6 @@
     "gulp-util": "~2.2.14",
     "gulp": "~3.5.2",
     "fibo-gulptasks": "~0.1.4"
-  }
+  },
+  "homepage": "http://www.g14n.info/dflow"
 }
