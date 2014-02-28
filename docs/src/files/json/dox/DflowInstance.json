@@ -1,0 +1,18 @@
+[
+    {
+        "tags": [],
+        "description": {
+            "full": "",
+            "summary": "",
+            "body": ""
+        },
+        "isPrivate": false,
+        "code": "var dflow = require('./index')\n  , iper  = require('iper')\n\nvar DflowOperationContainer = dflow.DflowOperationContainer\n  , IperGraph               = iper.IperGraph\n\nfunction DflowInstance () {\n  // model graph\n  var graph = new IperGraph()\n\n  Object.defineProperty(this, 'graph', {value: graph})\n\n  // operation tree\n  var root = new DflowOperationContainer()\n\n  Object.defineProperty(this, 'root', {value: root})\n}\n\nmodule.exports = DflowInstance",
+        "ctx": {
+            "type": "declaration",
+            "name": "dflow",
+            "value": "require('./index')",
+            "string": "dflow"
+        }
+    }
+]
