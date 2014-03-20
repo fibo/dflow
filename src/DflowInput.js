@@ -1,6 +1,6 @@
 
 var DflowEdge  = require('./DflowEdge')
-  , DflowSflot = require('./DflowSlot')
+  , DflowSlot = require('./DflowSlot')
   , inherits   = require('inherits')
 
 function DflowInput () {

@@ -3,7 +3,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title></title>
+  <title><%= @document.title %></title>
 
   <!-- Bootstrap -->
   <!-- Latest compiled and minified CSS -->
@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
 </head>
 <body style>
-  <h1></h1>
+  <h1><%= @document.title %></h1>
 
     <div class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
       <div class="container">
@@ -24,7 +24,7 @@
             <span class="icon-bar"></span>
             <!--span class="icon-bar"></span-->
           </button>
-          <span class="navbar-brand"></span>
+          <span class="navbar-brand"><%= @site.title %></span>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -45,7 +45,7 @@
                 <li><a href="#">One more separated link</a></li>
               </ul>
             </li -->
-            <li><a href="https://github.com/fibo/">repo</a></li>
+            <li><a href="https://github.com/fibo/<%= @site.title %>">repo</a></li>
             <li><a href="http://g14n.info">about me</a></li>
             <!-- li class="active"><a href="./">Static top</a></li -->
           </ul>
@@ -55,7 +55,7 @@
 
   <div class="container">
     <div style="height: 50px;"></div>
-    spec
+    <%- @content %>
   </div>
 
   <!-- Start of Google Analytics tracking code -->
