@@ -1,23 +1,12 @@
 
 function DflowTask () {
-  this.name = 'Task'
+  this.input = {}
+  this.output = {}
 }
 
-/*
+/**
  *
  */
-
-function getInputs () {
-  var inputs = []
-  // for each this.keys
-  //
-  // inputs.push if instanceof DflowInput
-  //
-
-  return inputs
-}
-
-DflowTask.prototype.getInputs = getInputs
 
 function run () {
   throw new Error('unimplemented abstract function')

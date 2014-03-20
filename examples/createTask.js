@@ -1,24 +1,12 @@
 
-var dflow    = require('dflow')
-  , inherits = require('inherits')
+var Foo = require('./Foo.js')
+  , should = require('should')
 
-var DflowInput  = dflow.DflowInput
-  , DflowOutput = dflow.DflowOutput
-  , DflowTask   = dflow.DflowTask
 
-function Foo () {
-  DflowTask.apply(this, arguments)
+var foo = new Foo()
 
-  this.input1 = new DflowInput()
-
-  this.output1 = new DflowOutput()
-}
-
-inherits(Foo, DflowTask)
-
-function run () {
-  this.output1 = this.input1
-}
-
-module.exports = Foo
+foo.out.data = 5
+foo.in.data = 5
+foo.run()
+foo.out.data.should.be.eql(5)
 
