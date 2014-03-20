@@ -1,3 +1,3 @@
 
-module.exports = {}
+export.DflowTask = require('./DflowTask')
 
