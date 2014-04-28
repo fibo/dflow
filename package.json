@@ -33,7 +33,7 @@
     "should": "~3.1.2",
     "gulp-util": "~2.2.14",
     "gulp": "~3.5.2",
-    "fibo-gulptasks": "~0.1.4"
+    "fibo-gulptasks": "git+ssh://git@github.com:fibo/fibo-gulptasks"
   },
   "homepage": "http://www.g14n.info/dflow"
 }

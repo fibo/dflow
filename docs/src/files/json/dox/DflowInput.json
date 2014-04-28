@@ -1,0 +1,32 @@
+[
+    {
+        "tags": [],
+        "description": {
+            "full": "@return {Boolean}",
+            "summary": "@return {Boolean}",
+            "body": ""
+        },
+        "ignore": false,
+        "code": "function isConnected () {\n  return this.edge instanceof DflowEdge\n}\n\nDflowInput.prototype.isConnected = isConnected",
+        "ctx": {
+            "type": "function",
+            "name": "isConnected",
+            "string": "isConnected()"
+        }
+    },
+    {
+        "tags": [],
+        "description": {
+            "full": "@param {Object} output",
+            "summary": "@param {Object} output",
+            "body": ""
+        },
+        "ignore": false,
+        "code": "function connectTo (output) {\n  this.edge = new DflowEdge(this, output)\n}\n\nDflowInput.prototype.connectTo = connectTo\n\nmodule.exports = DflowInput",
+        "ctx": {
+            "type": "function",
+            "name": "connectTo",
+            "string": "connectTo()"
+        }
+    }
+]
