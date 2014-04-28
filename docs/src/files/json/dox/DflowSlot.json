@@ -1,0 +1,17 @@
+[
+    {
+        "tags": [],
+        "description": {
+            "full": "",
+            "summary": "",
+            "body": ""
+        },
+        "isPrivate": false,
+        "code": "function DflowSlot () {\n  this.data = null\n  this.name = null\n}\n\nmodule.exports = DflowSlot",
+        "ctx": {
+            "type": "function",
+            "name": "DflowSlot",
+            "string": "DflowSlot()"
+        }
+    }
+]
