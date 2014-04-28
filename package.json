@@ -10,7 +10,8 @@
     "iper": "0.0.5",
     "underscore": "~1.5.2",
     "inherits": "~2.0.1",
-    "strict-mode": "~0.1.0"
+    "strict-mode": "~0.1.0",
+    "gulp": "~3.5.6"
   },
   "repository": {
     "type": "git",
