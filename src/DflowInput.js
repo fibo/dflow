@@ -12,7 +12,7 @@ function DflowInput () {
 inherits(DflowInput, DflowSlot)
 
 /**
- * @return boolean
+ * @return {Boolean}
  */
 function isConnected () {
   return this.edge instanceof DflowEdge
