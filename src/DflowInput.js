@@ -1,7 +1,7 @@
 
-var DflowEdge  = require('./DflowEdge')
+var DflowEdge = require('./DflowEdge')
   , DflowSlot = require('./DflowSlot')
-  , inherits   = require('inherits')
+  , inherits  = require('inherits')
 
 function DflowInput () {
   DflowSlot.apply(this, arguments)
@@ -19,6 +19,15 @@ function isConnected () {
 }
 
 DflowInput.prototype.isConnected = isConnected
+
+/**
+ * @param {Object} output
+ */
+function connectTo (output) {
+  this.edge = new DflowEdge(this, output)
+}
+
+DflowInput.prototype.connectTo = connectTo
 
 module.exports = DflowInput
 

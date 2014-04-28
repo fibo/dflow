@@ -22,8 +22,25 @@ describe('DflowInput', function () {
   })
 
   describe('Method', function () {
+    describe('#connectTo()', function () {
+      var input  = new DflowInput()
+        , output = new DflowOutput()
+
+      input.connectTo(output)
+    })
+
     describe('#isConnected()', function () {
-      var input = new DflowInput()
+      var input  = new DflowInput()
+        , output = new DflowOutput()
+
+      it('defaults to false', function () {
+        input.isConnected().should.be.false
+      })
+
+      it('returns true when input has an edge', function () {
+        input.connectTo(output)
+        input.isConnected().should.be.true
+      })
     })
   })
 })
