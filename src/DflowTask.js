@@ -1,13 +1,11 @@
 
 function DflowTask () {
-  this.input = {}
-  this.output = {}
+  this.name = 'Task'
 }
 
 /**
- *
+ * Abstract function
  */
-
 function run () {
   throw new Error('unimplemented abstract function')
 }
