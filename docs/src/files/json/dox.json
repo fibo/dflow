@@ -1,18 +1,53 @@
 {
     "DflowEdge": [
         {
-            "tags": [],
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "source",
+                    "description": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "target",
+                    "description": ""
+                }
+            ],
             "description": {
-                "full": "",
-                "summary": "",
+                "full": "Connect outputs to inputs\n",
+                "summary": "Connect outputs to inputs\n",
                 "body": ""
             },
             "isPrivate": false,
-            "code": "function DflowEdge (source, target) {\n  this.source = source\n  this.target = target\n}\n\nmodule.exports = DflowEdge",
+            "ignore": false,
+            "code": "function DflowEdge (source, target) {\n  this.source = source\n\n  this.target = target\n}",
             "ctx": {
                 "type": "function",
                 "name": "DflowEdge",
                 "string": "DflowEdge()"
+            }
+        },
+        {
+            "tags": [],
+            "description": {
+                "full": "Export",
+                "summary": "Export",
+                "body": ""
+            },
+            "ignore": true,
+            "code": "module.exports = DflowEdge",
+            "ctx": {
+                "type": "property",
+                "receiver": "module",
+                "name": "exports",
+                "value": "DflowEdge",
+                "string": "module.exports"
             }
         }
     ],
@@ -20,10 +55,69 @@
         {
             "tags": [],
             "description": {
-                "full": "@param {Object} task",
-                "summary": "@param {Object} task",
+                "full": "A graph made of of tasks",
+                "summary": "A graph made of of tasks",
                 "body": ""
             },
+            "ignore": false,
+            "code": "function DflowGraph () {\n  DflowTask.apply(this, arguments)",
+            "ctx": {
+                "type": "function",
+                "name": "DflowGraph",
+                "string": "DflowGraph()"
+            }
+        },
+        {
+            "tags": [],
+            "description": {
+                "full": "Edge list",
+                "summary": "Edge list",
+                "body": ""
+            },
+            "ignore": false,
+            "code": "this.edges = []",
+            "ctx": {
+                "type": "property",
+                "receiver": "this",
+                "name": "edges",
+                "value": "[]",
+                "string": "this.edges"
+            }
+        },
+        {
+            "tags": [],
+            "description": {
+                "full": "Task list",
+                "summary": "Task list",
+                "body": ""
+            },
+            "ignore": false,
+            "code": "this.tasks = []\n}\n\ninherits(DflowGraph, DflowTask)",
+            "ctx": {
+                "type": "property",
+                "receiver": "this",
+                "name": "tasks",
+                "value": "[]",
+                "string": "this.tasks"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "task",
+                    "description": ""
+                }
+            ],
+            "description": {
+                "full": "Push a DflowTask\n",
+                "summary": "Push a DflowTask\n",
+                "body": ""
+            },
+            "isPrivate": false,
             "ignore": false,
             "code": "function createTask (obj) {\n  this.tasks.push(new DflowTask(obj))\n}\n\nDflowGraph.prototype.createTask = createTask",
             "ctx": {
@@ -35,8 +129,8 @@
         {
             "tags": [],
             "description": {
-                "full": "Runs every task",
-                "summary": "Runs every task",
+                "full": "Run every task",
+                "summary": "Run every task",
                 "body": ""
             },
             "ignore": false,
