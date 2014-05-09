@@ -1,0 +1,149 @@
+{
+    "DflowEdge": [
+        {
+            "tags": [],
+            "description": {
+                "full": "",
+                "summary": "",
+                "body": ""
+            },
+            "isPrivate": false,
+            "code": "function DflowEdge (source, target) {\n  this.source = source\n  this.target = target\n}\n\nmodule.exports = DflowEdge",
+            "ctx": {
+                "type": "function",
+                "name": "DflowEdge",
+                "string": "DflowEdge()"
+            }
+        }
+    ],
+    "DflowGraph": [
+        {
+            "tags": [],
+            "description": {
+                "full": "@param {Object} task",
+                "summary": "@param {Object} task",
+                "body": ""
+            },
+            "ignore": false,
+            "code": "function createTask (obj) {\n  this.tasks.push(new DflowTask(obj))\n}\n\nDflowGraph.prototype.createTask = createTask",
+            "ctx": {
+                "type": "function",
+                "name": "createTask",
+                "string": "createTask()"
+            }
+        },
+        {
+            "tags": [],
+            "description": {
+                "full": "Runs every task",
+                "summary": "Runs every task",
+                "body": ""
+            },
+            "ignore": false,
+            "code": "function run () {\n}\n\nDflowGraph.prototype.run = run\n\nmodule.exports = DflowGraph",
+            "ctx": {
+                "type": "function",
+                "name": "run",
+                "string": "run()"
+            }
+        }
+    ],
+    "DflowInput": [
+        {
+            "tags": [],
+            "description": {
+                "full": "@return {Boolean}",
+                "summary": "@return {Boolean}",
+                "body": ""
+            },
+            "ignore": false,
+            "code": "function isConnected () {\n  return this.edge instanceof DflowEdge\n}\n\nDflowInput.prototype.isConnected = isConnected",
+            "ctx": {
+                "type": "function",
+                "name": "isConnected",
+                "string": "isConnected()"
+            }
+        },
+        {
+            "tags": [],
+            "description": {
+                "full": "@param {Object} output",
+                "summary": "@param {Object} output",
+                "body": ""
+            },
+            "ignore": false,
+            "code": "function connectTo (output) {\n  this.edge = new DflowEdge(this, output)\n}\n\nDflowInput.prototype.connectTo = connectTo\n\nmodule.exports = DflowInput",
+            "ctx": {
+                "type": "function",
+                "name": "connectTo",
+                "string": "connectTo()"
+            }
+        }
+    ],
+    "DflowOutput": [
+        {
+            "tags": [],
+            "description": {
+                "full": "@return {Boolean}",
+                "summary": "@return {Boolean}",
+                "body": ""
+            },
+            "ignore": false,
+            "code": "function isConnected () {\n  return this.edges.length > 0\n}\n\nDflowOutput.prototype.isConnected = isConnected",
+            "ctx": {
+                "type": "function",
+                "name": "isConnected",
+                "string": "isConnected()"
+            }
+        },
+        {
+            "tags": [],
+            "description": {
+                "full": "@param {Object} input",
+                "summary": "@param {Object} input",
+                "body": ""
+            },
+            "ignore": false,
+            "code": "function connectTo (input) {\n  this.edges.push(new DflowEdge(input, this))\n}\n\nDflowOutput.prototype.isConnected = isConnected\n\nmodule.exports = DflowOutput",
+            "ctx": {
+                "type": "function",
+                "name": "connectTo",
+                "string": "connectTo()"
+            }
+        }
+    ],
+    "DflowSlot": [
+        {
+            "tags": [],
+            "description": {
+                "full": "",
+                "summary": "",
+                "body": ""
+            },
+            "isPrivate": false,
+            "code": "function DflowSlot () {\n  this.data = null\n  this.name = null\n}\n\nmodule.exports = DflowSlot",
+            "ctx": {
+                "type": "function",
+                "name": "DflowSlot",
+                "string": "DflowSlot()"
+            }
+        }
+    ],
+    "DflowTask": [
+        {
+            "tags": [],
+            "description": {
+                "full": "Abstract function",
+                "summary": "Abstract function",
+                "body": ""
+            },
+            "ignore": false,
+            "code": "function run () {\n  throw new Error('unimplemented abstract function')\n}\n\nDflowTask.prototype.run = run\n\nmodule.exports = DflowTask",
+            "ctx": {
+                "type": "function",
+                "name": "run",
+                "string": "run()"
+            }
+        }
+    ]
+}
