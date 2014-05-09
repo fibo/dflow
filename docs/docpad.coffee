@@ -1,11 +1,16 @@
 # DocPad Configuration File
 # http://docpad.org/docs/config
 
-pkg = require('../package.json')
+pkgData = require('../package.json')
+doxData = require('./src/files/json/dox.json')
 
 docpadConfig = {
   templateData: {
-    pkg: pkg
+    dox: doxData
+    pkg: pkgData
+    bootstrap: {
+      cdn: '//netdna.bootstrapcdn.com/bootstrap/3.1.1'
+    }
   }
 }
 

@@ -2,5 +2,15 @@
 layout: default
 ---
 
-api
+<% for section, api of @dox: %>
+  <h2><%= section %></h2>
 
+  <% for item in api: %>
+    <% if not item.ignore and not item.isPrivate and item.ctx: %>
+      <p>
+        <h3><%= item.ctx.name %></h3>
+        <h4><%= item.summary %></h4>
+      </p>
+    <% end %>
+  <% end %>
+<% end %>
