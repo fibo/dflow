@@ -3,14 +3,25 @@ layout: default
 ---
 
 <% for section, api of @dox: %>
-  <h2><%= section %></h2>
+	<h2><%= section %></h2>
 
-  <% for item in api: %>
-    <% if not item.ignore and not item.isPrivate and item.ctx: %>
-      <p>
-        <h3><%= item.ctx.name %></h3>
-        <h4><%= item.summary %></h4>
-      </p>
-    <% end %>
-  <% end %>
+	<% for item in api: %>
+		<% if not item.ignore and not item.isPrivate and item.ctx: %>
+			<% if item.ctx.type is 'property': %>
+				<% label = item.ctx.name %>
+			<% else: %>
+				<% label = item.ctx.string %>
+			<% end %>
+
+			<p>
+				<h3><%= label %></h3>
+				<h4><%= item.description.full %></h4>
+				<% for tag in item.tags: %>
+					<% if tag.type is 'param': %>
+						<span>param <%= tag.name %></span>
+					<% end %>
+				<% end %>
+			</p>
+		<% end %>
+	<% end %>
 <% end %>
