@@ -4,29 +4,29 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title><%= @pkg.name + ' | ' + @document.title %></title>
+  <title>dflow</title>
 
   <!-- Bootstrap -->
   <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="<%= @bootstrap.cdn %>/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1//css/bootstrap.min.css">
 
   <!-- Optional theme -->
-  <link rel="stylesheet" href="<%= @bootstrap.cdn %>/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1//css/bootstrap-theme.min.css">
 </head>
 <body style>
   <div class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
     <div class="container">
       <div class="navbar-header">
-        <a href=<% if @document.isIndex: %>"./"<% else: %>"../"<% end %> class="navbar-brand"><%= @pkg.name %></a>
+        <a href=./ class="navbar-brand">dflow</a>
       </div>
 
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
-          <li <% if @document.title is 'api': %>class="active"<% end %>><a href="./api.html">api</a></li>
+          <li ><a href="./api.html">api</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="https://github.com/fibo/<%= @pkg.name %>">repo</a></li>
+          <li><a href="https://github.com/fibo/dflow">repo</a></li>
 
           <li><a href="http://g14n.info">about me</a></li>
         </ul>
@@ -35,11 +35,25 @@
   </div> <!-- div class="navbar" -->
 
   <div class="container">
-    <div style="height: 50px;"></div>
-    <%- @content %>
-  </div>
 
-  <%- @getBlock('scripts').toHTML() %>
+    <div style="height: 50px;"></div>
+
+
+
+<h1 id="dflow">dflow</h1>
+<blockquote>
+<p>Dataflow programming</p>
+</blockquote>
+<p><a href="https://travis-ci.org//dflow.png?branch=master"><img src="https://travis-ci.org//dflow.png?branch=master" alt="Build Status"></a> <a href="http://badge.fury.io/js/dflow"><img src="https://badge.fury.io/js/dflow.png" alt="NPM version"></a> <a href="https://gemnasium.com//dflow"><img src="https://gemnasium.com//dflow.png" alt="Dependency Status"></a> <a href="https://waffle.io//dflow"><img src="https://badge.waffle.io//dflow.png?label=ready&amp;title=Ready" alt="Stories in Ready"></a></p>
+<h1 id="installation">Installation</h1>
+<p>With <a href="https://npmjs.org/">npm</a> do</p>
+<pre><code class="lang-bash">npm install dflow
+</code></pre>
+<h1 id="license">License</h1>
+<p><a href="http://fibo.mit-license.org/">MIT</a></p>
+
+
+  </div> <!-- div class="container" -->
 
   <script type="text/javascript"> <!-- Start of Google Analytics tracking code -->
 
@@ -56,3 +70,4 @@
   </script> <!-- End of Google Analytics tracking code -->
 </body>
 </html>
+

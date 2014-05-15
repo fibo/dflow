@@ -1,6 +1,6 @@
 {
   "name": "dflow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Dataflow programming",
   "main": "index.js",
   "scripts": {
@@ -28,12 +28,9 @@
       "url": "http://fibo.mit-license.org/"
     }
   ],
+  "homepage": "http://www.g14n.info/dflow",
   "devDependencies": {
-    "mocha": "~1.17.1",
-    "should": "~3.1.2",
-    "gulp-util": "~2.2.14",
-    "gulp": "~3.5.2",
-    "fibo-gulptasks": "git+ssh://git@github.com:fibo/fibo-gulptasks"
-  },
-  "homepage": "http://www.g14n.info/dflow"
+    "should": "^3.3.1",
+    "mocha": "^1.18.2"
+  }
 }
