@@ -92,7 +92,7 @@
                 "body": ""
             },
             "ignore": false,
-            "code": "this.tasks = []\n}\n\ninherits(DflowGraph, DflowTask)",
+            "code": "this.tasks = []\n}",
             "ctx": {
                 "type": "property",
                 "receiver": "this",
@@ -100,6 +100,16 @@
                 "value": "[]",
                 "string": "this.tasks"
             }
+        },
+        {
+            "tags": [],
+            "description": {
+                "full": "Inheritance",
+                "summary": "Inheritance",
+                "body": ""
+            },
+            "ignore": true,
+            "code": "inherits(DflowGraph, DflowTask)"
         },
         {
             "tags": [
