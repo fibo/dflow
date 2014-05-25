@@ -1,12 +1,32 @@
 
-var Foo = require('./Foo.js')
-  , should = require('should')
+var dflow = require('dflow')
 
+dflow.register('Math.min', Math.min)
+dflow.register('console.log', console.log)
 
-var foo = new Foo()
+var graph = {
+  tasks: [
+    {
+      id: 2,
+      arg: [''],
+      name: 'console.log',
+      out: undefined
+    },
+    {
+      id: 1,
+      arg: [4, 3],
+      name: 'Math.min',
+      out: undefined
+    }
+  ],
+  pipes: [
+    {
+      id: 3,
+      sourceId: 1,
+      targetId: [2, 0]
+    }
+  ]
+}
 
-foo.out.data = 5
-foo.in.data = 5
-foo.run()
-foo.out.data.should.be.eql(5)
+dflow.evaluate(graph)
 
