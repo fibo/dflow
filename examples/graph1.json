@@ -1,0 +1,31 @@
+{
+  "tasks": [
+    {
+      "id": 2,
+      "arg": [4, 5],
+      "name": "Math.max"
+    },
+    {
+      "id": 4,
+      "arg": [-1, 2],
+      "name": "Math.min"
+    },
+    {
+      "id": 1,
+      "arg": ["ciao"],
+      "name": "console.log"
+    }
+  ],
+  "pipes": [
+    {
+      "id": 3,
+      "sourceId": 2,
+      "targetId": [1, 1]
+    },
+    {
+      "id": 5,
+      "sourceId": 4,
+      "targetId": [2, 0]
+    }
+  ]
+}
