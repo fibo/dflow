@@ -1,28 +1,55 @@
 
 var dflow = require('dflow')
 
+function string (input) {
+  if (typeof input === 'string')
+    return input
+  else
+    return ''
+}
+
+dflow.register('string', function string (x) { return x })
+
 dflow.register('Math.min', Math.min)
+dflow.register('Math.max', Math.max)
 dflow.register('console.log', console.log)
 
 var graph = {
   tasks: [
     {
+      id: 7,
+      arg: ['hello'],
+      name: 'string',
+      out: undefined
+    },
+    {
+      id: 4,
+      arg: [4, 5],
+      name: 'Math.max',
+      out: undefined
+    },
+    {
       id: 2,
-      arg: [''],
-      name: 'console.log',
+      arg: [4, 3],
+      name: 'Math.min',
       out: undefined
     },
     {
       id: 1,
-      arg: [4, 3],
-      name: 'Math.min',
+      arg: ['ciao'],
+      name: 'console.log',
       out: undefined
     }
   ],
   pipes: [
     {
       id: 3,
-      sourceId: 1,
+      sourceId: 2,
+      targetId: [1, 1]
+    },
+    {
+      id: 5,
+      sourceId: 4,
       targetId: [2, 0]
     }
   ]

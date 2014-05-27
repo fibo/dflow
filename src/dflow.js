@@ -8,87 +8,84 @@ function register (name, func) {
 exports.register = register
 
 function evaluate (graph) {
-  var currentLevel = -1
-    , level = []
-    , pipes = graph.pipes
-    , seen = {}
-    , tasks = graph.tasks
-
-  for (var i in tasks)
-    seen[i] = false
+      // there are at most tasks.length levels
+  var maxLevel = graph.tasks.length
+    , levelOf = {}
 
   function nextLevel () {
-    var thisLevel = []
 
-    currentLevel++
-    console.log('currentLevel ' + currentLevel)
+    graph.tasks.forEach(function (task) {
+      var foundPipe      = false
+        , maxParentLevel = -1
 
-    for (var i in tasks) {
-      var task = tasks[i]
-        , belongsToThisLevel = true
+      if (typeof levelOf[task.id] !== 'undefined')
+        return
 
-      if (!seen[task.id]) {
-        for (var j in pipes) {
-          var pipe = pipes[j]
+      graph.pipes.forEach(function computeMaxParentLevel (pipe) {
+        if (pipe.targetId[0] === task.id) {
+          foundPipe = true
 
-          if (pipe.targetId[0] === task.id) {
-            console.log('pipe.id', pipe.id, 'has targetId', task.id, 'and sourceId', pipe.sourceId)
-
-            if (!seen[pipe.sourceId]) {
-              belongsToThisLevel = false
-            }
+          if (typeof levelOf[pipe.sourceId] === 'number') {
+            maxParentLevel = Math.max(levelOf[pipe.sourceId], maxParentLevel)
           }
         }
+      })
 
-        if (belongsToThisLevel) {
-          console.log('task.id', task.id, 'has level', currentLevel)
-          thisLevel.push(task)
-          seen[task.id] = true
-        }
-      }
-    }
-
-    if (thisLevel.length > 0)
-      level[currentLevel] = thisLevel
+      if (foundPipe)
+        levelOf[task.id] = maxParentLevel + 1
+      else
+        levelOf[task.id] = 0
+    })
   }
 
-  // there are at most tasks.length levels
-  for (var i in tasks)
-    nextLevel(i)
+  for (var i = 0; i < maxLevel; i++)
+    nextLevel()
 
-  console.dir(level)
+  console.log(levelOf)
 
-  function run(i) {
-    var task
-
-    for (var t in tasks)
-      if (tasks[t].id === i)
-        task = tasks[t]
-
+  function run (task) {
     var func = registered[task.name]
 
-    for (var j in pipes) {
-      var pipe = pipes[j]
-
+    graph.pipes.forEach(function (pipe) {
       if (pipe.targetId[0] === task.id) {
         var argIndex = pipe.targetId[1]
           , parentTaskId = pipe.sourceId
+          , parentTask
 
-        var parentTask = tasks[parentTaskId]
+        graph.tasks.forEach(function (task) {
+          if (parentTask)
+            return
 
-        task.arg[argIndex] = parentTask.out
+          if (parentTaskId === task.id)
+            parentTask = task
+        })
+
+        if (parentTask)
+          task.arg[argIndex] = parentTask.out
       }
-    }
+    })
 
     task.out = func.apply(null, task.arg)
   }
 
-  level.forEach(function (elements) {
-    elements.forEach(function (element) {
-      run(element.id)
-    })
-  })
+  function byLevel (a, b) {
+    return levelOf[a.id] - levelOf[b.id]
+  }
+
+  graph.tasks.sort(byLevel)
+       .forEach(run)
+
+  return graph
 }
 
 exports.evaluate = evaluate
+
+function emptyGraph () {
+  return {
+    tasks: [],
+    pipes: []
+  }
+}
+
+exports.emptyGraph = emptyGraph
 
