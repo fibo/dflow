@@ -1,5 +1,9 @@
 
-var registered = {}
+var registered = {
+  'console.log': console.log,
+  'Math.max': Math.max,
+  'Math.min': Math.min
+}
 
 function register (name, func) {
   registered[name] = func
@@ -7,73 +11,93 @@ function register (name, func) {
 
 exports.register = register
 
-function evaluate (graph) {
-      // there are at most tasks.length levels
-  var maxLevel = graph.tasks.length
-    , levelOf = {}
+function indexOfTask (graph, task) {
+  for (var i in graph.tasks)
+    if (task.id === graph.tasks[i].id)
+      return i
+}
 
-  function nextLevel () {
+function taskById (graph, id) {
+  for (var i in graph.tasks)
+    if (graph.tasks[i].id === id)
+      return graph.tasks[i]
+}
 
-    graph.tasks.forEach(function (task) {
-      var foundPipe      = false
-        , maxParentLevel = -1
+function inputPipesOfTask (graph, task) {
+  var inputPipes = []
 
-      if (typeof levelOf[task.id] !== 'undefined')
-        return
+  graph.pipes.forEach(function (pipe) {
+    if (pipe.targetId[0] === task.id)
+      inputPipes.push(pipe)
+  })
 
-      graph.pipes.forEach(function computeMaxParentLevel (pipe) {
-        if (pipe.targetId[0] === task.id) {
-          foundPipe = true
+  //console.log('task', task, 'has inputPipes', inputPipes)
 
-          if (typeof levelOf[pipe.sourceId] === 'number') {
-            maxParentLevel = Math.max(levelOf[pipe.sourceId], maxParentLevel)
-          }
-        }
+  return inputPipes
+}
+
+function parentsOfTask (graph, task) {
+  var parentTasks = []
+
+  inputPipesOfTask(graph, task)
+    .forEach(function (pipe) {
+      graph.tasks.forEach(function (task) {
+        if (pipe.sourceId === task.id)
+          parentTasks.push(task)
       })
-
-      if (foundPipe)
-        levelOf[task.id] = maxParentLevel + 1
-      else
-        levelOf[task.id] = 0
-    })
-  }
-
-  for (var i = 0; i < maxLevel; i++)
-    nextLevel()
-
-  console.log(levelOf)
-
-  function run (task) {
-    var func = registered[task.name]
-
-    graph.pipes.forEach(function (pipe) {
-      if (pipe.targetId[0] === task.id) {
-        var argIndex = pipe.targetId[1]
-          , parentTaskId = pipe.sourceId
-          , parentTask
-
-        graph.tasks.forEach(function (task) {
-          if (parentTask)
-            return
-
-          if (parentTaskId === task.id)
-            parentTask = task
-        })
-
-        if (parentTask)
-          task.arg[argIndex] = parentTask.out
-      }
     })
 
-    task.out = func.apply(null, task.arg)
-  }
+  //console.log('task', task, 'has parentTasks', parentTasks)
 
-  function byLevel (a, b) {
-    return levelOf[a.id] - levelOf[b.id]
-  }
+  return parentTasks
+}
 
-  graph.tasks.sort(byLevel)
-       .forEach(run)
+function levelOfTask (graph, task) {
+  var level = 0
+
+  parentsOfTask(graph, task)
+    .forEach( function (parentTask) {
+      level = Math.max(level, levelOfTask(graph, parentTask) + 1)
+    })
+
+  return level
+}
+
+exports.levelOfTask = levelOfTask
+
+function inputArgOfTask (graph, task) {
+  var inputArg = task.arg
+
+  inputPipesOfTask(graph, task)
+    .forEach(function (pipe) {
+      var argIndex = pipe.targetId[1]
+        , sourceTask = taskById(graph, pipe.sourceId)
+
+      inputArg[argIndex] = sourceTask.out
+    })
+
+  //console.log('task', task, 'has inputArg', inputArg)
+
+  return inputArg
+}
+
+function evaluate (graph) {
+  graph.tasks
+       .sort(function byLevel (a, b) {
+         return levelOfTask(graph, a) - levelOfTask(graph, b)
+       })
+       .forEach(function run (task) {
+         var func = registered[task.name]
+           , arg = inputArgOfTask(graph, task)
+
+         var out = func.apply(null, task.arg)
+
+         var i = indexOfTask(graph, task)
+
+         graph.tasks[i].arg = arg
+         graph.tasks[i].out = out
+         //console.log('running task', task)
+       })
 
   return graph
 }
