@@ -10,10 +10,6 @@ function string (input) {
 
 dflow.register('string', function string (x) { return x })
 
-dflow.register('Math.min', Math.min)
-dflow.register('Math.max', Math.max)
-dflow.register('console.log', console.log)
-
 var graph = {
   tasks: [
     {
@@ -43,6 +39,11 @@ var graph = {
   ],
   pipes: [
     {
+      id: 8,
+      sourceId: 7,
+      targetId: [1, 2]
+    },
+    {
       id: 3,
       sourceId: 2,
       targetId: [1, 1]
@@ -50,7 +51,7 @@ var graph = {
     {
       id: 5,
       sourceId: 4,
-      targetId: [2, 0]
+      targetId: [1, 0]
     }
   ]
 }
