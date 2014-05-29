@@ -1,9 +1,5 @@
 
-var registered = {
-  'console.log': console.log,
-  'Math.max': Math.max,
-  'Math.min': Math.min
-}
+var registered = require('./registry.js')
 
 function register (name, func) {
   registered[name] = func
