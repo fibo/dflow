@@ -7,17 +7,48 @@ function register (name, func) {
 
 exports.register = register
 
+/**
+ * Compute index of task
+ *
+ * @api private
+ *
+ * @param {Object} graph
+ * @param {Object} task
+ *
+ * @return {Number} index array
+ */
+
 function indexOfTask (graph, task) {
   for (var i in graph.tasks)
     if (task.id === graph.tasks[i].id)
       return i
 }
 
+/**
+ * Get task by id
+ *
+ * @param {Object} graph
+ * @param {Scalar} id
+ *
+ * @return {Objct} task
+ */
+
 function taskById (graph, id) {
   for (var i in graph.tasks)
     if (graph.tasks[i].id === id)
       return graph.tasks[i]
 }
+
+exports.taskById = taskById
+
+/**
+ * Compute input pipes of task
+ *
+ * @param {Object} graph
+ * @param {Object} task
+ *
+ * @return {Array} inputPipes connected to task
+ */
 
 function inputPipesOfTask (graph, task) {
   var inputPipes = []
@@ -27,10 +58,19 @@ function inputPipesOfTask (graph, task) {
       inputPipes.push(pipe)
   })
 
-  //console.log('task', task, 'has inputPipes', inputPipes)
-
   return inputPipes
 }
+
+exports.inputPipesOfTask = inputPipesOfTask
+
+/**
+ * Compute tasks that feeds the given task
+ *
+ * @param {Object} graph
+ * @param {Object} task
+ *
+ * @return {Array} parentsOfTask
+ */
 
 function parentsOfTask (graph, task) {
   var parentTasks = []
@@ -43,10 +83,22 @@ function parentsOfTask (graph, task) {
       })
     })
 
-  //console.log('task', task, 'has parentTasks', parentTasks)
-
   return parentTasks
 }
+
+exports.parentsOfTask = parentsOfTask
+
+/**
+ * Compute level of task
+ *
+ * A task that has no input pipe has level 0.
+ * The level task equals one plus the max level of parent tasks.
+ *
+ * @param {Object} graph
+ * @param {Object} task
+ *
+ * @return {Number} level
+ */
 
 function levelOfTask (graph, task) {
   var level = 0
@@ -61,6 +113,15 @@ function levelOfTask (graph, task) {
 
 exports.levelOfTask = levelOfTask
 
+/**
+ * Compute arguments of task
+ *
+ * @param {Object} graph
+ * @param {Object} task
+ *
+ * @return {Array} inputArg
+ */
+
 function inputArgOfTask (graph, task) {
   var inputArg = task.arg
 
@@ -72,10 +133,19 @@ function inputArgOfTask (graph, task) {
       inputArg[argIndex] = sourceTask.out
     })
 
-  //console.log('task', task, 'has inputArg', inputArg)
-
   return inputArg
 }
+
+exports.inputArgOfTask = inputArgOfTask
+
+/** Evaluate a dflow graph
+ *
+ * This is the core of dflow
+ *
+ * @param {Object} graph
+ *
+ * @return {Object} graph
+ */
 
 function evaluate (graph) {
   graph.tasks
@@ -92,13 +162,78 @@ function evaluate (graph) {
 
          graph.tasks[i].arg = arg
          graph.tasks[i].out = out
-         //console.log('running task', task)
        })
 
   return graph
 }
 
 exports.evaluate = evaluate
+
+/**
+ * Checks task name is available in registry
+ *
+ * @return {Boolean} isValid
+ */
+
+function isTask () {
+
+}
+
+/**
+ * Checks tasks and pipes are valid
+ *
+ * @param {Object} graph
+ *
+ * @return {Boolean} isValid
+ */
+
+function isGraph () {
+
+}
+
+/**
+ * Adds a task
+ *
+ * #param {Object} graph
+ * #param {String} name of task in the registry
+ *
+ * @param {Number} taskId
+ */
+
+function addTask (graph, name, arg) {
+
+}
+
+/**
+ * Pipes two tasks
+ *
+ * #param {Object} graph
+ * #param {Object} source task
+ * #param {Object} target task
+ * #param {Object} argIndex
+ *
+ * @param {Number} pipeId
+ */
+
+function addPipe (graph, source, target, argIndex) {
+
+}
+
+/**
+ * Removes a task
+ *
+ * @param {Number} taskId
+ */
+
+function delTask (taskId) {}
+
+/**
+ * Removes a pipe
+ *
+ * @param {Number} pipeId
+ */
+
+function delPipe (pipeId) {}
 
 function emptyGraph () {
   return {
