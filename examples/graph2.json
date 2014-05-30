@@ -1,0 +1,41 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "arg": [],
+      "name": "Math.PI"
+    },
+    {
+      "id": 2,
+      "arg": [],
+      "name": "typeof"
+    },
+    {
+      "id": 4,
+      "arg": [],
+      "name": "console.log"
+    },
+    {
+      "id": 3,
+      "arg": ["The typeof Math.PI is"],
+      "name": "string"
+    }
+  ],
+  "pipes": [
+    {
+      "id": 5,
+      "sourceId": 1,
+      "targetId": [2, 0]
+    },
+    {
+      "id": 6,
+      "sourceId": 2,
+      "targetId": [4, 1]
+    },
+    {
+      "id": 7,
+      "sourceId": 3,
+      "targetId": [4, 0]
+    }
+  ]
+}

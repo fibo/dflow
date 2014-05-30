@@ -1,6 +1,17 @@
 
-var dflow = require('dflow')
-  , graph = require('./graph1.json')
+/*
+ * usage:
+ *
+ * node examples/evaluateGraph.js XYZ
+ *
+ * will launch examples/graphXYZ.json
+ *
+ */
 
-console.log(JSON.stringify(dflow.evaluate(graph), null, 4))
+var dflow = require('dflow')
+  , graph = require('./graph' + process.argv[2] + '.json')
+
+//console.log(JSON.stringify(dflow.evaluate(graph), null, 4))
+
+dflow.evaluate(graph)
 
