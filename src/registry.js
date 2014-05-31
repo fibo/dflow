@@ -1,24 +1,26 @@
 
-
-/**
- * Return a value
- *
- * @api private
- */
-
-function x (val) {
-  return function () {
-    return val
-  }
-}
+function and (a, b) { return a && b }
+function or (a, b) { return a || b }
 
 var registry = {
-  'console.log': console.log,
-  'Math.max': Math.max,
-  'Math.min': Math.min,
-  'Math.PI': x(Math.PI),
-  'string': function string (x) { if (typeof x === 'string') return x },
-  'typeof' : function (x) { return typeof x }
+  'and'       : and
+, '&&'        : and
+, 'or'        : or
+, '||'        : or
+, '*'         : function (a, b) { return a * b }
+, '/'         : function (a, b) { return a / b }
+, '-'         : function (a, b) { return a - b }
+, '+'         : function (a, b) { return a + b }
+, '=='        : function (a, b) { return a == b }
+, '!='        : function (a, b) { return a != b }
+, '==='       : function (a, b) { return a === b }
+, '!=='       : function (a, b) { return a !== b }
+, 'string'    : function string (x) { if (typeof x === 'string') return x }
+, 'number'    : function number (x) { if (typeof x === 'number') return x }
+, 'object'    : function object (x) { if (typeof x === 'object') return x }
+, 'typeof'    : function _typeof (x) { return typeof x }
+, 'undefined' : function _undefined () { return undefined }
+, 'null'      : function _null () { return null }
 }
 
 module.exports = registry
