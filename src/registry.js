@@ -7,6 +7,7 @@ var registry = {
 , '&&'        : and
 , 'or'        : or
 , '||'        : or
+, '.'         : function (obj, propName) { return obj[propName] }
 , '*'         : function (a, b) { return a * b }
 , '/'         : function (a, b) { return a / b }
 , '-'         : function (a, b) { return a - b }

@@ -58,6 +58,8 @@ function register (name, func) {
 
 }
 
+register('dflow.register', register)
+
 register('dflow.registered', function () {
   var keys = []
 

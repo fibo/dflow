@@ -1,7 +1,7 @@
 
 var dflow = require('dflow')
 
-// add a custom functions
+// add a custom function
 dflow.register('message', function () { console.log('List of registered functions:') })
 
 dflow.evaluate({
