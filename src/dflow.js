@@ -1,9 +1,71 @@
 
+// Load core registry at compile time
 var registered = require('./registry.js')
 
-function register (name, func) {
-  registered[name] = func
+/**
+ * Wrap into a Function
+ *
+ * @api private
+ *
+ * @param {Any} arg
+ *
+ * @return {Function} func
+ */
+
+function coerceToFunction (arg) {
+  if (typeof arg === 'function')
+    return arg
+  else
+    return function () { return arg }
 }
+
+/**
+ * Store function in dflow registry
+ *
+ * @param {String} name identifier of task
+ * @param {Function} func to store in registry
+ *
+ * @return {Function} func stored in registry
+ */
+
+function register (name, func) {
+  if (registered[name])
+    return registered[name]
+
+  // At this point func was not found in registry
+  // so dflow will try to get it from global
+  var path = name.split('.')
+    
+  var globalName = path[0]
+    , propName = path[1]
+
+  if (typeof global[globalName] !== 'undefined')
+    if (typeof propName === 'undefined')
+      return coerceToFunction(global[globalName])
+    else
+      return coerceToFunction(global[globalName][propName])
+
+  // At this point no func was found in global
+  // so if a func was passed as parameter, I assume it should be inserted
+  // into the registry.
+  // Custom functions in registry will not override global definitions.
+
+  registered[name] = coerceToFunction(func)
+
+   // TODO try to require name 
+  // TODO since there are packages with a . in their name,
+  // like *socket.io* use split('/')
+
+}
+
+register('dflow.registered', function () {
+  var keys = []
+
+  for (var i in registered)
+    keys.push(i)
+
+  return keys
+})
 
 exports.register = register
 
@@ -153,12 +215,13 @@ function evaluate (graph) {
          return levelOfTask(graph, a) - levelOfTask(graph, b)
        })
        .forEach(function run (task) {
-         var func = registered[task.name]
-           , arg = inputArgOfTask(graph, task)
+         var arg, func, i, out
 
-         var out = func.apply(null, task.arg)
+         func = register(task.name)
 
-         var i = indexOfTask(graph, task)
+         arg = inputArgOfTask(graph, task)
+         out = func.apply(null, task.arg)
+         i = indexOfTask(graph, task)
 
          graph.tasks[i].arg = arg
          graph.tasks[i].out = out
