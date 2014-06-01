@@ -2,36 +2,55 @@
 <head>
   <meta charset="utf-8">
 
+  <meta name="keywords" content="dataflow,visual">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>dflow</title>
 
   <!-- Bootstrap -->
-  <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1//css/bootstrap.min.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1//css/bootstrap.min.css">
 
-  <!-- Optional theme -->
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1//css/bootstrap-theme.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1//css/bootstrap-theme.min.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1//js/bootstrap.min.js"></script>
+  <!-- Bootstrap END -->
+
 </head>
 <body style>
-  <div class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
+
+  <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
     <div class="container">
       <div class="navbar-header">
-        <a href=./ class="navbar-brand">dflow</a>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <a href="./" class="navbar-brand">dflow</a>
       </div>
 
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           <li ><a href="./api.html">api</a></li>
-        </ul>
-
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="https://github.com/fibo/dflow">repo</a></li>
-
-          <li><a href="http://g14n.info">about me</a></li>
+          <li><a href="https://github.com/fibo/dflow" target="_blank">code</a></li>
         </ul>
       </div>
-    </div> <!-- div class="container" -->
+    </div>
   </div> <!-- div class="navbar" -->
 
   <div class="container">
@@ -44,11 +63,31 @@
 <blockquote>
 <p>Dataflow programming</p>
 </blockquote>
-<p><a href="https://travis-ci.org//dflow.png?branch=master"><img src="https://travis-ci.org//dflow.png?branch=master" alt="Build Status"></a> <a href="http://badge.fury.io/js/dflow"><img src="https://badge.fury.io/js/dflow.png" alt="NPM version"></a> <a href="https://gemnasium.com//dflow"><img src="https://gemnasium.com//dflow.png" alt="Dependency Status"></a> <a href="https://waffle.io//dflow"><img src="https://badge.waffle.io//dflow.png?label=ready&amp;title=Ready" alt="Stories in Ready"></a></p>
+<p><a href="http://badge.fury.io/js/dflow"><img src="https://badge.fury.io/js/dflow.png" alt="NPM version"></a> <a href="https://travis-ci.org//dflow.png?branch=master"><img src="https://travis-ci.org//dflow.png?branch=master" alt="Build Status"></a> <a href="https://gemnasium.com//dflow"><img src="https://gemnasium.com//dflow.png" alt="Dependency Status"></a></p>
+<h1 id="hello-world">Hello world</h1>
+<pre><code class="lang-js">var dflow = require(&#39;dflow&#39;)
+
+// Create a graph with a single task and say &quot;Hello world&quot;
+
+var graph = {
+  tasks: [
+    {
+      name: &#39;console.log&#39;,
+      arg: [&#39;Hello&#39;, &#39;world&#39;]
+    }
+  ],
+  pipes: []
+}
+
+dflow.evaluate(graph)
+// Hello world
+</code></pre>
 <h1 id="installation">Installation</h1>
 <p>With <a href="https://npmjs.org/">npm</a> do</p>
-<pre><code class="lang-bash">npm install dflow
+<pre><code class="lang-bash">$ npm install dflow
 </code></pre>
+<h1 id="development">Development</h1>
+<p>Install <a href="https://github.com/fibo/fibo-gulptasks">fibo/fibo-gulptasks</a> for development tasks automation.</p>
 <h1 id="license">License</h1>
 <p><a href="http://fibo.mit-license.org/">MIT</a></p>
 
