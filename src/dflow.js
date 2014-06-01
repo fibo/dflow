@@ -94,7 +94,7 @@ function indexOfTask (graph, task) {
  * @param {Object} graph
  * @param {Scalar} id
  *
- * @return {Objct} task
+ * @return {Object} task
  */
 
 function taskById (graph, id) {
@@ -260,8 +260,8 @@ function isGraph () {
 /**
  * Add a task
  *
- * #param {Object} graph
- * #param {String} name of task in the registry
+ * @param {Object} graph
+ * @param {String} name of task in the registry
  *
  * @param {Number} taskId
  */
@@ -273,10 +273,10 @@ function addTask (graph, name, arg) {
 /**
  * Pipe two tasks
  *
- * #param {Object} graph
- * #param {Object} source task
- * #param {Object} target task
- * #param {Object} argIndex
+ * @param {Object} graph
+ * @param {Object} source task
+ * @param {Object} target task
+ * @param {Object} argIndex
  *
  * @param {Number} pipeId
  */

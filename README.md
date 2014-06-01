@@ -25,6 +25,14 @@ dflow.evaluate(graph)
 // Hello world
 ```
 
+Clone repo and run [Hello world source](https://github.com/fibo/dflow/blob/master/examples/helloWorld.js)
+
+```bash
+$ git clone https://github.com/fibo/dflow
+$ cd dflow
+$ node examples/helloWorld.js
+```
+
 # Installation
 
 With [npm](https://npmjs.org/) do

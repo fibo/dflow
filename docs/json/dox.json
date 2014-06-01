@@ -165,7 +165,7 @@
                 {
                     "type": "return",
                     "types": [
-                        "Objct"
+                        "Object"
                     ],
                     "description": "<p>task</p>\n"
                 }
@@ -461,6 +461,26 @@
                 {
                     "type": "param",
                     "types": [
+                        "Object"
+                    ],
+                    "name": "graph",
+                    "description": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "String"
+                    ],
+                    "name": "name",
+                    "description": "<p>of task in the registry</p>\n"
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
                         "Number"
                     ],
                     "name": "taskId",
@@ -468,9 +488,9 @@
                 }
             ],
             "description": {
-                "full": "<p>Add a task</p>\n<h1 id=\"param-object-graph\">param {Object} graph</h1>\n<h1 id=\"param-string-name-of-task-in-the-registry\">param {String} name of task in the registry</h1>\n",
+                "full": "<p>Add a task</p>\n",
                 "summary": "<p>Add a task</p>\n",
-                "body": "<h1 id=\"param-object-graph\">param {Object} graph</h1>\n<h1 id=\"param-string-name-of-task-in-the-registry\">param {String} name of task in the registry</h1>\n"
+                "body": ""
             },
             "isPrivate": false,
             "ignore": false,
@@ -486,6 +506,42 @@
                 {
                     "type": "param",
                     "types": [
+                        "Object"
+                    ],
+                    "name": "graph",
+                    "description": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "source",
+                    "description": "<p>task</p>\n"
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "target",
+                    "description": "<p>task</p>\n"
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "argIndex",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
                         "Number"
                     ],
                     "name": "pipeId",
@@ -493,9 +549,9 @@
                 }
             ],
             "description": {
-                "full": "<p>Pipe two tasks</p>\n<h1 id=\"param-object-graph\">param {Object} graph</h1>\n<h1 id=\"param-object-source-task\">param {Object} source task</h1>\n<h1 id=\"param-object-target-task\">param {Object} target task</h1>\n<h1 id=\"param-object-argindex\">param {Object} argIndex</h1>\n",
+                "full": "<p>Pipe two tasks</p>\n",
                 "summary": "<p>Pipe two tasks</p>\n",
-                "body": "<h1 id=\"param-object-graph\">param {Object} graph</h1>\n<h1 id=\"param-object-source-task\">param {Object} source task</h1>\n<h1 id=\"param-object-target-task\">param {Object} target task</h1>\n<h1 id=\"param-object-argindex\">param {Object} argIndex</h1>\n"
+                "body": ""
             },
             "isPrivate": false,
             "ignore": false,
