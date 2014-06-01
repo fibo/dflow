@@ -7,10 +7,7 @@
     "test": "mocha --bail --require should --reporter min"
   },
   "dependencies": {
-    "inherits": "~2.0.1",
-    "iper": "0.0.5",
-    "strict-mode": "^0.1.4",
-    "underscore": "^1.5.2"
+    "strict-mode": "^0.1.4"
   },
   "repository": {
     "type": "git",
