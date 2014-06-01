@@ -2,36 +2,55 @@
 <head>
   <meta charset="utf-8">
 
+  <meta name="keywords" content="dataflow,visual">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>dflow</title>
 
   <!-- Bootstrap -->
-  <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1//css/bootstrap.min.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1//css/bootstrap.min.css">
 
-  <!-- Optional theme -->
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1//css/bootstrap-theme.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1//css/bootstrap-theme.min.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1//js/bootstrap.min.js"></script>
+  <!-- Bootstrap END -->
+
 </head>
 <body style>
-  <div class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
+
+  <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
     <div class="container">
       <div class="navbar-header">
-        <a href=../ class="navbar-brand">dflow</a>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <a href="./" class="navbar-brand">dflow</a>
       </div>
 
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           <li class="active"><a href="./api.html">api</a></li>
-        </ul>
-
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="https://github.com/fibo/dflow">repo</a></li>
-
-          <li><a href="http://g14n.info">about me</a></li>
+          <li><a href="https://github.com/fibo/dflow" target="_blank">code</a></li>
         </ul>
       </div>
-    </div> <!-- div class="container" -->
+    </div>
   </div> <!-- div class="navbar" -->
 
   <div class="container">
@@ -40,6 +59,876 @@
 
 
 
+
+  <section>
+    <h1>dflow</h1>
+
+    
+      
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>register()</h2> <small><p>Store function in dflow registry</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  name
+                </th>
+                <td>
+                  
+                    <span class="badge">String</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                    <p>identifier of task</p>
+
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  func
+                </th>
+                <td>
+                  
+                    <span class="badge">Function</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                    <p>to store in registry</p>
+
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>taskById()</h2> <small><p>Get task by id</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  graph
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  id
+                </th>
+                <td>
+                  
+                    <span class="badge">Scalar</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>inputPipesOfTask()</h2> <small><p>Compute input pipes of task</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  graph
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  task
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>parentsOfTask()</h2> <small><p>Compute tasks that feeds the given task</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  graph
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  task
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>levelOfTask()</h2> <small><p>Compute level of task</p>
+</small>
+      </div>
+
+      <p><p>A task that has no input pipe has level 0.
+The level task equals one plus the max level of parent tasks.</p>
+</p>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  graph
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  task
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>inputArgOfTask()</h2> <small><p>Compute arguments of task</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  graph
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  task
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>evaluate()</h2> <small><p>Evaluate a dflow graph</p>
+</small>
+      </div>
+
+      <p><p>This is the core of dflow</p>
+</p>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  graph
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>isTask()</h2> <small><p>Checks task name is available in registry</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>isGraph()</h2> <small><p>Checks tasks and pipes are valid</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  graph
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>addTask()</h2> <small><p>Add a task</p>
+</small>
+      </div>
+
+      <p><h1 id="param-object-graph">param {Object} graph</h1>
+<h1 id="param-string-name-of-task-in-the-registry">param {String} name of task in the registry</h1>
+</p>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  taskId
+                </th>
+                <td>
+                  
+                    <span class="badge">Number</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>addPipe()</h2> <small><p>Pipe two tasks</p>
+</small>
+      </div>
+
+      <p><h1 id="param-object-graph">param {Object} graph</h1>
+<h1 id="param-object-source-task">param {Object} source task</h1>
+<h1 id="param-object-target-task">param {Object} target task</h1>
+<h1 id="param-object-argindex">param {Object} argIndex</h1>
+</p>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  pipeId
+                </th>
+                <td>
+                  
+                    <span class="badge">Number</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>delTask()</h2> <small><p>Remove a task</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  taskId
+                </th>
+                <td>
+                  
+                    <span class="badge">Number</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>delPipe()</h2> <small><p>Remove a pipe</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  pipeId
+                </th>
+                <td>
+                  
+                    <span class="badge">Number</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+        </tbody>
+      </table>
+    
+
+  </section>
+
+  <section>
+    <h1>registry</h1>
+
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>and()</h2> <small>summary</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+    
+
+  </section>
 
 
   </div> <!-- div class="container" -->

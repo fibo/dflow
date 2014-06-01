@@ -1,13 +1,109 @@
 {
-    "DflowEdge": [
+    "dflow": [
+        {
+            "tags": [
+                {
+                    "type": "api",
+                    "visibility": "private"
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Any"
+                    ],
+                    "name": "arg",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Function"
+                    ],
+                    "description": "<p>func</p>\n"
+                }
+            ],
+            "description": {
+                "full": "<p>Wrap into a Function</p>\n",
+                "summary": "<p>Wrap into a Function</p>\n",
+                "body": ""
+            },
+            "isPrivate": true,
+            "ignore": false,
+            "code": "function coerceToFunction (arg) {\n  if (typeof arg === 'function')\n    return arg\n  else\n    return function value () { return arg }\n}",
+            "ctx": {
+                "type": "function",
+                "name": "coerceToFunction",
+                "string": "coerceToFunction()"
+            }
+        },
         {
             "tags": [
                 {
                     "type": "param",
                     "types": [
+                        "String"
+                    ],
+                    "name": "name",
+                    "description": "<p>identifier of task</p>\n"
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Function"
+                    ],
+                    "name": "func",
+                    "description": "<p>to store in registry</p>\n"
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Function"
+                    ],
+                    "description": "<p>func stored in registry</p>\n"
+                }
+            ],
+            "description": {
+                "full": "<p>Store function in dflow registry</p>\n",
+                "summary": "<p>Store function in dflow registry</p>\n",
+                "body": ""
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function register (name, func) {\n  if (registered[name])\n    return registered[name]\n\n  // At this point func was not found in registry\n  // so dflow will try to get it from global\n  var path = name.split('.')\n    \n  var globalName = path[0]\n    , propName = path[1]\n\n  if (typeof global[globalName] !== 'undefined')\n    if (typeof propName === 'undefined')\n      return coerceToFunction(global[globalName])\n    else\n      return coerceToFunction(global[globalName][propName])\n\n  // At this point no func was found in global\n  // so if a func was passed as parameter, I assume it should be inserted\n  // into the registry.\n  // Custom functions in registry will not override global definitions.\n\n  registered[name] = coerceToFunction(func)\n\n   // TODO try to require name \n  // TODO since there are packages with a . in their name,\n  // like *socket.io* use split('/')\n\n}\n\nregister('dflow.register', register)\n\nregister('dflow.registered', function () {\n  var keys = []\n\n  for (var i in registered)\n    keys.push(i)\n\n  return keys\n})\n\nexports.register = register",
+            "ctx": {
+                "type": "function",
+                "name": "register",
+                "string": "register()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "api",
+                    "visibility": "private"
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
                         "Object"
                     ],
-                    "name": "source",
+                    "name": "graph",
                     "description": ""
                 },
                 {
@@ -15,101 +111,34 @@
                     "types": [
                         "Object"
                     ],
-                    "name": "target",
+                    "name": "task",
                     "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Number"
+                    ],
+                    "description": "<p>index array</p>\n"
                 }
             ],
             "description": {
-                "full": "Connect outputs to inputs\n",
-                "summary": "Connect outputs to inputs\n",
+                "full": "<p>Compute index of task</p>\n",
+                "summary": "<p>Compute index of task</p>\n",
                 "body": ""
             },
-            "isPrivate": false,
+            "isPrivate": true,
             "ignore": false,
-            "code": "function DflowEdge (source, target) {\n  this.source = source\n\n  this.target = target\n}",
+            "code": "function indexOfTask (graph, task) {\n  for (var i in graph.tasks)\n    if (task.id === graph.tasks[i].id)\n      return i\n}",
             "ctx": {
                 "type": "function",
-                "name": "DflowEdge",
-                "string": "DflowEdge()"
+                "name": "indexOfTask",
+                "string": "indexOfTask()"
             }
-        },
-        {
-            "tags": [],
-            "description": {
-                "full": "Export",
-                "summary": "Export",
-                "body": ""
-            },
-            "ignore": true,
-            "code": "module.exports = DflowEdge",
-            "ctx": {
-                "type": "property",
-                "receiver": "module",
-                "name": "exports",
-                "value": "DflowEdge",
-                "string": "module.exports"
-            }
-        }
-    ],
-    "DflowGraph": [
-        {
-            "tags": [],
-            "description": {
-                "full": "A graph made of of tasks",
-                "summary": "A graph made of of tasks",
-                "body": ""
-            },
-            "ignore": false,
-            "code": "function DflowGraph () {\n  DflowTask.apply(this, arguments)",
-            "ctx": {
-                "type": "function",
-                "name": "DflowGraph",
-                "string": "DflowGraph()"
-            }
-        },
-        {
-            "tags": [],
-            "description": {
-                "full": "Edge list",
-                "summary": "Edge list",
-                "body": ""
-            },
-            "ignore": false,
-            "code": "this.edges = []",
-            "ctx": {
-                "type": "property",
-                "receiver": "this",
-                "name": "edges",
-                "value": "[]",
-                "string": "this.edges"
-            }
-        },
-        {
-            "tags": [],
-            "description": {
-                "full": "Task list",
-                "summary": "Task list",
-                "body": ""
-            },
-            "ignore": false,
-            "code": "this.tasks = []\n}",
-            "ctx": {
-                "type": "property",
-                "receiver": "this",
-                "name": "tasks",
-                "value": "[]",
-                "string": "this.tasks"
-            }
-        },
-        {
-            "tags": [],
-            "description": {
-                "full": "Inheritance",
-                "summary": "Inheritance",
-                "body": ""
-            },
-            "ignore": true,
-            "code": "inherits(DflowGraph, DflowTask)"
         },
         {
             "tags": [
@@ -118,105 +147,417 @@
                     "types": [
                         "Object"
                     ],
-                    "name": "task",
+                    "name": "graph",
                     "description": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Scalar"
+                    ],
+                    "name": "id",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Objct"
+                    ],
+                    "description": "<p>task</p>\n"
                 }
             ],
             "description": {
-                "full": "Push a DflowTask\n",
-                "summary": "Push a DflowTask\n",
+                "full": "<p>Get task by id</p>\n",
+                "summary": "<p>Get task by id</p>\n",
                 "body": ""
             },
             "isPrivate": false,
             "ignore": false,
-            "code": "function createTask (obj) {\n  this.tasks.push(new DflowTask(obj))\n}\n\nDflowGraph.prototype.createTask = createTask",
+            "code": "function taskById (graph, id) {\n  for (var i in graph.tasks)\n    if (graph.tasks[i].id === id)\n      return graph.tasks[i]\n}\n\nexports.taskById = taskById",
             "ctx": {
                 "type": "function",
-                "name": "createTask",
-                "string": "createTask()"
+                "name": "taskById",
+                "string": "taskById()"
             }
         },
         {
-            "tags": [],
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "graph",
+                    "description": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "task",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Array"
+                    ],
+                    "description": "<p>inputPipes connected to task</p>\n"
+                }
+            ],
             "description": {
-                "full": "Run every task",
-                "summary": "Run every task",
+                "full": "<p>Compute input pipes of task</p>\n",
+                "summary": "<p>Compute input pipes of task</p>\n",
                 "body": ""
             },
+            "isPrivate": false,
             "ignore": false,
-            "code": "function run () {\n}\n\nDflowGraph.prototype.run = run\n\nmodule.exports = DflowGraph",
+            "code": "function inputPipesOfTask (graph, task) {\n  var inputPipes = []\n\n  graph.pipes.forEach(function (pipe) {\n    if (pipe.targetId[0] === task.id)\n      inputPipes.push(pipe)\n  })\n\n  return inputPipes\n}\n\nexports.inputPipesOfTask = inputPipesOfTask",
             "ctx": {
                 "type": "function",
-                "name": "run",
-                "string": "run()"
-            }
-        }
-    ],
-    "DflowInput": [
-        {
-            "tags": [],
-            "description": {
-                "full": "@return {Boolean}",
-                "summary": "@return {Boolean}",
-                "body": ""
-            },
-            "ignore": false,
-            "code": "function isConnected () {\n  return this.edge instanceof DflowEdge\n}\n\nDflowInput.prototype.isConnected = isConnected",
-            "ctx": {
-                "type": "function",
-                "name": "isConnected",
-                "string": "isConnected()"
-            }
-        },
-        {
-            "tags": [],
-            "description": {
-                "full": "@param {Object} output",
-                "summary": "@param {Object} output",
-                "body": ""
-            },
-            "ignore": false,
-            "code": "function connectTo (output) {\n  this.edge = new DflowEdge(this, output)\n}\n\nDflowInput.prototype.connectTo = connectTo\n\nmodule.exports = DflowInput",
-            "ctx": {
-                "type": "function",
-                "name": "connectTo",
-                "string": "connectTo()"
-            }
-        }
-    ],
-    "DflowOutput": [
-        {
-            "tags": [],
-            "description": {
-                "full": "@return {Boolean}",
-                "summary": "@return {Boolean}",
-                "body": ""
-            },
-            "ignore": false,
-            "code": "function isConnected () {\n  return this.edges.length > 0\n}\n\nDflowOutput.prototype.isConnected = isConnected",
-            "ctx": {
-                "type": "function",
-                "name": "isConnected",
-                "string": "isConnected()"
+                "name": "inputPipesOfTask",
+                "string": "inputPipesOfTask()"
             }
         },
         {
-            "tags": [],
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "graph",
+                    "description": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "task",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Array"
+                    ],
+                    "description": "<p>parentsOfTask</p>\n"
+                }
+            ],
             "description": {
-                "full": "@param {Object} input",
-                "summary": "@param {Object} input",
+                "full": "<p>Compute tasks that feeds the given task</p>\n",
+                "summary": "<p>Compute tasks that feeds the given task</p>\n",
                 "body": ""
             },
+            "isPrivate": false,
             "ignore": false,
-            "code": "function connectTo (input) {\n  this.edges.push(new DflowEdge(input, this))\n}\n\nDflowOutput.prototype.isConnected = isConnected\n\nmodule.exports = DflowOutput",
+            "code": "function parentsOfTask (graph, task) {\n  var parentTasks = []\n\n  inputPipesOfTask(graph, task)\n    .forEach(function (pipe) {\n      graph.tasks.forEach(function (task) {\n        if (pipe.sourceId === task.id)\n          parentTasks.push(task)\n      })\n    })\n\n  return parentTasks\n}\n\nexports.parentsOfTask = parentsOfTask",
             "ctx": {
                 "type": "function",
-                "name": "connectTo",
-                "string": "connectTo()"
+                "name": "parentsOfTask",
+                "string": "parentsOfTask()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "graph",
+                    "description": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "task",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Number"
+                    ],
+                    "description": "<p>level</p>\n"
+                }
+            ],
+            "description": {
+                "full": "<p>Compute level of task</p>\n<p>A task that has no input pipe has level 0.\nThe level task equals one plus the max level of parent tasks.</p>\n",
+                "summary": "<p>Compute level of task</p>\n",
+                "body": "<p>A task that has no input pipe has level 0.\nThe level task equals one plus the max level of parent tasks.</p>\n"
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function levelOfTask (graph, task) {\n  var level = 0\n\n  parentsOfTask(graph, task)\n    .forEach( function (parentTask) {\n      level = Math.max(level, levelOfTask(graph, parentTask) + 1)\n    })\n\n  return level\n}\n\nexports.levelOfTask = levelOfTask",
+            "ctx": {
+                "type": "function",
+                "name": "levelOfTask",
+                "string": "levelOfTask()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "graph",
+                    "description": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "task",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Array"
+                    ],
+                    "description": "<p>inputArg</p>\n"
+                }
+            ],
+            "description": {
+                "full": "<p>Compute arguments of task</p>\n",
+                "summary": "<p>Compute arguments of task</p>\n",
+                "body": ""
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function inputArgOfTask (graph, task) {\n  var inputArg = task.arg\n\n  inputPipesOfTask(graph, task)\n    .forEach(function (pipe) {\n      var argIndex = pipe.targetId[1]\n        , sourceTask = taskById(graph, pipe.sourceId)\n\n      inputArg[argIndex] = sourceTask.out\n    })\n\n  return inputArg\n}\n\nexports.inputArgOfTask = inputArgOfTask",
+            "ctx": {
+                "type": "function",
+                "name": "inputArgOfTask",
+                "string": "inputArgOfTask()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "graph",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Object"
+                    ],
+                    "description": "<p>graph</p>\n"
+                }
+            ],
+            "description": {
+                "full": "<p>Evaluate a dflow graph</p>\n<p>This is the core of dflow</p>\n",
+                "summary": "<p>Evaluate a dflow graph</p>\n",
+                "body": "<p>This is the core of dflow</p>\n"
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function evaluate (graph) {\n  graph.tasks\n       .sort(function byLevel (a, b) {\n         return levelOfTask(graph, a) - levelOfTask(graph, b)\n       })\n       .forEach(function run (task) {\n         var arg, func, i, out\n\n         func = register(task.name)\n\n         arg = inputArgOfTask(graph, task)\n         out = func.apply(null, task.arg)\n         i = indexOfTask(graph, task)\n\n         graph.tasks[i].arg = arg\n         graph.tasks[i].out = out\n       })\n\n  return graph\n}\n\nexports.evaluate = evaluate",
+            "ctx": {
+                "type": "function",
+                "name": "evaluate",
+                "string": "evaluate()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "return",
+                    "types": [
+                        "Boolean"
+                    ],
+                    "description": "<p>isValid</p>\n"
+                }
+            ],
+            "description": {
+                "full": "<p>Checks task name is available in registry</p>\n",
+                "summary": "<p>Checks task name is available in registry</p>\n",
+                "body": ""
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function isTask () {\n\n}",
+            "ctx": {
+                "type": "function",
+                "name": "isTask",
+                "string": "isTask()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "graph",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Boolean"
+                    ],
+                    "description": "<p>isValid</p>\n"
+                }
+            ],
+            "description": {
+                "full": "<p>Checks tasks and pipes are valid</p>\n",
+                "summary": "<p>Checks tasks and pipes are valid</p>\n",
+                "body": ""
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function isGraph () {\n\n}",
+            "ctx": {
+                "type": "function",
+                "name": "isGraph",
+                "string": "isGraph()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Number"
+                    ],
+                    "name": "taskId",
+                    "description": ""
+                }
+            ],
+            "description": {
+                "full": "<p>Add a task</p>\n<h1 id=\"param-object-graph\">param {Object} graph</h1>\n<h1 id=\"param-string-name-of-task-in-the-registry\">param {String} name of task in the registry</h1>\n",
+                "summary": "<p>Add a task</p>\n",
+                "body": "<h1 id=\"param-object-graph\">param {Object} graph</h1>\n<h1 id=\"param-string-name-of-task-in-the-registry\">param {String} name of task in the registry</h1>\n"
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function addTask (graph, name, arg) {\n\n}",
+            "ctx": {
+                "type": "function",
+                "name": "addTask",
+                "string": "addTask()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Number"
+                    ],
+                    "name": "pipeId",
+                    "description": ""
+                }
+            ],
+            "description": {
+                "full": "<p>Pipe two tasks</p>\n<h1 id=\"param-object-graph\">param {Object} graph</h1>\n<h1 id=\"param-object-source-task\">param {Object} source task</h1>\n<h1 id=\"param-object-target-task\">param {Object} target task</h1>\n<h1 id=\"param-object-argindex\">param {Object} argIndex</h1>\n",
+                "summary": "<p>Pipe two tasks</p>\n",
+                "body": "<h1 id=\"param-object-graph\">param {Object} graph</h1>\n<h1 id=\"param-object-source-task\">param {Object} source task</h1>\n<h1 id=\"param-object-target-task\">param {Object} target task</h1>\n<h1 id=\"param-object-argindex\">param {Object} argIndex</h1>\n"
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function addPipe (graph, source, target, argIndex) {\n\n}",
+            "ctx": {
+                "type": "function",
+                "name": "addPipe",
+                "string": "addPipe()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Number"
+                    ],
+                    "name": "taskId",
+                    "description": ""
+                }
+            ],
+            "description": {
+                "full": "<p>Remove a task</p>\n",
+                "summary": "<p>Remove a task</p>\n",
+                "body": ""
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function delTask (taskId) {}",
+            "ctx": {
+                "type": "function",
+                "name": "delTask",
+                "string": "delTask()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "param",
+                    "types": [
+                        "Number"
+                    ],
+                    "name": "pipeId",
+                    "description": ""
+                }
+            ],
+            "description": {
+                "full": "<p>Remove a pipe</p>\n",
+                "summary": "<p>Remove a pipe</p>\n",
+                "body": ""
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function delPipe (pipeId) {}\n\nfunction emptyGraph () {\n  return {\n    tasks: [],\n    pipes: []\n  }\n}\n\nexports.emptyGraph = emptyGraph",
+            "ctx": {
+                "type": "function",
+                "name": "delPipe",
+                "string": "delPipe()"
             }
         }
     ],
-    "DflowSlot": [
+    "registry": [
         {
             "tags": [],
             "description": {
@@ -225,28 +566,11 @@
                 "body": ""
             },
             "isPrivate": false,
-            "code": "function DflowSlot () {\n  this.data = null\n  this.name = null\n}\n\nmodule.exports = DflowSlot",
+            "code": "function and (a, b) { return a && b }\nfunction or (a, b) { return a || b }\n\nvar registry = {\n  'and'       : and\n, '&&'        : and\n, 'or'        : or\n, '||'        : or\n, '.'         : function (obj, propName) { return obj[propName] }\n, '*'         : function (a, b) { return a * b }\n, '/'         : function (a, b) { return a / b }\n, '-'         : function (a, b) { return a - b }\n, '+'         : function (a, b) { return a + b }\n, '=='        : function (a, b) { return a == b }\n, '!='        : function (a, b) { return a != b }\n, '==='       : function (a, b) { return a === b }\n, '!=='       : function (a, b) { return a !== b }\n, 'string'    : function string (x) { if (typeof x === 'string') return x }\n, 'number'    : function number (x) { if (typeof x === 'number') return x }\n, 'object'    : function object (x) { if (typeof x === 'object') return x }\n, 'typeof'    : function _typeof (x) { return typeof x }\n, 'undefined' : function _undefined () { return undefined }\n, 'null'      : function _null () { return null }\n}\n\nmodule.exports = registry",
             "ctx": {
                 "type": "function",
-                "name": "DflowSlot",
-                "string": "DflowSlot()"
-            }
-        }
-    ],
-    "DflowTask": [
-        {
-            "tags": [],
-            "description": {
-                "full": "Abstract function",
-                "summary": "Abstract function",
-                "body": ""
-            },
-            "ignore": false,
-            "code": "function run () {\n  throw new Error('unimplemented abstract function')\n}\n\nDflowTask.prototype.run = run\n\nmodule.exports = DflowTask",
-            "ctx": {
-                "type": "function",
-                "name": "run",
-                "string": "run()"
+                "name": "and",
+                "string": "and()"
             }
         }
     ]

@@ -16,7 +16,7 @@ function coerceToFunction (arg) {
   if (typeof arg === 'function')
     return arg
   else
-    return function () { return arg }
+    return function value () { return arg }
 }
 
 /**
@@ -202,7 +202,8 @@ function inputArgOfTask (graph, task) {
 
 exports.inputArgOfTask = inputArgOfTask
 
-/** Evaluate a dflow graph
+/**
+ * Evaluate a dflow graph
  *
  * This is the core of dflow
  *
@@ -257,7 +258,7 @@ function isGraph () {
 }
 
 /**
- * Adds a task
+ * Add a task
  *
  * #param {Object} graph
  * #param {String} name of task in the registry
@@ -270,7 +271,7 @@ function addTask (graph, name, arg) {
 }
 
 /**
- * Pipes two tasks
+ * Pipe two tasks
  *
  * #param {Object} graph
  * #param {Object} source task
@@ -285,7 +286,7 @@ function addPipe (graph, source, target, argIndex) {
 }
 
 /**
- * Removes a task
+ * Remove a task
  *
  * @param {Number} taskId
  */
@@ -293,7 +294,7 @@ function addPipe (graph, source, target, argIndex) {
 function delTask (taskId) {}
 
 /**
- * Removes a pipe
+ * Remove a pipe
  *
  * @param {Number} pipeId
  */
