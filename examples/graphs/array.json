@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+       "id": 1,
+       "arg": [],
+       "name": "[]"
+       "arg": ["foo", "bar"]
+    },
+    {
+       "id": 2,
+       "arg": [],
+       "name": "console.log"
+    }
+  ],
+  "pipes" : [
+    {
+       "id": 3,
+       "sourceId": 1,
+       "targetId": [2, 0]
+    }
+  ]
+}

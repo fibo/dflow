@@ -9,7 +9,7 @@
  */
 
 var dflow = require('dflow')
-  , graph = require('./graph' + process.argv[2] + '.json')
+  , graph = require('./graphs/' + process.argv[2] + '.json')
 
 //console.log(JSON.stringify(dflow.evaluate(graph), null, 4))
 
