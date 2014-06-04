@@ -2,6 +2,8 @@
 // Load core registry at compile time
 var registered = require('./registry.js')
 
+var nextId = 0
+
 /**
  * Wrap into a Function
  *
@@ -256,13 +258,24 @@ function isGraph () {
  *
  * @param {Object} graph
  * @param {String} name of task in the registry
+ * @param {Array} arg list passed to task function
  *
- * @param {Number} taskId
+ * @return {Object} task
  */
 
 function addTask (graph, name, arg) {
+  var task = {
+    id: nextId++
+  , name: name
+  , arg: arg
+  }
 
+  graph.tasks.push(task)
+
+  return task
 }
+
+exports.addTask = addTask
 
 /**
  * Pipe two tasks
@@ -272,33 +285,55 @@ function addTask (graph, name, arg) {
  * @param {Object} target task
  * @param {Object} argIndex
  *
- * @param {Number} pipeId
+ * @return {Object} pipe
  */
 
 function addPipe (graph, source, target, argIndex) {
+  var pipe = {
+    id: nextId++
+  , sourceId: null
+  , targetId: []
+  }
 
+  return pipe
 }
+
+exports.addPipe = addPipe
 
 /**
  * Remove a task
  *
+ * @param {Object} graph
  * @param {Number} taskId
+ *
+ * @return {Object} task
  */
 
-function delTask (taskId) {}
+function delTask (graph, taskId) {
+}
 
 /**
  * Remove a pipe
  *
+ * @param {Object} graph
  * @param {Number} pipeId
+ *
+ * @return {Object} pipe
  */
 
-function delPipe (pipeId) {}
+function delPipe (graph, pipeId) {
+}
+
+/**
+ * Return an empty graph
+ *
+ * @return {Object} graph
+ */
 
 function emptyGraph () {
   return {
-    tasks: [],
-    pipes: []
+    tasks: []
+  , pipes: []
   }
 }
 
