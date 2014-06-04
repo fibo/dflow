@@ -1,29 +1,41 @@
 {
   "tasks": [
     {
+       "arg": [],
        "id": 1,
        "name": "."
     },
     {
        "id": 2,
-       "name": "Math"
+       "name": "string",
+       "arg": ["Math"]
     },
     {
        "id": 3,
        "name": "string",
        "arg": ["PI"]
+    },
+    {
+       "arg": [],
+       "id": 4,
+       "name": "console.log"
     }
   ],
   "pipes" : [
     {
-      "id": 4,
+      "id": 5,
       "targetId": [1, 1],
       "sourceId": 3
     },
     {
-      "id": 5,
+      "id": 6,
       "targetId": [1, 0],
       "sourceId": 2
+    },
+    {
+      "id": 7,
+      "targetId": [4, 0],
+      "sourceId": 1
     }
   ]
 }
