@@ -1,0 +1,48 @@
+{
+  "tasks": [
+    {
+       "id": 1,
+       "name": "console"
+    },
+    {
+       "id": 2,
+       "name": "string",
+       "arg": ["log"]
+    },
+    {
+       "id": 3,
+       "name": "."
+    },
+    {
+       "id": 4,
+       "name": "array",
+       "arg": ["foo", "bar"]
+    },
+    {
+       "id": 5,
+       "name": "Array.forEach"
+    }
+  ],
+  "pipes" : [
+    {
+       "id": 6,
+       "sourceId": 1,
+       "targetId": [3, 0]
+    },
+    {
+       "id": 7,
+       "sourceId": 2,
+       "targetId": [3, 1]
+    },
+    {
+       "id": 8,
+       "sourceId": 4,
+       "targetId": [5, 0]
+    },
+    {
+       "id": 9,
+       "sourceId": 3,
+       "targetId": [5, 1]
+    }
+  ]
+}

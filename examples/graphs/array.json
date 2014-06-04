@@ -2,8 +2,7 @@
   "tasks": [
     {
        "id": 1,
-       "arg": [],
-       "name": "[]"
+       "name": "array",
        "arg": ["foo", "bar"]
     },
     {

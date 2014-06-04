@@ -35,15 +35,17 @@ function register (name, func) {
   // At this point func was not found in registry
   // so dflow will try to get it from global
   var path = name.split('.')
-    
+
   var globalName = path[0]
     , propName = path[1]
 
-  if (typeof global[globalName] !== 'undefined')
-    if (typeof propName === 'undefined')
-      return coerceToFunction(global[globalName])
-    else
-      return coerceToFunction(global[globalName][propName])
+  if (typeof global[globalName] !== 'undefined') {
+    if (typeof propName !== 'undefined') {
+      registered[name] = coerceToFunction(global[globalName][propName])
+
+      return registered[name]
+    }
+  }
 
   // At this point no func was found in global
   // so if a func was passed as parameter, I assume it should be inserted
@@ -51,23 +53,15 @@ function register (name, func) {
   // Custom functions in registry will not override global definitions.
 
   registered[name] = coerceToFunction(func)
+  return registered[name]
 
-   // TODO try to require name 
+   // TODO try to require name
   // TODO since there are packages with a . in their name,
   // like *socket.io* use split('/')
 
 }
 
 register('dflow.register', register)
-
-register('dflow.registered', function () {
-  var keys = []
-
-  for (var i in registered)
-    keys.push(i)
-
-  return keys
-})
 
 exports.register = register
 
@@ -187,7 +181,7 @@ exports.levelOfTask = levelOfTask
  */
 
 function inputArgOfTask (graph, task) {
-  var inputArg = task.arg
+  var inputArg = task.arg || []
 
   inputPipesOfTask(graph, task)
     .forEach(function (pipe) {

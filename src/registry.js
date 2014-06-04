@@ -15,12 +15,23 @@ function or (a, b) { return a || b }
 
 function array () { return Array.prototype.slice.call(arguments, 0) }
 
+function dot (obj, propName) {
+  if (typeof propName === 'string') {
+    if (typeof obj === 'object')
+      return obj[propName]
+    else
+      // fallback to global object
+      return global[obj][propName]
+  }
+}
+
 var registry = {
   'and'            : and
 , '&&'             : and
 , 'or'             : or
 , '||'             : or
-, '.'              : function (obj, propName) { return obj[propName] }
+, '.'              : dot
+, 'dot'            : dot
 , '+'              : addition
 , 'addition'       : addition
 , '-'              : subtraction
