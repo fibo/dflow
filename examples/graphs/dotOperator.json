@@ -1,20 +1,29 @@
 {
-  tasks: [
+  "tasks": [
     {
        "id": 1,
-       "name": '.'
+       "name": "."
     },
     {
        "id": 2,
-       "name": 'Math'
+       "name": "Math"
     },
     {
        "id": 3,
-       "name": 'string'
-       "arg": ['PI']
+       "name": "string",
+       "arg": ["PI"]
     }
   ],
-  pipes : [
-
+  "pipes" : [
+    {
+      "id": 4,
+      "targetId": [1, 1],
+      "sourceId": 3
+    },
+    {
+      "id": 5,
+      "targetId": [1, 0],
+      "sourceId": 2
+    }
   ]
 }
