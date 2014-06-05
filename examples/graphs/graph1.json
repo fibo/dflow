@@ -19,13 +19,13 @@
   "pipes": [
     {
       "id": 3,
-      "sourceId": 2,
-      "targetId": [1, 1]
+     "from": 2,
+      "to": [1, 1]
     },
     {
       "id": 5,
-      "sourceId": 4,
-      "targetId": [2, 0]
+      "from": 4,
+      "to": [2, 0]
     }
   ]
 }

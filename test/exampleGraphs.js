@@ -3,9 +3,6 @@ var dflow = require('../index')
   , fs    = require('fs')
   , path  = require('path')
 
-// silent console.log
-dflow.register('console.log', function () {})
-
 fs.readdir(path.join('examples', 'graphs'), function (err, files) {
   if (err) throw err
 
@@ -18,8 +15,16 @@ fs.readdir(path.join('examples', 'graphs'), function (err, files) {
       })
 
       it('evaluate', function () {
+        // silent console.log
+        var log = global.console.log
+        global.console.log = function () {}
+
         dflow.evaluate(graph)
+
+        // restore original console.log
+        global.console.log = log
       })
     })
   })
 })
+

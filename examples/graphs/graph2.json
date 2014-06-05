@@ -24,18 +24,18 @@
   "pipes": [
     {
       "id": 5,
-      "sourceId": 1,
-      "targetId": [2, 0]
+      "from": 1,
+      "to": [2, 0]
     },
     {
       "id": 6,
-      "sourceId": 2,
-      "targetId": [4, 1]
+      "from": 2,
+      "to": [4, 1]
     },
     {
       "id": 7,
-      "sourceId": 3,
-      "targetId": [4, 0]
+      "from": 3,
+      "to": [4, 0]
     }
   ]
 }
