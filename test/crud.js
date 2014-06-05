@@ -38,34 +38,29 @@ describe('add', function () {
   })
 
   describe('pipe', function () {
-    var pipe, source, target, argIndex
+    var pipe, argIndex
 
     it('works', function () {
       argIndex = 0
-      source = task1
-      target = task2
 
-      pipe = dflow.addPipe(graph, source, target, argIndex)
+      pipe = dflow.addPipe(graph, task1, task2, argIndex)
     })
 
     it('return a pipe', function () {
-      pipe.sourceId.should.eql(task1.id)
-      pipe.targetId[0].should.eql(task2.id)
-      pipe.targetId[1].should.eql(argIndex)
+      pipe.from.should.eql(task1.id)
+      pipe.to[0].should.eql(task2.id)
+      pipe.to[1].should.eql(argIndex)
       pipe.id.should.be.a.Number
 
       pipe1 = pipe
     })
 
     it('does not require argIndex', function () {
-      source = task1
-      target = task2
+      pipe = dflow.addPipe(graph, task1, task2)
 
-      pipe = dflow.addPipe(graph, source, target)
-
-      pipe.sourceId.should.eql(task1.id)
-      pipe.targetId[0].should.eql(task2.id)
-      pipe.targetId[1].should.eql(argIndex + 1)
+      pipe.from.should.eql(task1.id)
+      pipe.to[0].should.eql(task2.id)
+      pipe.to[1].should.eql(argIndex + 1)
       pipe.id.should.be.a.Number
 
       pipe2 = pipe

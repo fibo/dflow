@@ -14,8 +14,8 @@
   "pipes" : [
     {
        "id": 3,
-       "sourceId": 1,
-       "targetId": [2, 0]
+       "from": 1,
+       "to": [2, 0]
     }
   ]
 }

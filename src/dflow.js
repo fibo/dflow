@@ -56,11 +56,6 @@ function register (name, func) {
 
   registered[name] = coerceToFunction(func)
   return registered[name]
-
-   // TODO try to require name
-  // TODO since there are packages with a . in their name,
-  // like *socket.io* use split('/')
-
 }
 
 register('dflow.register', register)
@@ -88,7 +83,7 @@ function indexOfTask (graph, task) {
  * Get task by id
  *
  * @param {Object} graph
- * @param {Scalar} id
+ * @param {Number} id
  *
  * @return {Object} task
  */
@@ -114,7 +109,7 @@ function inputPipesOfTask (graph, task) {
   var inputPipes = []
 
   graph.pipes.forEach(function (pipe) {
-    if (pipe.targetId[0] === task.id)
+    if (pipe.to[0] === task.id)
       inputPipes.push(pipe)
   })
 
@@ -138,7 +133,7 @@ function parentsOfTask (graph, task) {
   inputPipesOfTask(graph, task)
     .forEach(function (pipe) {
       graph.tasks.forEach(function (task) {
-        if (pipe.sourceId === task.id)
+        if (pipe.from === task.id)
           parentTasks.push(task)
       })
     })
@@ -187,8 +182,8 @@ function inputArgOfTask (graph, task) {
 
   inputPipesOfTask(graph, task)
     .forEach(function (pipe) {
-      var argIndex = pipe.targetId[1]
-        , sourceTask = taskById(graph, pipe.sourceId)
+      var argIndex = pipe.to[1]
+        , sourceTask = taskById(graph, pipe.from)
 
       inputArg[argIndex] = sourceTask.out
     })
@@ -284,21 +279,26 @@ exports.addTask = addTask
  * Pipe two tasks
  *
  * @param {Object} graph
- * @param {Object} source task
- * @param {Object} target task
+ * @param {Object} from source task
+ * @param {Object} to target task
  * @param {Object} argIndex
  *
  * @return {Object} pipe
  */
 
-function addPipe (graph, source, target, argIndex) {
+function addPipe (graph, from, to, argIndex) {
+  var sourceId, targetId
+
+  sourceId = from.id
+  targetId = to.id
+
   if (typeof argIndex === 'undefined')
-    argIndex = target.arg.length + 1
+    argIndex = to.arg.length + 1
 
   var pipe = {
     id: nextId++
-  , sourceId: source.id
-  , targetId: [target.id, argIndex]
+  , from: sourceId
+  , to: [targetId, argIndex]
   }
 
   return pipe
@@ -310,24 +310,28 @@ exports.addPipe = addPipe
  * Remove a task
  *
  * @param {Object} graph
- * @param {Number} taskId
+ * @param {Object} task
  *
  * @return {Object} task
  */
 
-function delTask (graph, taskId) {
+function delTask (graph, task) {
+
+  return task
 }
 
 /**
  * Remove a pipe
  *
  * @param {Object} graph
- * @param {Number} pipeId
+ * @param {Object} pipe
  *
  * @return {Object} pipe
  */
 
-function delPipe (graph, pipeId) {
+function delPipe (graph, pipe) {
+
+  return pipe
 }
 
 /**
