@@ -264,6 +264,9 @@ function isGraph () {
  */
 
 function addTask (graph, name, arg) {
+  if (typeof arg === 'undefined')
+    arg = []
+
   var task = {
     id: nextId++
   , name: name
@@ -289,10 +292,13 @@ exports.addTask = addTask
  */
 
 function addPipe (graph, source, target, argIndex) {
+  if (typeof argIndex === 'undefined')
+    argIndex = target.arg.length + 1
+
   var pipe = {
     id: nextId++
-  , sourceId: null
-  , targetId: []
+  , sourceId: source.id
+  , targetId: [target.id, argIndex]
   }
 
   return pipe
