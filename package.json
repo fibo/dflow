@@ -1,14 +1,12 @@
 {
   "name": "dflow",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Dataflow programming",
   "main": "index.js",
   "scripts": {
     "test": "mocha --bail --require should --reporter min"
   },
-  "dependencies": {
-    "strict-mode": "^0.1.4"
-  },
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git://github.com/fibo/dflow.git"

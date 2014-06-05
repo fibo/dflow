@@ -1,7 +1,3 @@
 
-;(function () {
-  "use strict";
-
-  module.exports = require('./dflow')
-})()
+module.exports = require('./dflow')
 
