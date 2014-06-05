@@ -64,7 +64,19 @@
 <p>Dataflow programming</p>
 </blockquote>
 <p><a href="http://badge.fury.io/js/dflow"><img src="https://badge.fury.io/js/dflow.png" alt="NPM version"></a> <a href="https://travis-ci.org//dflow.png?branch=master"><img src="https://travis-ci.org/fibo/dflow.png?branch=master" alt="Build Status"></a> <a href="https://gemnasium.com//dflow"><img src="https://gemnasium.com/fibo/dflow.png" alt="Dependency Status"></a></p>
-<h1 id="hello-world">Hello world</h1>
+<h1 id="installation">Installation</h1>
+<p>With <a href="https://npmjs.org/">npm</a> do</p>
+<pre><code class="lang-bash">$ npm install dflow
+</code></pre>
+<h1 id="examples">Examples</h1>
+<p>Clone repo to run examples</p>
+<pre><code class="lang-bash">$ git clone https://github.com/fibo/dflow
+$ cd dflow
+</code></pre>
+<h2 id="hello-world">Hello world</h2>
+<pre><code class="lang-bash">$ node examples/helloWorld.js
+</code></pre>
+<p>For instance, here it is <a href="https://github.com/fibo/dflow/blob/master/examples/helloWorld.js">Hello world source</a></p>
 <pre><code class="lang-js">var dflow = require(&#39;dflow&#39;)
 
 // Create a graph with a single task and say &quot;Hello world&quot;
@@ -82,14 +94,11 @@ var graph = {
 dflow.evaluate(graph)
 // Hello world
 </code></pre>
-<p>Clone repo and run <a href="https://github.com/fibo/dflow/blob/master/examples/helloWorld.js">Hello world source</a></p>
-<pre><code class="lang-bash">$ git clone https://github.com/fibo/dflow
-$ cd dflow
-$ node examples/helloWorld.js
-</code></pre>
-<h1 id="installation">Installation</h1>
-<p>With <a href="https://npmjs.org/">npm</a> do</p>
-<pre><code class="lang-bash">$ npm install dflow
+<h2 id="graphs">Graphs</h2>
+<p>Graphs can be stored in JSON format. Run <a href="https://github.com/fibo/dflow/blob/master/examples/graphs">examples/graphs</a>
+using <a href="https://github.com/fibo/dflow/blob/master/examples/evaluateGraph.js">examples/evaluateGraph.js</a> passing the graph filename as a parameter, for example</p>
+<pre><code class="lang-bash">$ node examples/evaluateGraph.js graph2
+The typeof Math.PI is number
 </code></pre>
 <h1 id="development">Development</h1>
 <p>Install <a href="https://github.com/fibo/fibo-gulptasks">fibo/fibo-gulptasks</a> for development tasks automation.</p>

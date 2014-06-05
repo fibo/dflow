@@ -81,7 +81,7 @@
             },
             "isPrivate": false,
             "ignore": false,
-            "code": "function register (name, func) {\n  if (registered[name])\n    return registered[name]\n\n  // At this point func was not found in registry\n  // so dflow will try to get it from global\n  var path = name.split('.')\n    \n  var globalName = path[0]\n    , propName = path[1]\n\n  if (typeof global[globalName] !== 'undefined')\n    if (typeof propName === 'undefined')\n      return coerceToFunction(global[globalName])\n    else\n      return coerceToFunction(global[globalName][propName])\n\n  // At this point no func was found in global\n  // so if a func was passed as parameter, I assume it should be inserted\n  // into the registry.\n  // Custom functions in registry will not override global definitions.\n\n  registered[name] = coerceToFunction(func)\n\n   // TODO try to require name \n  // TODO since there are packages with a . in their name,\n  // like *socket.io* use split('/')\n\n}\n\nregister('dflow.register', register)\n\nregister('dflow.registered', function () {\n  var keys = []\n\n  for (var i in registered)\n    keys.push(i)\n\n  return keys\n})\n\nexports.register = register",
+            "code": "function register (name, func) {\n  if (registered[name])\n    return registered[name]\n\n  // At this point func was not found in registry\n  // so dflow will try to get it from global\n  var path = name.split('.')\n\n  var globalName = path[0]\n    , propName = path[1]\n\n  if (typeof global[globalName] !== 'undefined') {\n    if (typeof propName !== 'undefined') {\n      registered[name] = coerceToFunction(global[globalName][propName])\n\n      return registered[name]\n    }\n  }\n\n  // At this point no func was found in global\n  // so if a func was passed as parameter, I assume it should be inserted\n  // into the registry.\n  // Custom functions in registry will not override global definitions.\n\n  registered[name] = coerceToFunction(func)\n  return registered[name]\n}\n\nregister('dflow.register', register)\n\nexports.register = register",
             "ctx": {
                 "type": "function",
                 "name": "register",
@@ -153,7 +153,7 @@
                 {
                     "type": "param",
                     "types": [
-                        "Scalar"
+                        "Number"
                     ],
                     "name": "id",
                     "description": ""
@@ -221,7 +221,7 @@
             },
             "isPrivate": false,
             "ignore": false,
-            "code": "function inputPipesOfTask (graph, task) {\n  var inputPipes = []\n\n  graph.pipes.forEach(function (pipe) {\n    if (pipe.targetId[0] === task.id)\n      inputPipes.push(pipe)\n  })\n\n  return inputPipes\n}\n\nexports.inputPipesOfTask = inputPipesOfTask",
+            "code": "function inputPipesOfTask (graph, task) {\n  var inputPipes = []\n\n  graph.pipes.forEach(function (pipe) {\n    if (pipe.to[0] === task.id)\n      inputPipes.push(pipe)\n  })\n\n  return inputPipes\n}\n\nexports.inputPipesOfTask = inputPipesOfTask",
             "ctx": {
                 "type": "function",
                 "name": "inputPipesOfTask",
@@ -265,7 +265,7 @@
             },
             "isPrivate": false,
             "ignore": false,
-            "code": "function parentsOfTask (graph, task) {\n  var parentTasks = []\n\n  inputPipesOfTask(graph, task)\n    .forEach(function (pipe) {\n      graph.tasks.forEach(function (task) {\n        if (pipe.sourceId === task.id)\n          parentTasks.push(task)\n      })\n    })\n\n  return parentTasks\n}\n\nexports.parentsOfTask = parentsOfTask",
+            "code": "function parentsOfTask (graph, task) {\n  var parentTasks = []\n\n  inputPipesOfTask(graph, task)\n    .forEach(function (pipe) {\n      graph.tasks.forEach(function (task) {\n        if (pipe.from === task.id)\n          parentTasks.push(task)\n      })\n    })\n\n  return parentTasks\n}\n\nexports.parentsOfTask = parentsOfTask",
             "ctx": {
                 "type": "function",
                 "name": "parentsOfTask",
@@ -353,7 +353,7 @@
             },
             "isPrivate": false,
             "ignore": false,
-            "code": "function inputArgOfTask (graph, task) {\n  var inputArg = task.arg\n\n  inputPipesOfTask(graph, task)\n    .forEach(function (pipe) {\n      var argIndex = pipe.targetId[1]\n        , sourceTask = taskById(graph, pipe.sourceId)\n\n      inputArg[argIndex] = sourceTask.out\n    })\n\n  return inputArg\n}\n\nexports.inputArgOfTask = inputArgOfTask",
+            "code": "function inputArgOfTask (graph, task) {\n  var inputArg = task.arg || []\n\n  inputPipesOfTask(graph, task)\n    .forEach(function (pipe) {\n      var argIndex = pipe.to[1]\n        , sourceTask = taskById(graph, pipe.from)\n\n      inputArg[argIndex] = sourceTask.out\n    })\n\n  return inputArg\n}\n\nexports.inputArgOfTask = inputArgOfTask",
             "ctx": {
                 "type": "function",
                 "name": "inputArgOfTask",
@@ -475,16 +475,23 @@
                     "description": "<p>of task in the registry</p>\n"
                 },
                 {
+                    "type": "param",
+                    "types": [
+                        "Array"
+                    ],
+                    "name": "arg",
+                    "description": "<p>list passed to task function</p>\n"
+                },
+                {
                     "type": "",
                     "string": ""
                 },
                 {
-                    "type": "param",
+                    "type": "return",
                     "types": [
-                        "Number"
+                        "Object"
                     ],
-                    "name": "taskId",
-                    "description": ""
+                    "description": "<p>task</p>\n"
                 }
             ],
             "description": {
@@ -494,7 +501,7 @@
             },
             "isPrivate": false,
             "ignore": false,
-            "code": "function addTask (graph, name, arg) {\n\n}",
+            "code": "function addTask (graph, name, arg) {\n  if (typeof arg === 'undefined')\n    arg = []\n\n  var task = {\n    id: nextId++\n  , name: name\n  , arg: arg\n  }\n\n  graph.tasks.push(task)\n\n  return task\n}\n\nexports.addTask = addTask",
             "ctx": {
                 "type": "function",
                 "name": "addTask",
@@ -516,16 +523,16 @@
                     "types": [
                         "Object"
                     ],
-                    "name": "source",
-                    "description": "<p>task</p>\n"
+                    "name": "from",
+                    "description": "<p>source task</p>\n"
                 },
                 {
                     "type": "param",
                     "types": [
                         "Object"
                     ],
-                    "name": "target",
-                    "description": "<p>task</p>\n"
+                    "name": "to",
+                    "description": "<p>target task</p>\n"
                 },
                 {
                     "type": "param",
@@ -540,12 +547,11 @@
                     "string": ""
                 },
                 {
-                    "type": "param",
+                    "type": "return",
                     "types": [
-                        "Number"
+                        "Object"
                     ],
-                    "name": "pipeId",
-                    "description": ""
+                    "description": "<p>pipe</p>\n"
                 }
             ],
             "description": {
@@ -555,7 +561,7 @@
             },
             "isPrivate": false,
             "ignore": false,
-            "code": "function addPipe (graph, source, target, argIndex) {\n\n}",
+            "code": "function addPipe (graph, from, to, argIndex) {\n  var sourceId, targetId\n\n  sourceId = from.id\n  targetId = to.id\n\n  if (typeof argIndex === 'undefined')\n    argIndex = to.arg.length + 1\n\n  var pipe = {\n    id: nextId++\n  , from: sourceId\n  , to: [targetId, argIndex]\n  }\n\n  return pipe\n}\n\nexports.addPipe = addPipe",
             "ctx": {
                 "type": "function",
                 "name": "addPipe",
@@ -567,10 +573,29 @@
                 {
                     "type": "param",
                     "types": [
-                        "Number"
+                        "Object"
                     ],
-                    "name": "taskId",
+                    "name": "graph",
                     "description": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "task",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Object"
+                    ],
+                    "description": "<p>task</p>\n"
                 }
             ],
             "description": {
@@ -580,7 +605,7 @@
             },
             "isPrivate": false,
             "ignore": false,
-            "code": "function delTask (taskId) {}",
+            "code": "function delTask (graph, task) {\n\n  return task\n}",
             "ctx": {
                 "type": "function",
                 "name": "delTask",
@@ -592,10 +617,29 @@
                 {
                     "type": "param",
                     "types": [
-                        "Number"
+                        "Object"
                     ],
-                    "name": "pipeId",
+                    "name": "graph",
                     "description": ""
+                },
+                {
+                    "type": "param",
+                    "types": [
+                        "Object"
+                    ],
+                    "name": "pipe",
+                    "description": ""
+                },
+                {
+                    "type": "",
+                    "string": ""
+                },
+                {
+                    "type": "return",
+                    "types": [
+                        "Object"
+                    ],
+                    "description": "<p>pipe</p>\n"
                 }
             ],
             "description": {
@@ -605,11 +649,35 @@
             },
             "isPrivate": false,
             "ignore": false,
-            "code": "function delPipe (pipeId) {}\n\nfunction emptyGraph () {\n  return {\n    tasks: [],\n    pipes: []\n  }\n}\n\nexports.emptyGraph = emptyGraph",
+            "code": "function delPipe (graph, pipe) {\n\n  return pipe\n}",
             "ctx": {
                 "type": "function",
                 "name": "delPipe",
                 "string": "delPipe()"
+            }
+        },
+        {
+            "tags": [
+                {
+                    "type": "return",
+                    "types": [
+                        "Object"
+                    ],
+                    "description": "<p>graph</p>\n"
+                }
+            ],
+            "description": {
+                "full": "<p>Return an empty graph</p>\n",
+                "summary": "<p>Return an empty graph</p>\n",
+                "body": ""
+            },
+            "isPrivate": false,
+            "ignore": false,
+            "code": "function emptyGraph () {\n  return {\n    tasks: []\n  , pipes: []\n  }\n}\n\nexports.emptyGraph = emptyGraph",
+            "ctx": {
+                "type": "function",
+                "name": "emptyGraph",
+                "string": "emptyGraph()"
             }
         }
     ],
@@ -622,11 +690,11 @@
                 "body": ""
             },
             "isPrivate": false,
-            "code": "function and (a, b) { return a && b }\nfunction or (a, b) { return a || b }\n\nvar registry = {\n  'and'       : and\n, '&&'        : and\n, 'or'        : or\n, '||'        : or\n, '.'         : function (obj, propName) { return obj[propName] }\n, '*'         : function (a, b) { return a * b }\n, '/'         : function (a, b) { return a / b }\n, '-'         : function (a, b) { return a - b }\n, '+'         : function (a, b) { return a + b }\n, '=='        : function (a, b) { return a == b }\n, '!='        : function (a, b) { return a != b }\n, '==='       : function (a, b) { return a === b }\n, '!=='       : function (a, b) { return a !== b }\n, 'string'    : function string (x) { if (typeof x === 'string') return x }\n, 'number'    : function number (x) { if (typeof x === 'number') return x }\n, 'object'    : function object (x) { if (typeof x === 'object') return x }\n, 'typeof'    : function _typeof (x) { return typeof x }\n, 'undefined' : function _undefined () { return undefined }\n, 'null'      : function _null () { return null }\n}\n\nmodule.exports = registry",
+            "code": "function addition (a, b) { return a + b }\nfunction subtraction (a, b) { return a - b }\nfunction multiplication (a, b) { return a * b }\nfunction division (a, b) { return a / b }\n\nfunction modulus (a, b) { return a % b }\n\nfunction increment (a) { return a++ }\nfunction decrement (a) { return a-- }\n\nfunction and (a, b) { return a && b }\n\nfunction or (a, b) { return a || b }\n\nfunction array () { return Array.prototype.slice.call(arguments, 0) }\n\nfunction dot (obj, propName) {\n  if (typeof propName === 'string') {\n    if (typeof obj === 'object')\n      return obj[propName]\n    else\n      // fallback to global object\n      return global[obj][propName]\n  }\n}\n\nvar registry = {\n  'and'            : and\n, '&&'             : and\n, 'or'             : or\n, '||'             : or\n, '.'              : dot\n, 'dot'            : dot\n, '+'              : addition\n, 'addition'       : addition\n, '-'              : subtraction\n, 'subtraction'    : subtraction\n, '*'              : multiplication\n, 'multiplication' : multiplication\n, '/'              : division\n, 'division'       : division\n, '%'              : modulus\n, 'modulus'        : modulus\n, '++'             : increment\n, 'increment'      : increment\n, '--'             : decrement\n, 'decrement'      : decrement\n, '=='             : function (a, b) { return a == b }\n, '!='             : function (a, b) { return a != b }\n, '==='            : function (a, b) { return a === b }\n, '!=='            : function (a, b) { return a !== b }\n, 'string'         : function string (x) { if (typeof x === 'string') return x }\n, 'number'         : function number (x) { if (typeof x === 'number') return x }\n, 'object'         : function object (x) { if (typeof x === 'object') return x }\n, 'typeof'         : function _typeof (x) { return typeof x }\n, 'undefined'      : function _undefined () { return undefined }\n, 'null'           : function _null () { return null }\n, '[]'             : array\n, 'array'          : array\n}\n\nmodule.exports = registry",
             "ctx": {
                 "type": "function",
-                "name": "and",
-                "string": "and()"
+                "name": "addition",
+                "string": "addition()"
             }
         }
     ]
