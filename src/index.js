@@ -1,5 +1,7 @@
 
-require('strict-mode')(function () {
+;(function () {
+  "use strict";
+
   module.exports = require('./dflow')
-})
+})()
 
