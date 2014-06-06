@@ -225,6 +225,8 @@ exports.inputArgOfTask = inputArgOfTask
  */
 
 function evaluate (graph) {
+  registered['thisGraph'] = function thisGraph () { return graph }
+
   graph.tasks
        .sort(function byLevel (a, b) {
          return levelOfTask(graph, a) - levelOfTask(graph, b)
