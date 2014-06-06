@@ -171,6 +171,7 @@ exports.levelOfTask = levelOfTask
 /**
  * Compute arguments of task
  *
+ *
  * @param {Object} graph
  * @param {Object} task
  *
@@ -182,10 +183,30 @@ function inputArgOfTask (graph, task) {
 
   inputPipesOfTask(graph, task)
     .forEach(function (pipe) {
-      var argIndex = pipe.to[1]
-        , sourceTask = taskById(graph, pipe.from)
+      var arg
+        , argIndex
+        , out
+        , sourceId
+        , sourceProp
+        , sourceTask
+        , targetId
 
-      inputArg[argIndex] = sourceTask.out
+      // pipe.from can be a taskId or an array [taskId, prop]
+      if (Array.isArray(pipe.from)) {
+        sourceId = pipe.from[0]
+        sourceProp = pipe.from[1]
+      }
+      else {
+        sourceId = pipe.from
+        sourceProp = 'out'
+      }
+
+      sourceTask = taskById(graph, sourceId)
+      arg = sourceTask[sourceProp]
+
+      // pipe.to is an array [taskId, argIndex]
+      argIndex = pipe.to[1]
+      inputArg[argIndex] = arg
     })
 
   return inputArg

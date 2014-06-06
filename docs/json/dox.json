@@ -353,7 +353,7 @@
             },
             "isPrivate": false,
             "ignore": false,
-            "code": "function inputArgOfTask (graph, task) {\n  var inputArg = task.arg || []\n\n  inputPipesOfTask(graph, task)\n    .forEach(function (pipe) {\n      var argIndex = pipe.to[1]\n        , sourceTask = taskById(graph, pipe.from)\n\n      inputArg[argIndex] = sourceTask.out\n    })\n\n  return inputArg\n}\n\nexports.inputArgOfTask = inputArgOfTask",
+            "code": "function inputArgOfTask (graph, task) {\n  var inputArg = task.arg || []\n\n  inputPipesOfTask(graph, task)\n    .forEach(function (pipe) {\n      var arg\n        , argIndex\n        , out\n        , sourceId\n        , sourceProp\n        , sourceTask\n        , targetId\n\n      // pipe.from can be a taskId or an array [taskId, prop]\n      if (Array.isArray(pipe.from)) {\n        sourceId = pipe.from[0]\n        sourceProp = pipe.from[1]\n      }\n      else {\n        sourceId = pipe.from\n        sourceProp = 'out'\n      }\n\n      sourceTask = taskById(graph, sourceId)\n      arg = sourceTask[sourceProp]\n\n      // pipe.to is an array [taskId, argIndex]\n      argIndex = pipe.to[1]\n      inputArg[argIndex] = arg\n    })\n\n  return inputArg\n}\n\nexports.inputArgOfTask = inputArgOfTask",
             "ctx": {
                 "type": "function",
                 "name": "inputArgOfTask",
