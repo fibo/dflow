@@ -1,0 +1,20 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "name": "thisGraph"
+    },
+    {
+      "id": 2,
+      "arg": [],
+      "name": "console.dir"
+    }
+  ],
+  "pipes": [
+    {
+      "id": 3,
+      "from": 1,
+      "to": [2, 0]
+    }
+  ]
+}

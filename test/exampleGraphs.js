@@ -15,13 +15,17 @@ fs.readdir(path.join('examples', 'graphs'), function (err, files) {
       })
 
       it('evaluate', function () {
-        // silent console.log
-        var log = global.console.log
+        // silent console
+        var dir = global.console.dir
+          , log = global.console.log
+
+        global.console.dir = function () {}
         global.console.log = function () {}
 
         dflow.evaluate(graph)
 
-        // restore original console.log
+        // restore original console
+        global.console.dir = dir
         global.console.log = log
       })
     })
