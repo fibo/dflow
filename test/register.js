@@ -5,15 +5,18 @@ var graph, task
 
 describe('register', function () {
   describe('global', function () {
-
-
+    it('coerces to function', function () {
+      dflow.register('Math.PI').should.be.Function
+    })
   })
 
   describe('custom', function () {
-    it('does not override global', function () {
-      dflow.register('Math.PI', 3)
+    it('can override global', function () {
+      var wrongPI = 3
 
-      var graph = dflow.emptyGraph()
+      dflow.register('Math.PI', wrongPI)
+
+      graph = dflow.emptyGraph()
 
       task = dflow.addTask(graph, 'Math.PI')
 
@@ -21,7 +24,7 @@ describe('register', function () {
 
       graph = dflow.evaluate(graph)
 
-      graph.tasks[0].out.should.be.eql(Math.PI)
+      graph.tasks[0].out.should.be.eql(wrongPI)
     })
   })
 })
