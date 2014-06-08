@@ -26,12 +26,15 @@ function coerceToFunction (arg) {
  *
  * @param {String} name identifier of task
  * @param {Function} func to store in registry
+ * @param {Object} context
  *
  * @return {Function} func stored in registry
  */
 
-function register (name, func) {
-  if (registered[name])
+function register (name, func, context) {
+  var funcIsUndefined = (typeof func === 'undefined')
+
+  if (registered[name] && funcIsUndefined)
     return registered[name]
 
   // At this point func was not found in registry
@@ -41,24 +44,32 @@ function register (name, func) {
   var globalName = path[0]
     , propName = path[1]
 
-  if (typeof global[globalName] !== 'undefined') {
+  if (typeof global[globalName] !== 'undefined' && funcIsUndefined) {
     if (typeof propName !== 'undefined') {
       registered[name] = coerceToFunction(global[globalName][propName])
-
-      return registered[name]
     }
   }
+  else {
+    // At this point no func was found in global
+    // so if a func was passed as parameter, I assume it should be inserted
+    // into the registry.
+    // Custom functions in registry will not override global definitions.
+   
+    registered[name] = coerceToFunction(func)
+  }
 
-  // At this point no func was found in global
-  // so if a func was passed as parameter, I assume it should be inserted
-  // into the registry.
-  // Custom functions in registry will not override global definitions.
+  // If optional context is provided, bind function to it
+  if (typeof context === 'object')
+    registered[name] = registered[name].bind(context)
 
-  registered[name] = coerceToFunction(func)
   return registered[name]
 }
 
 register('dflow.register', register)
+
+// Make sure console  functions are executed in console context
+for (var k in console)
+  register('console.' + k, console[k], console)
 
 exports.register = register
 

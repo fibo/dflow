@@ -19,14 +19,14 @@ fs.readdir(path.join('examples', 'graphs'), function (err, files) {
         var dir = global.console.dir
           , log = global.console.log
 
-        global.console.dir = function () {}
-        global.console.log = function () {}
+        dflow.register('console.dir', function () {})
+        dflow.register('console.log', function () {})
 
         dflow.evaluate(graph)
 
         // restore original console
-        global.console.dir = dir
-        global.console.log = log
+        dflow.register('console.dir', dir)
+        dflow.register('console.log', log)
       })
     })
   })
