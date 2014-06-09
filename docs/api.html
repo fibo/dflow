@@ -138,6 +138,22 @@
             
           
             
+              <tr>
+                <th>
+                  context
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
           
             
           
@@ -570,44 +586,12 @@ The level task equals one plus the max level of parent tasks.</p>
         </tbody>
       </table>
     
-      
-      
-      
-      
-      
-      
-      
 
-      <div class="page-header">
-        <h2>isTask()</h2> <small><p>Checks task name is available in registry</p>
-</small>
-      </div>
+  </section>
 
-      
+  <section>
+    <h1>DflowGraph</h1>
 
-      <table class="table">
-        <thead>
-          <tr>
-            <th>param</th>
-            <th>type</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          
-            
-          
-        </tbody>
-      </table>
     
       
       
@@ -618,11 +602,14 @@ The level task equals one plus the max level of parent tasks.</p>
       
 
       <div class="page-header">
-        <h2>isGraph()</h2> <small><p>Checks tasks and pipes are valid</p>
+        <h2>DflowGraph()</h2> <small><p>DflowGraph constructor</p>
 </small>
       </div>
 
-      
+      <p><pre><code>var dflow = require(&#39;dflow&#39;)
+
+var graph = new dflow.Graph()
+</code></pre></p>
 
       <table class="table">
         <thead>
@@ -642,26 +629,6 @@ The level task equals one plus the max level of parent tasks.</p>
           </tr>
         </thead>
         <tbody>
-          
-            
-              <tr>
-                <th>
-                  graph
-                </th>
-                <td>
-                  
-                    <span class="badge">Object</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                </td>
-              <tr>
-            
-          
-            
-          
-            
           
         </tbody>
       </table>
@@ -699,22 +666,6 @@ The level task equals one plus the max level of parent tasks.</p>
           </tr>
         </thead>
         <tbody>
-          
-            
-              <tr>
-                <th>
-                  graph
-                </th>
-                <td>
-                  
-                    <span class="badge">Object</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                </td>
-              <tr>
-            
           
             
               <tr>
@@ -794,22 +745,6 @@ The level task equals one plus the max level of parent tasks.</p>
           </tr>
         </thead>
         <tbody>
-          
-            
-              <tr>
-                <th>
-                  graph
-                </th>
-                <td>
-                  
-                    <span class="badge">Object</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                </td>
-              <tr>
-            
           
             
               <tr>
@@ -1027,8 +962,7 @@ The level task equals one plus the max level of parent tasks.</p>
       
 
       <div class="page-header">
-        <h2>emptyGraph()</h2> <small><p>Return an empty graph</p>
-</small>
+        <h2>evaluate()</h2> <small>summary</small>
       </div>
 
       
@@ -1051,8 +985,6 @@ The level task equals one plus the max level of parent tasks.</p>
           </tr>
         </thead>
         <tbody>
-          
-            
           
         </tbody>
       </table>

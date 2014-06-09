@@ -1,5 +1,6 @@
 
 var dflow = require('../index')
+  , should = require('should')
 
 var graph, task
 
