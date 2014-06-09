@@ -16,13 +16,11 @@ describe('register', function () {
 
       dflow.register('Math.PI', wrongPI)
 
-      graph = dflow.emptyGraph()
+      graph = new dflow.Graph()
 
-      task = dflow.addTask(graph, 'Math.PI')
+      graph.addTask('Math.PI')
 
-      graph.tasks.push(task)
-
-      graph = dflow.evaluate(graph)
+      graph.evaluate()
 
       graph.tasks[0].out.should.be.eql(wrongPI)
     })
