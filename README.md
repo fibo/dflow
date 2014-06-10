@@ -4,58 +4,39 @@
 
 [![NPM version](https://badge.fury.io/js/dflow.png)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.png?branch=master)](https://travis-ci.org//dflow.png?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.png)](https://gemnasium.com//dflow)
 
+# Description
+
+*dflow* is a very simple, minimal and natural idea that could be implemented in any programming language.
+
+A *dflow* **graph** is a collection of **tasks** and **pipes**. A *graph* is stored in JSON format.
+Every task refers to a function which output can be piped as an argument to other tasks.
+A *task* can have **input pipes** and **output pipes**.
+
+A *task* can have 
+* **parents**
+: tasks which output is piped to the task arguments
+* **children**
+: tasks that has an argument piped from the task output
+
+Every task has a **level** from 0 to n. A task with no input pipes has *level* 0.
+A task with *parents* has level = max(level of its parents) + 1
+
+The `dflow.evaluate()` is a filter function that
+  * takes a *graph* as argument
+  * order its *tasks* by their *level*
+  * executes the tasks and store their output
+  * return the evaluated *graph*
+
+# Examples
+
+See [dflow.it](http://dflow.it) and online [examples](https://github.com/fibo/dflow/blob/master/examples/README.md)
+
 # Installation
 
 With [npm](https://npmjs.org/) do
 
 ```bash
 $ npm install dflow
-```
-
-# Examples
-
-Clone repo to run examples
-
-```bash
-$ git clone https://github.com/fibo/dflow
-$ cd dflow
-```
-## Hello world
-
-
-```bash
-$ node examples/helloWorld.js
-```
-
-For instance, here it is [Hello world source](https://github.com/fibo/dflow/blob/master/examples/helloWorld.js)
-
-```js
-var dflow = require('dflow')
-
-// Create a graph with a single task and say "Hello world"
-
-var graph = {
-  tasks: [
-    {
-      name: 'console.log',
-      arg: ['Hello', 'world']
-    }
-  ],
-  pipes: []
-}
-
-dflow.evaluate(graph)
-// Hello world
-```
-
-## Graphs
-
-Graphs can be stored in JSON format. Run [examples/graphs](https://github.com/fibo/dflow/blob/master/examples/graphs)
-using [examples/evaluateGraph.js](https://github.com/fibo/dflow/blob/master/examples/evaluateGraph.js) passing the graph filename as a parameter, for example
-
-```bash
-$ node examples/evaluateGraph.js graph2
-The typeof Math.PI is number
 ```
 
 # Development
