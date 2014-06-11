@@ -1,26 +1,10 @@
 
-// Load core registry at compile time
-var registered = require('./registry.js')
-
-/**
- * Wrap into a Function
- *
- * @api private
- *
- * @param {Any} arg
- *
- * @return {Function} func
- */
-
-function coerceToFunction (arg) {
-  if (typeof arg === 'function')
-    return arg
-  else
-    return function value () { return arg }
-}
+var Registry = require('./Registry')
 
 /**
  * Store function in dflow registry
+ *
+ * Delegates to dflow.Registry.add
  *
  * @param {String} name identifier of task
  * @param {Function} func to store in registry
@@ -30,37 +14,7 @@ function coerceToFunction (arg) {
  */
 
 function register (name, func, context) {
-  var funcIsUndefined = (typeof func === 'undefined')
-
-  if (registered[name] && funcIsUndefined)
-    return registered[name]
-
-  // At this point func was not found in registry
-  // so dflow will try to get it from global
-  var path = name.split('.')
-
-  var globalName = path[0]
-    , propName = path[1]
-
-  if (typeof global[globalName] !== 'undefined' && funcIsUndefined) {
-    if (typeof propName !== 'undefined') {
-      registered[name] = coerceToFunction(global[globalName][propName])
-    }
-  }
-  else {
-    // At this point no func was found in global
-    // so if a func was passed as parameter, I assume it should be inserted
-    // into the registry.
-    // Custom functions in registry will not override global definitions.
-   
-    registered[name] = coerceToFunction(func)
-  }
-
-  // If optional context is provided, bind function to it
-  if (typeof context === 'object')
-    registered[name] = registered[name].bind(context)
-
-  return registered[name]
+  return Registry.add(name, func, context)
 }
 
 register('dflow.register', register)
@@ -234,7 +188,7 @@ exports.inputArgOfTask = inputArgOfTask
  */
 
 function evaluate (graph) {
-  registered['thisGraph'] = function thisGraph () { return graph }
+  register('thisGraph', function thisGraph () { return graph })
 
   graph.tasks
        .sort(function byLevel (a, b) {

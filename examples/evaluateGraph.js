@@ -11,7 +11,9 @@
 var dflow = require('dflow')
   , graph = require('./graphs/' + process.argv[2] + '.json')
 
-//console.log(JSON.stringify(dflow.evaluate(graph), null, 4))
+
+dflow.use(dflow.plugin.core)
 
 dflow.evaluate(graph)
+//console.log(JSON.stringify(dflow.evaluate(graph), null, 4))
 

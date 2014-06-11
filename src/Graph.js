@@ -1,5 +1,5 @@
 
-var dflow = require('./dflow')
+var algorithm = require('./algorithm')
 
 var nextId = 0
 
@@ -114,7 +114,7 @@ DflowGraph.prototype.delPipe = delPipe
  */
 
 function evaluate () {
-  var graph = dflow.evaluate(this)
+  var graph = algorithm.evaluate(this)
 
   this.tasks = graph.tasks
   this.pipes = graph.pipes
