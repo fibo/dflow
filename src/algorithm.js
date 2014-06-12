@@ -14,14 +14,10 @@ var Registry = require('./Registry')
  */
 
 function register (name, func, context) {
-  return Registry.add(name, func, context)
+  return Registry.set(name, func, context)
 }
 
 register('dflow.register', register)
-
-// Make sure console  functions are executed in console context
-for (var k in console)
-  register('console.' + k, console[k], console)
 
 exports.register = register
 
