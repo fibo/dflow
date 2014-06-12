@@ -72,13 +72,5 @@ module.exports = function (dflow) {
 
   register('[]', array)
   register('array', array)
-
-  // console tasks
-  var console = global.console
-
-  for (var k in console)
-    // Make sure console functions are executed in console context
-    register('console.' + k, console[k], console)
-
 }
 
