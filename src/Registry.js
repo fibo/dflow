@@ -21,6 +21,10 @@ function coerceToFunction (arg) {
 /**
  * Store function in dflow registry
  *
+ * ```
+ * dflow.Registry.set('foo', function () { return {bar: 'quz'}})
+ * ```
+ *
  * @param {String} name identifier of task
  * @param {Function} func to store in registry
  * @param {Object} context
@@ -28,10 +32,28 @@ function coerceToFunction (arg) {
  * @return {Function} func stored in registry
  */
 
-function add (name, func, context) {
-  var funcIsUndefined = (typeof func === 'undefined')
+function set (name, func, context) {
+    registered[name] = coerceToFunction(func)
 
-  if (registered[name] && funcIsUndefined)
+  // If optional context is provided, bind function to it
+  if (typeof context === 'object')
+    registered[name] = registered[name].bind(context)
+
+  return registered[name]
+}
+
+exports.set = set
+
+/**
+ * Retrieve function from dflow registry
+ *
+ * @param {String} name identifier of task
+ *
+ * @return {Function} func stored in registry
+ */
+
+function get (name) {
+  if (typeof registered[name] === 'function')
     return registered[name]
 
   // At this point func was not found in registry
@@ -41,38 +63,11 @@ function add (name, func, context) {
   var globalName = path[0]
     , propName = path[1]
 
-  if (typeof global[globalName] !== 'undefined' && funcIsUndefined) {
+  if (typeof global[globalName] !== 'undefined') {
     if (typeof propName !== 'undefined') {
-      registered[name] = coerceToFunction(global[globalName][propName])
+      return coerceToFunction(global[globalName][propName])
     }
   }
-  else {
-    // At this point no func was found in global
-    // so if a func was passed as parameter, I assume it should be inserted
-    // into the registry.
-    // Custom functions in registry will not override global definitions.
-   
-    registered[name] = coerceToFunction(func)
-  }
-
-  // If optional context is provided, bind function to it
-  if (typeof context === 'object')
-    registered[name] = registered[name].bind(context)
-
-  return registered[name]
-}
-
-exports.add = add
-
-/**
- * Retrieve function from dflow registry
- *
- * @param {String} name identifier of task
- *
- * @return {Function} func stored in registry
- */
-function get (name) {
-  return registered[name]
 }
 
 exports.get = get

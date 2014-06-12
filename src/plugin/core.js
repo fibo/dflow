@@ -37,40 +37,48 @@ module.exports = function (dflow) {
   register('.', dot)
   register('dot', dot)
 
-  register('+'              , addition)
-  register('addition'       , addition)
+  register('+', addition)
+  register('addition', addition)
 
-  register('-'              , subtraction)
-  register('subtraction'    , subtraction)
+  register('-', subtraction)
+  register('subtraction', subtraction)
 
-  register('*'              , multiplication)
-  register('multiplication' , multiplication)
+  register('*', multiplication)
+  register('multiplication', multiplication)
 
-  register('/'              , division)
-  register('division'       , division)
+  register('/', division)
+  register('division', division)
 
-  register('%'              , modulus)
-  register('modulus'        , modulus)
+  register('%', modulus)
+  register('modulus', modulus)
 
-  register('++'             , increment)
-  register('increment'      , increment)
+  register('++', increment)
+  register('increment', increment)
 
-  register('--'             , decrement)
-  register('decrement'      , decrement)
+  register('--', decrement)
+  register('decrement', decrement)
 
-  register('=='             , function (a, b) { return a == b })
-  register('!='             , function (a, b) { return a != b })
+  register('==', function (a, b) { return a == b })
+  register('!=', function (a, b) { return a != b })
   register('==='            , function (a, b) { return a === b })
   register('!=='            , function (a, b) { return a !== b })
 
-  register('string'         , function string (x) { if (typeof x === 'string') return x })
-  register('number'         , function number (x) { if (typeof x === 'number') return x })
-  register('object'         , function object (x) { if (typeof x === 'object') return x })
-  register('typeof'         , function _typeof (x) { return typeof x })
-  register('undefined'      , function _undefined () { return undefined })
-  register('null'           , function _null () { return null })
+  register('string', function string (x) { if (typeof x === 'string') return x })
+  register('number', function number (x) { if (typeof x === 'number') return x })
+  register('object', function object (x) { if (typeof x === 'object') return x })
+  register('typeof', function _typeof (x) { return typeof x })
+  register('undefined', function _undefined () { return undefined })
+  register('null', function _null () { return null })
 
-  register('[]'             , array)
-  register('array'          , array)
+  register('[]', array)
+  register('array', array)
+
+  // console tasks
+  var console = global.console
+
+  for (var k in console)
+    // Make sure console functions are executed in console context
+    register('console.' + k, console[k], console)
+
 }
 
