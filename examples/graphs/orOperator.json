@@ -1,0 +1,21 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "name": "or",
+      "arg": [true, false]
+    },
+    {
+      "id": 2,
+      "name": "console.log",
+      "arg": []
+    }
+  ],
+  "pipes": [
+    {
+      "id": 3,
+      "from": 1,
+      "to": [2, 0]
+    }
+  ]
+}

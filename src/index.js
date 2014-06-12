@@ -47,6 +47,6 @@ function use (plugin) {
 
 exports.use = use
 
-// Load core plugins at compile time
+// Load core plugin at compile time
 use(core)
 

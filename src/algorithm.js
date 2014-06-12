@@ -193,7 +193,7 @@ function evaluate (graph) {
        .forEach(function run (task) {
          var arg, func, i, out
 
-         func = register(task.name)
+         func = Registry.get(task.name)
 
          arg = inputArgOfTask(graph, task)
          out = func.apply(null, task.arg)
