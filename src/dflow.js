@@ -69,3 +69,33 @@ if (typeof global.window === 'object') {
   use(windowPlugin)
 }
 
+/**
+ * Convert a foreign package to a dflow plugin
+ *
+ * ```js
+ * var _ = require('underscore')
+ *
+ * var underscorePlugin = dflow.pluginFrom(_, '_')
+ *
+ * dflow.use(underscorePlugin)
+ * ```
+ *
+ * @param {Object} pkg to convert
+ * @param {String} name of plugin
+ *
+ * @return {Function} plugin that dflow can use
+ */
+
+function pluginFrom (pkg, name) {
+  var plugin = function (dflow) {
+    for (var item in pkg)
+      dflow.register(name + '.' + item, pkg[item])
+  }
+
+  plugin.name = name
+
+  return plugin
+}
+
+exports.pluginFrom = pluginFrom
+
