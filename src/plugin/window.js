@@ -8,7 +8,7 @@ function bgColor (color) {
       document.bgColor = color
 }
 
-module.exports = function (dflow) {
+var _window = function (dflow) {
   var register = dflow.register
 
   register('body', function () { return body })
@@ -22,4 +22,9 @@ module.exports = function (dflow) {
 
   register('bgColor', bgColor)
 }
+
+// To avoid create a `function window () {}`, name it later
+_window.name = 'window'
+
+module.exports = _window
 

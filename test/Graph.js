@@ -1,5 +1,6 @@
 
-var dflow = require('../index')
+var dflow  = require('../index')
+  , should = require('should')
 
 var DflowGraph = dflow.Graph
 
@@ -74,6 +75,31 @@ describe('DflowGraph', function () {
         pipe.id.should.be.a.Number
 
         pipe2 = pipe
+      })
+    })
+
+    describe('delTask()', function () {
+      var task
+
+      it('works', function () {
+        task = graph.delTask(task1)
+
+        should.not.exist(graph.getTaskById(task1.id))
+      })
+
+      it('return removed task', function () {
+        task.should.eql(task1)
+      })
+
+      it('removes pipes connected to task')
+    })
+
+    describe('getTaskById()', function () {
+      it('works', function () {
+        var graph = new DflowGraph()
+          , task = graph.addTask('number', [1])
+
+        graph.getTaskById(task.id).should.eql(task)
       })
     })
   })
