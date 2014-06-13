@@ -25,7 +25,7 @@ function dot (obj, propName) {
   }
 }
 
-module.exports = function (dflow) {
+module.exports = function core (dflow) {
   var register = dflow.register
 
   register('and', and)
