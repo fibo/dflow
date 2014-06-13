@@ -4,6 +4,12 @@
 
 [![NPM version](https://badge.fury.io/js/dflow.png)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.png?branch=master)](https://travis-ci.org//dflow.png?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.png)](https://gemnasium.com//dflow)
 
+# NOTA BENE
+
+`dflow` can run from command line, but, it is intended to be used with a GUI.
+See [dflow.it](http://dflow.it), for a **work in progress** demo using [springy](http://getspringy.com).
+ 
+
 # Description
 
 *dflow* is a very simple, minimal and natural idea that could be implemented in any programming language.
@@ -29,7 +35,7 @@ The `dflow.evaluate()` is a filter function that
 
 # Examples
 
-See [dflow.it](http://dflow.it) and online [examples](https://github.com/fibo/dflow/blob/master/examples/README.md)
+See online [examples](https://github.com/fibo/dflow/blob/master/examples/README.md)
 
 # Installation
 

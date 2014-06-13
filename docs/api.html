@@ -61,10 +61,635 @@
 
 
   <section>
-    <h1>dflow</h1>
+    <h1>Graph</h1>
 
     
       
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>DflowGraph()</h2> <small><p>DflowGraph constructor</p>
+</small>
+      </div>
+
+      <p><pre><code>var dflow = require(&#39;dflow&#39;)
+
+var graph = new dflow.Graph()
+</code></pre></p>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>addTask()</h2> <small><p>Add a task</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  name
+                </th>
+                <td>
+                  
+                    <span class="badge">String</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                    <p>of task in the registry</p>
+
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  arg
+                </th>
+                <td>
+                  
+                    <span class="badge">Array</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                    <p>list passed to task function</p>
+
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>addPipe()</h2> <small><p>Pipe two tasks</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  from
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                    <p>source task</p>
+
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  to
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                    <p>target task</p>
+
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  argIndex
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>delTask()</h2> <small><p>Remove a task</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  graph
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  task
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>delPipe()</h2> <small><p>Remove a pipe</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  graph
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  pipe
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>getTaskById()</h2> <small><p>Get task by given id</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  id
+                </th>
+                <td>
+                  
+                    <span class="badge">Number</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>evaluate()</h2> <small><p>Execute tasks</p>
+</small>
+      </div>
+
+      <p><p>Delegate to <code>dflow.evaluate()</code></p>
+</p>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+    
+
+  </section>
+
+  <section>
+    <h1>Registry</h1>
+
+    
+      
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>set()</h2> <small><p>Store function in dflow registry</p>
+</small>
+      </div>
+
+      <p><pre><code>dflow.Registry.set(&#39;foo&#39;, function () { return {bar: &#39;quz&#39;}})
+</code></pre></p>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  name
+                </th>
+                <td>
+                  
+                    <span class="badge">String</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                    <p>identifier of task</p>
+
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  func
+                </th>
+                <td>
+                  
+                    <span class="badge">Function</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                    <p>to store in registry</p>
+
+                  
+                </td>
+              <tr>
+            
+          
+            
+              <tr>
+                <th>
+                  context
+                </th>
+                <td>
+                  
+                    <span class="badge">Object</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+      
+      
+      
+      
+      
+      
+      
+
+      <div class="page-header">
+        <h2>get()</h2> <small><p>Retrieve function from dflow registry</p>
+</small>
+      </div>
+
+      
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>param</th>
+            <th>type</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            
+              <tr>
+                <th>
+                  name
+                </th>
+                <td>
+                  
+                    <span class="badge">String</span>
+                  
+                </td>
+                <td colspan="10">
+                  
+                    <p>identifier of task</p>
+
+                  
+                </td>
+              <tr>
+            
+          
+            
+          
+            
+          
+        </tbody>
+      </table>
+    
+
+  </section>
+
+  <section>
+    <h1>algorithm</h1>
+
+    
       
       
       
@@ -78,7 +703,8 @@
 </small>
       </div>
 
-      
+      <p><p>Delegates to dflow.Registry.add</p>
+</p>
 
       <table class="table">
         <thead>
@@ -170,7 +796,7 @@
       
 
       <div class="page-header">
-        <h2>taskById()</h2> <small><p>Get task by id</p>
+        <h2>getTaskById()</h2> <small><p>Get task by id</p>
 </small>
       </div>
 
@@ -582,452 +1208,6 @@ The level task equals one plus the max level of parent tasks.</p>
             
           
             
-          
-        </tbody>
-      </table>
-    
-
-  </section>
-
-  <section>
-    <h1>DflowGraph</h1>
-
-    
-      
-      
-      
-      
-      
-      
-      
-
-      <div class="page-header">
-        <h2>DflowGraph()</h2> <small><p>DflowGraph constructor</p>
-</small>
-      </div>
-
-      <p><pre><code>var dflow = require(&#39;dflow&#39;)
-
-var graph = new dflow.Graph()
-</code></pre></p>
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th>param</th>
-            <th>type</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          
-        </tbody>
-      </table>
-    
-      
-      
-      
-      
-      
-      
-      
-
-      <div class="page-header">
-        <h2>addTask()</h2> <small><p>Add a task</p>
-</small>
-      </div>
-
-      
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th>param</th>
-            <th>type</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          
-            
-              <tr>
-                <th>
-                  name
-                </th>
-                <td>
-                  
-                    <span class="badge">String</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                    <p>of task in the registry</p>
-
-                  
-                </td>
-              <tr>
-            
-          
-            
-              <tr>
-                <th>
-                  arg
-                </th>
-                <td>
-                  
-                    <span class="badge">Array</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                    <p>list passed to task function</p>
-
-                  
-                </td>
-              <tr>
-            
-          
-            
-          
-            
-          
-        </tbody>
-      </table>
-    
-      
-      
-      
-      
-      
-      
-      
-
-      <div class="page-header">
-        <h2>addPipe()</h2> <small><p>Pipe two tasks</p>
-</small>
-      </div>
-
-      
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th>param</th>
-            <th>type</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          
-            
-              <tr>
-                <th>
-                  from
-                </th>
-                <td>
-                  
-                    <span class="badge">Object</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                    <p>source task</p>
-
-                  
-                </td>
-              <tr>
-            
-          
-            
-              <tr>
-                <th>
-                  to
-                </th>
-                <td>
-                  
-                    <span class="badge">Object</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                    <p>target task</p>
-
-                  
-                </td>
-              <tr>
-            
-          
-            
-              <tr>
-                <th>
-                  argIndex
-                </th>
-                <td>
-                  
-                    <span class="badge">Object</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                </td>
-              <tr>
-            
-          
-            
-          
-            
-          
-        </tbody>
-      </table>
-    
-      
-      
-      
-      
-      
-      
-      
-
-      <div class="page-header">
-        <h2>delTask()</h2> <small><p>Remove a task</p>
-</small>
-      </div>
-
-      
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th>param</th>
-            <th>type</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          
-            
-              <tr>
-                <th>
-                  graph
-                </th>
-                <td>
-                  
-                    <span class="badge">Object</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                </td>
-              <tr>
-            
-          
-            
-              <tr>
-                <th>
-                  task
-                </th>
-                <td>
-                  
-                    <span class="badge">Object</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                </td>
-              <tr>
-            
-          
-            
-          
-            
-          
-        </tbody>
-      </table>
-    
-      
-      
-      
-      
-      
-      
-      
-
-      <div class="page-header">
-        <h2>delPipe()</h2> <small><p>Remove a pipe</p>
-</small>
-      </div>
-
-      
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th>param</th>
-            <th>type</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          
-            
-              <tr>
-                <th>
-                  graph
-                </th>
-                <td>
-                  
-                    <span class="badge">Object</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                </td>
-              <tr>
-            
-          
-            
-              <tr>
-                <th>
-                  pipe
-                </th>
-                <td>
-                  
-                    <span class="badge">Object</span>
-                  
-                </td>
-                <td colspan="10">
-                  
-                </td>
-              <tr>
-            
-          
-            
-          
-            
-          
-        </tbody>
-      </table>
-    
-      
-      
-      
-      
-      
-      
-      
-
-      <div class="page-header">
-        <h2>evaluate()</h2> <small>summary</small>
-      </div>
-
-      
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th>param</th>
-            <th>type</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          
-        </tbody>
-      </table>
-    
-
-  </section>
-
-  <section>
-    <h1>registry</h1>
-
-    
-      
-      
-      
-      
-      
-      
-      
-
-      <div class="page-header">
-        <h2>addition()</h2> <small>summary</small>
-      </div>
-
-      
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th>param</th>
-            <th>type</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
           
         </tbody>
       </table>
