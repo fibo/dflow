@@ -29,6 +29,7 @@ exports.plugin = {}
  *
  * If the exported function is named, for instance *myplugin*, dflow will store
  * it in the `dflow.plugin` object.
+ *
  * Make it easy!
  *
  * * If plugin *foo* is stored in a file, name it *foo.js*.
@@ -51,11 +52,8 @@ exports.plugin = {}
 function use (plugin) {
   plugin(exports)
 
-    console.dir(plugin)
-    console.dir(plugin.name)
-
   // Export plugin as a dflow.plugin item
-  if (plugin.name.lenght > 0)
+  if (plugin.name.length > 0)
     exports.plugin[plugin.name] = plugin
 
   return exports
@@ -67,6 +65,7 @@ exports.use = use
 use(corePlugin)
 
 // Load window plugin if it seems there is a window
-if (typeof global.window === 'object')
+if (typeof global.window === 'object') {
   use(windowPlugin)
+}
 

@@ -38,6 +38,8 @@ function indexOfTask (graph, task) {
       return i
 }
 
+exports.indexOfTask = indexOfTask
+
 /**
  * Get task by id
  *
@@ -47,13 +49,13 @@ function indexOfTask (graph, task) {
  * @return {Object} task
  */
 
-function taskById (graph, id) {
+function getTaskById (graph, id) {
   for (var i in graph.tasks)
     if (graph.tasks[i].id === id)
       return graph.tasks[i]
 }
 
-exports.taskById = taskById
+exports.getTaskById = getTaskById
 
 /**
  * Compute input pipes of task
@@ -160,7 +162,7 @@ function inputArgOfTask (graph, task) {
         sourceProp = 'out'
       }
 
-      sourceTask = taskById(graph, sourceId)
+      sourceTask = getTaskById(graph, sourceId)
       arg = sourceTask[sourceProp]
 
       // pipe.to is an array [taskId, argIndex]

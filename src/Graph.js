@@ -86,7 +86,8 @@ DflowGraph.prototype.addPipe = addPipe
  * @return {Object} task
  */
 
-function delTask (graph, task) {
+function delTask (task) {
+  this.tasks.splice(algorithm.indexOfTask(task), 1)
 
   return task
 }
@@ -110,6 +111,23 @@ function delPipe (graph, pipe) {
 DflowGraph.prototype.delPipe = delPipe
 
 /**
+ * Get task by given id
+ *
+ * @param {Number} id
+ *
+ * @return {Object} task
+ */
+
+function getTaskById (id) {
+  return algorithm.getTaskById(this, id)
+}
+
+DflowGraph.prototype.getTaskById = getTaskById
+
+/**
+ * Execute tasks
+ *
+ * Delegate to `dflow.evaluate()`
  *
  */
 
