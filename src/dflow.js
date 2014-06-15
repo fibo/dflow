@@ -1,4 +1,6 @@
 
+var path = require('path')
+
 var algorithm    = require('./algorithm')
   , Graph        = require('./Graph')
   , Registry     = require('./Registry')
@@ -8,11 +10,48 @@ var algorithm    = require('./algorithm')
 for (var i in algorithm)
   exports[i] = algorithm[i]
 
+exports.example = {
+  // TODO add graphs dynamically
+  'graph1': require('../examples/graphs/graph1.json'),
+  'graph2': require('../examples/graphs/graph2.json')
+}
+
 exports.Graph = Graph
 
 exports.Registry = Registry
 
 exports.plugin = {}
+
+/**
+ * Convert a foreign package to a dflow plugin
+ *
+ * ```js
+ * var _ = require('underscore')
+ *
+ * var underscorePlugin = dflow.pluginFrom(_, '_')
+ *
+ * dflow.use(underscorePlugin)
+ * ```
+ *
+ * @param {Object} pkg to convert
+ * @param {String} name of plugin
+ *
+ * @return {Function} plugin that dflow can use
+ */
+
+function pluginFrom (pkg, name) {
+  var plugin = function (dflow) {
+    for (var item in pkg) {
+      dflow.register(name + '.' + item, pkg[item])
+    }
+  }
+
+  plugin.name = name
+
+  return plugin
+}
+
+exports.pluginFrom = pluginFrom
 
 /**
  * Import plugin
@@ -68,34 +107,4 @@ use(corePlugin)
 if (typeof global.window === 'object') {
   use(windowPlugin)
 }
-
-/**
- * Convert a foreign package to a dflow plugin
- *
- * ```js
- * var _ = require('underscore')
- *
- * var underscorePlugin = dflow.pluginFrom(_, '_')
- *
- * dflow.use(underscorePlugin)
- * ```
- *
- * @param {Object} pkg to convert
- * @param {String} name of plugin
- *
- * @return {Function} plugin that dflow can use
- */
-
-function pluginFrom (pkg, name) {
-  var plugin = function (dflow) {
-    for (var item in pkg)
-      dflow.register(name + '.' + item, pkg[item])
-  }
-
-  plugin.name = name
-
-  return plugin
-}
-
-exports.pluginFrom = pluginFrom
 

@@ -1,26 +1,30 @@
 
-var window = global.window     || {}
-  , document = window.document || {}
-  , body     = document.body   || {}
-
 function bgColor (color) {
     if (color !== document.bgColor)
-      document.bgColor = color
+      window.document.bgColor = color
 }
 
 var _window = function (dflow) {
   var register = dflow.register
+    , prop
 
-  register('body', function () { return body })
+  function registerAllFrom (obj, name) {
+    for (var prop in obj)
+      if (typeof obj[prop] === 'function')
+        register(name + '.' + prop, obj[prop], obj)
+      else
+        register(name + '.' + prop, obj[prop])
+  }
+
+  registerAllFrom(window.document, 'document')
+  registerAllFrom(window.document.body, 'body')
 
   // console tasks
-  var console = global.console
-
-  for (var k in console)
+  for (var prop in console)
     // Make sure console functions are executed in console context
-    register('console.' + k, console[k], console)
+    register('console.' + prop, console[prop], console)
 
-  register('bgColor', bgColor)
+  register('document.bgColor', bgColor)
 }
 
 // To avoid create a `function window () {}`, name it later
