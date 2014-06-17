@@ -1,7 +1,8 @@
+
 /**
  * # Usage
  *
- * Launch examples/graphXYZ.json
+ * Evaluate example graph examples/graphs/XYZ.json
  *
  * ```
  * node examples/evaluateGraph.js XYZ

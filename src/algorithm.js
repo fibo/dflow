@@ -210,3 +210,84 @@ function evaluate (graph) {
 
 exports.evaluate = evaluate
 
+/**
+ * Sort out a graph layout
+ *
+ * Every task is a box, every pipe is a line.
+ *
+ * The `layout` is an object with a list of boxes and a list of lines.
+ *
+ * A box has the same id of its corresponding task.
+ * A line has the same id of its corresponding pipe.
+ *
+ * Basically, tasks are on a grid which row number is given by task level.
+ *
+ * Drawing is delegated to some other class.
+ *
+ * ```js
+ * var layout = dflow.arrange(graph)
+ *
+ * somehow.render(layout) // SVG, Canvas, WebGL ... whatever
+ * ```
+ *
+ * @param {Object} graph
+ *
+ * @return {Object} layout
+ */
+
+function arrange (graph) {
+  var boxes = []
+    , lines = []
+
+  var box
+    , elementsIn = {}
+    , level
+
+  // Compute boxes, then lines
+
+  graph.tasks.forEach(function (task, index, tasks) {
+    level = levelOfTask(graph, task)
+
+    if (typeof elementsIn[level] === 'undefined')
+      elementsIn[level] = 0
+    else
+      elementsIn[level] = elementsIn[level] + 1
+
+    boxes.push({
+      id: task.id,
+      x: elementsIn[level] * 100,
+      y: level * 40,
+      w: 80,
+      h: 20
+    })
+  })
+
+  graph.pipes.forEach(function (pipe, index, pipes) {
+    var from
+      , to
+
+    for (var i in boxes) {
+      if (boxes[i].id === pipe.from)
+        from = boxes[i]
+
+      if (boxes[i].id === pipe.to[0])
+        to = boxes[i]
+    }
+
+    lines.push({
+      id: pipe.id,
+      x1: from.x,
+      y1: from.y + from.h,
+      x2: to.x,
+      y2: to.y
+    })
+  })
+
+  return {
+    boxes: boxes,
+    lines: lines
+  }
+}
+
+exports.arrange = arrange
+
