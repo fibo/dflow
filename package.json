@@ -6,6 +6,9 @@
   "scripts": {
     "test": "mocha --bail --require should --reporter min"
   },
+  "bin": {
+    "dflow": "bin/dflow"
+  },
   "dependencies": {},
   "repository": {
     "type": "git",
