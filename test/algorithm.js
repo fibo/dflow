@@ -35,7 +35,14 @@ describe('algorithm', function () {
   })
 
   describe('levelOfTask', function () {
-    it('assigns a level to each task')
+    it('assigns a level to each task'/*, function () {
+      var graph = require('../examples/graphs/graph2.json')
+
+      dflow.levelOfTask(graph , graph.tasks[0]).should.eql(0)
+      dflow.levelOfTask(graph , graph.tasks[1]).should.eql(1)
+      dflow.levelOfTask(graph , graph.tasks[4]).should.eql(2)
+      //FIXME dflow.levelOfTask(graph , graph.tasks[3]).should.eql(0)
+    }*/)
   })
 })
 

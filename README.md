@@ -45,10 +45,6 @@ With [npm](https://npmjs.org/) do
 $ npm install dflow
 ```
 
-# Development
-
-Install [fibo/fibo-gulptasks][1] for development tasks automation.
-
 # License
 
 [MIT][2]
