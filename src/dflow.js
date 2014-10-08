@@ -1,6 +1,4 @@
 
-var path = require('path')
-
 var algorithm    = require('./algorithm')
   , Graph        = require('./Graph')
   , Registry     = require('./Registry')
