@@ -1,0 +1,19 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "func": "hello"
+    },
+    {
+      "id": "2",
+      "func": "console.log"
+    }
+  ],
+  "pipes": [
+    {
+      "id": "3",
+      "from": {"id": "1"},
+      "to": {"id": "2", "arg": 0}
+    }
+  ]
+}

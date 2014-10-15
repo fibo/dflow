@@ -1,3 +1,3 @@
 
-module.exports = require('./src/dflow')
+exports.func = require('./src/func')
 
