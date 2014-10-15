@@ -3,6 +3,7 @@ var should = require('should')
   , dflow = require('..')
 
 var graph = {
+  pipes: [],
   tasks: [
     {
       id: '1',
@@ -17,7 +18,9 @@ var funcs = {
 
 describe('func', function () {
   it('returns a function', function () {
-    dflow.func(graph, funcs).should.be.instanceOf(Function)
+    var f = dflow.func(graph, funcs)
+    f.should.be.instanceOf(Function)
+    f()
   })
 })
 

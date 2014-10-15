@@ -1,20 +1,22 @@
 
 var outputPipesOf = require('./outputPipesOf')
-var inputPipesOf = require('./inputPipesOf')
+  , run = require('./run')
 
 function func (graph, funcs) {
-  function dflowFunc () {}
+  function ifHasOutputPipes (task) {
+    return outputPipesOf(graph.pipes, task).length > 0
+  }
+
+  var leaves = graph.tasks.filter(ifHasOutputPipes)
+
+  function dflowFunc () {
+    var runTask = run.bind(graph, funcs)
+
+    leaves.forEach(runTask)
+  }
 
   return dflowFunc
 }
 
 module.exports = func
-
-function leaves (graph) {
-  function ifHasOutputPipes (task) {
-    return outputPipesOf(raph.pipes, task).length > 0
-  }
-
-  return graph.tasks.filter(ifHasOutputPipes)
-}
 
