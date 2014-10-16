@@ -77,5 +77,19 @@ describe('validate', function () {
       validate(funcs, graph)
     }).should.throwError(orphanPipe)
   })
+
+  it('do not fail with injected arguments[N] functions', function () {
+    graph = {
+      tasks: [
+        {
+          'id': '0',
+          'func': 'arguments[0]'
+        }
+      ],
+      pipes: []
+    }
+
+    validate(funcs, graph).should.be.ok
+  })
 })
 

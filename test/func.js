@@ -1,6 +1,6 @@
 
 var should = require('should')
-  , dflow = require('..')
+  , func = require('../src/func')
 
 var graph = {
   pipes: [],
@@ -18,9 +18,17 @@ var funcs = {
 
 describe('func', function () {
   it('returns a function', function () {
-    var f = dflow.func(funcs, graph)
+    var f = func(funcs, graph)
     f.should.be.instanceOf(Function)
     f()
+  })
+
+  it('validates funcs and graph', function () {
+    funcs.foo = 'bar'
+
+    ;(function () {
+      func(funcs, graph)
+    }).should.throwError()
   })
 })
 
