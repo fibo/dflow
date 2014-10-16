@@ -4,7 +4,6 @@ function getArgument (args, index) {
 }
 
 function injectArguments (funcs, graph, args) {
-
   graph.tasks.forEach(function (task) {
     var argumentsN = /^arguments\[(\d+)\]$/
     var arg = argumentsN.exec(task.func)

@@ -3,14 +3,14 @@
 var should = require('should')
 var injectArguments = require('../src/injectArguments')
 
-graph = {
+var graph = {
   tasks: [
     { func: 'arguments[0]' },
     { func: 'arguments[1]' }
   ]
 }
 
-funcs = {}
+var funcs = {}
 
 describe('injectArguments', function () {
   it('returns funcs object with arguments[N] injected', function () {
