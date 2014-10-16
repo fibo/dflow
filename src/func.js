@@ -1,20 +1,34 @@
 
 var injectArguments = require('./injectArguments')
-var leavesOf = require('./leavesOf')
-var run = require('./run')
+  , inputArgsOf = require('./inputArgsOf')
+  , leavesOf = require('./leavesOf')
+  , validate = require('./validate')
 
 function func (funcs, graph) {
-  graph.outs = {}
+  validate(funcs, graph)
 
-  function dflowFunc () {
+  return function dflowFunc () {
+    graph.outs = {}
+    graph.errs = {}
+
     funcs = injectArguments(funcs, graph, arguments)
-//    var runTask = run.bind(null, funcsWithArguments, graph)
 
-    var runTask = run.bind(null, funcs, graph)
+    function run (task) {
+      var func = funcs[task.func]
+
+      var args = inputArgsOf(graph, task)
+  
+      try {
+        graph.outs[task.id] = func.apply(null, task.args)
+      }
+      catch (err) {
+        graph.errs[task.id] = err
+      }
+    }
 
     var returns = {}
 
-    graph.tasks.forEach(runTask)
+    graph.tasks.forEach(run)
 
     leavesOf(graph).forEach(function (task) {
       returns[task.id] = graph.outs[task.id]
@@ -22,8 +36,6 @@ function func (funcs, graph) {
 
     return returns
   }
-
-  return dflowFunc
 }
 
 module.exports = func

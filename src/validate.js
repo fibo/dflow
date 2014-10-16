@@ -1,8 +1,17 @@
 
 function validate (funcs, graph) {
-  for (var i in funcs)
-    if (typeof funcs[i] !== 'function')
-      throw new TypeError('Not a Function:', i, funcs[i])
+  funcs['arguments[0]'] = Function.prototype
+
+  for (var i in funcs) {
+    // Ignore arguments[N] function names, they will be injected.
+    if (/^arguments\[\d+\]/.exec(i))
+      continue
+
+    var f = funcs[i]
+
+    if (typeof f !== 'function')
+      throw new TypeError('Not a Function:', i, f)
+  }
 
   if (!Array.isArray(graph.pipes))
     throw new TypeError('Not an Array:', 'graph.pipes', graph.pipes)
@@ -38,6 +47,8 @@ function validate (funcs, graph) {
   }
 
   graph.pipes.forEach(checkOrphan)
+
+  return true
 }
 
 module.exports = validate
