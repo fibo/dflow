@@ -1,18 +1,26 @@
 
-var outputPipesOf = require('./outputPipesOf')
-  , run = require('./run')
+var injectArguments = require('./injectArguments')
+var leavesOf = require('./leavesOf')
+var run = require('./run')
 
-function func (graph, funcs) {
-  function ifHasOutputPipes (task) {
-    return outputPipesOf(graph.pipes, task).length > 0
-  }
-
-  var leaves = graph.tasks.filter(ifHasOutputPipes)
+function func (funcs, graph) {
+  graph.outs = {}
 
   function dflowFunc () {
-    var runTask = run.bind(graph, funcs)
+    funcs = injectArguments(funcs, graph, arguments)
+//    var runTask = run.bind(null, funcsWithArguments, graph)
 
-    leaves.forEach(runTask)
+    var runTask = run.bind(null, funcs, graph)
+
+    var returns = {}
+
+    graph.tasks.forEach(runTask)
+
+    leavesOf(graph).forEach(function (task) {
+      returns[task.id] = graph.outs[task.id]
+    })
+
+    return returns
   }
 
   return dflowFunc
