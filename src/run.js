@@ -1,13 +1,15 @@
 
-var inputPipesOf = require('./inputPipesOf')
+var inputArgsOf = require('./inputArgsOf')
 
-function run (graph, funcs, task) {
-  var taskFunc = funcs[task[func]]
-  // TODO get args running parent tasks
-  // read also graph arguments
-  var taskArgs = []
-      
-  taskFunc.apply(null, taskArgs)
+function run (funcs, graph, task) {
+  var func = funcs[task.func]
+
+//  if (typeof func !== 'function')
+//    throw new TypeError('Not a function:', func)
+
+  var args = inputArgsOf(graph, task)
+  
+  return func.apply(null, task.args)
 }
 
 module.exports = run

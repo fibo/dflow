@@ -18,7 +18,7 @@ var funcs = {
 
 describe('func', function () {
   it('returns a function', function () {
-    var f = dflow.func(graph, funcs)
+    var f = dflow.func(funcs, graph)
     f.should.be.instanceOf(Function)
     f()
   })

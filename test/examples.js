@@ -1,22 +1,35 @@
 
-var examples = ['helloWorld', 'sum']
+var examples = require('./examples/graphs')
+
 
 var dflow = require('..')
 
-var expected
-  , funcs = require('./examples/funcs')
+var should = require('should')
+
+var funcs = require('./examples/funcs')
   , graph
 
 describe('example', function () {
-  examples.forEach(function (example) {
+  function testExample (name, graph) {
+    describe(name, function () {
+      it('works', function () {
+        dflow.func(funcs, graph).should.be.instanceOf(Function)
+      })
+    })
+  }
+
+  for (var exampleName in examples) {
+    var exampleGraph = examples[exampleName]
+    testExample(exampleName, exampleGraph)
+  }
+/*
     describe(example, function () {
-      //expected = require('./expected/' + example + '.json')
       graph = require('./examples/' + example + '.json')
       it('works', function () {
-        //evaluate(graph, funcs).should.eql(expected)
-        dflow.func(graph, funcs)
+        dflow.func(funcs, graph).should.be.instanceOf(Function)
       })
     })
   })
+*/
 })
 
