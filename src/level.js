@@ -1,18 +1,18 @@
 
 var parents = require('./parents')
 
-function levelOf (graph, task) {
-  var level = 0
+function level (graph, task) {
+  var taskLevel = 0
     , parentsOf = parents.bind(null, graph)
 
   function computeLevel (parentTask) {
-    level = Math.max(level, levelOf(graph, parentTask) + 1)
+    taskLevel = Math.max(taskLevel, level(graph, parentTask) + 1)
   }
 
   parentsOf(task).forEach(computeLevel)
 
-  return level
+  return taskLevel
 }
 
-module.exports = levelOf
+module.exports = level
 
