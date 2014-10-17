@@ -1,17 +1,24 @@
 
 var injectArguments = require('./injectArguments')
-  , inputArgsOf = require('./inputArgsOf')
-  , leavesOf = require('./leavesOf')
+  , inputArgs = require('./inputArgs')
+  , level = require('./level')
   , validate = require('./validate')
 
 function func (funcs, graph) {
   validate(funcs, graph)
+
+  var inputArgsOf = inputArgs.bind(null, graph)
+    , levelOf = level.bind(null, graph)
 
   return function dflowFunc () {
     graph.outs = {}
     graph.errs = {}
 
     funcs = injectArguments(funcs, graph, arguments)
+
+    function byLevel (a, b) {
+      return levelOf(a) - levelOf(b)
+    }
 
     function run (task) {
       var func = funcs[task.func]
@@ -26,15 +33,9 @@ function func (funcs, graph) {
       }
     }
 
-    var returns = {}
+    graph.tasks.sort(byLevel).forEach(run)
 
-    graph.tasks.forEach(run)
-
-    leavesOf(graph).forEach(function (task) {
-      returns[task.id] = graph.outs[task.id]
-    })
-
-    return returns
+    return
   }
 }
 

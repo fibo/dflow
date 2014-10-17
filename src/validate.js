@@ -4,7 +4,7 @@ function validate (funcs, graph) {
 
   for (var i in funcs) {
     // Ignore arguments[N] function names, they will be injected.
-    if (/^arguments\[\d+\]/.exec(i))
+    if (/^arguments\[\d+\]$/.exec(i))
       continue
 
     var f = funcs[i]
@@ -18,6 +18,18 @@ function validate (funcs, graph) {
   
   if (!Array.isArray(graph.tasks))
     throw new TypeError('Not an Array:', 'graph.tasks', graph.tasks)
+
+  function isDefined (prop) {
+    if (typeof this[prop] === 'undefined')
+      throw new TypeError('Missing prop:', prop, this)
+  }
+
+  function checkProps (props, obj) {
+    props.forEach(isDefined.bind(obj))
+  }
+
+  graph.pipes.forEach(checkProps.bind(null, ['id', 'from', 'to']))
+  graph.tasks.forEach(checkProps.bind(null, ['id', 'func']))
 
   function checkFunc (task) {
     var f = funcs[task.func]

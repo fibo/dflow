@@ -1,5 +1,5 @@
 
-function inputPipesOf (pipes, task) {
+function inputPipes (pipes, task) {
   function ifIsInputPipe (pipe) {
     return pipe.to.id === task.id 
   }
@@ -7,5 +7,5 @@ function inputPipesOf (pipes, task) {
   return pipes.filter(ifIsInputPipe)
 }
 
-module.exports = inputPipesOf
+module.exports = inputPipes
 

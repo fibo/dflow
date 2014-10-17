@@ -1,6 +1,6 @@
 
 var should = require('should')
-var inputPipesOf = require('../src/inputPipesOf')
+var inputPipes = require('../src/inputPipes')
 
 var tasks = [
       { id: '0' },
@@ -15,15 +15,17 @@ var tasks = [
       { id: 'd', from: { id: '2' }, to: { id: '3' } }
     ]
 
-describe('inputPipesOf', function () {
+var inputPipesOf = inputPipes.bind(null, pipes)
+
+describe('inputPipes', function () {
   it('returns input pipes of task', function () {
-    inputPipesOf(pipes, tasks[0]).should.eql([])
+    inputPipesOf(tasks[0]).should.eql([])
 
-    inputPipesOf(pipes, tasks[1]).should.eql([pipes[0]])
+    inputPipesOf(tasks[1]).should.eql([pipes[0]])
 
-    inputPipesOf(pipes, tasks[2]).should.eql([pipes[1]])
+    inputPipesOf(tasks[2]).should.eql([pipes[1]])
 
-    inputPipesOf(pipes, tasks[3]).should.eql([pipes[2], pipes[3]])
+    inputPipesOf(tasks[3]).should.eql([pipes[2], pipes[3]])
   })
 })
 

@@ -11,7 +11,8 @@ var funcs = {
   'f': Function.prototype
 }
 
-var notArray = /Not an Array:/
+var missingProp = /Missing prop:/
+  , notArray = /Not an Array:/
   , notFunction = /Not a Function:/
   , orphanPipe = /Orphan pipe:/
 
@@ -62,8 +63,7 @@ describe('validate', function () {
 
   it('throws if a pipe is orphan', function () {
     graph = {
-      tasks: [
-      ],
+      tasks: [],
       pipes: [
         {
           'id': '1',
@@ -90,6 +90,84 @@ describe('validate', function () {
     }
 
     validate(funcs, graph).should.be.ok
+  })
+
+  it('throws if a pipe has missing props', function () {
+    graph = {
+      tasks: [],
+      pipes: [
+        {
+          '(missing)id': '1',
+          'from': { id: '2' },
+          'to': { id: '3', arg: 0 },
+        }
+      ]
+    }
+
+    ;(function () {
+      validate(funcs, graph)
+    }).should.throwError(missingProp)
+
+    graph = {
+      tasks: [],
+      pipes: [
+        {
+          'id': '1',
+          '(missing)from': { id: '2' },
+          'to': { id: '3', arg: 0 },
+        }
+      ]
+    }
+
+    ;(function () {
+      validate(funcs, graph)
+    }).should.throwError(missingProp)
+
+    graph = {
+      tasks: [],
+      pipes: [
+        {
+          'id': '1',
+          'from': { id: '2' },
+          '(missing)to': { id: '3', arg: 0 },
+        }
+      ]
+    }
+
+    ;(function () {
+      validate(funcs, graph)
+    }).should.throwError(missingProp)
+  })
+
+  it('throws if a task has missing props', function () {
+    graph = {
+      tasks: [
+        {
+          '(missing)id': '1',
+          'func': 'arguments[0]',
+        }
+      ],
+      pipes: []
+    }
+
+    ;(function () {
+      validate(funcs, graph)
+    }).should.throwError(missingProp)
+
+    graph = {
+      tasks: [
+        {
+          'id': '1',
+          '(missing)func': 'arguments[0]',
+        }
+      ],
+      pipes: []
+    }
+
+    ;(function () {
+      validate(funcs, graph)
+    }).should.throwError(missingProp)
+
   })
 })
 
