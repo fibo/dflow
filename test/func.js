@@ -23,8 +23,9 @@ var funcs = {
 var f = func(funcs, graph)
 
 describe('func', function () {
-  it('returns a function', function () {
+  it('returns a function with a graph prop', function () {
     f.should.be.instanceOf(Function)
+    f.graph.should.eql(graph)
   f()
   })
 

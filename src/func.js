@@ -7,7 +7,7 @@ function func (funcs, graph) {
   var inputArgsOf = inputArgs.bind(null, graph)
     , levelOf = level.bind(null, graph)
 
-  return function dflowFunc () {
+  function dflowFunc () {
     var gotReturn = false
       , returnValue
 
@@ -37,6 +37,11 @@ function func (funcs, graph) {
 
     return returnValue
   }
+
+  // Remember function was created from a dflow graph
+  dflowFunc.graph = graph
+
+  return dflowFunc
 }
 
 module.exports = func
