@@ -1,7 +1,6 @@
 
 var examples = require('./examples/graphs')
 
-
 var dflow = require('..')
 
 var should = require('should')
