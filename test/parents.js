@@ -30,5 +30,20 @@ describe('parentsOf', function () {
 
     parentsOf(tasks[3]).should.eql([tasks[1], tasks[2]])
   })
+
+  it('does not count twice', function () {
+    var graph = {
+      tasks: [
+        { id: '0' }, { id: '1' }
+      ],
+      pipes: [
+        { id: 'a', from: { id: '0' }, to: { id: '1', arg: 0 } },
+        { id: 'b', from: { id: '0' }, to: { id: '1', arg: 1 } }
+      ]
+    }
+    , tasks = graph.tasks
+    
+    parentsOf(tasks[1]).should.eql([tasks[0]]) // not [tasks[0], tasks[0]]
+  })
 })
 

@@ -3,22 +3,19 @@ var inputPipes = require('./inputPipes')
 
 function parents (graph, task) {
   var inputPipesOf = inputPipes.bind(null, graph.pipes)
-    , parentTasks = []
     , parentTaskIds = {}
 
   function rememberParentTaskId (pipe) {
-
+    parentTaskIds[pipe.from.id] = true
   }
 
-  inputPipesOf(task)
-    .forEach(function (pipe) {
-      graph.tasks.forEach(function (task) {
-        if (pipe.from.id === task.id)
-          parentTasks.push(task)
-      })
-  })
+  inputPipesOf(task).forEach(rememberParentTaskId)
 
-  return parentTasks
+  function parentTasks (task) {
+    return parentTaskIds[task.id] === true 
+  }
+
+  return graph.tasks.filter(parentTasks)
 }
 
 module.exports = parents
