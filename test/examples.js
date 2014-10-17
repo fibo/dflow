@@ -22,14 +22,5 @@ describe('example', function () {
     var exampleGraph = examples[exampleName]
     testExample(exampleName, exampleGraph)
   }
-/*
-    describe(example, function () {
-      graph = require('./examples/' + example + '.json')
-      it('works', function () {
-        dflow.func(funcs, graph).should.be.instanceOf(Function)
-      })
-    })
-  })
-*/
 })
 

@@ -23,10 +23,10 @@ function func (funcs, graph) {
     function run (task) {
       var func = funcs[task.func]
 
-      var args = inputArgsOf(graph, task)
+      var args = inputArgs(graph, task)
   
       try {
-        graph.outs[task.id] = func.apply(null, task.args)
+        graph.outs[task.id] = func.apply(null, args)
       }
       catch (err) {
         graph.errs[task.id] = err
