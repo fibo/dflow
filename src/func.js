@@ -20,9 +20,12 @@ function func (funcs, graph) {
     }
 
     function run (task) {
-      var args = inputArgs(graph, task)
+      var args = inputArgsOf(task)
         , funcName = task.func
         , func = funcs[funcName]
+
+      if (gotReturn)
+        return
 
       if ((funcName === 'return') && (!gotReturn)) {
         returnValue = args[0]
@@ -30,7 +33,7 @@ function func (funcs, graph) {
         return
       }
 
-      graph.outs[task.id] = func.apply(null, args)
+      graph.outs[task.key] = func.apply(null, args)
     }
 
     graph.tasks.sort(byLevel).forEach(run)

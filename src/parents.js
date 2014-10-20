@@ -6,13 +6,13 @@ function parents (graph, task) {
     , parentTaskIds = {}
 
   function rememberParentTaskId (pipe) {
-    parentTaskIds[pipe.from.id] = true
+    parentTaskIds[pipe.from.key] = true
   }
 
   inputPipesOf(task).forEach(rememberParentTaskId)
 
   function parentTasks (task) {
-    return parentTaskIds[task.id] === true 
+    return parentTaskIds[task.key] === true 
   }
 
   return graph.tasks.filter(parentTasks)

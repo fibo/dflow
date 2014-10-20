@@ -4,16 +4,16 @@ var inputArgs = require('../src/inputArgs')
 
 var graph = {
   tasks: [
-    { id: '0' },
-    { id: '1' },
-    { id: '2' },
-    { id: '3' }
+    { key: '0' },
+    { key: '1' },
+    { key: '2' },
+    { key: '3' }
   ],
   pipes: [
-    { id: 'a', from: { id: '0' }, to: { id: '1', arg: 0 } },
-    { id: 'b', from: { id: '1' }, to: { id: '2', arg: 0 } },
-    { id: 'c', from: { id: '2' }, to: { id: '3', arg: 0 } },
-    { id: 'd', from: { id: '1' }, to: { id: '3', arg: 1 } }
+    { key: 'a', from: { key: '0' }, to: { key: '1', arg: 0 } },
+    { key: 'b', from: { key: '1' }, to: { key: '2', arg: 0 } },
+    { key: 'c', from: { key: '2' }, to: { key: '3', arg: 0 } },
+    { key: 'd', from: { key: '1' }, to: { key: '3', arg: 1 } }
   ], 
   outs: {
     '0': 'foo',

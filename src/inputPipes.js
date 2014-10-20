@@ -1,7 +1,7 @@
 
 function inputPipes (pipes, task) {
   function ifIsInputPipe (pipe) {
-    return pipe.to.id === task.id 
+    return pipe.to.key === task.key 
   }
 
   return pipes.filter(ifIsInputPipe)
