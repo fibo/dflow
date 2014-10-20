@@ -4,15 +4,15 @@ var should = require('should')
 
 var graph = {
   pipes: [
-    { id: 'a', from: { id: '0' }, to: { id: '2', arg: 0 } },
-    { id: 'b', from: { id: '1' }, to: { id: '2', arg: 1 } },
-    { id: 'c', from: { id: '2' }, to: { id: '3', arg: 0 } }
+    { key: 'a', from: { key: '0' }, to: { key: '2', arg: 0 } },
+    { key: 'b', from: { key: '1' }, to: { key: '2', arg: 1 } },
+    { key: 'c', from: { key: '2' }, to: { key: '3', arg: 0 } }
   ],
   tasks: [
-    { id: '0', func: 'arguments[0]' },
-    { id: '1', func: 'arguments[1]' },
-    { id: '2', func: '+' },
-    { id: '3', func: 'return' }
+    { key: '0', func: 'arguments[0]' },
+    { key: '1', func: 'arguments[1]' },
+    { key: '2', func: '+' },
+    { key: '3', func: 'return' }
   ]
 }
 

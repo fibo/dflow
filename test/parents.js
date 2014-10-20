@@ -4,16 +4,16 @@ var parents = require('../src/parents')
 
 var graph = {
   tasks: [
-    { id: '0' },
-    { id: '1' },
-    { id: '2' },
-    { id: '3' }
+    { key: '0' },
+    { key: '1' },
+    { key: '2' },
+    { key: '3' }
   ],
   pipes: [
-    { id: 'a', from: { id: '0' }, to: { id: '1' } },
-    { id: 'b', from: { id: '1' }, to: { id: '2' } },
-    { id: 'c', from: { id: '1' }, to: { id: '3' } },
-    { id: 'd', from: { id: '2' }, to: { id: '3' } }
+    { key: 'a', from: { key: '0' }, to: { key: '1' } },
+    { key: 'b', from: { key: '1' }, to: { key: '2' } },
+    { key: 'c', from: { key: '1' }, to: { key: '3' } },
+    { key: 'd', from: { key: '2' }, to: { key: '3' } }
   ]
 }
 
@@ -34,11 +34,11 @@ describe('parentsOf', function () {
   it('does not count twice', function () {
     var graph = {
       tasks: [
-        { id: '0' }, { id: '1' }
+        { key: '0' }, { key: '1' }
       ],
       pipes: [
-        { id: 'a', from: { id: '0' }, to: { id: '1', arg: 0 } },
-        { id: 'b', from: { id: '0' }, to: { id: '1', arg: 1 } }
+        { key: 'a', from: { key: '0' }, to: { key: '1', arg: 0 } },
+        { key: 'b', from: { key: '0' }, to: { key: '1', arg: 1 } }
       ]
     }
     , tasks = graph.tasks

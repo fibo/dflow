@@ -7,7 +7,7 @@ function inputArgs (graph, task) {
   
   function populateArg (pipe) {
     var index = pipe.to.arg
-      , value = graph.outs[pipe.from.id]
+      , value = graph.outs[pipe.from.key]
 
     args[index] = value
   }
