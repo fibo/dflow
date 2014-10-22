@@ -3,17 +3,17 @@ var should = require('should')
   , func = require('../src/func')
 
 var graph = {
-  pipes: [
-    { key: 'a', from: { key: '0' }, to: { key: '2', arg: 0 } },
-    { key: 'b', from: { key: '1' }, to: { key: '2', arg: 1 } },
-    { key: 'c', from: { key: '2' }, to: { key: '3', arg: 0 } }
-  ],
-  tasks: [
-    { key: '0', func: 'arguments[0]' },
-    { key: '1', func: 'arguments[1]' },
-    { key: '2', func: '+' },
-    { key: '3', func: 'return' }
-  ]
+  pipe: {
+    'a': { from: '0', to: '2', arg: 0 },
+    'b': {  from: '1', to: '2', arg: 1 },
+    'c': {  from: '2', to: '3', arg: 0 }
+  },
+  task: {
+    '0': { func: 'arguments[0]' },
+    '1': { func: 'arguments[1]' },
+    '2': { func: '+' },
+    '3': { func: 'return' }
+  }
 }
 
 var funcs = {
