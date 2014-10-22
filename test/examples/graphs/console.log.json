@@ -1,19 +1,13 @@
 {
-  "tasks": [
-    {
-      "key": "1",
-      "func": "arguments[0]"
-    },
-    {
-      "key": "2",
-      "func": "console.log"
+  "task": {
+    "1": { "func": "arguments[0]" },
+    "2": { "func": "console.log" }
+  },
+  "pipe": {
+    "3": {
+      "from": "1",
+      "to": "2",
+      "arg": 0
     }
-  ],
-  "pipes": [
-    {
-      "key": "3",
-      "from": {"key": "1"},
-      "to": {"key": "2", "arg": 0}
-    }
-  ]
+  }
 }

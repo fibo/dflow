@@ -1,7 +1,16 @@
 
-function inputPipes (pipes, task) {
+/**
+ * Compute pipes that feed a task
+ *
+ * @param {Array} pipes
+ * @param {String} taskKey
+ *
+ * @returns {Array} inputPipes
+ */
+
+function inputPipes (pipes, taskKey) {
   function ifIsInputPipe (pipe) {
-    return pipe.to.key === task.key 
+    return pipe.to === taskKey 
   }
 
   return pipes.filter(ifIsInputPipe)

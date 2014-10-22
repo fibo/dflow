@@ -3,19 +3,17 @@
 var should = require('should')
 var injectArguments = require('../src/injectArguments')
 
-var graph = {
-  tasks: [
+var funcs = {}
+  , tasks = [
     { func: 'arguments[0]' },
     { func: 'arguments[1]' }
   ]
-}
 
-var funcs = {}
 
 describe('injectArguments', function () {
   it('returns funcs object with arguments[N] injected', function () {
     ;(function () {
-      funcs = injectArguments(funcs, graph, arguments)
+      funcs = injectArguments(funcs, tasks, arguments)
 
       funcs['arguments[0]'].should.be.instanceOf(Function)
       funcs['arguments[1]'].should.be.instanceOf(Function)
