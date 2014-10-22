@@ -25,12 +25,8 @@ var f = func(funcs, graph)
 describe('func', function () {
   it('returns a function with a graph prop', function () {
     f.should.be.instanceOf(Function)
-    f.graph.should.eql(graph)
-  f()
-  })
-
-  it('function returns some value', function () {
     f(1, 2).should.eql(3)
+    f.graph.should.eql(graph)
   })
 })
 
