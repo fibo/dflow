@@ -14,13 +14,22 @@ function getArgument (args, index) {
  */
 
 function injectArguments (funcs, tasks, args) {
-  tasks.forEach(function (task) {
-    var argumentsN = /^arguments\[(\d+)\]$/
-    var arg = argumentsN.exec(task.func)
+  function inject (task) {
+    var funcName = task.func
 
-    if (arg)
-      funcs[task.func] = getArgument.bind(null, args, arg[1])
-  })
+    if (funcName === 'arguments') {
+      funcs[funcName] = function getArguments () { return args }
+    }
+    else {
+      var argumentsN = /^arguments\[(\d+)\]$/
+      var arg = argumentsN.exec(funcName)
+
+      if (arg)
+        funcs[funcName] = getArgument.bind(null, args, arg[1])
+    }
+  }
+
+  tasks.forEach(inject)
 
   return funcs
 }

@@ -5,6 +5,7 @@ var injectArguments = require('../src/injectArguments')
 
 var funcs = {}
   , tasks = [
+    { func: 'arguments' },
     { func: 'arguments[0]' },
     { func: 'arguments[1]' }
   ]
@@ -20,6 +21,16 @@ describe('injectArguments', function () {
 
       funcs['arguments[0]']().should.be.eql('foo')
       funcs['arguments[1]']().should.be.eql('bar')
+    })('foo', 'bar', 'quz')
+  })
+
+  it('returns funcs object with arguments injected', function () {
+    ;(function () {
+      funcs = injectArguments(funcs, tasks, arguments)
+
+      funcs['arguments'].should.be.instanceOf(Function)
+
+      funcs['arguments']().should.be.eql(arguments)
     })('foo', 'bar', 'quz')
   })
 })

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var dflow = require('../..')
+var dflow = require('dflow')
   , funcs = require('./funcs')
   , graph = require('./graphs/console.log.json')
 
