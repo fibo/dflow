@@ -2,7 +2,7 @@
 var inputPipes = require('./inputPipes')
 
 /**
- * Compute parent tasks
+ * Compute parent tasks.
  *
  * @param {Array} pipes of graph
  * @param {Array} tasks of graph

@@ -1,6 +1,6 @@
 
 /**
- * Compute pipes that feed a task
+ * Compute pipes that feed a task.
  *
  * @param {Array} pipes
  * @param {String} taskKey

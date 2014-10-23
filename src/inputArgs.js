@@ -2,7 +2,7 @@
 var inputPipes = require('./inputPipes')
 
 /**
- * Retrieve input arguments of a task
+ * Retrieve input arguments of a task.
  *
  * @param {Object} outs
  * @param {Array} pipes

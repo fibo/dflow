@@ -2,7 +2,7 @@
 var parents = require('./parents')
 
 /**
- * Compute level of task
+ * Compute level of task.
  *
  * @param {Array} pipes
  * @param {Array} tasks

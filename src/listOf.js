@@ -1,4 +1,14 @@
 
+/**
+ * Build a list of object keys and their content.
+ *
+ * { "foo": { "bar": 2 } ==> [ { "key": "foo", "bar": 2 } ]
+ *
+ * @param {Object} obj
+ *
+ * @returns {Array} list of items
+ */
+
 function listOf (obj) {
   var list = []
 
