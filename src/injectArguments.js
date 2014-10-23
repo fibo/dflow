@@ -1,10 +1,6 @@
 
-function getArgument (args, index) {
-  return args[index]
-}
-
 /**
- * Inject functions to retrieve arguments
+ * Inject functions to retrieve arguments.
  *
  * @param {Object} funcs
  * @param {Array} tasks
@@ -14,6 +10,10 @@ function getArgument (args, index) {
  */
 
 function injectArguments (funcs, tasks, args) {
+  function getArgument (index) {
+    return args[index]
+  }
+
   function inject (task) {
     var funcName = task.func
 
@@ -25,7 +25,7 @@ function injectArguments (funcs, tasks, args) {
       var arg = argumentsN.exec(funcName)
 
       if (arg)
-        funcs[funcName] = getArgument.bind(null, args, arg[1])
+        funcs[funcName] = getArgument.bind(null, arg[1])
     }
   }
 

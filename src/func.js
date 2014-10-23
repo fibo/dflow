@@ -3,8 +3,20 @@ var injectArguments = require('./injectArguments')
   , inputArgs = require('./inputArgs')
   , level = require('./level')
   , listOf = require('./listOf')
+  , validate = require('./validate')
+
+/**
+ * Create a dflow function.
+ *
+ * @param {Object} funcs context
+ * @param {Object} graph to be executed
+ *
+ * @returns {Function} f
+ */
 
 function func (funcs, graph) {
+// TODO  try { validate(graph) } catch (err) { throw err }
+
   var pipes = listOf(graph.pipe)
     , tasks = listOf(graph.task)
 
