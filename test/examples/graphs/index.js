@@ -1,4 +1,11 @@
 
-exports['console.log'] = require('./console.log.json')
-exports.sum = require('./sum.json')
+function exportIt (name) {
+  var graph = require('./' + name + '.json')
+
+  graph.results = require('./' + name + '-results.json')
+
+  exports[name] = graph
+}
+
+['sum', 'empty'].forEach(exportIt)
 
