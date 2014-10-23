@@ -7,5 +7,5 @@ function exportIt (name) {
   exports[name] = graph
 }
 
-['sum', 'empty'].forEach(exportIt)
+['apply', 'sum', 'empty'].forEach(exportIt)
 
