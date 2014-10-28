@@ -4,11 +4,11 @@ var dflow = require('dflow');
 // A JSON that represents the execution graph.
 var graph = {
   "task": {
-    "1": { "func": "arguments[0]" },
-    "2": { "func": "console.log" }
+    "1": "arguments[0]",
+    "2": "console.log"
   },
   "pipe": {
-    "3": { "from": "1", "to": "2", "arg": 0 }
+    "3": [ "1", "2" ]
   }
 }
 
@@ -20,7 +20,7 @@ var funcs = {
 }
 
 // Create a function.
-var f = dflow.func(funcs, graph)
+var f = dflow.fun(funcs, graph)
 
 f('Hello World') // prints "Hello World"
 

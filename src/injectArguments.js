@@ -3,19 +3,19 @@
  * Inject functions to retrieve arguments.
  *
  * @param {Object} funcs
- * @param {Array} tasks
+ * @param {Object} task
  * @param {Object} args
  *
  * @returns {Object} funcs enriched with arguments[N] funcs
  */
 
-function injectArguments (funcs, tasks, args) {
+function injectArguments (funcs, task, args) {
   function getArgument (index) {
     return args[index]
   }
 
-  function inject (task) {
-    var funcName = task.func
+  function inject (taskKey) {
+    var funcName = task[taskKey]
 
     if (funcName === 'arguments') {
       funcs[funcName] = function getArguments () { return args }
@@ -29,7 +29,7 @@ function injectArguments (funcs, tasks, args) {
     }
   }
 
-  tasks.forEach(inject)
+  Object.keys(task).forEach(inject)
 
   return funcs
 }
