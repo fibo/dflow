@@ -13,12 +13,12 @@ var injectArguments = require('./injectArguments')
  * @returns {Function} f
  */
 
-function func (funcs, graph) {
+function fun (funcs, graph) {
   try { validate(graph) } catch (err) { throw err }
 
   var levelOf = level.bind(null, graph.pipe)
 
-  function dflowFunc () {
+  function dflowFun () {
     var gotReturn = false
       , outs = {}
       , returnValue
@@ -36,6 +36,7 @@ function func (funcs, graph) {
         , funcName = graph.task[taskKey]
         , func = funcs[funcName]
 
+      // Behave like a JavaScript function: if found a return, skip all other tasks.
       if (gotReturn)
         return
 
@@ -53,11 +54,11 @@ function func (funcs, graph) {
     return returnValue
   }
 
-  // Remember function was created from a dflow graph
-  dflowFunc.graph = graph
+  // Remember function was created from a dflow graph.
+  dflowFun.graph = graph
 
-  return dflowFunc
+  return dflowFun
 }
 
-module.exports = func
+module.exports = fun
 

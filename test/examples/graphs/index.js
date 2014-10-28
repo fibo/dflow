@@ -7,5 +7,10 @@ function exportIt (name) {
   exports[name] = graph
 }
 
-['apply', 'sum', 'empty'].forEach(exportIt)
+[
+  'apply',
+  'empty',
+  'dotOperator',
+  'sum'
+].forEach(exportIt)
 

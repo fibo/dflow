@@ -1,0 +1,6 @@
+[
+  {
+    "args": [ { "foo": "bar" }, "foo" ],
+    "expected": [ "bar" ]
+  }
+]
