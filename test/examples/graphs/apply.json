@@ -1,15 +1,15 @@
 {
   "task": {
-    "1": { "func": "funcs[Math.cos]" },
-    "2": { "func": "null" },
-    "3": { "func": "arguments" },
-    "4": { "func": "apply" },
-    "5": { "func": "return" }
+    "1": "funcs[Math.cos]",
+    "2": "null",
+    "3": "arguments",
+    "4": "apply",
+    "5": "return"
   },
   "pipe": {
-    "6": { "from": "1", "to": "4", "arg": 0 },
-    "7": { "from": "2", "to": "4", "arg": 1 },
-    "8": { "from": "3", "to": "4", "arg": 2 },
-    "9": { "from": "4", "to": "5", "arg": 0 }
+    "6": [ "1", "4", 0 ],
+    "7": [ "2", "4", 1 ],
+    "8": [ "3", "4", 2 ],
+    "9": [ "4", "5", 0 ]
   }
 }

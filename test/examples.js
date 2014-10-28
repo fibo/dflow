@@ -8,7 +8,7 @@ var funcs = require('./examples/funcs')
 describe('example', function () {
   function testExample (name, graph) {
     describe(name, function () {
-      var f = dflow.func(funcs, graph)
+      var f = dflow.fun(funcs, graph)
       it('works', function () {
         f.should.be.instanceOf(Function)
       })

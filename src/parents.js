@@ -5,27 +5,22 @@ var inputPipes = require('./inputPipes')
  * Compute parent tasks.
  *
  * @param {Array} pipes of graph
- * @param {Array} tasks of graph
  * @param {String} taskKey
  *
- * @returns {Array} parentTasks
+ * @returns {Array} parentTaskIds
  */
 
-function parents (pipes, tasks, taskKey) {
-  var inputPipesOf = inputPipes.bind(null, pipes)
-    , parentTaskIds = {}
+function parents (pipe, taskKey) {
+  var inputPipesOf = inputPipes.bind(null, pipe)
+    , parentTaskIds = []
 
-  function rememberParentTaskId (pipe) {
-    parentTaskIds[pipe.from] = true
+  function pushParentTaskId (pipe) {
+    parentTaskIds.push(pipe[0])
   }
 
-  inputPipesOf(taskKey).forEach(rememberParentTaskId)
+  inputPipesOf(taskKey).forEach(pushParentTaskId)
 
-  function parentTasks (task) {
-    return parentTaskIds[task.key] === true 
-  }
-
-  return tasks.filter(parentTasks)
+  return parentTaskIds
 }
 
 module.exports = parents

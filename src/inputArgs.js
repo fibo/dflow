@@ -5,19 +5,19 @@ var inputPipes = require('./inputPipes')
  * Retrieve input arguments of a task.
  *
  * @param {Object} outs
- * @param {Array} pipes
+ * @param {Object} pipe
  * @param {String} taskKey
  *
  * @returns {Array} args
  */
 
-function inputArgs (outs, pipes, taskKey) {
+function inputArgs (outs, pipe, taskKey) {
   var args = []
-    , inputPipesOf = inputPipes.bind(null, pipes)
+    , inputPipesOf = inputPipes.bind(null, pipe)
   
-  function populateArg (pipe) {
-    var index = pipe.arg
-      , value = outs[pipe.from]
+  function populateArg (inputPipe) {
+    var index = inputPipe[2]
+      , value = outs[inputPipe[0]]
 
     args[index] = value
   }

@@ -2,20 +2,14 @@
 var should = require('should')
 var level = require('../src/level')
 
-var tasks = [
-    { key: '0' },
-    { key: '1' },
-    { key: '2' },
-    { key: '3' }
-  ]
-  , pipes = [
-    { key: 'a', from: '0', to: '1' },
-    { key: 'b', from: '1', to: '2' },
-    { key: 'c', from: '1', to: '3' },
-    { key: 'd', from: '2', to: '3' }
-  ]
+var pipe = {
+      'a': [ '0', '1' ],
+      'b': [ '1', '2' ],
+      'c': [ '1', '3' ],
+      'd': [ '2', '3' ]
+    }
 
-var levelOf = level.bind(null, pipes, tasks)
+var levelOf = level.bind(null, pipe)
 
 describe('level', function () {
   it('returns level of task', function () {

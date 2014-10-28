@@ -2,18 +2,26 @@
 /**
  * Compute pipes that feed a task.
  *
- * @param {Array} pipes
+ * @param {Object} pipe
  * @param {String} taskKey
  *
- * @returns {Array} inputPipes
+ * @returns {Array} pipes
  */
 
-function inputPipes (pipes, taskKey) {
-  function ifIsInputPipe (pipe) {
-    return pipe.to === taskKey 
+function inputPipes (pipe, taskKey) {
+  var pipes = []
+
+  function pushPipe (key) {
+    pipes.push(pipe[key])
   }
 
-  return pipes.filter(ifIsInputPipe)
+  function ifIsInputPipe (key) {
+    return pipe[key][1] === taskKey 
+  }
+
+  Object.keys(pipe).filter(ifIsInputPipe).forEach(pushPipe)
+
+  return pipes
 }
 
 module.exports = inputPipes

@@ -22,28 +22,28 @@ function validate (graph) {
 
 
   function checkPipe (key) {
-    var arg = pipe[key].arg
-      , from = pipe[key].from
-      , to = pipe[key].to
+    var arg = pipe[key][2] || 0
+      , from = pipe[key][0]
+      , to = pipe[key][1]
 
-    // Check pipe props type is valid.
+    // Check types.
 
     if (typeof arg !== 'number')
-      throw new TypeError('Not a number: pipe', key, 'arg', arg)
+      throw new TypeError('Invalid pipe:', pipe[key])
 
     if (typeof from !== 'string')
-      throw new TypeError('Not a string: pipe', key, 'from', from)
+      throw new TypeError('Invalid pipe:', pipe[key])
 
     if (typeof to !== 'string')
-      throw new TypeError('Not a string: pipe', key, 'to', to)
+      throw new TypeError('Invalid pipe:', pipe[key])
 
-    // Check for orphan pipes
+    // Check for orphan pipes.
 
     if (typeof task[from] === 'undefined')
-      throw new Error('Orphan pipe', pipe[key])
+      throw new Error('Orphan pipe:', pipe[key])
 
     if (typeof task[to] === 'undefined')
-      throw new Error('Orphan pipe', pipe[key])
+      throw new Error('Orphan pipe:', pipe[key])
 
     // Remember pipes, avoid duplicates.
 
@@ -56,7 +56,7 @@ function validate (graph) {
     if (typeof seenPipe[from][to][arg] === 'undefined')
       seenPipe[from][to][arg] = true
     else
-      throw new Error('Duplicated pipe', pipe[key])
+      throw new Error('Duplicated pipe:', pipe[key])
   }
 
   Object.keys(pipe).forEach(checkPipe)

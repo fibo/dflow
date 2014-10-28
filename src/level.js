@@ -4,19 +4,19 @@ var parents = require('./parents')
 /**
  * Compute level of task.
  *
- * @param {Array} pipes
- * @param {Array} tasks
+ * @param {Object} pipe
  * @param {String} taskKey
  *
  * @returns {Number} taskLevel
  */
 
-function level (pipes, tasks, taskKey) {
+function level (pipe, taskKey) {
   var taskLevel = 0
-    , parentsOf = parents.bind(null, pipes, tasks)
+    , parentsOf = parents.bind(null, pipe)
 
-  function computeLevel (parentTask) {
-    taskLevel = Math.max(taskLevel, level(pipes, tasks, parentTask.key) + 1)
+  function computeLevel (parentTaskKey) {
+                                    // Recursion here.
+    taskLevel = Math.max(taskLevel, level(pipe, parentTaskKey) + 1)
   }
 
   parentsOf(taskKey).forEach(computeLevel)

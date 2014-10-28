@@ -3,17 +3,17 @@ var dflow = require('dflow')
 
 var graph = {
   task: {
-    '0': { func: 'arguments[0]' },
-    '1': { func: 'cos' },
-    '2': { func: 'return' }
+    'a': 'arguments[0]',
+    'b': 'cos',
+    'c': 'return'
   },
   pipe: {
-    '3': { from: '0', to: '1', arg: 0 },
-    '4': { from: '1', to: '2', arg: 0 }
+    '1': ['a', 'b'],
+    '2': ['b', 'c']
   }
 }
 
-var f = dflow.func(Math, graph)
+var f = dflow.fun(Math, graph)
 
 console.log(f(0.5))
 

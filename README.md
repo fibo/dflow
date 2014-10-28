@@ -8,6 +8,8 @@ For more information point your browser to [dflow Homepage](http://www.g14n.info
 
 ## Synopsis
 
+> dflow exports `fun` ☺
+
 Say **Hello World** with *dflow*.
 
 ```js
@@ -15,13 +17,15 @@ Say **Hello World** with *dflow*.
 var dflow = require('dflow')
 
 // A JSON that represents the execution graph.
+//
+// arguments[0] ==> console.log
 var graph = {
   "task": {
-    "1": { "func": "arguments[0]" },
-    "2": { "func": "console.log" }
+    "1": "arguments[0]",
+    "2": "console.log"
   },
   "pipe": {
-    "3": { "from": "1", "to": "2", "arg": 0 }
+    "3": [ "1", "2" ]
   }
 }
 
@@ -32,7 +36,7 @@ var funcs = {
 }
 
 // Create a function.
-var f = dflow.func(funcs, graph)
+var f = dflow.fun(funcs, graph)
 
 f('Hello World') // prints "Hello World"
 
@@ -47,18 +51,18 @@ var dflow = require('dflow')
 // A simple graph: arguments[0] ==> cos ==> return
 var graph = {
   task: {
-    '0': { func: 'arguments[0]' },
-    '1': { func: 'cos' },
-    '2': { func: 'return' }
+    'a': 'arguments[0]',
+    'b': 'cos',
+    'c': 'return'
   },
   pipe: {
-    '3': { from: '0', to: '1', arg: 0 },
-    '4': { from: '1', to: '2', arg: 0 }
+    '1': ['a', 'b'],
+    '2': ['b', 'c']
   }
 }
 
-// Run graph on Math context.
-var f = dflow.func(Math, graph)
+// Create a function that run graph on Math context.
+var f = dflow.fun(Math, graph)
 
 console.log(f(0.5)) // 0.8775825618903728
 

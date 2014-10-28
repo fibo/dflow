@@ -2,7 +2,6 @@
 var injectArguments = require('./injectArguments')
   , inputArgs = require('./inputArgs')
   , level = require('./level')
-  , listOf = require('./listOf')
   , validate = require('./validate')
 
 /**
@@ -15,29 +14,26 @@ var injectArguments = require('./injectArguments')
  */
 
 function func (funcs, graph) {
-// TODO  try { validate(graph) } catch (err) { throw err }
+  try { validate(graph) } catch (err) { throw err }
 
-  var pipes = listOf(graph.pipe)
-    , tasks = listOf(graph.task)
-
-  var levelOf = level.bind(null, pipes, tasks)
+  var levelOf = level.bind(null, graph.pipe)
 
   function dflowFunc () {
     var gotReturn = false
       , outs = {}
       , returnValue
 
-    var inputArgsOf = inputArgs.bind(null, outs, pipes)
+    var inputArgsOf = inputArgs.bind(null, outs, graph.pipe)
 
-    funcs = injectArguments(funcs, tasks, arguments)
+    funcs = injectArguments(funcs, graph.task, arguments)
 
     function byLevel (a, b) {
       return levelOf(a.key) - levelOf(b.key)
     }
 
-    function run (task) {
-      var args = inputArgsOf(task.key)
-        , funcName = task.func
+    function run (taskKey) {
+      var args = inputArgsOf(taskKey)
+        , funcName = graph.task[taskKey]
         , func = funcs[funcName]
 
       if (gotReturn)
@@ -49,10 +45,10 @@ function func (funcs, graph) {
         return
       }
 
-      outs[task.key] = func.apply(null, args)
+      outs[taskKey] = func.apply(null, args)
     }
 
-    tasks.sort(byLevel).forEach(run)
+    Object.keys(graph.task).sort(byLevel).forEach(run)
 
     return returnValue
   }
