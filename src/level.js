@@ -15,7 +15,7 @@ function level (pipe, taskKey) {
     , parentsOf = parents.bind(null, pipe)
 
   function computeLevel (parentTaskKey) {
-                                    // Recursion here.
+                                 // ↓ Recursion here: the level of a task is the max level of its parents + 1.
     taskLevel = Math.max(taskLevel, level(pipe, parentTaskKey) + 1)
   }
 

@@ -16,7 +16,7 @@ function inputArgs (outs, pipe, taskKey) {
     , inputPipesOf = inputPipes.bind(null, pipe)
   
   function populateArg (inputPipe) {
-    var index = inputPipe[2]
+    var index = inputPipe[2] || 0
       , value = outs[inputPipe[0]]
 
     args[index] = value
