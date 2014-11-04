@@ -1,6 +1,6 @@
 {
   "task": {
-    "1": "funcs[Math.cos]",
+    "1": "function Math.cos",
     "2": "null",
     "3": "arguments",
     "4": "apply",
