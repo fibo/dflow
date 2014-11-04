@@ -13,7 +13,7 @@ describe('example', function () {
         f.should.be.instanceOf(Function)
       })
 
-      it('returns expected result', function () {
+      it('returns expected results', function () {
         graph.results.forEach(function (test) {
           var result = f.apply(null, test.args)
 
