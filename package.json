@@ -4,7 +4,8 @@
   "description": "Dataflow programming",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --bail --require should --reporter min --recursive"
+    "test": "mocha --bail --require should --reporter min --recursive",
+    "browserify": "browserify -s dflow -e index.js -o dist/dflow.js"
   },
   "dependencies": {},
   "repository": {
@@ -28,6 +29,7 @@
   "homepage": "http://g14n.info/dflow",
   "devDependencies": {
     "mocha": "^1.20.0",
-    "should": "^4.0.0"
+    "should": "^4.0.0",
+    "browserify": "~6.2.0"
   }
 }
