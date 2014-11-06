@@ -1,22 +1,26 @@
 {
   "name": "dflow",
-  "version":"0.2.0",
+  "main": "dist/dflow.js",
+  "version": "0.2.0",
   "homepage": "http://g14n.info/dflow",
   "authors": [
-    "Gianluca Casati <casati_gianluca@yahoo.it>"
+    "fibo <casati_gianluca@yahoo.it>"
   ],
   "description": "Dataflow programming",
-  "main": "dist/dflow.js",
+  "moduleType": [
+    "globals"
+  ],
   "keywords": [
-    "dataflow", "visual"
+    "dataflow",
+    "visual"
   ],
   "license": "MIT",
   "ignore": [
-    "test/",
-    "src/",
-    "package.json",
-    "index.js",
-    ".travis.yml",
-    ".jshintrc"
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "src",
+    "index.js"
   ]
 }

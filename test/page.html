@@ -1,0 +1,41 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <title>dflow test</title>
+    <script type="text/javascript" src="../dist/dflow.js"></script>
+  </head>
+  <body onload="dflowTest()">
+    <script type="text/javascript">
+      function dflowTest () {
+        var funcs = {
+              createElement: document.createElement.bind(document),
+              appendChild: function (parent, child) { return parent.appendChild(child) },
+              'body.appendChild': function (child) { return document.body.appendChild(child) },
+              createTextNode: document.createTextNode.bind(document)
+            }
+          , graph = {
+              task: {
+                arg0: 'arguments[0]',
+                arg1: 'arguments[1]',
+                createParagraph: 'createElement',
+                createText: 'createTextNode',
+                appendChild: 'appendChild',
+                'body.appendChild': 'body.appendChild'
+              },
+              pipe: {
+                a: ['arg0', 'createParagraph'],
+                b: ['arg1', 'createText'],
+                c: ['createParagraph', 'appendChild'],
+                d: ['createText', 'appendChild', 1],
+                e: ['createParagraph', 'body.appendChild']
+              }
+            }
+
+        var test = dflow.fun(funcs, graph)
+       
+        test('h1', 'dflow test')
+        test('p', 'it works!')
+      }
+    </script>
+  </body>
+</html>
