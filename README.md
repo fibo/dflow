@@ -4,7 +4,25 @@
 
 [![NPM version](https://badge.fury.io/js/dflow.png)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.png?branch=master)](https://travis-ci.org/fibo/dflow.png?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.png)](https://gemnasium.com/fibo/dflow)
 
-For more information point your browser to [dflow homepage](http://g14n.info/dflow).
+## Description
+
+*dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
+
+For a **work in progress** demo, see [dflow.it](http://dflow.it).
+
+## Installation
+
+With [npm](https://npmjs.org/) do
+
+```bash
+$ npm install dflow
+```
+
+With [bower](http://bower.io/) do
+
+```bash
+$ bower install dflow
+```
 
 ## Synopsis
 
@@ -67,6 +85,65 @@ var f = dflow.fun(Math, graph)
 console.log(f(0.5)) // 0.8775825618903728
 
 ```
+
+## Concept
+
+A *dflow* **graph** is a collection of **tasks** and **pipes** that can be stored in JSON format.
+
+Every task refers to a function which output can be piped as an argument to another other task.
+
+A **context** is a collection of functions.
+
+`dflow.fun(context, graph)` returns a function that executes the *graph* on given *context*.
+
+Note that *dflow* is **context agnostic**. For example a *context* can be one of the following:
+
+  * [process](http://nodejs.org/api/process.html).
+  * [window](https://developer.mozilla.org/en-US/docs/Web/API/Window).
+  * [Math](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math) or any other built-in object.
+  * Any object which properties are functions.
+
+In order to mimic common functions behaviour, dflow provides few built-in tasks:
+
+  * return
+  * arguments
+  * arguments[0] ... arguments[N]
+
+## Examples
+
+### Sample graphs
+
+The following examples use a context defined in [test/examples/funcs.js](https://github.com/fibo/dflow/blob/master/test/examples/funcs.js).
+
+Every example has a *graph* and a set of expected *results* that are used by [test/examples.js](https://github.com/fibo/dflow/blob/master/test/examples.js)
+
+#### empty
+
+[graph](https://github.com/fibo/dflow/blob/master/test/examples/graphs/empty.json)
+[results](https://github.com/fibo/dflow/blob/master/test/examples/graphs/empty-results.json)
+
+Just an empty graph, `{}` for instance. It is expected that *dflow* has nothing to do.
+
+#### sum
+
+[graph](https://github.com/fibo/dflow/blob/master/test/examples/graphs/sum.json)
+[results](https://github.com/fibo/dflow/blob/master/test/examples/graphs/sum-results.json)
+
+Takes two operands as arguments and returns its sum.
+
+#### apply
+
+[graph](https://github.com/fibo/dflow/blob/master/test/examples/graphs/apply.json)
+[results](https://github.com/fibo/dflow/blob/master/test/examples/graphs/apply-results.json)
+
+Implements the apply operator.
+
+#### dotOperator
+
+[graph](https://github.com/fibo/dflow/blob/master/test/examples/graphs/dotOperator.json)
+[results](https://github.com/fibo/dflow/blob/master/test/examples/graphs/dotOperator-results.json)
+
+Like the `.` opretor, takes an object and a prop as arguments and returns `object[prop]` value.
 
 ## License
 
