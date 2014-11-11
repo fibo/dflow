@@ -1,5 +1,4 @@
 
-
 var should = require('should')
 var injectArguments = require('../src/injectArguments')
 
@@ -12,7 +11,7 @@ var funcs = {}
 
 
 describe('injectArguments', function () {
-  it('returns funcs object with arguments[N] injected', function () {
+  it('modifies funcs object with arguments[N] injected', function () {
     ;(function () {
       injectArguments(funcs, task, arguments)
 

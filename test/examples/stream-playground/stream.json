@@ -4,14 +4,19 @@
     "write": "createWriteStream",
     "in": "input",
     "out": "output",
-    "onend": "onend",
+    "on": "on",
+    "end": ".end",
     "cb": "cb"
   },
   "pipe": {
     "a": ["in", "read"],
     "b": ["read", "write", 0],
     "c": ["out", "write", 1],
-    "d": ["read", "onend", 0],
-    "e": ["cb", "onend", 1]
+    "d": ["read", "on", 0],
+    "e": ["end", "on", 1],
+    "f": ["cb", "on", 2]
+  },
+  "data": {
+    "end": "end"
   }
 }

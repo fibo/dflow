@@ -17,8 +17,8 @@ module.exports = {
 
     return stream
   },
-  onend: function (obj, callback) {
-    obj.on('end', callback)
+  on: function (obj, eventName, callback) {
+    obj.on(eventName, callback)
   },
   cb: function () { return function () { console.log('end') } }
 }
