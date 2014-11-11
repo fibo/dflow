@@ -1,4 +1,6 @@
 
+var debug = require('./debug')('dflow')
+
 var injectArguments = require('./injectArguments')
   , inputArgs = require('./inputArgs')
   , level = require('./level')
@@ -16,7 +18,8 @@ var injectArguments = require('./injectArguments')
 function fun (funcs, graph) {
   try { validate(graph) } catch (err) { throw err }
 
-  var levelOf = level.bind(null, graph.pipe)
+  var computeLevelOf = level.bind(null, graph.pipe)
+    , levelOf = {}
 
   function dflowFun () {
     var gotReturn = false
@@ -28,13 +31,23 @@ function fun (funcs, graph) {
     funcs = injectArguments(funcs, graph.task, arguments)
 
     function byLevel (a, b) {
-      return levelOf(a.key) - levelOf(b.key)
+console.log('byLevel', a, b)
+      if (typeof levelOf[a] === 'undefined')
+        levelOf[a] = computeLevelOf(a)
+
+      if (typeof levelOf[b] === 'undefined')
+        levelOf[b] = computeLevelOf(b)
+
+      return levelOf[a] - levelOf[b]
     }
 
     function run (taskKey) {
       var args = inputArgsOf(taskKey)
         , funcName = graph.task[taskKey]
         , func = funcs[funcName]
+
+        debug('taskKey', taskKey)
+        debug('funcName', funcName)
 
       // Behave like a JavaScript function: if found a return, skip all other tasks.
       if (gotReturn)
