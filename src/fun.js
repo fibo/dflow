@@ -1,6 +1,7 @@
 
 var injectArguments = require('./injectArguments')
   , injectAccessors = require('./injectAccessors')
+  , injectReferences = require('./injectReferences')
   , inputArgs = require('./inputArgs')
   , level = require('./level')
   , validate = require('./validate')
@@ -37,8 +38,10 @@ function fun (context, graph) {
 
     var inputArgsOf = inputArgs.bind(null, outs, graph.pipe)
 
-    injectArguments(funcs, graph.task, arguments)
+    // inject builtin tasks.
+    injectReferences(funcs, graph.task)
     injectAccessors(funcs, graph)
+    injectArguments(funcs, graph.task, arguments)
 
     function byLevel (a, b) {
       if (typeof cachedLevelOf[a] === 'undefined')
