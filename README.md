@@ -111,6 +111,10 @@ In order to mimic common functions behaviour, dflow provides few built-in tasks:
 
 ## Examples
 
+### page.html
+
+See [test/page.html](https://github.com/fibo/dflow/blob/master/test/page.html) for a working example of *dflow* in a browser context.
+
 ### Sample graphs
 
 The following examples use a context defined in [test/examples/funcs.js](https://github.com/fibo/dflow/blob/master/test/examples/funcs.js).
@@ -144,6 +148,22 @@ Implements the apply operator.
 [results](https://github.com/fibo/dflow/blob/master/test/examples/graphs/dotOperator-results.json)
 
 Like the `.` opretor, takes an object and a prop as arguments and returns `object[prop]` value.
+
+## Debug
+
+*dflow* uses [debug](https://www.npmjs.org/package/debug) if available.
+
+```bash
+npm install debug
+export DEBUG=dflow:*
+```
+
+will enable all debug messages on. Just do `npm prune` to turn them off.
+
+Availabe debuggers are
+
+* dflow:fun
+* dflow:level
 
 ## License
 
