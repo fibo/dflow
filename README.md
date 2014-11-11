@@ -68,7 +68,7 @@ Every task refers to a function which output can be piped as an argument to anot
 
 A **context** is a collection of functions.
 
-`dflow.fun(context, graph)` returns a function that executes the *graph* on given *context*.
+`dflow.fun(context, graph)` returns a function **f** that executes the *graph* on given *context*.
 
 Note that *dflow* is **context agnostic**. For example a *context* can be one of the following:
 
@@ -78,16 +78,32 @@ Note that *dflow* is **context agnostic**. For example a *context* can be one of
 
 In order to mimic common functions behaviour, dflow provides few built-in tasks:
 
-  * `return` 
-  * `arguments`
-  * `arguments[0]` ... `arguments[N]`
-  * `.foo` accessor/mutator to *graph.data.foo*
+  * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement). 
+  * `arguments`: task that returns the *arguments* of *f*. 
+  * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *f*. 
+  * `.foo`: accessor/mutator to *graph.data.foo*.
+  * `&bar`: returns *context.bar* function.
 
 ## Examples
 
 ### page.html
 
 See [test/page.html](https://github.com/fibo/dflow/blob/master/test/page.html) for a working example of *dflow* in a browser context.
+
+### Stream playground
+
+[Node.js Stream Playground](http://ejohn.org/blog/node-js-stream-playground/) first example is
+
+```js
+var fs = require("fs");
+
+// Read File
+fs.createReadStream("input/people.json")
+    // Write File
+    .pipe(fs.createWriteStream("output/people.json"));
+```
+
+Given this [context](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/funcs.js), the [stream.json graph](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/stream.json) is evaluated by [stream.js](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/stream.js) and works.
 
 ### Sample graphs
 
