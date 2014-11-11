@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --bail --require should --reporter min --recursive",
-    "browserify": "browserify -s dflow -e index.js -o dist/dflow.js"
+    "build": "browserify -s dflow -e index.js -o dist/dflow.js"
   },
   "dependencies": {},
   "repository": {

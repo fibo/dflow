@@ -7,14 +7,24 @@ var injectArguments = require('./injectArguments')
 /**
  * Create a dflow function.
  *
- * @param {Object} funcs context
+ * @param {Object} context
  * @param {Object} graph to be executed
  *
  * @returns {Function} f
  */
 
-function fun (funcs, graph) {
+function fun (context, graph) {
   try { validate(graph) } catch (err) { throw err }
+
+  // Clone context.
+  var funcs = {}
+
+  function cloneFunctions (key) {
+    if (typeof context[key] === 'function')
+      funcs[key] = context[key]
+  }
+
+  Object.keys(context).forEach(cloneFunctions)
 
   var cachedLevelOf = {}
     , computeLevelOf = level.bind(null, graph.pipe, cachedLevelOf)
@@ -26,7 +36,7 @@ function fun (funcs, graph) {
 
     var inputArgsOf = inputArgs.bind(null, outs, graph.pipe)
 
-    funcs = injectArguments(funcs, graph.task, arguments)
+    injectArguments(funcs, graph.task, arguments)
 
     function byLevel (a, b) {
       if (typeof cachedLevelOf[a] === 'undefined')

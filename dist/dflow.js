@@ -16,34 +16,7 @@
 exports.fun = require('./src/fun')
 
 
-},{"./src/fun":5}],2:[function(require,module,exports){
-
-},{}],3:[function(require,module,exports){
-
-// Use *debug* package if available.
-
-var debug
-
-try {
-  debug = require('debug')
-}
-catch (err) {
-  debug = require('./debugNoop')
-}
-
-module.exports = debug
-
-
-},{"./debugNoop":4,"debug":2}],4:[function(require,module,exports){
-
-function debugNoop () { return Function.prototype }
-
-module.exports = debugNoop
-
-
-},{}],5:[function(require,module,exports){
-
-var debug = require('./debug')('dflow:fun')
+},{"./src/fun":2}],2:[function(require,module,exports){
 
 var injectArguments = require('./injectArguments')
   , inputArgs = require('./inputArgs')
@@ -53,14 +26,24 @@ var injectArguments = require('./injectArguments')
 /**
  * Create a dflow function.
  *
- * @param {Object} funcs context
+ * @param {Object} context
  * @param {Object} graph to be executed
  *
  * @returns {Function} f
  */
 
-function fun (funcs, graph) {
+function fun (context, graph) {
   try { validate(graph) } catch (err) { throw err }
+
+  // Clone context.
+  var funcs = {}
+
+  function clone (key) {
+    if (typeof context[key] === 'function')
+      funcs[key] = context[key]
+  }
+
+  Object.keys(context).forEach(clone)
 
   var cachedLevelOf = {}
     , computeLevelOf = level.bind(null, graph.pipe, cachedLevelOf)
@@ -72,7 +55,7 @@ function fun (funcs, graph) {
 
     var inputArgsOf = inputArgs.bind(null, outs, graph.pipe)
 
-    funcs = injectArguments(funcs, graph.task, arguments)
+    injectArguments(funcs, graph.task, arguments)
 
     function byLevel (a, b) {
       if (typeof cachedLevelOf[a] === 'undefined')
@@ -88,9 +71,6 @@ function fun (funcs, graph) {
       var args = inputArgsOf(taskKey)
         , funcName = graph.task[taskKey]
         , func = funcs[funcName]
-
-        debug('taskKey', taskKey)
-        debug('funcName', funcName)
 
       // Behave like a JavaScript function: if found a return, skip all other tasks.
       if (gotReturn)
@@ -119,7 +99,7 @@ function fun (funcs, graph) {
 module.exports = fun
 
 
-},{"./debug":3,"./injectArguments":6,"./inputArgs":7,"./level":9,"./validate":11}],6:[function(require,module,exports){
+},{"./injectArguments":3,"./inputArgs":4,"./level":6,"./validate":8}],3:[function(require,module,exports){
 
 /**
  * Inject functions to retrieve arguments.
@@ -159,7 +139,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{}],7:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -192,7 +172,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":8}],8:[function(require,module,exports){
+},{"./inputPipes":5}],5:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -222,9 +202,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],9:[function(require,module,exports){
-
-var debug = require('./debug')('dflow:level')
+},{}],6:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -252,8 +230,6 @@ function level (pipe, cachedLevelOf, taskKey) {
 
   parentsOf(taskKey).forEach(computeLevel)
 
-  debug('task "' + taskKey + '" has level ' + taskLevel)
-
   cachedLevelOf[taskKey] = taskLevel
 
   return taskLevel
@@ -262,7 +238,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./debug":3,"./parents":10}],10:[function(require,module,exports){
+},{"./parents":7}],7:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -291,7 +267,7 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":8}],11:[function(require,module,exports){
+},{"./inputPipes":5}],8:[function(require,module,exports){
 
 /**
  * Check graph consistency.
