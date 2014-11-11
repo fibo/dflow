@@ -1,5 +1,5 @@
 
-var debug = require('./debug')('dflow')
+var debug = require('./debug')('dflow:fun')
 
 var injectArguments = require('./injectArguments')
   , inputArgs = require('./inputArgs')
@@ -18,8 +18,8 @@ var injectArguments = require('./injectArguments')
 function fun (funcs, graph) {
   try { validate(graph) } catch (err) { throw err }
 
-  var computeLevelOf = level.bind(null, graph.pipe)
-    , levelOf = {}
+  var cachedLevelOf = {}
+    , computeLevelOf = level.bind(null, graph.pipe, cachedLevelOf)
 
   function dflowFun () {
     var gotReturn = false
@@ -31,14 +31,13 @@ function fun (funcs, graph) {
     funcs = injectArguments(funcs, graph.task, arguments)
 
     function byLevel (a, b) {
-console.log('byLevel', a, b)
-      if (typeof levelOf[a] === 'undefined')
-        levelOf[a] = computeLevelOf(a)
+      if (typeof cachedLevelOf[a] === 'undefined')
+        cachedLevelOf[a] = computeLevelOf(a)
 
-      if (typeof levelOf[b] === 'undefined')
-        levelOf[b] = computeLevelOf(b)
+      if (typeof cachedLevelOf[b] === 'undefined')
+        cachedLevelOf[b] = computeLevelOf(b)
 
-      return levelOf[a] - levelOf[b]
+      return cachedLevelOf[a] - cachedLevelOf[b]
     }
 
     function run (taskKey) {
