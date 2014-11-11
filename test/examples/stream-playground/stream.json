@@ -1,0 +1,13 @@
+{
+  "task": {
+    "r": "createReadStream",
+    "w": "createWriteStream",
+    "i": "input",
+    "o": "output"
+  },
+  "pipe": {
+    "a": ["i", "r"],
+    "b": ["r", "w", 0],
+    "c": ["o", "w", 1]
+  }
+}
