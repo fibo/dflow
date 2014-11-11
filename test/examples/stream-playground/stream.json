@@ -1,13 +1,17 @@
 {
   "task": {
-    "r": "createReadStream",
-    "w": "createWriteStream",
-    "i": "input",
-    "o": "output"
+    "read": "createReadStream",
+    "write": "createWriteStream",
+    "in": "input",
+    "out": "output",
+    "onend": "onend",
+    "cb": "cb"
   },
   "pipe": {
-    "a": ["i", "r"],
-    "b": ["r", "w", 0],
-    "c": ["o", "w", 1]
+    "a": ["in", "read"],
+    "b": ["read", "write", 0],
+    "c": ["out", "write", 1],
+    "d": ["read", "onend", 0],
+    "e": ["cb", "onend", 1]
   }
 }

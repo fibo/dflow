@@ -6,8 +6,6 @@ var funcs = require('./funcs')
 
 var f = dflow.fun(funcs, graph)
 
-console.log(graph)
-
 f()
 
 /*
