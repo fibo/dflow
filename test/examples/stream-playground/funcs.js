@@ -3,8 +3,8 @@ var fs = require('fs')
 var path = require('path')
 
 module.exports = {
-  input: function () { return path.join(__dirname,'./input/people.json') },
-  output: function () { return path.join(__dirname,'./output/people.json') },
+  input: function () { return path.join(__dirname, './input/people.json') },
+  output: function () { return path.join(__dirname, './output/people.json') },
   createReadStream: function (inputPath) {
     var stream =  fs.createReadStream(inputPath)
 
@@ -16,10 +16,6 @@ module.exports = {
     inputStream.pipe(stream)
 
     return stream
-  },
-  on: function (obj, eventName, callback) {
-    obj.on(eventName, callback)
-  },
-  cb: function () { return function () { console.log('end') } }
+  }
 }
 
