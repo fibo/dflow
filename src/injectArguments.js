@@ -2,11 +2,9 @@
 /**
  * Inject functions to retrieve arguments.
  *
- * @param {Object} funcs
+ * @param {Object} funcs reference
  * @param {Object} task
  * @param {Object} args
- *
- * @returns {Object} funcs enriched with arguments[N] funcs
  */
 
 function injectArguments (funcs, task, args) {
@@ -30,8 +28,6 @@ function injectArguments (funcs, task, args) {
   }
 
   Object.keys(task).forEach(inject)
-
-  return funcs
 }
 
 module.exports = injectArguments

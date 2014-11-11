@@ -14,7 +14,7 @@ var funcs = {}
 describe('injectArguments', function () {
   it('returns funcs object with arguments[N] injected', function () {
     ;(function () {
-      funcs = injectArguments(funcs, task, arguments)
+      injectArguments(funcs, task, arguments)
 
       funcs['arguments[0]'].should.be.instanceOf(Function)
       funcs['arguments[1]'].should.be.instanceOf(Function)
@@ -26,7 +26,7 @@ describe('injectArguments', function () {
 
   it('returns funcs object with arguments injected', function () {
     ;(function () {
-      funcs = injectArguments(funcs, task, arguments)
+      injectArguments(funcs, task, arguments)
 
       funcs['arguments'].should.be.instanceOf(Function)
 

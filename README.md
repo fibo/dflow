@@ -60,32 +60,6 @@ f('Hello World') // prints "Hello World"
 
 ```
 
-Use builtin `Math` functions. Graphs could be executed on different *contexts* (read `funcs`).
-
-```js
-
-var dflow = require('dflow')
-
-// A simple graph: arguments[0] ==> cos ==> return
-var graph = {
-  task: {
-    'a': 'arguments[0]',
-    'b': 'cos',
-    'c': 'return'
-  },
-  pipe: {
-    '1': ['a', 'b'],
-    '2': ['b', 'c']
-  }
-}
-
-// Create a function that run graph on Math context.
-var f = dflow.fun(Math, graph)
-
-console.log(f(0.5)) // 0.8775825618903728
-
-```
-
 ## Concept
 
 A *dflow* **graph** is a collection of **tasks** and **pipes** that can be stored in JSON format.
