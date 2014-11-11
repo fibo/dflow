@@ -8,7 +8,7 @@
 
 *dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
 
-For a **work in progress** demo, see [dflow.it](http://dflow.it).
+For a **work in progress** editor, see [dflow.it](http://dflow.it).
 
 ## Installation
 
@@ -74,14 +74,14 @@ Note that *dflow* is **context agnostic**. For example a *context* can be one of
 
   * [process](http://nodejs.org/api/process.html).
   * [window](https://developer.mozilla.org/en-US/docs/Web/API/Window).
-  * [Math](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math) or any other built-in object.
-  * Any object which properties are functions.
+  * Any object: properties of *function* type will be used.
 
 In order to mimic common functions behaviour, dflow provides few built-in tasks:
 
-  * return
-  * arguments
-  * arguments[0] ... arguments[N]
+  * `return` 
+  * `arguments`
+  * `arguments[0]` ... `arguments[N]`
+  * `.foo` accessor/mutator to *graph.data.foo*
 
 ## Examples
 
