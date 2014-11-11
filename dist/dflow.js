@@ -19,6 +19,7 @@ exports.fun = require('./src/fun')
 },{"./src/fun":2}],2:[function(require,module,exports){
 
 var injectArguments = require('./injectArguments')
+  , injectAccessors = require('./injectAccessors')
   , inputArgs = require('./inputArgs')
   , level = require('./level')
   , validate = require('./validate')
@@ -38,12 +39,12 @@ function fun (context, graph) {
   // Clone context.
   var funcs = {}
 
-  function clone (key) {
+  function cloneFunctions (key) {
     if (typeof context[key] === 'function')
       funcs[key] = context[key]
   }
 
-  Object.keys(context).forEach(clone)
+  Object.keys(context).forEach(cloneFunctions)
 
   var cachedLevelOf = {}
     , computeLevelOf = level.bind(null, graph.pipe, cachedLevelOf)
@@ -56,6 +57,7 @@ function fun (context, graph) {
     var inputArgsOf = inputArgs.bind(null, outs, graph.pipe)
 
     injectArguments(funcs, graph.task, arguments)
+    injectAccessors(funcs, graph)
 
     function byLevel (a, b) {
       if (typeof cachedLevelOf[a] === 'undefined')
@@ -99,16 +101,52 @@ function fun (context, graph) {
 module.exports = fun
 
 
-},{"./injectArguments":3,"./inputArgs":4,"./level":6,"./validate":8}],3:[function(require,module,exports){
+},{"./injectAccessors":3,"./injectArguments":4,"./inputArgs":5,"./level":7,"./validate":9}],3:[function(require,module,exports){
+
+/**
+ * Inject functions to set or get context keywords.
+ *
+ * @param {Object} funcs reference
+ * @param {Object} graph
+ */
+
+function injectAccessors (funcs, graph) {
+  if (typeof graph.data === 'undefined')
+    graph.data = {}
+
+  function inject (taskKey) {
+    var accessorName
+      , accessorRegex = /^\.(.+)$/
+      , taskName = graph.task[taskKey]
+
+    if (accessorRegex.test(taskName)) {
+      accessorName = taskName.substring(1)
+
+      function accessor () {
+        if (arguments.length === 1)
+          graph.data[accessorName] = arguments[0]
+
+        return graph.data[accessorName]
+      }
+
+      funcs[taskName] = accessor
+    }
+  }
+
+  Object.keys(graph.task).forEach(inject)
+}
+
+module.exports = injectAccessors
+
+
+},{}],4:[function(require,module,exports){
 
 /**
  * Inject functions to retrieve arguments.
  *
- * @param {Object} funcs
+ * @param {Object} funcs reference
  * @param {Object} task
  * @param {Object} args
- *
- * @returns {Object} funcs enriched with arguments[N] funcs
  */
 
 function injectArguments (funcs, task, args) {
@@ -132,14 +170,12 @@ function injectArguments (funcs, task, args) {
   }
 
   Object.keys(task).forEach(inject)
-
-  return funcs
 }
 
 module.exports = injectArguments
 
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -172,7 +208,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":5}],5:[function(require,module,exports){
+},{"./inputPipes":6}],6:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -202,7 +238,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -238,7 +274,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":7}],7:[function(require,module,exports){
+},{"./parents":8}],8:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -267,7 +303,7 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":5}],8:[function(require,module,exports){
+},{"./inputPipes":6}],9:[function(require,module,exports){
 
 /**
  * Check graph consistency.
