@@ -1,6 +1,4 @@
 
-var debug = require('./debug')('dflow:level')
-
 var parents = require('./parents')
 
 /**
@@ -26,8 +24,6 @@ function level (pipe, cachedLevelOf, taskKey) {
   }
 
   parentsOf(taskKey).forEach(computeLevel)
-
-  debug('task "' + taskKey + '" has level ' + taskLevel)
 
   cachedLevelOf[taskKey] = taskLevel
 

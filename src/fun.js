@@ -1,6 +1,4 @@
 
-var debug = require('./debug')('dflow:fun')
-
 var injectArguments = require('./injectArguments')
   , inputArgs = require('./inputArgs')
   , level = require('./level')
@@ -44,9 +42,6 @@ function fun (funcs, graph) {
       var args = inputArgsOf(taskKey)
         , funcName = graph.task[taskKey]
         , func = funcs[funcName]
-
-        debug('taskKey', taskKey)
-        debug('funcName', funcName)
 
       // Behave like a JavaScript function: if found a return, skip all other tasks.
       if (gotReturn)

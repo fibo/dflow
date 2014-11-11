@@ -16,7 +16,34 @@
 exports.fun = require('./src/fun')
 
 
-},{"./src/fun":2}],2:[function(require,module,exports){
+},{"./src/fun":5}],2:[function(require,module,exports){
+
+},{}],3:[function(require,module,exports){
+
+// Use *debug* package if available.
+
+var debug
+
+try {
+  debug = require('debug')
+}
+catch (err) {
+  debug = require('./debugNoop')
+}
+
+module.exports = debug
+
+
+},{"./debugNoop":4,"debug":2}],4:[function(require,module,exports){
+
+function debugNoop () { return Function.prototype }
+
+module.exports = debugNoop
+
+
+},{}],5:[function(require,module,exports){
+
+var debug = require('./debug')('dflow:fun')
 
 var injectArguments = require('./injectArguments')
   , inputArgs = require('./inputArgs')
@@ -35,7 +62,8 @@ var injectArguments = require('./injectArguments')
 function fun (funcs, graph) {
   try { validate(graph) } catch (err) { throw err }
 
-  var levelOf = level.bind(null, graph.pipe)
+  var cachedLevelOf = {}
+    , computeLevelOf = level.bind(null, graph.pipe, cachedLevelOf)
 
   function dflowFun () {
     var gotReturn = false
@@ -47,13 +75,22 @@ function fun (funcs, graph) {
     funcs = injectArguments(funcs, graph.task, arguments)
 
     function byLevel (a, b) {
-      return levelOf(a.key) - levelOf(b.key)
+      if (typeof cachedLevelOf[a] === 'undefined')
+        cachedLevelOf[a] = computeLevelOf(a)
+
+      if (typeof cachedLevelOf[b] === 'undefined')
+        cachedLevelOf[b] = computeLevelOf(b)
+
+      return cachedLevelOf[a] - cachedLevelOf[b]
     }
 
     function run (taskKey) {
       var args = inputArgsOf(taskKey)
         , funcName = graph.task[taskKey]
         , func = funcs[funcName]
+
+        debug('taskKey', taskKey)
+        debug('funcName', funcName)
 
       // Behave like a JavaScript function: if found a return, skip all other tasks.
       if (gotReturn)
@@ -82,7 +119,7 @@ function fun (funcs, graph) {
 module.exports = fun
 
 
-},{"./injectArguments":3,"./inputArgs":4,"./level":6,"./validate":8}],3:[function(require,module,exports){
+},{"./debug":3,"./injectArguments":6,"./inputArgs":7,"./level":9,"./validate":11}],6:[function(require,module,exports){
 
 /**
  * Inject functions to retrieve arguments.
@@ -122,7 +159,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{}],4:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -155,7 +192,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":5}],5:[function(require,module,exports){
+},{"./inputPipes":8}],8:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -185,7 +222,9 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
+
+var debug = require('./debug')('dflow:level')
 
 var parents = require('./parents')
 
@@ -193,21 +232,29 @@ var parents = require('./parents')
  * Compute level of task.
  *
  * @param {Object} pipe
+ * @param {Object} cachedLevelOf
  * @param {String} taskKey
  *
  * @returns {Number} taskLevel
  */
 
-function level (pipe, taskKey) {
+function level (pipe, cachedLevelOf, taskKey) {
   var taskLevel = 0
     , parentsOf = parents.bind(null, pipe)
 
+  if (typeof cachedLevelOf[taskKey] === 'number')
+    return cachedLevelOf[taskKey]
+
   function computeLevel (parentTaskKey) {
                                  // ↓ Recursion here: the level of a task is the max level of its parents + 1.
-    taskLevel = Math.max(taskLevel, level(pipe, parentTaskKey) + 1)
+    taskLevel = Math.max(taskLevel, level(pipe, cachedLevelOf, parentTaskKey) + 1)
   }
 
   parentsOf(taskKey).forEach(computeLevel)
+
+  debug('task "' + taskKey + '" has level ' + taskLevel)
+
+  cachedLevelOf[taskKey] = taskLevel
 
   return taskLevel
 }
@@ -215,7 +262,7 @@ function level (pipe, taskKey) {
 module.exports = level
 
 
-},{"./parents":7}],7:[function(require,module,exports){
+},{"./debug":3,"./parents":10}],10:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -244,7 +291,7 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":5}],8:[function(require,module,exports){
+},{"./inputPipes":8}],11:[function(require,module,exports){
 
 /**
  * Check graph consistency.
