@@ -149,22 +149,6 @@ Implements the apply operator.
 
 Like the `.` opretor, takes an object and a prop as arguments and returns `object[prop]` value.
 
-## Debug
-
-*dflow* uses [debug](https://www.npmjs.org/package/debug) if available.
-
-```bash
-npm install debug
-export DEBUG=dflow:*
-```
-
-will enable all debug messages on. Just do `npm prune` to turn them off.
-
-Availabe debuggers are
-
-* dflow:fun
-* dflow:level
-
 ## License
 
 [MIT](http://g14n.info/mit-license)
