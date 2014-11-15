@@ -8,8 +8,9 @@
  */
 
 function validate (graph) {
-  var pipe = graph.pipe
-    , task = graph.task
+  var func     = graph.func
+    , pipe     = graph.pipe
+    , task     = graph.task
     , seenPipe = {}
 
   // Check pipe and task are objects.
@@ -60,6 +61,15 @@ function validate (graph) {
   }
 
   Object.keys(pipe).forEach(checkPipe)
+
+  // Recursively check subgraphs in func property.
+
+  function checkFunc (key) {
+    validate(func[key])
+  }
+
+  if (typeof func === 'object')
+    Object.keys(func).forEach(checkFunc)
 
   return true
 }

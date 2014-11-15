@@ -1,47 +1,63 @@
 
-var injectArguments = require('./injectArguments')
-  , injectAccessors = require('./injectAccessors')
+var builtinFunctions = require('./builtinFunctions')
+  , injectArguments  = require('./injectArguments')
+  , injectAccessors  = require('./injectAccessors')
   , injectReferences = require('./injectReferences')
-  , inputArgs = require('./inputArgs')
-  , level = require('./level')
-  , validate = require('./validate')
+  , inputArgs        = require('./inputArgs')
+  , level            = require('./level')
+  , validate         = require('./validate')
 
 /**
  * Create a dflow function.
  *
- * @param {Object} context
  * @param {Object} graph to be executed
+ * @param {Object} additionalFunctions
  *
  * @returns {Function} f
  */
 
-function fun (context, graph) {
+function fun (graph, additionalFunctions) {
+  // First of all, check if graph is valid.
   try { validate(graph) } catch (err) { throw err }
 
-  // Clone context.
-  var funcs = {}
-
-  function cloneFunctions (key) {
-    if (typeof context[key] === 'function')
-      funcs[key] = context[key]
-  }
-
-  Object.keys(context).forEach(cloneFunctions)
+  var func = graph.func
+    , pipe = graph.pipe
+    , task = graph.task
 
   var cachedLevelOf = {}
-    , computeLevelOf = level.bind(null, graph.pipe, cachedLevelOf)
+    , computeLevelOf = level.bind(null, pipe, cachedLevelOf)
 
+  var funcs = builtinFunctions
+
+  function cloneFunction (key) {
+    if (typeof additionalFunctions[key] === 'function')
+      funcs[key] = additionalFunctions[key]
+  }
+
+  if (typeof additionalFunctions === 'object')
+    Object.keys(additionalFunctions)
+          .forEach(cloneFunction)
+
+  function compileSubgraph (key) {
+    if (typeof funcs[key] === 'undefined')
+      funcs[key] = fun(graph.func[key], funcs)
+  }
+
+  if (typeof func === 'object')
+    Object.keys(func)
+          .forEach(compileSubgraph)
+  
   function dflowFun () {
     var gotReturn = false
       , outs = {}
       , returnValue
 
-    var inputArgsOf = inputArgs.bind(null, outs, graph.pipe)
+    var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
-    // inject builtin tasks.
-    injectReferences(funcs, graph.task)
+    // Inject builtin tasks.
+    injectReferences(funcs, task)
     injectAccessors(funcs, graph)
-    injectArguments(funcs, graph.task, arguments)
+    injectArguments(funcs, task, arguments)
 
     function byLevel (a, b) {
       if (typeof cachedLevelOf[a] === 'undefined')
@@ -55,8 +71,8 @@ function fun (context, graph) {
 
     function run (taskKey) {
       var args = inputArgsOf(taskKey)
-        , funcName = graph.task[taskKey]
-        , func = funcs[funcName]
+        , funcName = task[taskKey]
+        , f = funcs[funcName]
 
       // Behave like a JavaScript function: if found a return, skip all other tasks.
       if (gotReturn)
@@ -68,10 +84,10 @@ function fun (context, graph) {
         return
       }
 
-      outs[taskKey] = func.apply(null, args)
+      outs[taskKey] = f.apply(null, args)
     }
 
-    Object.keys(graph.task).sort(byLevel).forEach(run)
+    Object.keys(task).sort(byLevel).forEach(run)
 
     return returnValue
   }

@@ -20,7 +20,7 @@ var funcs = {
 }
 
 // Create a function.
-var f = dflow.fun(funcs, graph)
+var f = dflow.fun(graph, funcs)
 
 f('Hello World') // prints "Hello World"
 

@@ -3,7 +3,9 @@
 // Dependency graph
 //
 // fun.js
+// ├── injectAccessors.js
 // ├── injectArguments.js
+// ├── injectReferences.js
 // ├── inputArgs.js
 // │   └── inputPipes.js
 // ├── level.js
