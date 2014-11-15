@@ -58,5 +58,21 @@ describe('validate', function () {
           })
       }).should.throwError(/Orphan pipe:/)
   })
+
+  it('throws if some func is not a valid (sub)graph', function () {
+    ;(function () {
+        validate(
+          { task: {},
+            pipe: {},
+            func: {
+              'a': { task: {},
+                     pipe: {
+                       'a': [ '1', '2', 0 ]
+                     }
+                   }
+            }
+          })
+      }).should.throwError(/Orphan pipe:/)
+  })
 })
 

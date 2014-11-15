@@ -2,13 +2,13 @@
 var dflow = require('..')
   , should = require('should')
 
-var funcs = require('./examples/funcs')
-  , examples = require('./examples/graphs')
+var examples = require('./examples/graphs')
 
 describe('example', function () {
   function testExample (name, graph) {
     describe(name, function () {
-      var f = dflow.fun(funcs, graph)
+      var f = dflow.fun(graph)
+
       it('works', function () {
         f.should.be.instanceOf(Function)
       })
