@@ -4,7 +4,9 @@
 // Dependency graph
 //
 // fun.js
+// ├── injectAccessors.js
 // ├── injectArguments.js
+// ├── injectReferences.js
 // ├── inputArgs.js
 // │   └── inputPipes.js
 // ├── level.js
@@ -16,48 +18,125 @@
 exports.fun = require('./src/fun')
 
 
-},{"./src/fun":2}],2:[function(require,module,exports){
+},{"./src/fun":3}],2:[function(require,module,exports){
 
-var injectArguments = require('./injectArguments')
-  , injectAccessors = require('./injectAccessors')
-  , inputArgs = require('./inputArgs')
-  , level = require('./level')
-  , validate = require('./validate')
+function typeofOperator (operand) { return typeof operand }
+
+exports['typeof'] = typeofOperator
+
+function method0 (obj, method) { return obj[method]() }
+
+function applyMethod (fun, thisArg, argsArray) { return fun.apply(thisArg, argsArray) }
+
+exports['apply'] = applyMethod
+
+function nullValue () { return null }
+
+exports['null'] = nullValue
+
+function dot (obj, prop) { return obj[prop] }
+
+exports['.'] = dot
+
+// Arithmetic operators.
+
+function addition (a, b) { return a + b }
+
+exports['+'] = addition
+
+function multiplication (a, b) { return a * b }
+
+exports['*'] = multiplication
+
+function subtraction (a, b) { return a - b }
+
+exports['-'] = subtraction
+
+function division (a, b) { return a / b }
+
+exports['/'] = division
+
+// Logic operators.
+
+function and (a, b) { return a && b }
+
+exports['&&'] = and
+
+function or (a, b) { return a || b }
+
+exports['||'] = or
+
+// console.
+
+exports['console.log'] = console.log.bind(console)
+
+// Math.
+
+exports['Math.cos'] = Math.cos
+exports['Math.sin'] = Math.sin
+
+
+},{}],3:[function(require,module,exports){
+
+var builtinFunctions = require('./builtinFunctions')
+  , injectArguments  = require('./injectArguments')
+  , injectAccessors  = require('./injectAccessors')
+  , injectReferences = require('./injectReferences')
+  , inputArgs        = require('./inputArgs')
+  , level            = require('./level')
+  , validate         = require('./validate')
 
 /**
  * Create a dflow function.
  *
- * @param {Object} context
  * @param {Object} graph to be executed
+ * @param {Object} additionalFunctions
  *
- * @returns {Function} f
+ * @returns {Function} dflowFun that executes the given graph.
  */
 
-function fun (context, graph) {
+function fun (graph, additionalFunctions) {
+  // First of all, check if graph is valid.
   try { validate(graph) } catch (err) { throw err }
 
-  // Clone context.
-  var funcs = {}
-
-  function cloneFunctions (key) {
-    if (typeof context[key] === 'function')
-      funcs[key] = context[key]
-  }
-
-  Object.keys(context).forEach(cloneFunctions)
+  var func = graph.func
+    , pipe = graph.pipe
+    , task = graph.task
 
   var cachedLevelOf = {}
-    , computeLevelOf = level.bind(null, graph.pipe, cachedLevelOf)
+    , computeLevelOf = level.bind(null, pipe, cachedLevelOf)
 
+  var funcs = builtinFunctions
+
+  function cloneFunction (key) {
+    if (typeof additionalFunctions[key] === 'function')
+      funcs[key] = additionalFunctions[key]
+  }
+
+  if (typeof additionalFunctions === 'object')
+    Object.keys(additionalFunctions)
+          .forEach(cloneFunction)
+
+  function compileSubgraph (key) {
+    if (typeof funcs[key] === 'undefined')
+      funcs[key] = fun(graph.func[key], funcs)
+  }
+
+  if (typeof func === 'object')
+    Object.keys(func)
+          .forEach(compileSubgraph)
+  
   function dflowFun () {
     var gotReturn = false
       , outs = {}
       , returnValue
 
-    var inputArgsOf = inputArgs.bind(null, outs, graph.pipe)
+    var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
-    injectArguments(funcs, graph.task, arguments)
+    // Inject builtin tasks.
+    injectReferences(funcs, task)
     injectAccessors(funcs, graph)
+    injectArguments(funcs, task, arguments)
 
     function byLevel (a, b) {
       if (typeof cachedLevelOf[a] === 'undefined')
@@ -71,8 +150,8 @@ function fun (context, graph) {
 
     function run (taskKey) {
       var args = inputArgsOf(taskKey)
-        , funcName = graph.task[taskKey]
-        , func = funcs[funcName]
+        , funcName = task[taskKey]
+        , f = funcs[funcName]
 
       // Behave like a JavaScript function: if found a return, skip all other tasks.
       if (gotReturn)
@@ -84,10 +163,10 @@ function fun (context, graph) {
         return
       }
 
-      outs[taskKey] = func.apply(null, args)
+      outs[taskKey] = f.apply(null, args)
     }
 
-    Object.keys(graph.task).sort(byLevel).forEach(run)
+    Object.keys(task).sort(byLevel).forEach(run)
 
     return returnValue
   }
@@ -101,7 +180,7 @@ function fun (context, graph) {
 module.exports = fun
 
 
-},{"./injectAccessors":3,"./injectArguments":4,"./inputArgs":5,"./level":7,"./validate":9}],3:[function(require,module,exports){
+},{"./builtinFunctions":2,"./injectAccessors":4,"./injectArguments":5,"./injectReferences":6,"./inputArgs":7,"./level":9,"./validate":11}],4:[function(require,module,exports){
 
 /**
  * Inject functions to set or get context keywords.
@@ -139,7 +218,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 
 /**
  * Inject functions to retrieve arguments.
@@ -175,7 +254,39 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
+
+/**
+ * Inject references to functions.
+ *
+ * @param {Object} funcs reference
+ * @param {Object} task
+ */
+
+function injectReferences (funcs, task) {
+  function inject (taskKey) {
+    var referenceName
+      , referenceRegex = /^\&(.+)$/
+      , taskName = task[taskKey]
+
+    if (referenceRegex.test(taskName)) {
+      referenceName = taskName.substring(1)
+
+      function reference () {
+        return funcs[referenceName]
+      }
+
+      funcs[taskName] = reference
+    }
+  }
+
+  Object.keys(task).forEach(inject)
+}
+
+module.exports = injectReferences
+
+
+},{}],7:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -208,7 +319,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":6}],6:[function(require,module,exports){
+},{"./inputPipes":8}],8:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -238,7 +349,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -274,7 +385,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":8}],8:[function(require,module,exports){
+},{"./parents":10}],10:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -303,7 +414,7 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":6}],9:[function(require,module,exports){
+},{"./inputPipes":8}],11:[function(require,module,exports){
 
 /**
  * Check graph consistency.
@@ -314,8 +425,9 @@ module.exports = parents
  */
 
 function validate (graph) {
-  var pipe = graph.pipe
-    , task = graph.task
+  var func     = graph.func
+    , pipe     = graph.pipe
+    , task     = graph.task
     , seenPipe = {}
 
   // Check pipe and task are objects.
@@ -366,6 +478,15 @@ function validate (graph) {
   }
 
   Object.keys(pipe).forEach(checkPipe)
+
+  // Recursively check subgraphs in func property.
+
+  function checkFunc (key) {
+    validate(func[key])
+  }
+
+  if (typeof func === 'object')
+    Object.keys(func).forEach(checkFunc)
 
   return true
 }

@@ -13,7 +13,7 @@ var builtinFunctions = require('./builtinFunctions')
  * @param {Object} graph to be executed
  * @param {Object} additionalFunctions
  *
- * @returns {Function} f
+ * @returns {Function} dflowFun that executes the given graph.
  */
 
 function fun (graph, additionalFunctions) {
