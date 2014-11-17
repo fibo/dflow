@@ -8,8 +8,6 @@
 
 *dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
 
-For a **work in progress** editor, see [dflow.it](http://dflow.it).
-
 ## Installation
 
 With [npm](https://npmjs.org/) do
@@ -25,8 +23,6 @@ $ bower install dflow
 ```
 
 ## Synopsis
-
-> dflow exports `fun` ☺
 
 Say **Hello World** with *dflow*.
 
@@ -47,42 +43,43 @@ var graph = {
   }
 }
 
-// A collection of functions.
-var funcs = {
-  'console.log': console.log.bind(console),
-  '+': function plus (a, b) { return a + b }
-}
-
-// Create a function.
-var f = dflow.fun(graph, funcs)
+// Create a dflow function.
+var f = dflow.fun(graph)
 
 f('Hello World') // prints "Hello World"
 
 ```
 
+## Api
+
+> dflow exports a `fun` function ☺
+
+Function *fun* as the following signature
+
+  * param: {Object} *graph* to be executed.
+  * param: {Object} *additionalFunctions* is an **optional** collection of functions.
+  * returns: {Function} *dflowFun* that executes the given graph.
+
 ## Concept
 
-A *dflow* **graph** is a collection of **tasks** and **pipes** that can be stored in JSON format.
+A *graph* is a collection of *tasks* and *pipes* that can be stored in JSON format.
 
-Every task refers to a function which output can be piped as an argument to another other task.
+Every *task* refers to a function which output can be piped as an argument to another other task.
 
-A **context** is a collection of functions.
+A *graph* has the following properties
 
-`dflow.fun(context, graph)` returns a function **f** that executes the *graph* on given *context*.
+  * task: collection of function names.
+  * pipe: connections from the output of a task to an input of another task.
+  * data: (optional) persistence.
+  * func: (optional) collection of subgraphs.
 
-Note that *dflow* is **context agnostic**. For example a *context* can be one of the following:
-
-  * [process](http://nodejs.org/api/process.html).
-  * [window](https://developer.mozilla.org/en-US/docs/Web/API/Window).
-  * Any object: properties of *function* type will be used.
-
-In order to mimic common functions behaviour, dflow provides few built-in tasks:
+*dflow* provides few [builtin functions](https://github.com/fibo/dflow/blob/master/src/builtinFunctions) and injects the following ones
 
   * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement). 
-  * `arguments`: task that returns the *arguments* of *f*. 
-  * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *f*. 
-  * `.foo`: accessor/mutator to *graph.data.foo*.
-  * `&bar`: returns *context.bar* function.
+  * `arguments`: task that returns the *arguments* of *dflowFun*. 
+  * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*. 
+  * `.foo`: accessor to *graph.data.foo*.
+  * `&bar`: returns *bar* function.
 
 ## Examples
 
@@ -103,13 +100,11 @@ fs.createReadStream("input/people.json")
     .pipe(fs.createWriteStream("output/people.json"));
 ```
 
-Given this [context](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/funcs.js), the [stream.json graph](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/stream.json) is evaluated by [stream.js](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/stream.js) and works.
+It is ported to script [stream.js](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/stream.js) which evaluates [graph stream.json](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/stream.json) using [few custom functions](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/funcs.js).
 
 ### Sample graphs
 
-The following examples use a context defined in [test/examples/funcs.js](https://github.com/fibo/dflow/blob/master/test/examples/funcs.js).
-
-Every example has a *graph* and a set of expected *results* that are used by [test/examples.js](https://github.com/fibo/dflow/blob/master/test/examples.js)
+Every example has a *graph* and a set of expected *results* that are required by [test/examples.js](https://github.com/fibo/dflow/blob/master/test/examples.js).
 
 #### empty
 

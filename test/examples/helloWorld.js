@@ -12,15 +12,8 @@ var graph = {
   }
 }
 
-// A collection of functions.
-var funcs = {
-  'console.log': console.log.bind(console),
-  '+': function plus (a, b) { return a + b }
-  // arguments[0] will be injected by dflow.func
-}
-
 // Create a function.
-var f = dflow.fun(graph, funcs)
+var f = dflow.fun(graph)
 
 f('Hello World') // prints "Hello World"
 
