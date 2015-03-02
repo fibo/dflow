@@ -54,7 +54,7 @@ f('Hello World') // prints "Hello World"
 
 > dflow exports a `fun` function ☺
 
-Function *fun* as the following signature
+Function *fun* has the following signature
 
   * param: {Object} *graph* to be executed.
   * param: {Object} *additionalFunctions* is an **optional** collection of functions.

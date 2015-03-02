@@ -1,6 +1,6 @@
 {
   "name": "dflow",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Dataflow programming",
   "main": "index.js",
   "scripts": {
@@ -27,10 +27,19 @@
       "url": "http://g14n.info/mit-license"
     }
   ],
+  "testling": {
+    "harness": "mocha-tdd",
+    "files": "test/*.js",
+    "browsers": [
+      "ie/8..latest",
+      "chrome/latest",
+      "firefox/latest"
+    ]
+  },
   "homepage": "http://g14n.info/dflow",
   "devDependencies": {
-    "mocha": "^1.20.0",
-    "should": "^4.0.0",
-    "browserify": "~6.2.0"
+    "mocha": "~2.1.0",
+    "should": "~5.0.1",
+    "browserify": "~9.0.3"
   }
 }
