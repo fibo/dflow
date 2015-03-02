@@ -9,7 +9,6 @@ function exportIt (name) {
 
 [
   'apply',
-  'empty',
   'dotOperator',
   'sum'
 ].forEach(exportIt)
