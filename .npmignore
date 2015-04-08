@@ -2,3 +2,4 @@
 .jshintrc
 dist/
 npm-debug.log
+gh-pages
