@@ -6,10 +6,11 @@
   "scripts": {
     "homepage": "echo -e \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
     "package.json": "cp package.json gh-pages/_data",
-    "gh-pages": "npm run homepage; git commit -a && git subtree --prefix gh-pages push origin gh-pages",
+    "gh-pages": "npm run package.json; npm run homepage; git commit -a && git subtree --prefix gh-pages push origin gh-pages",
     "jekyll": "npm run homepage; cd gh-pages; jekyll build; cd ..",
     "test": "mocha --bail --require should --reporter min --recursive",
-    "build": "browserify -s $npm_package_name -e index.js -o dist/${npm_package_name}.js",
+    "browserify": "browserify -s $npm_package_name -e index.js -o dist/${npm_package_name}.js",
+    "build": "npm test && npm run browserify",
     "jshint": "jshint -c .jshintrc src/*.js"
   },
   "dependencies": {},
