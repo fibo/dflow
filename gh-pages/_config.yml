@@ -6,10 +6,6 @@ encoding: utf-8
 author: Gianluca Casati
 description: Dataflow programming
 
-source: gh-pages
-destination: gh-pages/_site
-data_source: .
-
 permalink: ./:year/:month/:title
 
 markdown: kramdown

@@ -19,6 +19,8 @@
     "**/.*",
     "node_modules",
     "bower_components",
+    "gh-pages",
+    "npm-debug.log",
     "test",
     "src",
     "index.js"
