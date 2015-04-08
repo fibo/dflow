@@ -1,4 +1,5 @@
 *~
-.codio
 node_modules
 npm-debug.log
+Gemfile*
+gh-pages/_site
