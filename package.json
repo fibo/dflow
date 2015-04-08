@@ -4,7 +4,8 @@
   "description": "Dataflow programming",
   "main": "index.js",
   "scripts": {
-    "gh-pages": "jekyll build && git commit -a && git subtree --prefix gh-pages/_site push origin gh-pages",
+    "homepage": "echo -e \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
+    "gh-pages": "npm run homepage; jekyll build && git commit -a && git subtree --prefix gh-pages/_site push origin gh-pages",
     "test": "mocha --bail --require should --reporter min --recursive",
     "build": "browserify -s $npm_package_name -e index.js -o dist/${npm_package_name}.js",
     "jshint": "jshint -c .jshintrc src/*.js"
