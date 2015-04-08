@@ -10,7 +10,7 @@
     "jekyll": "npm run homepage; npm run package.json; npm run dist; cd gh-pages; jekyll build; cd ..",
     "test": "mocha --bail --require should --reporter min --recursive",
     "browserify": "browserify -s $npm_package_name -e index.js -o dist/${npm_package_name}.js",
-    "dist": "npm test && npm run browserify && cp dist/${npm_package_name}.js gh-pages/js",
+    "dist": "npm test && npm run browserify",
     "jshint": "jshint -c .jshintrc src/*.js"
   },
   "dependencies": {},
