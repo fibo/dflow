@@ -1,0 +1,41 @@
+{
+  "name": "dflow",
+  "version": "0.5.0",
+  "description": "Dataflow programming",
+  "main": "index.js",
+  "scripts": {
+    "homepage": "echo -e \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
+    "package.json": "cp package.json gh-pages/_data",
+    "gh-pages": "npm run homepage; git commit -a && git subtree --prefix gh-pages push origin gh-pages",
+    "jekyll": "npm run homepage; cd gh-pages; jekyll build; cd ..",
+    "test": "mocha --bail --require should --reporter min --recursive",
+    "build": "browserify -s $npm_package_name -e index.js -o dist/${npm_package_name}.js",
+    "jshint": "jshint -c .jshintrc src/*.js"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fibo/dflow.git"
+  },
+  "keywords": [
+    "dataflow",
+    "visual"
+  ],
+  "author": {
+    "name": "fibo",
+    "url": "http://g14n.info"
+  },
+  "license": [
+    {
+      "type": "MIT",
+      "url": "http://g14n.info/mit-license"
+    }
+  ],
+  "homepage": "http://g14n.info/dflow",
+  "devDependencies": {
+    "browserify": "~9.0.3",
+    "jshint": "^2.6.3",
+    "mocha": "~2.1.0",
+    "should": "~5.0.1"
+  }
+}
