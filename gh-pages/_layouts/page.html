@@ -13,15 +13,15 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="//{{ site.domain }}/{{ site.name }}">{{ site.name }}</a>
+        <a class="navbar-brand" href="//{{ site.domain }}/{{ site.data.package.name }}">{{ site.name }}</a>
       </div>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
           <li {% if page.title == "{{ site.name }}" %}class="active"{% endif %}><a href="//{{ site.domain }}/{{ site.name }}">Home</a></li>
           <!--li {% if page.title == "Api" %}class="active"{% endif %}><a href="//{{ site.domain }}/{{ site.name }}/api">Api</a></li>
           <li {% if page.title == "Examples" %}class="active"{% endif %}><a href="//{{ site.domain }}/{{ site.name }}/examples">Examples</a></li-->
-          <li><a href="https://github.com/fibo/{{ site.name }}">GitHub</a></li>
-          <li><a href="https://www.npmjs.com/package/{{ site.name }}">npm</a></li>
+          <li><a href="https://github.com/fibo/{{ site.data.package.name }}">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/{{ site.data.package.name }}">npm</a></li>
         </ul>
       </div>
     </div>

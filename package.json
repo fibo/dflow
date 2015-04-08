@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "homepage": "echo -e \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
-    "gh-pages": "npm run homepage; jekyll build && git commit -a && git subtree --prefix gh-pages/_site push origin gh-pages",
+    "gh-pages": "npm run jekyll; git commit -a && git subtree --prefix gh-pages/_site push origin gh-pages",
+    "jekyll": "npm run homepage; jekyll build",
     "test": "mocha --bail --require should --reporter min --recursive",
     "build": "browserify -s $npm_package_name -e index.js -o dist/${npm_package_name}.js",
     "jshint": "jshint -c .jshintrc src/*.js"
@@ -29,15 +30,6 @@
       "url": "http://g14n.info/mit-license"
     }
   ],
-  "testling": {
-    "harness": "mocha-tdd",
-    "files": "test/*.js",
-    "browsers": [
-      "ie/8..latest",
-      "chrome/latest",
-      "firefox/latest"
-    ]
-  },
   "homepage": "http://g14n.info/dflow",
   "devDependencies": {
     "mocha": "~2.1.0",

@@ -8,6 +8,7 @@ description: Dataflow programming
 
 source: gh-pages
 destination: gh-pages/_site
+data_source: .
 
 permalink: ./:year/:month/:title
 
@@ -23,7 +24,7 @@ defaults:
       path: ""
       type: "pages"
     values:
-      layout: dflow
+      layout: page
 
 # Custom vars
 
