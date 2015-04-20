@@ -46,7 +46,7 @@ function fun (graph, additionalFunctions) {
   if (typeof func === 'object')
     Object.keys(func)
           .forEach(compileSubgraph)
-  
+
   function dflowFun () {
     var gotReturn = false
       , outs = {}
