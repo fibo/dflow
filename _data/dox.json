@@ -1,0 +1,66 @@
+[
+  {
+    "tags": [
+      {
+        "type": "param",
+        "string": "{Object} graph to be executed",
+        "name": "graph",
+        "description": "<p>to be executed</p>",
+        "types": [
+          "Object"
+        ],
+        "typesDescription": "<code>Object</code>",
+        "optional": false,
+        "nullable": false,
+        "nonNullable": false,
+        "variable": false
+      },
+      {
+        "type": "param",
+        "string": "{Object} additionalFunctions\n",
+        "name": "additionalFunctions",
+        "description": "",
+        "types": [
+          "Object"
+        ],
+        "typesDescription": "<code>Object</code>",
+        "optional": false,
+        "nullable": false,
+        "nonNullable": false,
+        "variable": false,
+        "html": "<p>{Object} additionalFunctions</p>"
+      },
+      {
+        "type": "returns",
+        "string": "{Function} dflowFun that executes the given graph.",
+        "types": [
+          "Function"
+        ],
+        "typesDescription": "<code>Function</code>",
+        "optional": false,
+        "nullable": false,
+        "nonNullable": false,
+        "variable": false,
+        "description": "<p>dflowFun that executes the given graph.</p>"
+      }
+    ],
+    "description": {
+      "full": "<p>Create a dflow function.</p>",
+      "summary": "<p>Create a dflow function.</p>",
+      "body": ""
+    },
+    "isPrivate": false,
+    "isConstructor": false,
+    "isClass": false,
+    "isEvent": false,
+    "ignore": false,
+    "line": 10,
+    "codeStart": 19,
+    "code": "function fun (graph, additionalFunctions) {\n  // First of all, check if graph is valid.\n  try { validate(graph) } catch (err) { throw err }\n\n  var func = graph.func\n    , pipe = graph.pipe\n    , task = graph.task\n\n  var cachedLevelOf = {}\n    , computeLevelOf = level.bind(null, pipe, cachedLevelOf)\n\n  var funcs = builtinFunctions\n\n  function cloneFunction (key) {\n    if (typeof additionalFunctions[key] === 'function')\n      funcs[key] = additionalFunctions[key]\n  }\n\n  if (typeof additionalFunctions === 'object')\n    Object.keys(additionalFunctions)\n          .forEach(cloneFunction)\n\n  function compileSubgraph (key) {\n    if (typeof funcs[key] === 'undefined')\n      funcs[key] = fun(graph.func[key], funcs)\n  }\n\n  if (typeof func === 'object')\n    Object.keys(func)\n          .forEach(compileSubgraph)\n\n  function dflowFun () {\n    var gotReturn = false\n      , outs = {}\n      , returnValue\n\n    var inputArgsOf = inputArgs.bind(null, outs, pipe)\n\n    // Inject builtin tasks.\n    injectReferences(funcs, task)\n    injectAccessors(funcs, graph)\n    injectArguments(funcs, task, arguments)\n\n    function byLevel (a, b) {\n      if (typeof cachedLevelOf[a] === 'undefined')\n        cachedLevelOf[a] = computeLevelOf(a)\n\n      if (typeof cachedLevelOf[b] === 'undefined')\n        cachedLevelOf[b] = computeLevelOf(b)\n\n      return cachedLevelOf[a] - cachedLevelOf[b]\n    }\n\n    function run (taskKey) {\n      var args = inputArgsOf(taskKey)\n        , funcName = task[taskKey]\n        , f = funcs[funcName]\n\n      // Behave like a JavaScript function: if found a return, skip all other tasks.\n      if (gotReturn)\n        return\n\n      if ((funcName === 'return') && (!gotReturn)) {\n        returnValue = args[0]\n        gotReturn = true\n        return\n      }\n\n      outs[taskKey] = f.apply(null, args)\n    }\n\n    Object.keys(task).sort(byLevel).forEach(run)\n\n    return returnValue\n  }\n\n  // Remember function was created from a dflow graph.\n  dflowFun.graph = graph\n\n  return dflowFun\n}\n\nmodule.exports = fun",
+    "ctx": {
+      "type": "function",
+      "name": "fun",
+      "string": "fun()"
+    }
+  }
+]
