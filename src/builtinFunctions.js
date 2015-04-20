@@ -13,7 +13,7 @@ exports['typeof'] = typeofOperator
 
 function applyMethod (fun, thisArg, argsArray) { return fun.apply(thisArg, argsArray) }
 
-exports['apply'] = applyMethod
+exports.apply = applyMethod
 
 function nullValue () { return null }
 

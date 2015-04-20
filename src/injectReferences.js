@@ -8,16 +8,16 @@
 
 function injectReferences (funcs, task) {
   function inject (taskKey) {
-    var referenceName
-      , referenceRegex = /^\&(.+)$/
-      , taskName = task[taskKey]
+    var referenceName,
+        referenceRegex = /^\&(.+)$/,
+        taskName       = task[taskKey]
+
+    function reference () {
+      return funcs[referenceName]
+    }
 
     if (referenceRegex.test(taskName)) {
       referenceName = taskName.substring(1)
-
-      function reference () {
-        return funcs[referenceName]
-      }
 
       funcs[taskName] = reference
     }

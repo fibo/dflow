@@ -11,19 +11,19 @@ function injectAccessors (funcs, graph) {
     graph.data = {}
 
   function inject (taskKey) {
-    var accessorName
-      , accessorRegex = /^\.(.+)$/
-      , taskName = graph.task[taskKey]
+    var accessorName,
+        accessorRegex = /^\.(.+)$/,
+        taskName      = graph.task[taskKey]
+
+    function accessor () {
+      if (arguments.length === 1)
+        graph.data[accessorName] = arguments[0]
+
+      return graph.data[accessorName]
+    }
 
     if (accessorRegex.test(taskName)) {
       accessorName = taskName.substring(1)
-
-      function accessor () {
-        if (arguments.length === 1)
-          graph.data[accessorName] = arguments[0]
-
-        return graph.data[accessorName]
-      }
 
       funcs[taskName] = accessor
     }
