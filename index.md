@@ -57,11 +57,7 @@ f('Hello World') // prints "Hello World"
 
 > dflow exports a `fun` function ☺
 
-Function *fun* has the following signature
-
-  * param: {Object} *graph* to be executed.
-  * param: {Object} *additionalFunctions* is an **optional** collection of functions.
-  * returns: {Function} *dflowFun* that executes the given graph.
+See [Api](./api) for defailts.
 
 ## Concept
 
