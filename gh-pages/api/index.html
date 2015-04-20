@@ -1,0 +1,12 @@
+---
+layout: page
+---
+
+{% for dox in site.data.dox %}
+<h2>{{ dox.ctx.name }}</h2>
+{{ dox.description.full }}
+<!-- params {% for tag in dox.tags %}
+{{ tag.name }}
+{% endfor %} -->
+{% endfor %}
+
