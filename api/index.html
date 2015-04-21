@@ -1,14 +1,22 @@
 ---
+title: Api
 layout: page
 ---
-
 {% for dox in site.data.dox %}
-	<h2>{{ dox.ctx.name }}</h2>
-	{{ dox.description.full }}
-	<dl>
-	{% for tag in dox.tags %}
-	<dt>{{ tag.name }}</dt><dd>tag.description</dd>
-	{% endfor %}
-	</dl>
+<div class="panel panel-default">
+<div class="panel-heading">
+    <h2>{{ dox.ctx.name }}</h2>
+    {{ dox.description.full }}
+</div>
+<div class="panel-body">
+    <dl>
+    {% for tag in dox.tags where "type","params" %}
+        <dt>{{ tag.name }} <span class="label label-default">{{ tag.types | join: ',' }}</span></dt><dd>tag.description</dd>
+    {% endfor %}
+    {% for tag in dox.tags where "type","returns" %}
+        <div class="panel-footer">{{ tag.name }} <span class="label label-default">{{ tag.types | join: ',' }}</span>tag.description</div>
+    {% endfor %}
+    </dl>
+</div>
+</div>
 {% endfor %}
-
