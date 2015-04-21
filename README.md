@@ -54,7 +54,7 @@ f('Hello World') // prints "Hello World"
 
 > dflow exports a `fun` function ☺
 
-See [Api](./api) for defailts.
+See [Api](https://g14n.info/dflow/api) for defailts.
 
 ## Concept
 
@@ -81,7 +81,7 @@ A *graph* has the following properties
 
 ### page.html
 
-See [test/page.html](https://github.com/fibo/dflow/blob/master/test/page.html) for a working example of *dflow* in a browser context.
+See [test/page.html](http://g14n.info/dflow/test/page.html) for a working example of *dflow* in a browser context.
 
 ### Stream playground
 
