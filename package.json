@@ -37,10 +37,9 @@
   ],
   "homepage": "http://g14n.info/dflow",
   "devDependencies": {
-    "browserify": "~9.0.3",
+    "browserify": "^10.1.3",
     "dox": "^0.7.1",
-    "jshint": "^2.6.3",
-    "mocha": "~2.1.0",
-    "should": "~5.0.1"
+    "mocha": "^2.2.4",
+    "should": "^6.0.1"
   }
 }
