@@ -125,5 +125,5 @@ Like the `.` operator, takes an object and a prop as arguments and returns `obje
 
 ## License
 
-[MIT](http://g14n.info/mit-license)
+[MIT](http://g14n.info/mit-license.html)
 

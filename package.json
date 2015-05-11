@@ -4,7 +4,7 @@
   "description": "Dataflow programming",
   "main": "index.js",
   "scripts": {
-    "homepage": "echo -e \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
+    "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
     "package.json": "cp package.json gh-pages/_data",
     "gh-pages:_data": "npm run package.json; npm run dox",
     "gh-pages:push": "git subtree --prefix gh-pages push origin gh-pages",
@@ -32,7 +32,7 @@
   "license": [
     {
       "type": "MIT",
-      "url": "http://g14n.info/mit-license"
+      "url": "http://g14n.info/mit-license.html"
     }
   ],
   "homepage": "http://g14n.info/dflow",
