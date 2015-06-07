@@ -40,7 +40,7 @@ function fun (graph, additionalFunctions) {
 
   function compileSubgraph (key) {
     if (typeof funcs[key] === 'undefined')
-      funcs[key] = fun(graph.func[key], funcs)
+      funcs[key] = fun(graph.func[key], additionalFunctions)
   }
 
   if (typeof func === 'object')
