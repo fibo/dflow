@@ -1,16 +1,21 @@
-  <meta charset="{{ site.encoding }}">
+<!-- _includes/header.html start -->
+{% assign package = site.data.package %}
 
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
 
-  <meta name="description" content="{{ site.description }}">
-  <meta name="author" content="{{ site.author }}">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="description" content="{{ package.description | strip_newlines }}">
+<meta name="keywords" content="{{ package.keywords | join: ',' }}">
+<meta name="author" content="{{ package.author.name }}">
 
-  <title>{{ page.title }}</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <!-- Bootstrap -->
-  <link rel="stylesheet" href="{{ site.bootstrap.base_url }}/{{ site.bootstrap.version }}/css/bootstrap.min.css">
-  <link rel="stylesheet" href="{{ site.bootstrap.base_url }}/{{ site.bootstrap.version }}/css/bootstrap-theme.min.css">
+<title>{{ page.title }}</title>
 
-  <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="//{{ site.domain }}/css/bootstrap.min.css">
+<link rel="stylesheet" href="//{{ site.domain }}/css/bootstrap-theme.min.css">
+
+<script type="text/javascript" src="//{{ site.domain }}/js/jquery.min.js"></script>
+
+<!-- _includes/header.html end -->
