@@ -1,10 +1,10 @@
 {
   "name": "dflow",
   "main": "dist/dflow.js",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "homepage": "http://g14n.info/dflow",
   "authors": [
-    "fibo <casati_gianluca@yahoo.it>"
+    "Gianluca Casati"
   ],
   "description": "Dataflow programming",
   "moduleType": [
