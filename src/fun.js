@@ -11,14 +11,14 @@ var builtinFunctions = require('./builtinFunctions')
  * Create a dflow function.
  *
  * @param {Object} graph to be executed
- * @param {Object} additionalFunctions
+ * @param {Object} [additionalFunctions] is a collection of functions
  *
  * @returns {Function} dflowFun that executes the given graph.
  */
 
 function fun (graph, additionalFunctions) {
   // First of all, check if graph is valid.
-  try { validate(graph) } catch (err) { throw err }
+  try { validate(graph, additionalFunctions) } catch (err) { throw err }
 
   var func = graph.func
     , pipe = graph.pipe
