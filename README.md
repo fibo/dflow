@@ -87,16 +87,16 @@ A *graph* has the following properties
 *dflow* provides few [builtin functions](https://github.com/fibo/dflow/blob/master/src/builtinFunctions.js) and injects the following ones
 
   * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement).
-  * `arguments`: task that return the *arguments* of *dflowFun*.
+  * `arguments`: task that returns the *arguments* of *dflowFun*.
   * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*.
   * `.foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
 
-Note that optional collection of *additionalFunctions*, in order to avoid conflicts *injected* functions, must contain function names validated by following the rules:
+Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:
 
   * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]` are reserved names.
-  * cannot start with a dot, name `.foo` for an additional function is not allowed.
-  * idem for the ampersand, name `&bar` for an additional function is not allowed.
+  * cannot start with a dot: name `.foo` for an additional function is not allowed.
+  * idem for the ampersand: name `&bar` for an additional function is not allowed.
 
 ## Examples
 
