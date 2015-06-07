@@ -1,25 +1,5 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.dflow = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
-//
-// Dependency graph
-//
-// fun.js
-// ├── injectAccessors.js
-// ├── injectArguments.js
-// ├── injectReferences.js
-// ├── inputArgs.js
-// │   └── inputPipes.js
-// ├── level.js
-// │   └── parents.js
-// │       └── inputPipes.js
-// └── validate.js
-//
-
-exports.fun = require('./src/fun')
-
-
-},{"./src/fun":3}],2:[function(require,module,exports){
-
 function typeofOperator (operand) { return typeof operand }
 
 exports['typeof'] = typeofOperator
@@ -34,7 +14,7 @@ exports['typeof'] = typeofOperator
 
 function applyMethod (fun, thisArg, argsArray) { return fun.apply(thisArg, argsArray) }
 
-exports['apply'] = applyMethod
+exports.apply = applyMethod
 
 function nullValue () { return null }
 
@@ -82,7 +62,7 @@ exports['Math.cos'] = Math.cos
 exports['Math.sin'] = Math.sin
 
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 
 var builtinFunctions = require('./builtinFunctions')
   , injectArguments  = require('./injectArguments')
@@ -96,14 +76,14 @@ var builtinFunctions = require('./builtinFunctions')
  * Create a dflow function.
  *
  * @param {Object} graph to be executed
- * @param {Object} additionalFunctions
+ * @param {Object} [additionalFunctions] is a collection of functions
  *
  * @returns {Function} dflowFun that executes the given graph.
  */
 
 function fun (graph, additionalFunctions) {
   // First of all, check if graph is valid.
-  try { validate(graph) } catch (err) { throw err }
+  try { validate(graph, additionalFunctions) } catch (err) { throw err }
 
   var func = graph.func
     , pipe = graph.pipe
@@ -131,7 +111,7 @@ function fun (graph, additionalFunctions) {
   if (typeof func === 'object')
     Object.keys(func)
           .forEach(compileSubgraph)
-  
+
   function dflowFun () {
     var gotReturn = false
       , outs = {}
@@ -186,7 +166,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./builtinFunctions":2,"./injectAccessors":4,"./injectArguments":5,"./injectReferences":6,"./inputArgs":7,"./level":9,"./validate":11}],4:[function(require,module,exports){
+},{"./builtinFunctions":1,"./injectAccessors":3,"./injectArguments":4,"./injectReferences":5,"./inputArgs":6,"./level":8,"./validate":10}],3:[function(require,module,exports){
 
 /**
  * Inject functions to set or get context keywords.
@@ -200,19 +180,19 @@ function injectAccessors (funcs, graph) {
     graph.data = {}
 
   function inject (taskKey) {
-    var accessorName
-      , accessorRegex = /^\.(.+)$/
-      , taskName = graph.task[taskKey]
+    var accessorName,
+        accessorRegex = /^\.(.+)$/,
+        taskName      = graph.task[taskKey]
+
+    function accessor () {
+      if (arguments.length === 1)
+        graph.data[accessorName] = arguments[0]
+
+      return graph.data[accessorName]
+    }
 
     if (accessorRegex.test(taskName)) {
       accessorName = taskName.substring(1)
-
-      function accessor () {
-        if (arguments.length === 1)
-          graph.data[accessorName] = arguments[0]
-
-        return graph.data[accessorName]
-      }
 
       funcs[taskName] = accessor
     }
@@ -224,7 +204,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 
 /**
  * Inject functions to retrieve arguments.
@@ -260,7 +240,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 
 /**
  * Inject references to functions.
@@ -271,16 +251,16 @@ module.exports = injectArguments
 
 function injectReferences (funcs, task) {
   function inject (taskKey) {
-    var referenceName
-      , referenceRegex = /^\&(.+)$/
-      , taskName = task[taskKey]
+    var referenceName,
+        referenceRegex = /^\&(.+)$/,
+        taskName       = task[taskKey]
+
+    function reference () {
+      return funcs[referenceName]
+    }
 
     if (referenceRegex.test(taskName)) {
       referenceName = taskName.substring(1)
-
-      function reference () {
-        return funcs[referenceName]
-      }
 
       funcs[taskName] = reference
     }
@@ -292,7 +272,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -325,7 +305,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":8}],8:[function(require,module,exports){
+},{"./inputPipes":7}],7:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -355,7 +335,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -391,7 +371,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":10}],10:[function(require,module,exports){
+},{"./parents":9}],9:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -420,7 +400,7 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":8}],11:[function(require,module,exports){
+},{"./inputPipes":7}],10:[function(require,module,exports){
 
 /**
  * Check graph consistency.
@@ -500,5 +480,25 @@ function validate (graph) {
 module.exports = validate
 
 
-},{}]},{},[1])(1)
+},{}],11:[function(require,module,exports){
+
+//
+// Dependency graph
+//
+// fun.js
+// ├── injectAccessors.js
+// ├── injectArguments.js
+// ├── injectReferences.js
+// ├── inputArgs.js
+// │   └── inputPipes.js
+// ├── level.js
+// │   └── parents.js
+// │       └── inputPipes.js
+// └── validate.js
+//
+
+exports.fun = require('./src/fun')
+
+
+},{"./src/fun":2}]},{},[11])(11)
 });

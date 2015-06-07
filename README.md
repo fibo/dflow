@@ -4,6 +4,8 @@
 
 [![NPM version](https://badge.fury.io/js/dflow.png)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.png?branch=master)](https://travis-ci.org/fibo/dflow.png?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.png)](https://gemnasium.com/fibo/dflow) [![Coverage Status](https://coveralls.io/repos/fibo/dflow/badge.svg?branch=master)](https://coveralls.io/r/fibo/dflow?branch=master)
 
+[![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
+
 ## Description
 
 *dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
@@ -52,11 +54,22 @@ f('Hello World') // prints "Hello World"
 
 ## Api
 
-> dflow exports a `fun` function ☺
+> dflow exports a [fun](https://github.com/fibo/dflow/blob/master/src/fun.js) function ☺
 
-See [Api](https://g14n.info/dflow/api) for defailts.
+It has the following signature.
 
-## Concept
+```
+/**
+ * Create a dflow function.
+ *
+ * @param {Object} graph to be executed
+ * @param {Object} [additionalFunctions] is a collection of functions
+ *
+ * @returns {Function} dflowFun that executes the given graph
+ */
+```
+
+## Specification
 
 A *graph* is a collection of *tasks* and *pipes* that can be stored in JSON format.
 
@@ -68,14 +81,21 @@ A *graph* has the following properties
   * pipe: connections from the output of a task to an input of another task.
   * data: (optional) persistence.
   * func: (optional) collection of subgraphs.
+  * view: (ignored) object containing information used by [flow-view](http://g14n.info/flow-view).
+  * info: (to be defined) meta data, like *author*, *version* and, above all, *doc* which is a dflow graph itself.
 
 *dflow* provides few [builtin functions](https://github.com/fibo/dflow/blob/master/src/builtinFunctions.js) and injects the following ones
 
-  * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement). 
-  * `arguments`: task that returns the *arguments* of *dflowFun*. 
-  * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*. 
+  * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement).
+  * `arguments`: task that returns the *arguments* of *dflowFun*.
+  * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*.
   * `.foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
+
+Note that optional collection of *additionalFunctions*, in order to avoid conflicts *injected* functions, must contain function names validated by following the rules:
+  * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]` are reserved names.
+  * cannot start with a dot, name `.foo` for an additional function is not allowed.
+  * idem for the ampersand, name `&bar` for an additional function is not allowed.
 
 ## Examples
 
@@ -123,7 +143,15 @@ Implements the apply operator.
 
 Like the `.` operator, takes an object and a prop as arguments and returns `object[prop]` value.
 
-## License
+## Support and License
 
-[MIT](http://g14n.info/mit-license.html)
+*dflow* is [MIT](http://g14n.info/mit-license) licensed. It is developed in my spare time and, as far as I know, by now *I am my only user*.
+I am starting to use *dflow* instead of angularjs for my website. I wrote few times a dataflow engine, the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
+Use cases I can think about *dflow* right now are many, but, the possibilities are I.M.H.O outstanding: from client to server, from JavaScript to cross language, from mono-thread to graphs distributed on a network and, above all, from skilled programmer who write functions code to artists, genetic engineers, data scientists, etc. that use those functions to create dflow graphs to get results nobody could even imagine.
+
+If this is also your vision or you just want to use *dflow*, [contact me](http://g14n.info).
+
+My goal is to say to a dflow user: 
+
+> Mamma mia! Did you achieve that with dflow?
 
