@@ -19,8 +19,9 @@ function injectArguments (funcs, task, args) {
       funcs[funcName] = function getArguments () { return args }
     }
     else {
-      var argumentsN = /^arguments\[(\d+)\]$/
-      var arg = argumentsN.exec(funcName)
+      var argumentRegex = /^arguments\[(\d+)\]$/
+
+      var arg = argumentRegex.exec(funcName)
 
       if (arg)
         funcs[funcName] = getArgument.bind(null, arg[1])

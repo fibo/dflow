@@ -93,6 +93,7 @@ A *graph* has the following properties
   * `&bar`: returns *bar* function.
 
 Note that optional collection of *additionalFunctions*, in order to avoid conflicts *injected* functions, must contain function names validated by following the rules:
+
   * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]` are reserved names.
   * cannot start with a dot, name `.foo` for an additional function is not allowed.
   * idem for the ampersand, name `&bar` for an additional function is not allowed.

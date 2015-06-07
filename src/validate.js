@@ -3,15 +3,39 @@
  * Check graph consistency.
  *
  * @param {Object} graph
+ * @param {Object} [additionalFunctions]
  *
  * @returns {Boolean} ok if no exception is thrown
  */
 
-function validate (graph) {
-  var func     = graph.func
-    , pipe     = graph.pipe
-    , task     = graph.task
-    , seenPipe = {}
+function validate (graph, additionalFunctions) {
+  var func     = graph.func,
+      pipe     = graph.pipe,
+      task     = graph.task,
+      seenPipe = {}
+
+  if (typeof additionalFunctions === 'object') {
+    for (var taskName in additionalFunctions) {
+      var accessorRegex  = /^\.(.+)$/,
+          argumentRegex  = /^arguments\[(\d+)\]$/,
+          referenceRegex = /^\&(.+)$/
+
+      if (taskName === 'return')
+        throw new TypeError('Reserved function name')
+
+      if (taskName === 'arguments')
+        throw new TypeError('Reserved function name')
+
+      if (argumentRegex.test(taskName))
+        throw new TypeError('Reserved function name')
+
+      if (accessorRegex.test(taskName))
+        throw new TypeError('Function name cannot start with a dot')
+
+      if (referenceRegex.test(taskName))
+        throw new TypeError('Function name cannot start with an ampersand')
+    }
+  }
 
   // Check pipe and task are objects.
 
@@ -23,9 +47,9 @@ function validate (graph) {
 
 
   function checkPipe (key) {
-    var arg = pipe[key][2] || 0
-      , from = pipe[key][0]
-      , to = pipe[key][1]
+    var arg  = pipe[key][2] || 0,
+        from = pipe[key][0],
+        to   = pipe[key][1]
 
     // Check types.
 
@@ -65,7 +89,7 @@ function validate (graph) {
   // Recursively check subgraphs in func property.
 
   function checkFunc (key) {
-    validate(func[key])
+    validate(func[key], additionalFunctions)
   }
 
   if (typeof func === 'object')
