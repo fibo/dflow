@@ -144,6 +144,16 @@ Implements the apply operator.
 
 Like the `.` operator, takes an object and a prop as arguments and returns `object[prop]` value.
 
+### Packaged graph
+
+The main advantage of *dflow* design is that you do not need to write components or plugins to extend it. You can use one of the most powerful JavaScript features: functions. Write your functions or import them from other packages like *JQuery* or *underscore* and you are able to use them as *tasks* and connect them with *pipes*.
+
+Also every *dflow* graph is a function itself, so why not packaging it and put it on [npm](https://npm.im)!?
+
+It is really easy: create your *dflow* graph and save it to a JSON file, *index.json* for instance; then launch `npm init` as usual and when prompted for the *entry point* write *index.json*.
+
+Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/test/examples/packagedGraph) as an example.
+
 ## Support and License
 
 *dflow* is [MIT](http://g14n.info/mit-license) licensed. It is developed in my spare time and, as far as I know, by now *I am my only user*.

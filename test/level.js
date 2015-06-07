@@ -1,6 +1,6 @@
 
-var should = require('should')
-var level = require('../src/level')
+var level  = require('../src/level'),
+    should = require('should')
 
 var pipe = {
       'a': [ '0', '1' ],
@@ -9,8 +9,8 @@ var pipe = {
       'd': [ '2', '3' ]
     }
 
-var cachedLevelOf = {}
-  , computeLevelOf = level.bind(null, pipe, cachedLevelOf)
+var cachedLevelOf  = {},
+    computeLevelOf = level.bind(null, pipe, cachedLevelOf)
 
 describe('level', function () {
   it('returns level of task', function () {

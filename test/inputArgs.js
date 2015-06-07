@@ -1,14 +1,14 @@
 
-var should = require('should')
-var inputArgs = require('../src/inputArgs')
+var inputArgs = require('../src/inputArgs'),
+    should    = require('should')
 
 var pipe = {
       'a': [ '0', '1', 0 ],
       'b': [ '1', '2', 0 ],
       'c': [ '2', '3', 0 ],
       'd': [ '1', '3', 1 ]
-    }
-  , outs = {
+    },
+    outs = {
     '0': 'foo',
     '1': 'bar',
     '2': 'quz'

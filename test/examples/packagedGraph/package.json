@@ -1,0 +1,23 @@
+{
+  "name": "packagedGraph",
+  "version": "1.0.0",
+  "private": true,
+  "description": "example of reusable dflow graph packaged with npm",
+  "main": "index.json",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "dflow"
+  ],
+  "author": {
+    "name": "Gianluca Casati",
+    "url": "http://g14n.info"
+  },
+  "license": [
+    {
+      "type": "MIT",
+      "url": "http://g14n.info/mit-license"
+    }
+  ]
+}
