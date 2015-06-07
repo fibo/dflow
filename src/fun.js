@@ -22,7 +22,7 @@ function fun (graph, additionalFunctions) {
 
   var func = graph.func,
       pipe = graph.pipe,
-      task = graph.task,
+      task = graph.task
 
   var cachedLevelOf  = {},
       computeLevelOf = level.bind(null, pipe, cachedLevelOf),
@@ -87,7 +87,7 @@ function fun (graph, additionalFunctions) {
     function run (taskKey) {
       var args     = inputArgsOf(taskKey),
           funcName = task[taskKey],
-          f        = funcs[funcName],
+          f        = funcs[funcName]
 
       // Behave like a JavaScript function: if found a return, skip all other tasks.
       if (gotReturn)
