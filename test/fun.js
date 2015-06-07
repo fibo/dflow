@@ -1,6 +1,6 @@
 
-var should = require('should')
-  , fun = require('../src/fun')
+var should = require('should'),
+    fun    = require('../src/fun')
 
 var graph = {
   task: {

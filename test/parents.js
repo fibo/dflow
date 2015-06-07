@@ -1,6 +1,6 @@
 
-var should = require('should')
-var parents = require('../src/parents')
+var parents = require('../src/parents'),
+    should  = require('should')
 
 var pipe = {
       'a': [ '0', '1' ],

@@ -1,11 +1,11 @@
 
-var should = require('should')
-var injectReferences = require('../src/injectReferences')
+var injectReferences = require('../src/injectReferences'),
+    should           = require('should')
 
 var funcs = {
-  'Math.cos': Math.cos
-}
-  , task = {
+      'Math.cos': Math.cos
+    },
+    task = {
       '1' : '&Math.cos'
     }
 

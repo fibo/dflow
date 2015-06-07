@@ -15,11 +15,11 @@ describe('inputPipes', function () {
   it('returns input pipes of task', function () {
     inputPipesOf('0').should.eql([])
 
-    inputPipesOf('1').should.eql([pipe['a']])
+    inputPipesOf('1').should.eql([pipe.a])
 
-    inputPipesOf('2').should.eql([pipe['b']])
+    inputPipesOf('2').should.eql([pipe.b])
 
-    inputPipesOf('3').should.eql([pipe['c'], pipe['d']])
+    inputPipesOf('3').should.eql([pipe.c, pipe.d])
   })
 })
 
