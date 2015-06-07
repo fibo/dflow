@@ -87,7 +87,7 @@ A *graph* has the following properties
 *dflow* provides few [builtin functions](https://github.com/fibo/dflow/blob/master/src/builtinFunctions.js) and injects the following ones
 
   * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement).
-  * `arguments`: task that returns the *arguments* of *dflowFun*.
+  * `arguments`: task that return the *arguments* of *dflowFun*.
   * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*.
   * `.foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
@@ -152,7 +152,7 @@ Use cases I can think about *dflow* right now are many, but, the possibilities a
 
 If this is also your vision or you just want to use *dflow*, [contact me](http://g14n.info).
 
-My goal is to say to a dflow user: 
+My goal is to say to a *dflow* user:
 
 > Mamma mia! Did you achieve that with dflow?
 
