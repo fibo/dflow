@@ -2,6 +2,8 @@
 /**
  * Inject functions to set or get context keywords.
  *
+ * @api private
+ *
  * @param {Object} funcs reference
  * @param {Object} graph
  */

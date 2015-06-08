@@ -14,6 +14,8 @@ function validate (graph, additionalFunctions) {
       task     = graph.task,
       seenPipe = {}
 
+  // Validate addition functions, if any. Check there are no reserved keys.
+
   if (typeof additionalFunctions === 'object') {
     for (var taskName in additionalFunctions) {
       var accessorRegex  = /^\.(.+)$/,

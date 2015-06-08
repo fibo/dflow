@@ -8,7 +8,7 @@
 
 ## Description
 
-*dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
+*dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine (~250 LOC).
 
 ## Installation
 
