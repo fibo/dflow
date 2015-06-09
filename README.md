@@ -98,6 +98,8 @@ Note that optional collection of *additionalFunctions*, in order to avoid confli
   * cannot start with a dot: name `.foo` for an additional function is not allowed.
   * idem for the ampersand: name `&bar` for an additional function is not allowed.
 
+Furthermore, *additionalFunctions* cannot override *builtinFunctions*.
+
 ## Examples
 
 ### page.html
@@ -156,9 +158,13 @@ Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/te
 
 ## Support and License
 
-*dflow* is [MIT](http://g14n.info/mit-license) licensed. It is developed in my spare time and, as far as I know, by now *I am my only user*.
-I am starting to use *dflow* instead of angularjs for my website. I wrote few times a dataflow engine, the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
-Use cases I can think about *dflow* right now are many, but, the possibilities are I.M.H.O outstanding: from client to server, from JavaScript to cross language, from mono-thread to graphs distributed on a network and, above all, from skilled programmer who write functions code to artists, genetic engineers, data scientists, etc. that use those functions to create dflow graphs to get results nobody could even imagine.
+*dflow* is [MIT](http://g14n.info/mit-license) licensed.
+
+It is developed in my spare time and, as far as I know, by now *I am my only user*.
+
+I wrote few times a dataflow engine, the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
+
+Use cases I can think about *dflow* right now are many, but, the possibilities are I.M.H.O outstanding: from client to server, from JavaScript to cross language, from mono-thread to graphs distributed on a network and, above all, from skilled programmer who write functions code … to artists, genetic engineers, data scientists, etc. that use those functions to create *dflow* graphs and get results nobody could even imagine.
 
 If this is also your vision or you just want to use *dflow*, [contact me](http://g14n.info).
 

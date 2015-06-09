@@ -1,11 +1,12 @@
 
-var builtinFunctions = require('./builtinFunctions'),
-    injectArguments  = require('./injectArguments'),
-    injectAccessors  = require('./injectAccessors'),
-    injectReferences = require('./injectReferences'),
-    inputArgs        = require('./inputArgs'),
-    level            = require('./level'),
-    validate         = require('./validate')
+var builtinFunctions          = require('./builtinFunctions'),
+    injectAdditionalFunctions = require('./injectAdditionalFunctions'),
+    injectArguments           = require('./injectArguments'),
+    injectAccessors           = require('./injectAccessors'),
+    injectReferences          = require('./injectReferences'),
+    inputArgs                 = require('./inputArgs'),
+    level                     = require('./level'),
+    validate                  = require('./validate')
 
 /**
  * Create a dflow function.
@@ -28,18 +29,6 @@ function fun (graph, additionalFunctions) {
       computeLevelOf = level.bind(null, pipe, cachedLevelOf),
       funcs          = builtinFunctions
 
-  /**
-   * Hard copy any additional function.
-   */
-
-  function cloneFunction (key) {
-    if (typeof additionalFunctions[key] === 'function')
-      funcs[key] = additionalFunctions[key]
-  }
-
-  if (typeof additionalFunctions === 'object')
-    Object.keys(additionalFunctions)
-          .forEach(cloneFunction)
 
   /**
    * Compile each sub graph.
@@ -66,9 +55,10 @@ function fun (graph, additionalFunctions) {
     var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
     // Inject builtin tasks.
-    injectReferences(funcs, task)
     injectAccessors(funcs, graph)
+    injectAdditionalFunctions(funcs, additionalFunctions)
     injectArguments(funcs, task, arguments)
+    injectReferences(funcs, task)
 
     /**
      * Sorts tasks by their level.
@@ -83,6 +73,10 @@ function fun (graph, additionalFunctions) {
 
       return cachedLevelOf[a] - cachedLevelOf[b]
     }
+
+    /**
+     * Execute task.
+     */
 
     function run (taskKey) {
       var args     = inputArgsOf(taskKey),
