@@ -1,15 +1,4 @@
 
-// Special values.
-
-function infinity () { return Infinity }
-exports['Infinity'] = infinity
-
-function nan () { return NaN }
-exports['NaN'] = nan
-
-function nullValue () { return null }
-exports['null'] = nullValue
-
 // Operators
 
 function typeofOperator (operand) { return typeof operand }
@@ -21,7 +10,7 @@ exports.apply = applyMethod
 function dot (obj, prop) { return obj[prop] }
 exports['.'] = dot
 
-// Arithmetic operators.
+// Arithmetic operators
 
 function addition (a, b) { return a + b }
 exports['+'] = addition
@@ -38,7 +27,7 @@ exports['/'] = division
 function modulus (a, b) { return a % b }
 exports['%'] = modulus
 
-// Logical operators.
+// Logical operators
 
 function and (a, b) { return a && b }
 exports['&&'] = and
@@ -49,7 +38,7 @@ exports['||'] = or
 function not (a) { return ! a }
 exports['!'] = not
 
-// Comparison operators.
+// Comparison operators
 
 function equalTo (a, b) { return a == b }
 exports['=='] = equalTo
@@ -75,11 +64,55 @@ exports['>='] = greaterThenOrEqualTo
 function lessThenOrEqualTo (a, b) { return a <= b }
 exports['<='] = lessThenOrEqualTo
 
-// console.
+// Array
+
+exports['Array.isArray']  = Array.isArray
+
+exports['Array.prototype.filter']  = Array.prototype.filter
+exports['Array.prototype.forEach'] = Array.prototype.forEach
+exports['Array.prototype.indexOf'] = Array.prototype.indexOf
+exports['Array.prototype.join']    = Array.prototype.join
+exports['Array.prototype.map']     = Array.prototype.map
+exports['Array.prototype.pop']     = Array.prototype.pop
+exports['Array.prototype.push']    = Array.prototype.push
+exports['Array.prototype.reduce']  = Array.prototype.reduce
+exports['Array.prototype.slice']   = Array.prototype.slice
+exports['Array.prototype.sort']    = Array.prototype.sort
+
+// console
 
 exports['console.log'] = console.log.bind(console)
 
-// Math.
+// Date
+
+exports['Date.now']   = Date.now
+exports['Date.parse'] = Date.parse
+
+// Function
+
+exports['Function.prototype'] = Function.prototype
+
+// Global
+
+function infinity () { return Infinity }
+exports['Infinity'] = infinity
+
+exports.isFinite = isFinite
+
+exports.isNaN = isNaN
+
+function nan () { return NaN }
+exports.NaN = nan
+
+function nullValue () { return null }
+exports['null'] = nullValue
+
+// JSON
+
+exports['JSON.parse']     = JSON.parse
+exports['JSON.stringify'] = JSON.stringify
+
+// Math
 
 function MathE () { return Math.E }
 exports['Math.E'] = MathE
@@ -141,10 +174,20 @@ exports['Math.tan']    = Math.tan
 exports['Math.tanh']   = Math.tanh
 exports['Math.trunc']  = Math.trunc
 
-// JSON
+// Number
 
-exports['JSON.parse']     = JSON.parse
-exports['JSON.stringify'] = JSON.stringify
+function epsilon () { return Number.EPSILON }
+exports['Number.EPSILON'] = epsilon
+
+function min_value () { return Number.MIN_VALUE }
+exports['Number.MIN_VALUE'] = min_value
+
+function max_value () { return Number.MAX_VALUE }
+exports['Number.MAX_VALUE'] = max_value
+
+// Object
+
+exports['Object.defineProperty'] = Object.defineProperty
 
 // String
 
@@ -165,7 +208,4 @@ exports['String.prototype.toLowerCase']       = String.prototype.toLowerCase
 exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
 
-// Date
-
-exports['Date.now'] = Date.now
 
