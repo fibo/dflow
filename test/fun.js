@@ -55,5 +55,11 @@ describe('fun', function () {
 
     f.graph.data.result.should.eql(9)
   })
+
+  it('injects dflow functions'/*, function (){
+
+    check that dflow.fun, dflow.validate are available tasks
+    check that also &dflow.fun, and &dflow.validate references are available
+  }*/)
 })
 
