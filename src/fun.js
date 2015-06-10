@@ -29,6 +29,11 @@ function fun (graph, additionalFunctions) {
       computeLevelOf = level.bind(null, pipe, cachedLevelOf),
       funcs          = builtinFunctions
 
+  // Expose dflow functions.
+  funcs['dflow.builtinFunctions'] = builtinFunctions
+  funcs['dflow.fun']              = this
+  funcs['dflow.validate']         = validate
+
   /**
    * Compile each sub graph.
    */
@@ -58,9 +63,6 @@ function fun (graph, additionalFunctions) {
     injectAdditionalFunctions(funcs, additionalFunctions)
     injectArguments(funcs, task, arguments)
     injectReferences(funcs, task)
-
-    funcs['dflow.fun']      = this
-    funcs['dflow.validate'] = validate
 
     /**
      * Sorts tasks by their level.
@@ -98,7 +100,9 @@ function fun (graph, additionalFunctions) {
       outs[taskKey] = f.apply(null, args)
     }
 
-    Object.keys(task).sort(byLevel).forEach(run)
+    Object.keys(task)
+          .sort(byLevel)
+          .forEach(run)
 
     return returnValue
   }
