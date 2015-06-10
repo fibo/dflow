@@ -81,7 +81,8 @@ exports['Array.prototype.sort']    = Array.prototype.sort
 
 // console
 
-exports['console.log'] = console.log.bind(console)
+exports['console.error'] = console.error.bind(console)
+exports['console.log']   = console.log.bind(console)
 
 // Date
 
