@@ -1,15 +1,4 @@
 
-// Operators
-
-function typeofOperator (operand) { return typeof operand }
-exports['typeof'] = typeofOperator
-
-function applyMethod (fun, thisArg, argsArray) { return fun.apply(thisArg, argsArray) }
-exports.apply = applyMethod
-
-function dot (obj, prop) { return obj[prop] }
-exports['.'] = dot
-
 // Arithmetic operators
 
 function addition (a, b) { return a + b }
@@ -63,6 +52,17 @@ exports['>='] = greaterThenOrEqualTo
 
 function lessThenOrEqualTo (a, b) { return a <= b }
 exports['<='] = lessThenOrEqualTo
+
+// Other operators
+
+function typeofOperator (operand) { return typeof operand }
+exports['typeof'] = typeofOperator
+
+function applyMethod (fun, thisArg, argsArray) { return fun.apply(thisArg, argsArray) }
+exports.apply = applyMethod
+
+function dot (obj, prop) { return obj[prop] }
+exports['.'] = dot
 
 // Array
 
@@ -187,7 +187,7 @@ exports['Number.MAX_VALUE'] = max_value
 
 // Object
 
-exports['Object.defineProperty'] = Object.defineProperty
+exports['Object.prototype.defineProperty'] = Object.prototype.defineProperty
 
 // String
 
@@ -207,5 +207,4 @@ exports['String.prototype.toLocaleUpperCase'] = String.prototype.toLocaleUpperCa
 exports['String.prototype.toLowerCase']       = String.prototype.toLowerCase
 exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
-
 

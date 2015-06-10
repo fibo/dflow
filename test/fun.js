@@ -56,10 +56,29 @@ describe('fun', function () {
     f.graph.data.result.should.eql(9)
   })
 
-  it('injects dflow functions'/*, function (){
+  it('accepts an empty graph', function () {
+    var emptyGraph = {
+          task: {},
+          pipe: {}
+        }
 
-    check that dflow.fun, dflow.validate are available tasks
-    check that also &dflow.fun, and &dflow.validate references are available
-  }*/)
+    var empty = fun(emptyGraph)
+
+    should.deepEqual(empty.graph, emptyGraph)
+  })
+
+  it('can use dflow functions as tasks', function (){
+    var graph = {
+          task: {
+            'builtinFunctions': 'dflow.builtinFunctions',
+            'fun'             : 'dflow.fun',
+            'validate'        : 'dflow.validate'
+          },
+          pipe: {}
+        }
+
+    var f = fun(graph)
+
+  })
 })
 
