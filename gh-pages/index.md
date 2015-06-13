@@ -9,6 +9,8 @@ title: dflow
 
 [![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
 
+[![NPM](http://g14n.info/dflow/graph/hello-world.png)](http://g14n.info/flow-view/examples/dflow/hello-world.html)
+
 ## Description
 
 *dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine (~250 LOC).
