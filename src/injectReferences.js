@@ -1,4 +1,6 @@
 
+var referenceRegex = require('./regex/reference')
+
 /**
  * Inject references to functions.
  *
@@ -9,7 +11,6 @@
 function injectReferences (funcs, task) {
   function inject (taskKey) {
     var referenceName,
-        referenceRegex = /^\&(.+)$/,
         taskName       = task[taskKey]
 
     function reference () {

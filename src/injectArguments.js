@@ -1,4 +1,6 @@
 
+var argumentRegex = require('./regex/argument')
+
 /**
  * Inject functions to retrieve arguments.
  *
@@ -19,8 +21,6 @@ function injectArguments (funcs, task, args) {
       funcs[funcName] = function getArguments () { return args }
     }
     else {
-      var argumentRegex = /^arguments\[(\d+)\]$/
-
       var arg = argumentRegex.exec(funcName)
 
       if (arg)
