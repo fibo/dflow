@@ -1,0 +1,46 @@
+{
+  "task": {
+    "1": ".message",
+    "2": "console.log"
+  },
+  "pipe": {
+    "3": [ "1", "2" ]
+  },
+  "data": {
+    "message": "Hello World, by dflow"
+  },
+  "view": {
+    "box": {
+      "1": {
+        "x": 80,
+        "y": 100,
+        "w": 15,
+        "h": 1,
+        "text": ".message",
+        "outs": [{"name": "out0", "data": 1}]
+      },
+      "2": {
+        "x": 80,
+        "y": 200,
+        "w": 15,
+        "h": 1,
+        "text": "console.log",
+        "ins": [{"name": "in0", "data": 2}]
+      },
+      "comment": {
+        "x": 180,
+        "y": 100,
+        "w": 15,
+        "h": 4,
+        "text": "This is a comment\n ... on two rows.",
+        "ins": [{"name": "in0", "data": 2}]
+      }
+   },
+   "link": {
+     "3": {
+       "from": ["1", 0],
+       "to": ["2", 0]
+      }
+    }
+  }
+}
