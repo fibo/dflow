@@ -15,7 +15,7 @@
         "x": 80,
         "y": 20,
         "w": 15,
-        "h": 1,
+        "task": "1",
         "text": ".message",
         "outs": [{"name": "out0", "data": 1}]
       },
@@ -23,17 +23,16 @@
         "x": 80,
         "y": 150,
         "w": 15,
-        "h": 1,
+        "task": "2",
         "text": "console.log",
         "ins": [{"name": "in0", "data": 2}]
       },
       "comment": {
         "x": 280,
         "y": 10,
-        "w": 15,
+        "w": 45,
         "h": 4,
-        "text": "This is a comment\n ... on two rows.",
-        "ins": [{"name": "in0", "data": 2}]
+        "text": "This is a comment\n ... on few rows. It is a box without a task"
       }
    },
    "link": {
