@@ -1,4 +1,6 @@
 
+var accessorRegex = require('./regex/accessor')
+
 /**
  * Inject functions to set or get context keywords.
  *
@@ -14,8 +16,7 @@ function injectAccessors (funcs, graph) {
 
   function inject (taskKey) {
     var accessorName,
-        accessorRegex = /^\.(.+)$/,
-        taskName      = graph.task[taskKey]
+        taskName = graph.task[taskKey]
 
     function accessor () {
       if (arguments.length === 1)

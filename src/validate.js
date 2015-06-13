@@ -1,4 +1,8 @@
 
+var accessorRegex  = require('./regex/accessor'),
+    argumentRegex  = require('./regex/argument'),
+    referenceRegex = require('./regex/reference')
+
 /**
  * Check graph consistency.
  *
@@ -24,10 +28,6 @@ function validate (graph, additionalFunctions) {
 
   if (typeof additionalFunctions === 'object') {
     for (var taskName in additionalFunctions) {
-      var accessorRegex  = /^\.(.+)$/,
-          argumentRegex  = /^arguments\[(\d+)\]$/,
-          referenceRegex = /^\&(.+)$/
-
       if (taskName === 'return')
         throw new TypeError('Reserved function name')
 
