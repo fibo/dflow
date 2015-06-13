@@ -70,6 +70,14 @@ describe('validate', function () {
     ;(function () { validate({ pipe: 'not an object', task: {} }) }).should.throwError(/Not an object: pipe/)
   })
 
+  it('throws if optional data, func or info is not an object', function () {
+    ;(function () { validate({ task: {}, pipe: {}, data: 'not an object' }) }).should.throwError(/Not an object: data/)
+
+    ;(function () { validate({ task: {}, pipe: {}, func: 'not an object' }) }).should.throwError(/Not an object: func/)
+
+    ;(function () { validate({ task: {}, pipe: {}, info: 'not an object' }) }).should.throwError(/Not an object: info/)
+  })
+
   it('throws if some pipe has invalid type', function () {
     ;(function () { validate({ task: {}, pipe: { '1': [ '1', '2', 'zero' ] } }) }).should.throwError(/Invalid pipe:/)
 

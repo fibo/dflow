@@ -83,12 +83,18 @@ Every *task* refers to a function which output can be piped as an argument to an
 
 A *graph* has the following properties
 
-  * task: collection of function names.
-  * pipe: connections from the output of a task to an input of another task.
-  * data: (optional) persistence.
-  * func: (optional) collection of subgraphs.
-  * view: (ignored) object containing information used by [flow-view](http://g14n.info/flow-view).
-  * info: (to be defined) meta data, like *author*, *version* and, above all, *doc* which is a dflow graph itself.
+task
+: collection of function names.
+pipe
+: connections from the output of a task to an input of another task.
+data
+: (optional) persistence.
+func
+: (optional) collection of subgraphs.
+view
+: (ignored) object containing information used by [flow-view](http://g14n.info/flow-view).
+info
+: (to be defined) meta data, like *author*, *version* and, above all, *doc* which is a dflow graph itself.
 
 *dflow* provides few [builtin functions](https://github.com/fibo/dflow/blob/master/src/builtinFunctions.js) and injects the following ones
 
@@ -103,8 +109,6 @@ Note that optional collection of *additionalFunctions*, in order to avoid confli
   * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]` are reserved names.
   * cannot start with a dot: name `.foo` for an additional function is not allowed.
   * idem for the ampersand: name `&bar` for an additional function is not allowed.
-
-Furthermore, *additionalFunctions* cannot override *builtinFunctions*.
 
 ## Examples
 

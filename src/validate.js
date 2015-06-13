@@ -9,10 +9,16 @@
  */
 
 function validate (graph, additionalFunctions) {
-  var func     = graph.func,
-      pipe     = graph.pipe,
-      task     = graph.task,
-      seenPipe = {}
+  // Required properties.
+  var pipe = graph.pipe,
+      task = graph.task
+
+  // Optional properties.
+  var data = graph.data || {},
+      func = graph.func || {},
+      info = graph.info || {}
+
+  var seenPipe = {}
 
   // Validate addition functions, if any. Check there are no reserved keys.
 
@@ -46,6 +52,17 @@ function validate (graph, additionalFunctions) {
 
   if (typeof task !== 'object')
     throw new TypeError('Not an object: task', task)
+
+  // Check optional data, func, info and view are objects.
+
+  if (typeof data !== 'object')
+    throw new TypeError('Not an object: data', data)
+
+  if (typeof func !== 'object')
+    throw new TypeError('Not an object: func', func)
+
+  if (typeof info !== 'object')
+    throw new TypeError('Not an object: info', info)
 
 
   function checkPipe (key) {

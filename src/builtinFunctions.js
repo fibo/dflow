@@ -188,6 +188,8 @@ exports['Number.MAX_VALUE'] = max_value
 
 // Object
 
+exports['Object.keys'] = Object.keys
+
 exports['Object.prototype.defineProperty'] = Object.prototype.defineProperty
 
 // String
