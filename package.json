@@ -4,8 +4,10 @@
   "description": "Dataflow programming",
   "main": "index.js",
   "scripts": {
+    "_build": "npm test && npm run browserify && npm run jekyll",
+    "_push": "git push origin master && npm run gh-pages:push",
+    "_pull": "git pull origin master && npm run gh-pages:pull",
     "browserify": "browserify -r ./index.js:${npm_package_name} -o dist/${npm_package_name}.js",
-    "build": "npm test && npm run browserify && npm run jekyll",
     "coverage": "npm run istanbul && npm run coveralls",
     "coveralls": "cat ./coverage/lcov.info | coveralls --verbose",
     "cp": "npm run cp:dist; npm run cp:package.json",

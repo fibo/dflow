@@ -331,7 +331,9 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./builtinFunctions":1,"./injectAccessors":3,"./injectAdditionalFunctions":4,"./injectArguments":5,"./injectReferences":6,"./inputArgs":7,"./level":9,"./validate":11}],3:[function(require,module,exports){
+},{"./builtinFunctions":1,"./injectAccessors":3,"./injectAdditionalFunctions":4,"./injectArguments":5,"./injectReferences":6,"./inputArgs":7,"./level":9,"./validate":14}],3:[function(require,module,exports){
+
+var accessorRegex = require('./regex/accessor')
 
 /**
  * Inject functions to set or get context keywords.
@@ -348,8 +350,7 @@ function injectAccessors (funcs, graph) {
 
   function inject (taskKey) {
     var accessorName,
-        accessorRegex = /^\.(.+)$/,
-        taskName      = graph.task[taskKey]
+        taskName = graph.task[taskKey]
 
     function accessor () {
       if (arguments.length === 1)
@@ -371,7 +372,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{}],4:[function(require,module,exports){
+},{"./regex/accessor":11}],4:[function(require,module,exports){
 
 var builtinFunctions = require('./builtinFunctions')
 
@@ -405,6 +406,8 @@ module.exports = injectAdditionalFunctions
 
 },{"./builtinFunctions":1}],5:[function(require,module,exports){
 
+var argumentRegex = require('./regex/argument')
+
 /**
  * Inject functions to retrieve arguments.
  *
@@ -425,8 +428,6 @@ function injectArguments (funcs, task, args) {
       funcs[funcName] = function getArguments () { return args }
     }
     else {
-      var argumentRegex = /^arguments\[(\d+)\]$/
-
       var arg = argumentRegex.exec(funcName)
 
       if (arg)
@@ -440,7 +441,9 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{}],6:[function(require,module,exports){
+},{"./regex/argument":12}],6:[function(require,module,exports){
+
+var referenceRegex = require('./regex/reference')
 
 /**
  * Inject references to functions.
@@ -452,7 +455,6 @@ module.exports = injectArguments
 function injectReferences (funcs, task) {
   function inject (taskKey) {
     var referenceName,
-        referenceRegex = /^\&(.+)$/,
         taskName       = task[taskKey]
 
     function reference () {
@@ -472,7 +474,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{}],7:[function(require,module,exports){
+},{"./regex/reference":13}],7:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -602,6 +604,25 @@ module.exports = parents
 
 },{"./inputPipes":8}],11:[function(require,module,exports){
 
+module.exports = /^\.(.+)$/
+
+
+},{}],12:[function(require,module,exports){
+
+module.exports = /^arguments\[(\d+)\]$/
+
+
+},{}],13:[function(require,module,exports){
+
+module.exports = /^\&(.+)$/
+
+
+},{}],14:[function(require,module,exports){
+
+var accessorRegex  = require('./regex/accessor'),
+    argumentRegex  = require('./regex/argument'),
+    referenceRegex = require('./regex/reference')
+
 /**
  * Check graph consistency.
  *
@@ -627,10 +648,6 @@ function validate (graph, additionalFunctions) {
 
   if (typeof additionalFunctions === 'object') {
     for (var taskName in additionalFunctions) {
-      var accessorRegex  = /^\.(.+)$/,
-          argumentRegex  = /^arguments\[(\d+)\]$/,
-          referenceRegex = /^\&(.+)$/
-
       if (taskName === 'return')
         throw new TypeError('Reserved function name')
 
@@ -723,7 +740,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{}],"dflow":[function(require,module,exports){
+},{"./regex/accessor":11,"./regex/argument":12,"./regex/reference":13}],"dflow":[function(require,module,exports){
 
 //
 // Dependency graph
