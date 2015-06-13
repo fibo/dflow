@@ -9,6 +9,7 @@
 
     <script type="text/javascript">
       function dflowTest () {
+        var dflow = require('dflow'),
         var funcs = {
               createElement: document.createElement.bind(document),
               appendChild: function (parent, child) { return parent.appendChild(child) },
