@@ -6,11 +6,12 @@
 
 [![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
 
+*dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine (~250 LOC).
+
+The following simple graph is executed by *dflow* and rendered by [flow-view][1].
+
 [![NPM](http://g14n.info/dflow/graph/hello-world.png)](http://g14n.info/flow-view/examples/dflow/hello-world.html)
 
-## Description
-
-*dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine (~250 LOC).
 
 ## Installation
 
@@ -178,3 +179,4 @@ My goal is to say to a *dflow* user:
 
 > Mamma mia! Did you achieve that with dflow?
 
+ [1]: http://g14n.info/flow-view "flow-view"
