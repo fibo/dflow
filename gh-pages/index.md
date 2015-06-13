@@ -11,7 +11,7 @@ title: dflow
 
 ## Description
 
-*dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
+*dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine (~250 LOC).
 
 ## Installation
 
@@ -72,6 +72,12 @@ It has the following signature.
  */
 ```
 
+Actually *dflow* exposes also the following functions, available only inside a *dflow* graph:
+
+  * [dflow.builtinFunctions](https://github.com/fibo/dflow/blob/master/src/builtinFunctions.js)
+  * [dflow.fun](https://github.com/fibo/dflow/blob/master/src/fun.js)
+  * [dflow.validate](https://github.com/fibo/dflow/blob/master/src/validate.js)
+
 ## Specification
 
 A *graph* is a collection of *tasks* and *pipes* that can be stored in JSON format.
@@ -80,26 +86,32 @@ Every *task* refers to a function which output can be piped as an argument to an
 
 A *graph* has the following properties
 
-  * task: collection of function names.
-  * pipe: connections from the output of a task to an input of another task.
-  * data: (optional) persistence.
-  * func: (optional) collection of subgraphs.
-  * view: (ignored) object containing information used by [flow-view](http://g14n.info/flow-view).
-  * info: (to be defined) meta data, like *author*, *version* and, above all, *doc* which is a dflow graph itself.
+task
+: collection of function names.
+pipe
+: connections from the output of a task to an input of another task.
+data
+: (optional) persistence.
+func
+: (optional) collection of subgraphs.
+view
+: (ignored) object containing information used by [flow-view](http://g14n.info/flow-view).
+info
+: (to be defined) meta data, like *author*, *version* and, above all, *doc* which is a dflow graph itself.
 
 *dflow* provides few [builtin functions](https://github.com/fibo/dflow/blob/master/src/builtinFunctions.js) and injects the following ones
 
   * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement).
-  * `arguments`: task that return the *arguments* of *dflowFun*.
+  * `arguments`: task that returns the *arguments* of *dflowFun*.
   * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*.
   * `.foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
 
-Note that optional collection of *additionalFunctions*, in order to avoid conflicts *injected* functions, must contain function names validated by following the rules:
+Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:
 
   * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]` are reserved names.
-  * cannot start with a dot, name `.foo` for an additional function is not allowed.
-  * idem for the ampersand, name `&bar` for an additional function is not allowed.
+  * cannot start with a dot: name `.foo` for an additional function is not allowed.
+  * idem for the ampersand: name `&bar` for an additional function is not allowed.
 
 ## Examples
 
@@ -147,11 +159,25 @@ Implements the apply operator.
 
 Like the `.` operator, takes an object and a prop as arguments and returns `object[prop]` value.
 
+### Packaged graph
+
+The main advantage of *dflow* design is that you do not need to write components or plugins to extend it. You can use one of the most powerful JavaScript features: functions. Write your functions or import them from other packages like *JQuery* or *underscore* and you are able to use them as *tasks* and connect them with *pipes*.
+
+Also every *dflow* graph is a function itself, so why not packaging it and put it on [npm](https://npm.im)!?
+
+It is really easy: create your *dflow* graph and save it to a JSON file, *index.json* for instance; then launch `npm init` as usual and when prompted for the *entry point* write *index.json*.
+
+Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/test/examples/packagedGraph) as an example.
+
 ## Support and License
 
-*dflow* is [MIT](http://g14n.info/mit-license) licensed. It is developed in my spare time and, as far as I know, by now *I am my only user*.
-I am starting to use *dflow* instead of angularjs for my website. I wrote few times a dataflow engine, the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
-Use cases I can think about *dflow* right now are many, but, the possibilities are I.M.H.O outstanding: from client to server, from JavaScript to cross language, from mono-thread to graphs distributed on a network and, above all, from skilled programmer who write functions code to artists, genetic engineers, data scientists, etc. that use those functions to create dflow graphs to get results nobody could even imagine.
+*dflow* is [MIT](http://g14n.info/mit-license) licensed.
+
+It is developed in my spare time and, as far as I know, by now *I am my only user*.
+
+I wrote few times a dataflow engine, the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
+
+Use cases I can think about *dflow* right now are many, but, the possibilities are I.M.H.O outstanding: from client to server, from JavaScript to cross language, from mono-thread to graphs distributed on a network and, above all, from skilled programmer who write functions code … to artists, genetic engineers, data scientists, etc. that use those functions to create *dflow* graphs and get results nobody could even imagine.
 
 If this is also your vision or you just want to use *dflow*, [contact me](http://g14n.info).
 

@@ -8,7 +8,7 @@
   ],
   "description": "Dataflow programming",
   "moduleType": [
-    "globals"
+    "node"
   ],
   "keywords": [
     "dataflow",

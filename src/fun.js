@@ -21,7 +21,7 @@ function fun (graph, additionalFunctions) {
   // First of all, check if graph is valid.
   try { validate(graph, additionalFunctions) } catch (err) { throw err }
 
-  var func = graph.func,
+  var func = graph.func || {},
       pipe = graph.pipe,
       task = graph.task
 
@@ -31,7 +31,7 @@ function fun (graph, additionalFunctions) {
 
   // Expose dflow functions.
   funcs['dflow.builtinFunctions'] = builtinFunctions
-  funcs['dflow.fun']              = this
+  funcs['dflow.fun']              = fun
   funcs['dflow.validate']         = validate
 
   /**
@@ -43,9 +43,8 @@ function fun (graph, additionalFunctions) {
       funcs[key] = fun(graph.func[key], additionalFunctions)
   }
 
-  if (typeof func === 'object')
-    Object.keys(func)
-          .forEach(compileSubgraph)
+  Object.keys(func)
+        .forEach(compileSubgraph)
 
   /**
    * Here we are, this is the ❤ of dflow.
