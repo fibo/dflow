@@ -4,7 +4,7 @@
   "description": "Dataflow programming",
   "main": "index.js",
   "scripts": {
-    "_build": "npm test && npm run browserify && npm run jekyll",
+    "_build": "npm test && npm run browserify && npm run jekyll; git status",
     "_push": "git push origin master && npm run gh-pages:push",
     "_pull": "git pull origin master && npm run gh-pages:pull",
     "browserify": "browserify -r ./index.js:${npm_package_name} -o dist/${npm_package_name}.js",
