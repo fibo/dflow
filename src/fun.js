@@ -5,6 +5,7 @@ var builtinFunctions          = require('./builtinFunctions'),
     injectAccessors           = require('./injectAccessors'),
     injectReferences          = require('./injectReferences'),
     inputArgs                 = require('./inputArgs'),
+    isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
     validate                  = require('./validate')
 
@@ -19,7 +20,8 @@ var builtinFunctions          = require('./builtinFunctions'),
 
 function fun (graph, additionalFunctions) {
   // First of all, check if graph is valid.
-  try { validate(graph, additionalFunctions) } catch (err) { throw err }
+  try { validate(graph, additionalFunctions) }
+  catch (err) { throw err }
 
   var func = graph.func || {},
       pipe = graph.pipe,
@@ -32,6 +34,7 @@ function fun (graph, additionalFunctions) {
   // Expose dflow functions.
   funcs['dflow.builtinFunctions'] = builtinFunctions
   funcs['dflow.fun']              = fun
+  funcs['dflow.isDflowFun']       = isDflowFun
   funcs['dflow.validate']         = validate
 
   /**
@@ -86,7 +89,8 @@ function fun (graph, additionalFunctions) {
           funcName = task[taskKey],
           f        = funcs[funcName]
 
-      // Behave like a JavaScript function: if found a return, skip all other tasks.
+      // Behave like a JavaScript function:
+      // if found a return, skip all other tasks.
       if (gotReturn)
         return
 
@@ -99,6 +103,7 @@ function fun (graph, additionalFunctions) {
       outs[taskKey] = f.apply(null, args)
     }
 
+    // Run every graph task, sorted by level.
     Object.keys(task)
           .sort(byLevel)
           .forEach(run)

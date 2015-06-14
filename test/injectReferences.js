@@ -20,6 +20,7 @@ describe('injectReferences', function () {
     ref.should.be.instanceOf(Function)
 
     ref().should.be.eql(fun)
+    ref()(1.5).should.be.eql(fun(1.5))
   })
 })
 
