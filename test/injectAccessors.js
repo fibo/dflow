@@ -28,7 +28,7 @@ describe('injectAccessors', function () {
     foo().should.be.eql(graph.data.foo)
     bar().should.be.eql(graph.data.bar)
 
-    data = { a: [2, 3]}
+    data = { a: [2, 3] }
     foo(data)
     foo().should.be.eql(graph.data.foo)
     foo().should.be.eql(data)
