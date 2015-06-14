@@ -221,6 +221,7 @@ var builtinFunctions          = require('./builtinFunctions'),
     injectAccessors           = require('./injectAccessors'),
     injectReferences          = require('./injectReferences'),
     inputArgs                 = require('./inputArgs'),
+    isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
     validate                  = require('./validate')
 
@@ -235,7 +236,8 @@ var builtinFunctions          = require('./builtinFunctions'),
 
 function fun (graph, additionalFunctions) {
   // First of all, check if graph is valid.
-  try { validate(graph, additionalFunctions) } catch (err) { throw err }
+  try { validate(graph, additionalFunctions) }
+  catch (err) { throw err }
 
   var func = graph.func || {},
       pipe = graph.pipe,
@@ -248,6 +250,7 @@ function fun (graph, additionalFunctions) {
   // Expose dflow functions.
   funcs['dflow.builtinFunctions'] = builtinFunctions
   funcs['dflow.fun']              = fun
+  funcs['dflow.isDflowFun']       = isDflowFun
   funcs['dflow.validate']         = validate
 
   /**
@@ -302,7 +305,8 @@ function fun (graph, additionalFunctions) {
           funcName = task[taskKey],
           f        = funcs[funcName]
 
-      // Behave like a JavaScript function: if found a return, skip all other tasks.
+      // Behave like a JavaScript function:
+      // if found a return, skip all other tasks.
       if (gotReturn)
         return
 
@@ -315,6 +319,7 @@ function fun (graph, additionalFunctions) {
       outs[taskKey] = f.apply(null, args)
     }
 
+    // Run every graph task, sorted by level.
     Object.keys(task)
           .sort(byLevel)
           .forEach(run)
@@ -331,7 +336,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./builtinFunctions":1,"./injectAccessors":3,"./injectAdditionalFunctions":4,"./injectArguments":5,"./injectReferences":6,"./inputArgs":7,"./level":9,"./validate":14}],3:[function(require,module,exports){
+},{"./builtinFunctions":1,"./injectAccessors":3,"./injectAdditionalFunctions":4,"./injectArguments":5,"./injectReferences":6,"./inputArgs":7,"./isDflowFun":9,"./level":10,"./validate":15}],3:[function(require,module,exports){
 
 var accessorRegex = require('./regex/accessor')
 
@@ -372,7 +377,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"./regex/accessor":11}],4:[function(require,module,exports){
+},{"./regex/accessor":12}],4:[function(require,module,exports){
 
 var builtinFunctions = require('./builtinFunctions')
 
@@ -441,7 +446,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"./regex/argument":12}],6:[function(require,module,exports){
+},{"./regex/argument":13}],6:[function(require,module,exports){
 
 var referenceRegex = require('./regex/reference')
 
@@ -474,7 +479,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"./regex/reference":13}],7:[function(require,module,exports){
+},{"./regex/reference":14}],7:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -539,6 +544,33 @@ module.exports = inputPipes
 
 },{}],9:[function(require,module,exports){
 
+var validate = require('./validate')
+
+/**
+ * Duct tape for dflow functions.
+ *
+ * @param {Function} f
+ *
+ * @returns {Boolean} ok, it looks like a dflowFun
+ */
+
+function isDflowFun (f) {
+  var isFunction     = typeof f === 'function',
+      hasGraphObject = typeof f.graph === 'object',
+      hasFuncsObject = typeof f.funcs === 'object',
+      hasValidGraph  = false
+
+  if (isFunction && hasGraphObject && hasFuncsObject)
+    hasValidGraph = validate(f.graph, f.funcs)
+
+  return hasValidGraph
+}
+
+module.exports = isDflowFun
+
+
+},{"./validate":15}],10:[function(require,module,exports){
+
 var parents = require('./parents')
 
 /**
@@ -573,7 +605,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":10}],10:[function(require,module,exports){
+},{"./parents":11}],11:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -602,22 +634,22 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":8}],11:[function(require,module,exports){
+},{"./inputPipes":8}],12:[function(require,module,exports){
 
 module.exports = /^\.(.+)$/
 
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 
 var accessorRegex  = require('./regex/accessor'),
     argumentRegex  = require('./regex/argument'),
@@ -740,7 +772,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":11,"./regex/argument":12,"./regex/reference":13}],"dflow":[function(require,module,exports){
+},{"./regex/accessor":12,"./regex/argument":13,"./regex/reference":14}],"dflow":[function(require,module,exports){
 
 //
 // Dependency graph
