@@ -1,0 +1,38 @@
+<DOCTYPE>
+<html>
+  <head>
+    <script type="text/javascript" src="//g14n.info/flow-view/dist/flow-view.js"></script>
+    <script type="text/javascript" src="//g14n.info/dflow/dist/dflow.js"></script>
+  </head>
+
+  <body>
+    <h1>dflow edit</h1>
+    <h2><%= graphPath %></h2>
+
+    <div id="flow"></div>
+
+    <script type="text/javascript">
+      var request = new XMLHttpRequest()
+      request.open('GET', '/graph.json', true)
+
+      request.onload = function() {
+        if (request.status >= 200 && request.status < 400) {
+          // Success!
+          var graph = JSON.parse(request.responseText)
+          require('flow-view').render('flow')(graph)
+          // TODO run graph depending on dflow-cli arguments
+          require('dflow').fun(graph)()
+        } else {
+          // We reached our target server, but it returned an error
+
+        }
+      }
+
+      request.onerror = function() {
+        // There was a connection error of some sort
+      }
+
+      request.send()
+    </script>
+  </body>
+</html>

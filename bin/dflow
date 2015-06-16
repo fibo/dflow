@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+
+var fs    = require('fs'),
+    nopt  = require('nopt'),
+    path  = require('path')
+
+var editorServer = require('../src/editor/server')
+
+process.title = 'dflow'
+
+var known = {
+      help: Boolean,
+      version: Boolean
+    },
+    aliases = {
+      h: '--help',
+      V: '--version'
+    }
+
+var command = process.argv[2]
+
+var opt = nopt(known, aliases, process.argv, 2)
+
+function appendCurrentWorkingDir (givenPath) {
+  return path.join(process.cwd(), givenPath)
+}
+
+var graphPath = opt.argv.remain.map(appendCurrentWorkingDir).shift()
+
+function checkGraphPath (err, stats) {
+  if (err) {
+    console.error(err)
+    process.exit(1)
+  }
+
+  if (stats.isFile()) {
+    editorServer(graphPath, opt)
+  }
+  else {
+    console.error('File not found: ' + graphPath)
+    process.exit(1)
+  }
+}
+
+fs.stat(graphPath, checkGraphPath)
+
