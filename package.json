@@ -2,6 +2,7 @@
   "name": "dflow",
   "version": "0.6.0",
   "description": "Dataflow programming",
+  "bin": "bin/dflow",
   "main": "index.js",
   "scripts": {
     "_build": "npm test && npm run browserify && npm run jekyll; git status",
