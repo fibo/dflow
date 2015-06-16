@@ -8,7 +8,8 @@ function editorServer (graphPath, opt) {
 
   var bodyParser = require('body-parser'),
       express    = require('express'),
-      ejs        = require('ejs')
+      ejs        = require('ejs'),
+      path       = require('path')
 
   var app  = express(),
       http = require('http').Server(app),
@@ -16,17 +17,17 @@ function editorServer (graphPath, opt) {
 
   var port = opt.port || defaultOpt.port
 
-  app.set('views', __dirname)
+  app.set('views', path.join(__dirname, 'views'))
   app.set('view engine', 'ejs')
 
-//  var secret = process.env.DFLOW_SECRET || 'changeme'
+// TODO  var secret = process.env.DFLOW_SECRET || 'changeme'
 
-  var publicDir = express.static(process.cwd())
+  var publicDir = express.static(path.join(__dirname, 'public'))
 
   app.use(publicDir)
 
   app.get('/', function (req, res){
-      res.render('editor', {graphPath: graphPath})
+      res.render('index', {graphPath: graphPath})
   })
 
   app.get('/graph.json', function (req, res){
