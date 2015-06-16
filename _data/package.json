@@ -2,6 +2,7 @@
   "name": "dflow",
   "version": "0.6.0",
   "description": "Dataflow programming",
+  "bin": "bin/dflow",
   "main": "index.js",
   "scripts": {
     "_build": "npm test && npm run browserify && npm run jekyll; git status",
@@ -21,7 +22,14 @@
     "jshint": "jshint -c .jshintrc src/**.js test/**.js",
     "test": "mocha --bail --require should --reporter min --recursive"
   },
-  "dependencies": {},
+  "dependencies": {
+    "body-parser": "^1.13.0",
+    "ejs": "^2.3.1",
+    "express": "^4.12.4",
+    "flow-view": "^0.2.0",
+    "nopt": "^3.0.2",
+    "socket.io": "^1.3.5"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/fibo/dflow.git"
