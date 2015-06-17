@@ -8,7 +8,10 @@ markdown: redcarpet
 redcarpet:
   extensions: ["smart", "tables", "no_intra_emphasis", "fenced_code_blocks", "autolink", "strikethrough", "superscript", "with_toc_data"]
 
-# Defaults
+
+collections:
+  examples:
+    output: true
 
 defaults:
   -
@@ -17,6 +20,11 @@ defaults:
       type: "pages"
     values:
       layout: page
+    scope:
+      path: ""
+      type: "examples"
+    values:
+      layout: example
 
 # Custom vars
 
