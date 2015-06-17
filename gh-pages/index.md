@@ -15,7 +15,6 @@ The following simple graph is executed by *dflow* and rendered by [flow-view][1]
 
 [![NPM](http://g14n.info/dflow/graph/hello-world.png)](http://g14n.info/flow-view/examples/dflow/hello-world.html)
 
-
 ## Installation
 
 With [npm](https://npmjs.org/) do
