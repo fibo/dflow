@@ -636,7 +636,7 @@ module.exports = parents
 
 },{"./inputPipes":8}],12:[function(require,module,exports){
 
-module.exports = /^\.(.+)$/
+module.exports = /^@(.+)$/
 
 
 },{}],13:[function(require,module,exports){
@@ -690,10 +690,10 @@ function validate (graph, additionalFunctions) {
         throw new TypeError('Reserved function name')
 
       if (accessorRegex.test(taskName))
-        throw new TypeError('Function name cannot start with a dot')
+        throw new TypeError('Function name cannot start with @')
 
       if (referenceRegex.test(taskName))
-        throw new TypeError('Function name cannot start with an ampersand')
+        throw new TypeError('Function name cannot start with &')
     }
   }
 
