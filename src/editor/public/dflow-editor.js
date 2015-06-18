@@ -306,7 +306,7 @@ function isUndefined(arg) {
 module.exports = require('./src')
 
 
-},{"./src":15}],3:[function(require,module,exports){
+},{"./src":16}],3:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -524,6 +524,39 @@ if (typeof Object.create === 'function') {
 
 }).call(this);
 },{}],5:[function(require,module,exports){
+/*! svg.foreignobject.js - v1.0.0 - 2015-06-14
+* https://github.com/fibo/svg.foreignobject.js
+* Copyright (c) 2015 Wout Fierens; Licensed MIT */
+SVG.ForiegnObject = function() {
+  this.constructor.call(this, SVG.create('foreignObject'))
+
+  /* store type */
+  this.type = 'foreignObject'
+}
+
+SVG.ForiegnObject.prototype = new SVG.Shape()
+
+SVG.extend(SVG.ForiegnObject, {
+  appendChild: function (child, attrs) {
+    var newChild = typeof(child)=='string' ? document.createElement(child) : child
+    if (typeof(attrs)=='object'){
+      for(var a in attrs) newChild[a] = attrs[a]
+    }
+    this.node.appendChild(newChild)
+    return this
+  },
+  getChild: function (index) {
+    return this.node.childNodes[index]
+  }
+})
+
+SVG.extend(SVG.Container, {
+  foreignObject: function(width, height) {
+    return this.put(new SVG.ForiegnObject()).size(width === null ? 100 : width, height === null ? 100 : height)
+  }
+})
+
+},{}],6:[function(require,module,exports){
 /*!
 * SVG.js - A lightweight library for manipulating and animating SVG.
 * @version 2.0.0-rc.2
@@ -4829,7 +4862,7 @@ return SVG;
 
 }));
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 
 var Input   = require('./Input'),
     Output  = require('./Output')
@@ -4938,27 +4971,70 @@ function Box (canvas, view, key) {
 module.exports = Box
 
 
-},{"./Input":9,"./Output":11}],7:[function(require,module,exports){
+},{"./Input":10,"./Output":12}],8:[function(require,module,exports){
+
+// TODO autocompletion from json
+// http://blog.teamtreehouse.com/creating-autocomplete-dropdowns-datalist-element
 
 function BoxSelector (canvas) {
   var draw  = canvas.draw
   this.draw = draw
 
+  var x = 0
+  this.x = x
+
+  var y = 0
+  this.y = y
+
   var foreignObject = draw.foreignObject(100,100)
                           .attr({id: 'flow-view-box-selector'})
 
-  var txt = "this is a box selector"
-  var fobj = foreignobject
-      fobj.appendChild("div", {id: 'mydiv', innerText: txt})
-      var n = fobj.getChild(0)
-      fobj.attr({width: 200, height: 100}).rotate(45).move(100,0)
-      n.style.height = '50px'
-      n.style.overflow = 'hidden'
-      n.style.border = "solid black 1px"
+  foreignObject.appendChild('form', {id: 'flow-view-box-selector-form'})
+
+  var form = foreignObject.getChild(0)
+  form.innerHTML = '<input id="box-selector-input" name="box" type="text" autofocus />'
+
+  function createBox () {
+    foreignObject.hide()
+
+    var inputText = document.getElementById('box-selector-input')
+
+    var boxName = inputText.value
+
+    var boxView = {
+      text: boxName,
+      x: this.x,
+      y: this.y
+    }
+
+    canvas.addBox(boxView)
+
+    // Remove input text, so next time box selector is shown empty again.
+    inputText.value = ''
+
+    // It is required to return false to have a form with no action.
+    return false;
+  }
+
+  form.onsubmit = createBox.bind(this)
+
+  // Start hidden.
+  foreignObject.attr({width: 200, height: 100})
+               .move(x, y)
+               .hide()
+
+  this.foreignObject = foreignObject
 }
 
-function showBoxSelector () {
-  console.log('show box selector')
+function showBoxSelector (ev) {
+  var x = ev.clientX,
+      y = ev.clientY
+
+  this.x = x
+  this.y = y
+
+  this.foreignObject.move(x, y)
+                    .show()
 }
 
 BoxSelector.prototype.show = showBoxSelector
@@ -4966,7 +5042,7 @@ BoxSelector.prototype.show = showBoxSelector
 module.exports = BoxSelector
 
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 var EventEmitter = require('events').EventEmitter,
     inherits     = require('inherits'),
@@ -5029,8 +5105,7 @@ function Canvas (id, view, theme) {
 
   var element = document.getElementById(id)
 
-  SVG.on(element, 'click', boxSelector.show.bind(boxSelector))
-
+  SVG.on(element, 'dblclick', boxSelector.show.bind(boxSelector))
 }
 
 inherits(Canvas, EventEmitter)
@@ -5056,7 +5131,7 @@ Canvas.prototype.addLink = addLink
 module.exports = Canvas
 
 
-},{"./Box":6,"./BoxSelector":7,"./Link":10,"./SVG":13,"./Theme":14,"events":1,"inherits":3}],9:[function(require,module,exports){
+},{"./Box":7,"./BoxSelector":8,"./Link":11,"./SVG":14,"./Theme":15,"events":1,"inherits":3}],10:[function(require,module,exports){
 
 function Input (box, position, numIns) {
   this.box      = box
@@ -5130,7 +5205,7 @@ function Input (box, position, numIns) {
 module.exports = Input
 
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 
 function Link (canvas, view, key) {
   var draw = canvas.draw
@@ -5193,7 +5268,7 @@ Link.prototype.linePlot = linePlot
 module.exports = Link
 
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 
 var PreLink = require('./PreLink')
 
@@ -5276,7 +5351,7 @@ function Output (box, position, numOuts) {
 module.exports = Output
 
 
-},{"./PreLink":12}],12:[function(require,module,exports){
+},{"./PreLink":13}],13:[function(require,module,exports){
 
 var Link = require('./Link')
 
@@ -5416,21 +5491,28 @@ module.exports = PreLink
 
 
 
-},{"./Link":10}],13:[function(require,module,exports){
+},{"./Link":11}],14:[function(require,module,exports){
 
 // Consider this module will be browserified.
-//
+
 // Load svg.js first ...
 var SVG = require('svg.js')
 
 // ... then load plugins: since plugins do not use *module.exports*, they are
 // loaded as plain text, and when browserified they will be included in the bundle.
 require('svg.draggable.js')
+require('svg.foreignobject.js')
+
+// Note that, in order to be included as expected by browserify, dynamic imports
+// do not work: for instance a code like the following won't work client-side
+//
+//    ['svg.draggable.js', 'svg.foreignobject.js'].forEach(require)
+//
 
 module.exports = SVG
 
 
-},{"svg.draggable.js":4,"svg.js":5}],14:[function(require,module,exports){
+},{"svg.draggable.js":4,"svg.foreignobject.js":5,"svg.js":6}],15:[function(require,module,exports){
 
 var theme = {
   unitHeight: 40,
@@ -5454,7 +5536,7 @@ var theme = {
 module.exports = theme
 
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 
 var Canvas = require('./Canvas')
 exports.Canvas = Canvas
@@ -5476,7 +5558,7 @@ function render (element, callback) {
 exports.render = render
 
 
-},{"./Canvas":8}],16:[function(require,module,exports){
+},{"./Canvas":9}],17:[function(require,module,exports){
 
       var request = new XMLHttpRequest()
       request.open('GET', '/graph.json', true)
@@ -5500,4 +5582,4 @@ exports.render = render
 
       request.send()
 
-},{"flow-view":2}]},{},[16]);
+},{"flow-view":2}]},{},[17]);
