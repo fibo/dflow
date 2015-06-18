@@ -1,6 +1,5 @@
 ---
-title: Hello World, by dflow
-flow: //g14n.info/dflow/graph/hello-world.json
+title: hello-world
 ---
 
 ## Hello World

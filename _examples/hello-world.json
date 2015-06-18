@@ -1,13 +1,14 @@
 {
   "task": {
-    "1": ".message",
+    "1": "@message",
     "2": "console.log"
   },
   "pipe": {
     "3": [ "1", "2" ]
   },
   "data": {
-    "message": "Hello World, by dflow"
+    "message": "Hello World, by dflow",
+    "results": []
   },
   "view": {
     "box": {
@@ -16,7 +17,7 @@
         "y": 20,
         "w": 15,
         "task": "1",
-        "text": ".message",
+        "text": "@message",
         "outs": [{"name": "out0", "data": 1}]
       },
       "2": {
