@@ -12,6 +12,7 @@ redcarpet:
 collections:
   examples:
     output: true
+    layout: example
 
 defaults:
   -
@@ -20,11 +21,6 @@ defaults:
       type: "pages"
     values:
       layout: page
-    scope:
-      path: ""
-      type: "examples"
-    values:
-      layout: example
 
 # Custom vars
 
