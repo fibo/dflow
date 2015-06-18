@@ -12,7 +12,14 @@
 
   </div>
 
-{% include render.html %}
+  <div id="flow"></div>
+
+  <script type="text/javascript" src="/js/examples-render.js"></script>
+  <script type="text/javascript">
+    var render = require('examples-render')
+
+    var graph = render('flow', '{{ page.title }}')
+  </script>
 
 {% include footer.html %}
 

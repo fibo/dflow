@@ -10,7 +10,7 @@
 
 The following simple graph is executed by *dflow* and rendered by [flow-view][1].
 
-[![NPM](http://g14n.info/dflow/graph/hello-world.png)](http://g14n.info/flow-view/examples/dflow/hello-world.html)
+[![NPM](http://g14n.info/dflow/examples/hello-world.png)](http://g14n.info/dflow/examples/hello-world.html)
 
 ## Installation
 
@@ -100,7 +100,7 @@ A *graph* has the following properties
   * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement).
   * `arguments`: task that returns the *arguments* of *dflowFun*.
   * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*.
-  * `.foo`: accessor to *graph.data.foo*.
+  * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
 
 Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:

@@ -2,7 +2,7 @@
 var dflow  = require('dflow'),
     should = require('should')
 
-var examples = require('./examples/graphs')
+var examples = require('../src/examples')
 
 describe('example', function () {
   function testExample (name, graph) {
@@ -14,7 +14,7 @@ describe('example', function () {
       })
 
       it('returns expected results', function () {
-        graph.results.forEach(function (test) {
+        graph.data.results.forEach(function (test) {
           var result = f.apply(null, test.args)
 
           // result.should.be.ok will throw if result is undefined

@@ -8,8 +8,8 @@ describe('injectAccessors', function () {
         funcs = {},
         graph = {
           task: {
-          '1' : '.foo',
-          '2': '.bar'
+          '1': '@foo',
+          '2': '@bar'
           },
           data: {
             'foo': 1,
@@ -19,8 +19,8 @@ describe('injectAccessors', function () {
 
     injectAccessors(funcs, graph)
 
-    var bar = funcs['.bar']
-    var foo = funcs['.foo']
+    var bar = funcs['@bar']
+    var foo = funcs['@foo']
 
     foo.should.be.instanceOf(Function)
     bar.should.be.instanceOf(Function)
