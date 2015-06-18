@@ -38,10 +38,10 @@ function validate (graph, additionalFunctions) {
         throw new TypeError('Reserved function name')
 
       if (accessorRegex.test(taskName))
-        throw new TypeError('Function name cannot start with a dot')
+        throw new TypeError('Function name cannot start with @')
 
       if (referenceRegex.test(taskName))
-        throw new TypeError('Function name cannot start with an ampersand')
+        throw new TypeError('Function name cannot start with &')
     }
   }
 

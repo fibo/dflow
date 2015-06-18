@@ -7,9 +7,9 @@ var graph = {
     '0': 'arguments[0]',
     '1': 'arguments[1]',
     '2': 'sum',
-    '3': '.three',
+    '3': '@three',
     '4': '*',
-    '5': '.result',
+    '5': '@result',
     '6': 'return'
   },
   pipe: {

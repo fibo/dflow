@@ -1,5 +1,5 @@
 
-var examples   = require('./examples/graphs'),
+var examples   = require('../src/examples'),
     fun        = require('../src/fun'),
     isDflowFun = require('../src/isDflowFun'),
     should     = require('should')
