@@ -18,7 +18,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 exports.fun = require('./src/fun')
 
 
-},{"./src/fun":24}],2:[function(require,module,exports){
+},{"./src/fun":25}],2:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -332,7 +332,7 @@ module.exports = require('../..')
 module.exports = require('./src')
 
 
-},{"./src":17}],5:[function(require,module,exports){
+},{"./src":18}],5:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -550,6 +550,39 @@ if (typeof Object.create === 'function') {
 
 }).call(this);
 },{}],7:[function(require,module,exports){
+/*! svg.foreignobject.js - v1.0.0 - 2015-06-14
+* https://github.com/fibo/svg.foreignobject.js
+* Copyright (c) 2015 Wout Fierens; Licensed MIT */
+SVG.ForiegnObject = function() {
+  this.constructor.call(this, SVG.create('foreignObject'))
+
+  /* store type */
+  this.type = 'foreignObject'
+}
+
+SVG.ForiegnObject.prototype = new SVG.Shape()
+
+SVG.extend(SVG.ForiegnObject, {
+  appendChild: function (child, attrs) {
+    var newChild = typeof(child)=='string' ? document.createElement(child) : child
+    if (typeof(attrs)=='object'){
+      for(var a in attrs) newChild[a] = attrs[a]
+    }
+    this.node.appendChild(newChild)
+    return this
+  },
+  getChild: function (index) {
+    return this.node.childNodes[index]
+  }
+})
+
+SVG.extend(SVG.Container, {
+  foreignObject: function(width, height) {
+    return this.put(new SVG.ForiegnObject()).size(width === null ? 100 : width, height === null ? 100 : height)
+  }
+})
+
+},{}],8:[function(require,module,exports){
 /*!
 * SVG.js - A lightweight library for manipulating and animating SVG.
 * @version 2.0.0-rc.2
@@ -4855,7 +4888,7 @@ return SVG;
 
 }));
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 var Input   = require('./Input'),
     Output  = require('./Output')
@@ -4964,27 +4997,70 @@ function Box (canvas, view, key) {
 module.exports = Box
 
 
-},{"./Input":11,"./Output":13}],9:[function(require,module,exports){
+},{"./Input":12,"./Output":14}],10:[function(require,module,exports){
+
+// TODO autocompletion from json
+// http://blog.teamtreehouse.com/creating-autocomplete-dropdowns-datalist-element
 
 function BoxSelector (canvas) {
   var draw  = canvas.draw
   this.draw = draw
 
+  var x = 0
+  this.x = x
+
+  var y = 0
+  this.y = y
+
   var foreignObject = draw.foreignObject(100,100)
                           .attr({id: 'flow-view-box-selector'})
 
-  var txt = "this is a box selector"
-  var fobj = foreignobject
-      fobj.appendChild("div", {id: 'mydiv', innerText: txt})
-      var n = fobj.getChild(0)
-      fobj.attr({width: 200, height: 100}).rotate(45).move(100,0)
-      n.style.height = '50px'
-      n.style.overflow = 'hidden'
-      n.style.border = "solid black 1px"
+  foreignObject.appendChild('form', {id: 'flow-view-box-selector-form'})
+
+  var form = foreignObject.getChild(0)
+  form.innerHTML = '<input id="box-selector-input" name="box" type="text" autofocus />'
+
+  function createBox () {
+    foreignObject.hide()
+
+    var inputText = document.getElementById('box-selector-input')
+
+    var boxName = inputText.value
+
+    var boxView = {
+      text: boxName,
+      x: this.x,
+      y: this.y
+    }
+
+    canvas.addBox(boxView)
+
+    // Remove input text, so next time box selector is shown empty again.
+    inputText.value = ''
+
+    // It is required to return false to have a form with no action.
+    return false;
+  }
+
+  form.onsubmit = createBox.bind(this)
+
+  // Start hidden.
+  foreignObject.attr({width: 200, height: 100})
+               .move(x, y)
+               .hide()
+
+  this.foreignObject = foreignObject
 }
 
-function showBoxSelector () {
-  console.log('show box selector')
+function showBoxSelector (ev) {
+  var x = ev.clientX,
+      y = ev.clientY
+
+  this.x = x
+  this.y = y
+
+  this.foreignObject.move(x, y)
+                    .show()
 }
 
 BoxSelector.prototype.show = showBoxSelector
@@ -4992,7 +5068,7 @@ BoxSelector.prototype.show = showBoxSelector
 module.exports = BoxSelector
 
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 
 var EventEmitter = require('events').EventEmitter,
     inherits     = require('inherits'),
@@ -5055,8 +5131,7 @@ function Canvas (id, view, theme) {
 
   var element = document.getElementById(id)
 
-  SVG.on(element, 'click', boxSelector.show.bind(boxSelector))
-
+  SVG.on(element, 'dblclick', boxSelector.show.bind(boxSelector))
 }
 
 inherits(Canvas, EventEmitter)
@@ -5082,7 +5157,7 @@ Canvas.prototype.addLink = addLink
 module.exports = Canvas
 
 
-},{"./Box":8,"./BoxSelector":9,"./Link":12,"./SVG":15,"./Theme":16,"events":2,"inherits":5}],11:[function(require,module,exports){
+},{"./Box":9,"./BoxSelector":10,"./Link":13,"./SVG":16,"./Theme":17,"events":2,"inherits":5}],12:[function(require,module,exports){
 
 function Input (box, position, numIns) {
   this.box      = box
@@ -5156,7 +5231,7 @@ function Input (box, position, numIns) {
 module.exports = Input
 
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 
 function Link (canvas, view, key) {
   var draw = canvas.draw
@@ -5219,7 +5294,7 @@ Link.prototype.linePlot = linePlot
 module.exports = Link
 
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 
 var PreLink = require('./PreLink')
 
@@ -5302,7 +5377,7 @@ function Output (box, position, numOuts) {
 module.exports = Output
 
 
-},{"./PreLink":14}],14:[function(require,module,exports){
+},{"./PreLink":15}],15:[function(require,module,exports){
 
 var Link = require('./Link')
 
@@ -5442,21 +5517,28 @@ module.exports = PreLink
 
 
 
-},{"./Link":12}],15:[function(require,module,exports){
+},{"./Link":13}],16:[function(require,module,exports){
 
 // Consider this module will be browserified.
-//
+
 // Load svg.js first ...
 var SVG = require('svg.js')
 
 // ... then load plugins: since plugins do not use *module.exports*, they are
 // loaded as plain text, and when browserified they will be included in the bundle.
 require('svg.draggable.js')
+require('svg.foreignobject.js')
+
+// Note that, in order to be included as expected by browserify, dynamic imports
+// do not work: for instance a code like the following won't work client-side
+//
+//    ['svg.draggable.js', 'svg.foreignobject.js'].forEach(require)
+//
 
 module.exports = SVG
 
 
-},{"svg.draggable.js":6,"svg.js":7}],16:[function(require,module,exports){
+},{"svg.draggable.js":6,"svg.foreignobject.js":7,"svg.js":8}],17:[function(require,module,exports){
 
 var theme = {
   unitHeight: 40,
@@ -5480,7 +5562,7 @@ var theme = {
 module.exports = theme
 
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 
 var Canvas = require('./Canvas')
 exports.Canvas = Canvas
@@ -5502,7 +5584,7 @@ function render (element, callback) {
 exports.render = render
 
 
-},{"./Canvas":10}],18:[function(require,module,exports){
+},{"./Canvas":11}],19:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -5717,7 +5799,7 @@ exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
 
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "&Math.cos",
@@ -5742,7 +5824,7 @@ module.exports={
   }
 }
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -5790,7 +5872,7 @@ module.exports={
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 
 exports['apply']       = require('./apply.json')
 exports['hello-world'] = require('./hello-world.json')
@@ -5798,7 +5880,7 @@ exports['or']          = require('./or.json')
 exports['sum']         = require('./sum.json')
 
 
-},{"./apply.json":19,"./hello-world.json":20,"./or.json":22,"./sum.json":23}],22:[function(require,module,exports){
+},{"./apply.json":20,"./hello-world.json":21,"./or.json":23,"./sum.json":24}],23:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -5821,7 +5903,7 @@ module.exports={
   }
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -5844,7 +5926,7 @@ module.exports={
   }
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 
 var builtinFunctions          = require('./builtinFunctions'),
     injectAdditionalFunctions = require('./injectAdditionalFunctions'),
@@ -5967,7 +6049,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./builtinFunctions":18,"./injectAccessors":25,"./injectAdditionalFunctions":26,"./injectArguments":27,"./injectReferences":28,"./inputArgs":29,"./isDflowFun":31,"./level":32,"./validate":37}],25:[function(require,module,exports){
+},{"./builtinFunctions":19,"./injectAccessors":26,"./injectAdditionalFunctions":27,"./injectArguments":28,"./injectReferences":29,"./inputArgs":30,"./isDflowFun":32,"./level":33,"./validate":38}],26:[function(require,module,exports){
 
 var accessorRegex = require('./regex/accessor')
 
@@ -6008,7 +6090,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"./regex/accessor":34}],26:[function(require,module,exports){
+},{"./regex/accessor":35}],27:[function(require,module,exports){
 
 var builtinFunctions = require('./builtinFunctions')
 
@@ -6040,7 +6122,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{"./builtinFunctions":18}],27:[function(require,module,exports){
+},{"./builtinFunctions":19}],28:[function(require,module,exports){
 
 var argumentRegex = require('./regex/argument')
 
@@ -6077,7 +6159,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"./regex/argument":35}],28:[function(require,module,exports){
+},{"./regex/argument":36}],29:[function(require,module,exports){
 
 var referenceRegex = require('./regex/reference')
 
@@ -6110,7 +6192,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"./regex/reference":36}],29:[function(require,module,exports){
+},{"./regex/reference":37}],30:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6143,7 +6225,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":30}],30:[function(require,module,exports){
+},{"./inputPipes":31}],31:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -6173,7 +6255,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -6200,7 +6282,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":37}],32:[function(require,module,exports){
+},{"./validate":38}],33:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -6236,7 +6318,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":33}],33:[function(require,module,exports){
+},{"./parents":34}],34:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6265,22 +6347,22 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":30}],34:[function(require,module,exports){
+},{"./inputPipes":31}],35:[function(require,module,exports){
 
 module.exports = /^@(.+)$/
 
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 
 var accessorRegex  = require('./regex/accessor'),
     argumentRegex  = require('./regex/argument'),
@@ -6403,7 +6485,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":34,"./regex/argument":35,"./regex/reference":36}],"examples-render":[function(require,module,exports){
+},{"./regex/accessor":35,"./regex/argument":36,"./regex/reference":37}],"examples-render":[function(require,module,exports){
 
 var dflow    = require('dflow'),
     examples = require('./index'),
@@ -6429,4 +6511,4 @@ function render (divId, example) {
 module.exports = render
 
 
-},{"./index":21,"dflow":3,"flow-view":4}]},{},[]);
+},{"./index":22,"dflow":3,"flow-view":4}]},{},[]);
