@@ -1,5 +1,6 @@
 ---
 title: hello-world
+layout: example
 ---
 
 ## Hello World
