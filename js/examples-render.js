@@ -18,7 +18,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 exports.fun = require('./src/fun')
 
 
-},{"./src/fun":25}],2:[function(require,module,exports){
+},{"./src/fun":27}],2:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -332,7 +332,7 @@ module.exports = require('../..')
 module.exports = require('./src')
 
 
-},{"./src":18}],5:[function(require,module,exports){
+},{"./src":20}],5:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -4890,10 +4890,236 @@ return SVG;
 
 },{}],9:[function(require,module,exports){
 
+var EventEmitter = require('events').EventEmitter,
+    inherits     = require('inherits'),
+    SVG          = require('./SVG')
+
+var Node          = require('./Node'),
+    NodeInspector = require('./NodeInspector'),
+    NodeSelector  = require('./NodeSelector'),
+    Link          = require('./Link')
+
+var defaultTheme = require('./default/theme.json'),
+    defaultView  = require('./default/view.json')
+
+function Canvas (id, view, theme) {
+  this.view  = view  || defaultView
+  this.theme = theme || defaultTheme
+
+  var node = this.node  = {}
+  var link = this.link = {}
+
+  var draw = this.draw = SVG(id).size(1000, 1000)
+                                .spof()
+
+  function createNode (key) {
+    var view = this.view.node[key]
+
+    this.addNode(view, key)
+  }
+
+  Object.keys(view.node)
+        .forEach(createNode.bind(this))
+
+  function createLink (key) {
+    var view = this.view.link[key]
+
+    this.addLink(view, key)
+  }
+
+  Object.keys(view.link).forEach(createLink.bind(this))
+
+  var nextKey = 0
+
+  function getNextKey () {
+    var currentKey = ++nextKey + ''
+
+    // Make next key unique.
+    if (box[currentKey])
+      return getNextKey()
+
+    if (link[currentKey])
+      return getNextKey()
+
+    return currentKey
+  }
+
+  Object.defineProperty(this, 'nextKey', { get: getNextKey })
+
+  var nodeSelector = new NodeSelector(this)
+  this.nodeSelector = nodeSelector
+
+  var element = document.getElementById(id)
+
+  SVG.on(element, 'dblclick', nodeSelector.show.bind(nodeSelector))
+}
+
+inherits(Canvas, EventEmitter)
+
+function addNode (view, key) {
+  if (typeof key === 'undefined')
+     key = this.nextKey
+
+  this.node[key] = new Node(this, view, key)
+}
+
+Canvas.prototype.addNode = addNode
+
+function addLink (view, key) {
+  if (typeof key === 'undefined')
+     key = this.nextKey
+
+  this.link[key] = new Link(this, view, key)
+}
+
+Canvas.prototype.addLink = addLink
+
+module.exports = Canvas
+
+
+},{"./Link":11,"./Node":12,"./NodeInspector":13,"./NodeSelector":14,"./SVG":17,"./default/theme.json":18,"./default/view.json":19,"events":2,"inherits":5}],10:[function(require,module,exports){
+
+function Input (node, position, numIns) {
+  this.node     = node
+  this.position = position
+
+  function getData () { return node.ins[position] }
+
+  Object.defineProperty(this, 'data', { get: getData })
+
+  this.link = null
+
+  var canvas = box.canvas
+
+  var theme = canvas.theme
+
+  var fillPin     = theme.fillPin,
+      halfPinSize = theme.halfPinSize
+
+  var size = halfPinSize * 2
+
+  var draw = canvas.draw
+
+  function getVertex () {
+    var vertex = {
+          absolute: {},
+          relative: {}
+        }
+
+
+    if (numIns > 1)
+      vertex.relative.x = position * ((node.w - size) / (numIns - 1))
+    else
+      vertex.relative.x = 0
+
+    vertex.relative.y = 0
+    vertex.absolute.x = vertex.relative.x + node.x
+    vertex.absolute.y = vertex.relative.y + node.y
+
+    return vertex
+  }
+
+  Object.defineProperty(this, 'vertex', { get: getVertex })
+
+  function getCenter () {
+    var center = {
+          absolute: {},
+          relative: {}
+        }
+
+    var vertex = this.vertex
+
+    center.relative.x = vertex.relative.x + halfPinSize
+    center.relative.y = vertex.relative.y + halfPinSize
+    center.absolute.x = center.relative.x + box.x
+    center.absolute.y = center.relative.y + box.y
+
+    return center
+  }
+
+  Object.defineProperty(this, 'center', { get: getCenter })
+
+  var vertex = this.vertex.relative
+
+  var rect = this.rect = draw.rect(size, size)
+                             .move(vertex.x , vertex.y)
+                             .fill(fillPin)
+
+  box.group.add(rect)
+}
+
+module.exports = Input
+
+
+},{}],11:[function(require,module,exports){
+
+function Link (canvas, view, key) {
+  var draw = canvas.draw
+
+  var theme = canvas.theme
+
+  var strokeLine            = theme.strokeLine,
+      strokeLineHighlighted = theme.strokeLineHighlighted
+
+  var from = canvas.box[view.from[0]],
+      to   = canvas.box[view.to[0]]
+
+  var start = from.outs[view.from[1]],
+      end   = to.ins[view.to[1]]
+
+  Object.defineProperty(this, 'x1', { get: function () { return start.center.absolute.x } })
+  Object.defineProperty(this, 'y1', { get: function () { return start.center.absolute.y } })
+  Object.defineProperty(this, 'x2', { get: function () { return end.center.absolute.x } })
+  Object.defineProperty(this, 'y2', { get: function () { return end.center.absolute.y } })
+
+  var line = this.line = draw.line(this.x1, this.y1, this.x2, this.y2)
+                             .stroke(strokeLine)
+
+  end.link = this
+  start.link[key] = this
+
+  function remove () {
+    end.link = null
+    delete start.link[key]
+    delete canvas.view.link[key]
+    line.remove()
+  }
+
+  function deselectLine () {
+    line.off('click')
+        .stroke(strokeLine)
+  }
+
+  function selectLine () {
+    line.on('click', remove)
+        .stroke(strokeLineHighlighted)
+  }
+
+  line.on('mouseover', selectLine)
+  line.on('mouseout', deselectLine)
+}
+
+function linePlot () {
+var line = this.line,
+    x1   = this.x1,
+    y1   = this.y1,
+    x2   = this.x2,
+    y2   = this.y2
+
+  line.plot(x1, y1, x2, y2)
+}
+
+Link.prototype.linePlot = linePlot
+
+module.exports = Link
+
+
+},{}],12:[function(require,module,exports){
+
 var Input   = require('./Input'),
     Output  = require('./Output')
 
-function Box (canvas, view, key) {
+function Node (canvas, view, key) {
   this.canvas = canvas
   this.key    = key
 
@@ -4994,15 +5220,24 @@ function Box (canvas, view, key) {
   Object.defineProperty(this, 'view', { get: getView.bind(this) })
 }
 
-module.exports = Box
+module.exports = Node
 
 
-},{"./Input":12,"./Output":14}],10:[function(require,module,exports){
+},{"./Input":10,"./Output":15}],13:[function(require,module,exports){
+
+function NodeInspector (canvas) {
+
+}
+
+module.exports = NodeInspector
+
+
+},{}],14:[function(require,module,exports){
 
 // TODO autocompletion from json
 // http://blog.teamtreehouse.com/creating-autocomplete-dropdowns-datalist-element
 
-function BoxSelector (canvas) {
+function NodeSelector (canvas) {
   var draw  = canvas.draw
   this.draw = draw
 
@@ -5013,36 +5248,36 @@ function BoxSelector (canvas) {
   this.y = y
 
   var foreignObject = draw.foreignObject(100,100)
-                          .attr({id: 'flow-view-box-selector'})
+                          .attr({id: 'flow-view-selector'})
 
-  foreignObject.appendChild('form', {id: 'flow-view-box-selector-form'})
+  foreignObject.appendChild('form', {id: 'flow-view-selector-form'})
 
   var form = foreignObject.getChild(0)
-  form.innerHTML = '<input id="box-selector-input" name="box" type="text" autofocus />'
+  form.innerHTML = '<input id="flow-view-selector-input" name="node" type="text" autofocus />'
 
-  function createBox () {
+  function createNode () {
     foreignObject.hide()
 
-    var inputText = document.getElementById('box-selector-input')
+    var inputText = document.getElementById('flow-view-selector-input')
 
-    var boxName = inputText.value
+    var nodeName = inputText.value
 
-    var boxView = {
-      text: boxName,
+    var nodeView = {
+      text: nodeName,
       x: this.x,
       y: this.y
     }
 
-    canvas.addBox(boxView)
+    canvas.addNode(nodeView)
 
-    // Remove input text, so next time box selector is shown empty again.
+    // Remove input text, so next time node selector is shown empty again.
     inputText.value = ''
 
     // It is required to return false to have a form with no action.
     return false;
   }
 
-  form.onsubmit = createBox.bind(this)
+  form.onsubmit = createNode.bind(this)
 
   // Start hidden.
   foreignObject.attr({width: 200, height: 100})
@@ -5052,7 +5287,7 @@ function BoxSelector (canvas) {
   this.foreignObject = foreignObject
 }
 
-function showBoxSelector (ev) {
+function showNodeSelector (ev) {
   var x = ev.clientX,
       y = ev.clientY
 
@@ -5063,246 +5298,20 @@ function showBoxSelector (ev) {
                     .show()
 }
 
-BoxSelector.prototype.show = showBoxSelector
+NodeSelector.prototype.show = showNodeSelector
 
-module.exports = BoxSelector
+module.exports = NodeSelector
 
 
-},{}],11:[function(require,module,exports){
-
-var EventEmitter = require('events').EventEmitter,
-    inherits     = require('inherits'),
-    SVG          = require('./SVG')
-
-var Box         = require('./Box'),
-    BoxSelector = require('./BoxSelector'),
-    Link        = require('./Link')
-
-var defaultTheme = require('./Theme')
-
-var defaultView = { box: {}, link: {} }
-
-function Canvas (id, view, theme) {
-  this.view  = view  || defaultView
-  this.theme = theme || defaultTheme
-
-  var box  = this.box  = {}
-  var link = this.link = {}
-
-  var draw = this.draw = SVG(id).size(1000, 1000)
-                                .spof()
-
-  function createBox (key) {
-    var view = this.view.box[key]
-
-    this.addBox(view, key)
-  }
-
-  Object.keys(view.box)
-        .forEach(createBox.bind(this))
-
-  function createLink (key) {
-    var view = this.view.link[key]
-
-    this.addLink(view, key)
-  }
-
-  Object.keys(view.link).forEach(createLink.bind(this))
-
-  var nextKey = 0
-
-  function getNextKey () {
-    var currentKey = ++nextKey + ''
-
-    // Make next key unique.
-    if (box[currentKey])
-      return getNextKey()
-
-    if (link[currentKey])
-      return getNextKey()
-
-    return currentKey
-  }
-
-  Object.defineProperty(this, 'nextKey', { get: getNextKey })
-
-  var boxSelector = new BoxSelector(this)
-  this.boxSelector = boxSelector
-
-  var element = document.getElementById(id)
-
-  SVG.on(element, 'dblclick', boxSelector.show.bind(boxSelector))
-}
-
-inherits(Canvas, EventEmitter)
-
-function addBox (view, key) {
-  if (typeof key === 'undefined')
-     key = this.nextKey
-
-  this.box[key] = new Box(this, view, key)
-}
-
-Canvas.prototype.addBox = addBox
-
-function addLink (view, key) {
-  if (typeof key === 'undefined')
-     key = this.nextKey
-
-  this.link[key] = new Link(this, view, key)
-}
-
-Canvas.prototype.addLink = addLink
-
-module.exports = Canvas
-
-
-},{"./Box":9,"./BoxSelector":10,"./Link":13,"./SVG":16,"./Theme":17,"events":2,"inherits":5}],12:[function(require,module,exports){
-
-function Input (box, position, numIns) {
-  this.box      = box
-  this.position = position
-
-  function getData () { return box.ins[position] }
-
-  Object.defineProperty(this, 'data', { get: getData })
-
-  this.link = null
-
-  var canvas = box.canvas
-
-  var theme = canvas.theme
-
-  var fillPin = theme.fillPin
-    , halfPinSize = theme.halfPinSize
-
-  var size = halfPinSize * 2
-
-  var draw = canvas.draw
-
-  function getVertex () {
-    var vertex = {
-          absolute: {},
-          relative: {}
-        }
-
-
-    if (numIns > 1)
-      vertex.relative.x = position * ((box.w - size) / (numIns - 1))
-    else
-      vertex.relative.x = 0
-
-    vertex.relative.y = 0
-    vertex.absolute.x = vertex.relative.x + box.x
-    vertex.absolute.y = vertex.relative.y + box.y
-
-    return vertex
-  }
-
-  Object.defineProperty(this, 'vertex', { get: getVertex })
-
-  function getCenter () {
-    var center = {
-          absolute: {},
-          relative: {}
-        }
-
-    var vertex = this.vertex
-
-    center.relative.x = vertex.relative.x + halfPinSize
-    center.relative.y = vertex.relative.y + halfPinSize
-    center.absolute.x = center.relative.x + box.x
-    center.absolute.y = center.relative.y + box.y
-
-    return center
-  }
-
-  Object.defineProperty(this, 'center', { get: getCenter })
-
-  var vertex = this.vertex.relative
-
-  var rect = this.rect = draw.rect(size, size)
-                             .move(vertex.x , vertex.y)
-                             .fill(fillPin)
-
-  box.group.add(rect)
-}
-
-module.exports = Input
-
-
-},{}],13:[function(require,module,exports){
-
-function Link (canvas, view, key) {
-  var draw = canvas.draw
-
-  var theme = canvas.theme
-
-  var strokeLine            = theme.strokeLine,
-      strokeLineHighlighted = theme.strokeLineHighlighted
-
-  var from = canvas.box[view.from[0]],
-      to   = canvas.box[view.to[0]]
-
-  var start = from.outs[view.from[1]],
-      end   = to.ins[view.to[1]]
-
-  Object.defineProperty(this, 'x1', { get: function () { return start.center.absolute.x } })
-  Object.defineProperty(this, 'y1', { get: function () { return start.center.absolute.y } })
-  Object.defineProperty(this, 'x2', { get: function () { return end.center.absolute.x } })
-  Object.defineProperty(this, 'y2', { get: function () { return end.center.absolute.y } })
-
-  var line = this.line = draw.line(this.x1, this.y1, this.x2, this.y2)
-                             .stroke(strokeLine)
-
-  end.link = this
-  start.link[key] = this
-
-  function remove () {
-    end.link = null
-    delete start.link[key]
-    delete canvas.view.link[key]
-    line.remove()
-  }
-
-  function deselectLine () {
-    line.off('click')
-        .stroke(strokeLine)
-  }
-
-  function selectLine () {
-    line.on('click', remove)
-        .stroke(strokeLineHighlighted)
-  }
-
-  line.on('mouseover', selectLine)
-  line.on('mouseout', deselectLine)
-}
-
-function linePlot () {
-var line = this.line,
-    x1   = this.x1,
-    y1   = this.y1,
-    x2   = this.x2,
-    y2   = this.y2
-
-  line.plot(x1, y1, x2, y2)
-}
-
-Link.prototype.linePlot = linePlot
-
-module.exports = Link
-
-
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 
 var PreLink = require('./PreLink')
 
-function Output (box, position, numOuts) {
-  this.box      = box
+function Output (node, position, numOuts) {
+  this.node     = node
   this.position = position
 
-  function getData () { return box.outs[position] }
+  function getData () { return box.node[position] }
 
   Object.defineProperty(this, 'data', { get: getData })
 
@@ -5326,13 +5335,13 @@ function Output (box, position, numOuts) {
         }
 
     if (numOuts > 1)
-      vertex.relative.x = position * ((box.w - size) / (numOuts - 1))
+      vertex.relative.x = position * ((node.w - size) / (numOuts - 1))
     else
       vertex.relative.x = 0
 
-    vertex.relative.y = box.h - size
-    vertex.absolute.x = vertex.relative.x + box.x
-    vertex.absolute.y = vertex.relative.y + box.y
+    vertex.relative.y = node.h - size
+    vertex.absolute.x = vertex.relative.x + node.x
+    vertex.absolute.y = vertex.relative.y + node.y
 
     return vertex
   }
@@ -5349,8 +5358,8 @@ function Output (box, position, numOuts) {
 
     center.relative.x = vertex.relative.x + halfPinSize
     center.relative.y = vertex.relative.y + halfPinSize
-    center.absolute.x = center.relative.x + box.x
-    center.absolute.y = center.relative.y + box.y
+    center.absolute.x = center.relative.x + node.x
+    center.absolute.y = center.relative.y + node.y
 
     return center
   }
@@ -5377,7 +5386,7 @@ function Output (box, position, numOuts) {
 module.exports = Output
 
 
-},{"./PreLink":15}],15:[function(require,module,exports){
+},{"./PreLink":16}],16:[function(require,module,exports){
 
 var Link = require('./Link')
 
@@ -5517,7 +5526,7 @@ module.exports = PreLink
 
 
 
-},{"./Link":13}],16:[function(require,module,exports){
+},{"./Link":11}],17:[function(require,module,exports){
 
 // Consider this module will be browserified.
 
@@ -5538,31 +5547,39 @@ require('svg.foreignobject.js')
 module.exports = SVG
 
 
-},{"svg.draggable.js":6,"svg.foreignobject.js":7,"svg.js":8}],17:[function(require,module,exports){
-
-var theme = {
-  unitHeight: 40,
-  unitWidth: 10,
-  labelFont: {
-    family: 'Consolas',
-    size: 17,
-    anchor: 'start'
+},{"svg.draggable.js":6,"svg.foreignobject.js":7,"svg.js":8}],18:[function(require,module,exports){
+module.exports={
+  "fillCircle": "#fff",
+  "fillLabel": "#333",
+    "fillPin": "#333",
+  "fillPinHighlighted": "#d63518",
+  "fillRect": "#ccc",
+  "halfPinSize": 5,
+  "labelFont": {
+    "family": "Consolas",
+    "size": 17,
+    "anchor": "start"
   },
-  fillLabel: '#333',
-  fillPin: '#333',
-  fillPinHighlighted: '#d63518',
-  fillRect: '#ccc',
-  fillCircle: '#fff',
-  halfPinSize: 5,
-  strokeDasharray: '5, 5',
-  strokeLine: { color: '#333', width: 3 },
-  strokeLineHighlighted: { color: '#d63518', width: 5 }
+  "strokeDasharray": "5, 5",
+  "strokeLine": {
+    "color": "#333",
+    "width": 3
+  },
+  "strokeLineHighlighted": {
+    "color": "#d63518",
+    "width": 5
+  },
+  "unitHeight": 40,
+  "unitWidth": 10
 }
 
-module.exports = theme
+},{}],19:[function(require,module,exports){
+module.exports={
+  "node": {},
+  "link": {}
+}
 
-
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 
 var Canvas = require('./Canvas')
 exports.Canvas = Canvas
@@ -5584,7 +5601,7 @@ function render (element, callback) {
 exports.render = render
 
 
-},{"./Canvas":11}],19:[function(require,module,exports){
+},{"./Canvas":9}],21:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -5799,7 +5816,7 @@ exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
 
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "&Math.cos",
@@ -5824,7 +5841,7 @@ module.exports={
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -5872,7 +5889,7 @@ module.exports={
   }
 }
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 
 exports['apply']       = require('./apply.json')
 exports['hello-world'] = require('./hello-world.json')
@@ -5880,7 +5897,7 @@ exports['or']          = require('./or.json')
 exports['sum']         = require('./sum.json')
 
 
-},{"./apply.json":20,"./hello-world.json":21,"./or.json":23,"./sum.json":24}],23:[function(require,module,exports){
+},{"./apply.json":22,"./hello-world.json":23,"./or.json":25,"./sum.json":26}],25:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -5903,7 +5920,7 @@ module.exports={
   }
 }
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -5926,7 +5943,7 @@ module.exports={
   }
 }
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 
 var builtinFunctions          = require('./builtinFunctions'),
     injectAdditionalFunctions = require('./injectAdditionalFunctions'),
@@ -6049,7 +6066,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./builtinFunctions":19,"./injectAccessors":26,"./injectAdditionalFunctions":27,"./injectArguments":28,"./injectReferences":29,"./inputArgs":30,"./isDflowFun":32,"./level":33,"./validate":38}],26:[function(require,module,exports){
+},{"./builtinFunctions":21,"./injectAccessors":28,"./injectAdditionalFunctions":29,"./injectArguments":30,"./injectReferences":31,"./inputArgs":32,"./isDflowFun":34,"./level":35,"./validate":40}],28:[function(require,module,exports){
 
 var accessorRegex = require('./regex/accessor')
 
@@ -6090,7 +6107,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"./regex/accessor":35}],27:[function(require,module,exports){
+},{"./regex/accessor":37}],29:[function(require,module,exports){
 
 var builtinFunctions = require('./builtinFunctions')
 
@@ -6122,7 +6139,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{"./builtinFunctions":19}],28:[function(require,module,exports){
+},{"./builtinFunctions":21}],30:[function(require,module,exports){
 
 var argumentRegex = require('./regex/argument')
 
@@ -6159,7 +6176,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"./regex/argument":36}],29:[function(require,module,exports){
+},{"./regex/argument":38}],31:[function(require,module,exports){
 
 var referenceRegex = require('./regex/reference')
 
@@ -6192,7 +6209,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"./regex/reference":37}],30:[function(require,module,exports){
+},{"./regex/reference":39}],32:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6225,7 +6242,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":31}],31:[function(require,module,exports){
+},{"./inputPipes":33}],33:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -6255,7 +6272,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -6282,7 +6299,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":38}],33:[function(require,module,exports){
+},{"./validate":40}],35:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -6318,7 +6335,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":34}],34:[function(require,module,exports){
+},{"./parents":36}],36:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6347,22 +6364,22 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":31}],35:[function(require,module,exports){
+},{"./inputPipes":33}],37:[function(require,module,exports){
 
 module.exports = /^@(.+)$/
 
 
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 
 var accessorRegex  = require('./regex/accessor'),
     argumentRegex  = require('./regex/argument'),
@@ -6485,7 +6502,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":35,"./regex/argument":36,"./regex/reference":37}],"examples-render":[function(require,module,exports){
+},{"./regex/accessor":37,"./regex/argument":38,"./regex/reference":39}],"examples-render":[function(require,module,exports){
 
 var dflow    = require('dflow'),
     examples = require('./index'),
@@ -6511,4 +6528,4 @@ function render (divId, example) {
 module.exports = render
 
 
-},{"./index":22,"dflow":3,"flow-view":4}]},{},[]);
+},{"./index":24,"dflow":3,"flow-view":4}]},{},[]);
