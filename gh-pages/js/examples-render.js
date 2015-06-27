@@ -5792,9 +5792,23 @@ exports['Number.MAX_VALUE'] = max_value
 
 // Object
 
-exports['Object.keys'] = Object.keys
+exports['Object.freeze']                   = Object.freeze
+exports['Object.getOwnPropertyDescriptor'] = Object.getOwnPropertyDescriptor
+exports['Object.getOwnPropertyNames']      = Object.getOwnPropertyNames
+exports['Object.getPrototypeOf']           = Object.getPrototypeOf
+exports['Object.isFrozen']                 = Object.isFrozen
+exports['Object.isSealed']                 = Object.isSealed
+exports['Object.keys']                     = Object.keys
+exports['Object.seal']                     = Object.seal
 
-exports['Object.prototype.defineProperty'] = Object.prototype.defineProperty
+exports['Object.prototype.defineProperties']     = Object.prototype.defineProperties
+exports['Object.prototype.defineProperty']       = Object.prototype.defineProperty
+exports['Object.prototype.hasOwnProperty']       = Object.prototype.hasOwnProperty
+exports['Object.prototype.isPrototypeOf']        = Object.prototype.isPrototypeOf
+exports['Object.prototype.propertyIsEnumerable'] = Object.prototype.propertyIsEnumerable
+exports['Object.prototype.toLocaleString']       = Object.prototype.toLocaleString
+exports['Object.prototype.toString']             = Object.prototype.toString
+exports['Object.prototype.valueOf']              = Object.prototype.valueOf
 
 // String
 
