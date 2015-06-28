@@ -1,7 +1,7 @@
 {
   "name": "dflow",
   "main": "dist/dflow.js",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "homepage": "http://g14n.info/dflow",
   "authors": [
     "Gianluca Casati"
