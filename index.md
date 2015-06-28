@@ -9,11 +9,11 @@ title: dflow
 
 [![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
 
-*dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine (~250 LOC).
+*dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
 
 The following simple graph is executed by *dflow* and rendered by [flow-view][1].
 
-[![NPM](http://g14n.info/dflow/examples/hello-world.png)](http://g14n.info/dflow/examples/hello-world.html)
+[![HelloWorld](http://g14n.info/dflow/examples/hello-world.png)][2]
 
 ## Installation
 
@@ -114,7 +114,11 @@ Note that optional collection of *additionalFunctions*, in order to avoid confli
 
 ## Examples
 
-### page.html
+### Sample graphs
+
+* [Hello World][2]
+
+### test page
 
 See [test/page.html](http://g14n.info/dflow/test/page.html) for a working example of *dflow* in a browser context.
 
@@ -132,31 +136,6 @@ fs.createReadStream("input/people.json")
 ```
 
 It is ported to script [stream.js](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/stream.js) which evaluates [graph stream.json](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/stream.json) using [few custom functions](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/funcs.js).
-
-### Sample graphs
-
-Every example has a *graph* and a set of expected *results* that are required by [test/examples.js](https://github.com/fibo/dflow/blob/master/test/examples.js).
-
-#### sum
-
-* [graph](https://github.com/fibo/dflow/blob/master/test/examples/graphs/sum.json)
-* [results](https://github.com/fibo/dflow/blob/master/test/examples/graphs/sum-results.json)
-
-Takes two operands as arguments and returns its sum.
-
-#### apply
-
-* [graph](https://github.com/fibo/dflow/blob/master/test/examples/graphs/apply.json)
-* [results](https://github.com/fibo/dflow/blob/master/test/examples/graphs/apply-results.json)
-
-Implements the apply operator.
-
-#### dotOperator
-
-* [graph](https://github.com/fibo/dflow/blob/master/test/examples/graphs/dotOperator.json)
-* [results](https://github.com/fibo/dflow/blob/master/test/examples/graphs/dotOperator-results.json)
-
-Like the `.` operator, takes an object and a prop as arguments and returns `object[prop]` value.
 
 ### Packaged graph
 
@@ -185,4 +164,6 @@ My goal is to say to a *dflow* user:
 > Mamma mia! Did you achieve that with dflow?
 
  [1]: http://g14n.info/flow-view "flow-view"
+ [2]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
+
 
