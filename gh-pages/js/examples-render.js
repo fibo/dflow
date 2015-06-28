@@ -18,7 +18,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 exports.fun = require('./src/fun')
 
 
-},{"./src/fun":27}],2:[function(require,module,exports){
+},{"./src/fun":34}],2:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -332,7 +332,7 @@ module.exports = require('../..')
 module.exports = require('./src')
 
 
-},{"./src":20}],5:[function(require,module,exports){
+},{"./src":26}],5:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -584,14 +584,14 @@ SVG.extend(SVG.Container, {
 
 },{}],8:[function(require,module,exports){
 /*!
-* SVG.js - A lightweight library for manipulating and animating SVG.
-* @version 2.0.0-rc.2
+* svg.js - A lightweight library for manipulating and animating SVG.
+* @version 2.0.3
 * http://www.svgjs.com
 *
 * @copyright Wout Fierens <wout@impinc.co.uk>
 * @license MIT
 *
-* BUILT: Thu Jun 11 2015 00:40:21 GMT+0200 (Mitteleuropäische Sommerzeit)
+* BUILT: Sat Jun 27 2015 14:02:53 GMT+0200 (Mitteleuropäische Sommerzeit)
 */;
 
 (function(root, factory) {
@@ -1020,7 +1020,7 @@ SVG.extend(SVG.Array, {
   }
   // Strip unnecessary whitespace
 , split: function(string) {
-    return string.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g,'').split(' ') 
+    return string.trim().split(/\s+/)
   }
   // Reverse array
 , reverse: function() {
@@ -1510,18 +1510,10 @@ SVG.Element = SVG.invent({
 , extend: {
     // Move over x-axis
     x: function(x) {
-      if (x != null) {
-        x = new SVG.Number(x)
-        x.value /= this.transform('scaleX')
-      }
       return this.attr('x', x)
     }
     // Move over y-axis
   , y: function(y) {
-      if (y != null) {
-        y = new SVG.Number(y)
-        y.value /= this.transform('scaleY')
-      }
       return this.attr('y', y)
     }
     // Move by center over x-axis
@@ -1670,7 +1662,7 @@ SVG.Element = SVG.invent({
     }
     // Get parent document
   , doc: function(type) {
-      return this.parent(type || SVG.Doc)
+      return this instanceof SVG.Doc ? this : this.parent(SVG.Doc)
     }
     // Returns the svg node to call native svg methods on it
   , native: function() {
@@ -1750,7 +1742,7 @@ SVG.FX = SVG.invent({
           if (element.morphArray && (fx.destination.plot || akeys.indexOf('points') > -1)) {
             // get destination
             var box
-              , p = new element.morphArray(fx.destination.plot || fx.attrs.points || element.array)
+              , p = new element.morphArray(fx.destination.plot || fx.attrs.points || element.array())
 
             // add size
             if (fx.destination.size)
@@ -1771,7 +1763,7 @@ SVG.FX = SVG.invent({
 
             // reset destination values
             fx.destination = {
-              plot: element.array.morph(p)
+              plot: element.array().morph(p)
             }
           }
         }
@@ -2526,7 +2518,7 @@ SVG.extend(SVG.Element, {
         parseFloat(v) : v
     
     } else {
-      // bUG FIX: some browsers will render a stroke if a color is given even though stroke width is 0
+      // BUG FIX: some browsers will render a stroke if a color is given even though stroke width is 0
       if (a == 'stroke-width')
         this.attr('stroke', parseFloat(v) > 0 ? this._stroke : null)
       else if (a == 'stroke')
@@ -2930,13 +2922,23 @@ SVG.off = function(node, event, listener) {
       delete SVG.listeners[index][ev][ns || '*'][listener]
     }
 
-  } else if (ns) {
-    // remove all listeners for the namespaced event
+  } else if (ns && ev) {
+    // remove all listeners for a namespaced event
     if (SVG.listeners[index][ev] && SVG.listeners[index][ev][ns]) {
       for (listener in SVG.listeners[index][ev][ns])
         SVG.off(node, [ev, ns].join('.'), listener)
 
       delete SVG.listeners[index][ev][ns]
+    }
+
+  } else if (ns){
+    // remove all listeners for a specific namespace
+    for(event in SVG.listeners[index]){
+        for(namespace in SVG.listeners[index][event]){
+            if(ns === namespace){
+                SVG.off(node, [event, ns].join('.'))
+            }
+        }
     }
 
   } else if (ev) {
@@ -2976,7 +2978,11 @@ SVG.extend(SVG.Element, {
 , fire: function(event, data) {
     
     // Dispatch event
-    this.node.dispatchEvent(new CustomEvent(event, {detail:data}))
+    if(event instanceof Event){
+        this.node.dispatchEvent(event)
+    }else{
+        this.node.dispatchEvent(new CustomEvent(event, {detail:data}))
+    }
 
     return this
   }
@@ -3345,10 +3351,10 @@ SVG.Pattern = SVG.invent({
 	  }
 	  // Update pattern by rebuilding
 	, update: function(block) {
-			/* remove content */
+      // remove content
       this.clear()
       
-      /* invoke passed block */
+      // invoke passed block
       if (typeof block == 'function')
       	block.call(this, this)
       
@@ -3474,47 +3480,47 @@ SVG.Shape = SVG.invent({
 })
 
 SVG.Bare = SVG.invent({
-	// Initialize
-	create: function(element, inherit) {
-		// construct element
-		this.constructor.call(this, SVG.create(element))
+  // Initialize
+  create: function(element, inherit) {
+    // construct element
+    this.constructor.call(this, SVG.create(element))
 
-		// inherit custom methods
-		if (inherit)
-			for (var method in inherit.prototype)
-				if (typeof inherit.prototype[method] === 'function')
-					element[method] = inherit.prototype[method]
-	}
+    // inherit custom methods
+    if (inherit)
+      for (var method in inherit.prototype)
+        if (typeof inherit.prototype[method] === 'function')
+          this[method] = inherit.prototype[method]
+  }
 
-	// Inherit from
+  // Inherit from
 , inherit: SVG.Element
-	
-	// Add methods
+
+  // Add methods
 , extend: {
-		// Insert some plain text
-		words: function(text) {
-			// remove contents
-			while (this.node.hasChildNodes())
-      	this.node.removeChild(this.node.lastChild)
+    // Insert some plain text
+    words: function(text) {
+      // remove contents
+      while (this.node.hasChildNodes())
+        this.node.removeChild(this.node.lastChild)
 
       // create text node
       this.node.appendChild(document.createTextNode(text))
 
       return this
-		}
-	}
+    }
+  }
 })
 
 
 SVG.extend(SVG.Parent, {
-	// Create an element that is not described by SVG.js
-	element: function(element, inherit) {
-		return this.put(new SVG.Bare(element, inherit))
-	}
-	// Add symbol element
+  // Create an element that is not described by SVG.js
+  element: function(element, inherit) {
+    return this.put(new SVG.Bare(element, inherit))
+  }
+  // Add symbol element
 , symbol: function() {
-		return this.defs().element('symbol', SVG.Container)
-	}
+    return this.defs().element('symbol', SVG.Container)
+  }
 
 })
 SVG.Use = SVG.invent({
@@ -3528,9 +3534,6 @@ SVG.Use = SVG.invent({
 , extend: {
     // Use element as a reference
     element: function(element, file) {
-      /* Store target element */
-      this.target = element
-
       /* Set lined element */
       return this.attr('href', (file || '') + '#' + element, SVG.xlink)
     }
@@ -3625,11 +3628,11 @@ SVG.extend(SVG.Circle, SVG.Ellipse, {
     }
     // Move by center over x-axis
   , cx: function(x) {
-      return x == null ? this.attr('cx') : this.attr('cx', new SVG.Number(x).divide(this.transform('scaleX')))
+      return x == null ? this.attr('cx') : this.attr('cx', x)
     }
     // Move by center over y-axis
   , cy: function(y) {
-      return y == null ? this.attr('cy') : this.attr('cy', new SVG.Number(y).divide(this.transform('scaleY')))
+      return y == null ? this.attr('cy') : this.attr('cy', y)
     }
     // Set width of element
   , width: function(width) {
@@ -4894,40 +4897,27 @@ var EventEmitter = require('events').EventEmitter,
     inherits     = require('inherits'),
     SVG          = require('./SVG')
 
-var Node          = require('./Node'),
-    NodeInspector = require('./NodeInspector'),
-    NodeSelector  = require('./NodeSelector'),
-    Link          = require('./Link')
+var Link          = require('./Link'),
+    Node          = require('./Node'),
+    NodeControls  = require('./NodeControls'),
+    NodeCreator   = require('./NodeCreator'),
+    NodeInspector = require('./NodeInspector')
+    validate      = require('./validate')
 
 var defaultTheme = require('./default/theme.json'),
     defaultView  = require('./default/view.json')
 
-function Canvas (id, view, theme) {
-  this.view  = view  || defaultView
-  this.theme = theme || defaultTheme
+function Canvas (id) {
+  var self = this
 
-  var node = this.node  = {}
-  var link = this.link = {}
+  var theme = defaultTheme
+  this.theme = theme
 
-  var draw = this.draw = SVG(id).size(1000, 1000)
-                                .spof()
+  this.node = {}
+  this.link = {}
 
-  function createNode (key) {
-    var view = this.view.node[key]
-
-    this.addNode(view, key)
-  }
-
-  Object.keys(view.node)
-        .forEach(createNode.bind(this))
-
-  function createLink (key) {
-    var view = this.view.link[key]
-
-    this.addLink(view, key)
-  }
-
-  Object.keys(view.link).forEach(createLink.bind(this))
+  this.draw = SVG(id).size(1000, 1000)
+                     .spof()
 
   var nextKey = 0
 
@@ -4935,10 +4925,10 @@ function Canvas (id, view, theme) {
     var currentKey = ++nextKey + ''
 
     // Make next key unique.
-    if (box[currentKey])
+    if (self.node[currentKey])
       return getNextKey()
 
-    if (link[currentKey])
+    if (self.link[currentKey])
       return getNextKey()
 
     return currentKey
@@ -4946,114 +4936,185 @@ function Canvas (id, view, theme) {
 
   Object.defineProperty(this, 'nextKey', { get: getNextKey })
 
-  var nodeSelector = new NodeSelector(this)
-  this.nodeSelector = nodeSelector
+  var nodeCreator  = new NodeCreator(this)
+  this.nodeCreator = nodeCreator
+
+  var nodeInspector  = new NodeInspector(this)
+  this.NodeInspector = NodeInspector
+
+  var nodeControls = new NodeControls(this)
+  this.nodeControls = nodeControls
 
   var element = document.getElementById(id)
 
-  SVG.on(element, 'dblclick', nodeSelector.show.bind(nodeSelector))
+  SVG.on(element, 'dblclick', nodeCreator.show.bind(nodeCreator))
 }
 
 inherits(Canvas, EventEmitter)
 
-function addNode (view, key) {
-  if (typeof key === 'undefined')
-     key = this.nextKey
+function createView (view) {
+  validate(view)
 
-  this.node[key] = new Node(this, view, key)
+  var self = this
+
+  function createNode (key) {
+    self.addNode(view.node[key], key)
+  }
+
+  Object.keys(view.node).forEach(createNode)
+
+  function createLink (key) {
+    self.addLink(view.link[key], key)
+  }
+
+  Object.keys(view.link).forEach(createLink)
 }
 
-Canvas.prototype.addNode = addNode
+Canvas.prototype.createView = createView
+
+function deleteView (view) {
+
+}
+
+Canvas.prototype.deleteView = deleteView
+
+function readView () {
+  var view = { link: {}, node: {} }
+
+  var link = this.link,
+      node = this.node
+
+  Object.keys(link).forEach(function (key) {
+    view.link[key] = link[key].readView()
+  })
+
+  Object.keys(node).forEach(function (key) {
+    view.node[key] = node[key].readView()
+  })
+
+  return view
+}
+
+Canvas.prototype.readView = readView
+
+function updateView (view) {
+
+}
+
+Canvas.prototype.updateView = updateView
 
 function addLink (view, key) {
   if (typeof key === 'undefined')
      key = this.nextKey
 
-  this.link[key] = new Link(this, view, key)
+  var link = new Link(this, key)
+
+  link.createView(view)
+
+  this.link[key] = link
+
+  this.emit('addLink', { link: { key: view } })
 }
 
 Canvas.prototype.addLink = addLink
 
+function addNode (view, key) {
+  if (typeof key === 'undefined')
+     key = this.nextKey
+
+  var node = new Node(this, key)
+
+  node.createView(view)
+
+  this.node[key] = node
+
+  this.emit('addNode', { node: { key: view } })
+}
+
+Canvas.prototype.addNode = addNode
+
+function delNode (key) {
+  var link = this.link,
+      node = this.node[key]
+
+  // First remove links connected to node.
+  for (var i in link) {
+    var nodeIsSource = link[i].from.key === key,
+        nodeIsTarget = link[i].to.key   === key
+
+    if (nodeIsSource || nodeIsTarget)
+      this.delLink(i)
+  }
+
+  // Then remove node.
+  node.deleteView()
+
+  this.emit('delNode', key)
+}
+
+Canvas.prototype.delNode = delNode
+
+function delLink (key) {
+  var link = this.link[key]
+
+  link.deleteView()
+
+  this.emit('delLink', key)
+}
+
+Canvas.prototype.delLink = delLink
+
 module.exports = Canvas
 
 
-},{"./Link":11,"./Node":12,"./NodeInspector":13,"./NodeSelector":14,"./SVG":17,"./default/theme.json":18,"./default/view.json":19,"events":2,"inherits":5}],10:[function(require,module,exports){
+},{"./Link":11,"./Node":12,"./NodeControls":17,"./NodeCreator":18,"./NodeInspector":19,"./SVG":23,"./default/theme.json":24,"./default/view.json":25,"./validate":27,"events":2,"inherits":5}],10:[function(require,module,exports){
 
-function Input (node, position, numIns) {
-  this.node     = node
-  this.position = position
+var inherits = require('inherits'),
+    Pin      = require('./Pin')
 
-  function getData () { return node.ins[position] }
-
-  Object.defineProperty(this, 'data', { get: getData })
+function Input (node, position) {
+  Pin.call(this, 'ins', node, position)
 
   this.link = null
-
-  var canvas = box.canvas
-
-  var theme = canvas.theme
-
-  var fillPin     = theme.fillPin,
-      halfPinSize = theme.halfPinSize
-
-  var size = halfPinSize * 2
-
-  var draw = canvas.draw
-
-  function getVertex () {
-    var vertex = {
-          absolute: {},
-          relative: {}
-        }
-
-
-    if (numIns > 1)
-      vertex.relative.x = position * ((node.w - size) / (numIns - 1))
-    else
-      vertex.relative.x = 0
-
-    vertex.relative.y = 0
-    vertex.absolute.x = vertex.relative.x + node.x
-    vertex.absolute.y = vertex.relative.y + node.y
-
-    return vertex
-  }
-
-  Object.defineProperty(this, 'vertex', { get: getVertex })
-
-  function getCenter () {
-    var center = {
-          absolute: {},
-          relative: {}
-        }
-
-    var vertex = this.vertex
-
-    center.relative.x = vertex.relative.x + halfPinSize
-    center.relative.y = vertex.relative.y + halfPinSize
-    center.absolute.x = center.relative.x + box.x
-    center.absolute.y = center.relative.y + box.y
-
-    return center
-  }
-
-  Object.defineProperty(this, 'center', { get: getCenter })
-
-  var vertex = this.vertex.relative
-
-  var rect = this.rect = draw.rect(size, size)
-                             .move(vertex.x , vertex.y)
-                             .fill(fillPin)
-
-  box.group.add(rect)
 }
+
+inherits(Input, Pin)
+
+function createView () {
+  var fill   = this.fill,
+      node   = this.node,
+      size   = this.size,
+      vertex = this.vertex.relative
+
+  var draw = node.canvas.draw
+
+  var rect = draw.rect(size, size)
+                 .move(vertex.x, vertex.y)
+                 .fill(fill)
+
+  this.rect = rect
+
+  node.group.add(rect)
+}
+
+Input.prototype.createView = createView
 
 module.exports = Input
 
 
-},{}],11:[function(require,module,exports){
+},{"./Pin":21,"inherits":5}],11:[function(require,module,exports){
 
-function Link (canvas, view, key) {
+function Link (canvas, key) {
+  this.canvas = canvas
+  this.key    = key
+}
+
+function createView (view) {
+  var self = this
+
+  var canvas = this.canvas,
+      key    = this.key
+
   var draw = canvas.draw
 
   var theme = canvas.theme
@@ -5061,28 +5122,36 @@ function Link (canvas, view, key) {
   var strokeLine            = theme.strokeLine,
       strokeLineHighlighted = theme.strokeLineHighlighted
 
-  var from = canvas.box[view.from[0]],
-      to   = canvas.box[view.to[0]]
+  var from = canvas.node[view.from[0]],
+      to   = canvas.node[view.to[0]]
 
   var start = from.outs[view.from[1]],
       end   = to.ins[view.to[1]]
 
-  Object.defineProperty(this, 'x1', { get: function () { return start.center.absolute.x } })
-  Object.defineProperty(this, 'y1', { get: function () { return start.center.absolute.y } })
-  Object.defineProperty(this, 'x2', { get: function () { return end.center.absolute.x } })
-  Object.defineProperty(this, 'y2', { get: function () { return end.center.absolute.y } })
+  Object.defineProperties(this, {
+    'from' : { value: from  },
+    'to'   : { value: to    },
+    'start': { value: start },
+    'end'  : { value: end   }
+  })
 
-  var line = this.line = draw.line(this.x1, this.y1, this.x2, this.y2)
-                             .stroke(strokeLine)
+  Object.defineProperties(this, {
+    'x1': { get: function () { return start.center.absolute.x } },
+    'y1': { get: function () { return start.center.absolute.y } },
+    'x2': { get: function () { return end.center.absolute.x   } },
+    'y2': { get: function () { return end.center.absolute.y   } }
+  })
+
+  var line = draw.line(this.x1, this.y1, this.x2, this.y2)
+                 .stroke(strokeLine)
+
+  this.line = line
 
   end.link = this
   start.link[key] = this
 
   function remove () {
-    end.link = null
-    delete start.link[key]
-    delete canvas.view.link[key]
-    line.remove()
+    canvas.delLink(key)
   }
 
   function deselectLine () {
@@ -5090,21 +5159,56 @@ function Link (canvas, view, key) {
         .stroke(strokeLine)
   }
 
+  line.on('mouseout', deselectLine)
+
   function selectLine () {
     line.on('click', remove)
         .stroke(strokeLineHighlighted)
   }
 
   line.on('mouseover', selectLine)
-  line.on('mouseout', deselectLine)
 }
 
+Link.prototype.createView = createView
+
+function deleteView () {
+  var canvas = this.canvas,
+      end    = this.end,
+      key    = this.key,
+      line   = this.line,
+      start  = this.start
+
+  line.remove()
+
+  end.link = null
+
+  delete start.link[key]
+
+  delete canvas.link[key]
+}
+
+Link.prototype.deleteView = deleteView
+
+function readView () {
+  var view = { from: [], to: [] }
+
+  view.from[0] = this.from.key
+  view.from[1] = this.start.position
+
+  view.to[0] = this.to.key
+  view.to[1] = this.end.position
+
+  return view
+}
+
+Link.prototype.readView = readView
+
 function linePlot () {
-var line = this.line,
-    x1   = this.x1,
-    y1   = this.y1,
-    x2   = this.x2,
-    y2   = this.y2
+  var line = this.line,
+      x1   = this.x1,
+      y1   = this.y1,
+      x2   = this.x2,
+      y2   = this.y2
 
   line.plot(x1, y1, x2, y2)
 }
@@ -5119,9 +5223,23 @@ module.exports = Link
 var Input   = require('./Input'),
     Output  = require('./Output')
 
-function Node (canvas, view, key) {
+function Node (canvas, key) {
   this.canvas = canvas
   this.key    = key
+
+  var draw  = canvas.draw
+
+  this.group = draw.group()
+
+  this.ins  = []
+  this.outs = []
+}
+
+function createView (view) {
+  var self = this
+
+  var canvas = this.canvas,
+      group  = this.group
 
   var draw  = canvas.draw,
       theme = canvas.theme
@@ -5142,46 +5260,42 @@ function Node (canvas, view, key) {
   var h = view.h * theme.unitHeight,
       w = view.w * theme.unitWidth
 
-  var group = this.group = draw.group()
+  var ins  = view.ins  || [],
+      outs = view.outs || []
 
-  this.ins  = []
-  this.outs = []
+  var rect = draw.rect(w, h)
+                 .fill(fillRect)
 
-  this.draw = draw
-
-  var rect = this.rect = draw.rect(w, h)
-                             .fill(fillRect)
-
-  var text = this.text = draw.text(view.text)
-                             .fill(fillLabel)
-                             .back()
-                             .move(10, 10)
-                             .font(labelFont)
+  var text = draw.text(view.text)
+                 .fill(fillLabel)
+                 .back()
+                 .move(10, 10)
+                 .font(labelFont)
 
   group.add(rect)
        .add(text)
-       .move(view.x, view.y)
+
+  Object.defineProperties(this, {
+    'x': { get: function () { return group.x()     } },
+    'y': { get: function () { return group.y()     } },
+    'w': { get: function () { return rect.width()  } },
+    'h': { get: function () { return rect.height() } }
+  })
+
+  function createInput (inputView, position) {
+    self.addInput(position, inputView)
+  }
+
+  ins.forEach(createInput)
+
+  function createOutput (outputView, position) {
+    self.addOutput(position, outputView)
+  }
+
+  outs.forEach(createOutput)
+
+  group.move(view.x, view.y)
        .draggable()
-
-  Object.defineProperty(this, 'x', { get: function () { return group.x() } })
-  Object.defineProperty(this, 'y', { get: function () { return group.y() } })
-  Object.defineProperty(this, 'w', { get: function () { return rect.width() } })
-  Object.defineProperty(this, 'h', { get: function () { return rect.height() } })
-
-  var numIns  = 0,
-      numOuts = 0
-
-  if (view.ins)
-    numIns = view.ins.length
-
-  if (view.outs)
-    numOuts = view.outs.length
-
-  for (var i = 0; i < numIns; i++)
-    this.ins[i] = new Input(this, i, numIns)
-
-  for (var o = 0; o < numOuts; o++)
-    this.outs[o] = new Output(this, o, numOuts)
 
   function dragmove () {
     this.outs.forEach(function (output) {
@@ -5203,41 +5317,440 @@ function Node (canvas, view, key) {
 
   group.on('dragmove', dragmove.bind(this))
 
-  function getView () {
-    var view = {
-      x: this.x,
-      y: this.y,
-      w: this.w,
-      h: this.h,
-      text: this.text,
-      ins: this.ins,
-      outs: this.outs
-    }
-
-    return view
+  function dragstart () {
+    canvas.nodeControls.detach()
   }
 
-  Object.defineProperty(this, 'view', { get: getView.bind(this) })
+  group.on('dragstart', dragstart.bind(this))
+
+  function showNodeControls (ev) {
+    ev.stopPropagation()
+
+    canvas.nodeControls.attachTo(this)
+  }
+
+  group.on('click', showNodeControls.bind(this))
 }
+
+Node.prototype.createView = createView
+
+function readView () {
+  var view = { ins: [], outs: [] }
+
+  var ins  = this.ins,
+      outs = this.outs
+
+  view.text = this.text
+
+  ins.forEach(function (position) {
+    view.ins[position] = {} // TODO get input data
+  })
+
+  outs.forEach(function (position) {
+    view.outs[position] = {} // TODO get output data
+  })
+
+  return view
+}
+
+Node.prototype.readView = readView
+
+function deleteView () {
+  var canvas = this.canvas,
+      group  = this.group,
+      key    = this.key
+
+  group.remove()
+
+  delete canvas.node[key]
+}
+
+Node.prototype.deleteView = deleteView
+
+function updateView () {
+}
+
+Node.prototype.updateView = updateView
+
+function xCoordinateOf (pin) {
+  var position = pin.position
+
+  if (position === 0)
+    return 0
+
+  var size     = pin.size,
+      type     = pin.type,
+      w        = this.w,
+      x        = 0
+
+  var numPins = this[type].length
+
+  if (numPins > 1)
+    return position * ((w - size) / (numPins - 1))
+}
+
+Node.prototype.xCoordinateOf = xCoordinateOf
+
+function addPin (type, position) {
+  var newPin,
+      numPins = this[type].length
+
+  if (typeof position === 'undefined')
+    position = numPins
+
+  if (type === 'ins')
+    newPin = new Input(this, position)
+
+  if (type === 'outs')
+    newPin = new Output(this, position)
+
+  this[type].splice(position, 0, newPin)
+
+  newPin.createView()
+
+  // Move existing pins to new position.
+  //
+  // Nothing to do it there is no pin yet.
+  if (numPins > 0) {
+    // Start loop on i = 1, the second position. The first pin is not moved.
+    // The loop ends at numPins + 1 cause one pin was added.
+    for (var i = 1; i < numPins + 1; i++) {
+      // Nothing to do for input added right now.
+      if (i === position)
+        continue
+
+      var pin
+
+      if (i < position)
+        pin = this[type][i]
+
+      if (i > position)
+        pin = this[type][i + 1]
+
+      var rect   = pin.rect,
+          vertex = pin.vertex.relative
+
+      rect.move(vertex.x, vertex.y)
+    }
+  }
+}
+
+function addInput (position) {
+  addPin.bind(this)('ins', position)
+}
+
+Node.prototype.addInput = addInput
+
+function addOutput (position) {
+  addPin.bind(this)('outs', position)
+}
+
+Node.prototype.addOutput = addOutput
 
 module.exports = Node
 
 
-},{"./Input":10,"./Output":15}],13:[function(require,module,exports){
+},{"./Input":10,"./Output":20}],13:[function(require,module,exports){
 
-function NodeInspector (canvas) {
+function NodeButton (canvas, relativeCoordinate) {
+  this.relativeCoordinate = relativeCoordinate
 
+  this.node = null
+
+  this.canvas = canvas
+
+  var draw  = canvas.draw,
+      theme = canvas.theme
+
+  var size = theme.halfPinSize * 2
+
+  this.size = size
+
+  var group = draw.group()
+
+  this.group = group
 }
 
-module.exports = NodeInspector
+function detachNodeButton () {
+  this.group.hide()
+
+  this.node = null
+}
+
+NodeButton.prototype.detach = detachNodeButton
+
+module.exports = NodeButton
 
 
 },{}],14:[function(require,module,exports){
 
+var inherits   = require('inherits'),
+    NodeButton = require('../NodeButton')
+
+function AddInput (canvas) {
+  NodeButton.call(this, canvas)
+
+  var draw  = canvas.draw,
+      theme = canvas.theme
+
+  var halfPinSize           = theme.halfPinSize,
+      strokeLine            = theme.strokeLine,
+      strokeLineHighlighted = theme.strokeLineHighlighted
+
+  var size = halfPinSize * 2
+  this.size = size
+
+  var group = draw.group()
+
+  var line1 = draw.line(0, halfPinSize, size, halfPinSize)
+                  .stroke(strokeLine)
+
+  var line2 = draw.line(halfPinSize, 0, halfPinSize, size)
+                  .stroke(strokeLine)
+
+  group.add(line1)
+       .add(line2)
+       .hide()
+
+  this.group = group
+
+  function addInput (ev) {
+    this.node.addInput()
+  }
+
+  function deselectButton () {
+    group.off('click')
+
+    line1.stroke(strokeLine)
+    line2.stroke(strokeLine)
+  }
+
+  group.on('mouseout', deselectButton.bind(this))
+
+  function selectButton () {
+    group.on('click', addInput.bind(this))
+
+    line1.stroke(strokeLineHighlighted)
+    line2.stroke(strokeLineHighlighted)
+  }
+
+  group.on('mouseover', selectButton.bind(this))
+}
+
+inherits(AddInput, NodeButton)
+
+function attachTo (node) {
+  var group = this.group,
+      size  = this.size
+
+  group.move(node.x - size, node.y)
+       .show()
+
+  this.node = node
+}
+
+AddInput.prototype.attachTo = attachTo
+
+module.exports = AddInput
+
+
+},{"../NodeButton":13,"inherits":5}],15:[function(require,module,exports){
+
+var inherits   = require('inherits'),
+    NodeButton = require('../NodeButton')
+
+function AddOutput (canvas) {
+  NodeButton.call(this, canvas)
+
+  var draw  = canvas.draw,
+      theme = canvas.theme
+
+  var halfPinSize           = theme.halfPinSize,
+      strokeLine            = theme.strokeLine,
+      strokeLineHighlighted = theme.strokeLineHighlighted
+
+  var size = halfPinSize * 2
+  this.size = size
+
+  var group = draw.group()
+
+  var line1 = draw.line(0, halfPinSize, size, halfPinSize)
+                  .stroke(strokeLine)
+
+  var line2 = draw.line(halfPinSize, 0, halfPinSize, size)
+                  .stroke(strokeLine)
+
+  group.add(line1)
+       .add(line2)
+       .hide()
+
+  this.group = group
+
+  function addOutput (ev) {
+    this.node.addOutput()
+  }
+
+  function deselectButton () {
+    group.off('click')
+
+    line1.stroke(strokeLine)
+    line2.stroke(strokeLine)
+  }
+
+  group.on('mouseout', deselectButton.bind(this))
+
+  function selectButton () {
+    group.on('click', addOutput.bind(this))
+
+    line1.stroke(strokeLineHighlighted)
+    line2.stroke(strokeLineHighlighted)
+  }
+
+  group.on('mouseover', selectButton.bind(this))
+}
+
+inherits(AddOutput, NodeButton)
+
+function attachTo (node) {
+  var group = this.group,
+      size  = this.size
+
+  group.move(node.x - size, node.y + node.h - size)
+       .show()
+
+  this.node = node
+}
+
+AddOutput.prototype.attachTo = attachTo
+
+module.exports = AddOutput
+
+
+
+},{"../NodeButton":13,"inherits":5}],16:[function(require,module,exports){
+
+var inherits   = require('inherits'),
+    NodeButton = require('../NodeButton')
+
+function DeleteNode (canvas) {
+  NodeButton.call(this, canvas)
+
+  var draw  = canvas.draw,
+      theme = canvas.theme
+
+  var halfPinSize           = theme.halfPinSize,
+      strokeLine            = theme.strokeLine,
+      strokeLineHighlighted = theme.strokeLineHighlighted
+
+  var size = halfPinSize * 2
+  this.size = size
+
+  var group = draw.group()
+
+  var diag1 = draw.line(0, 0, size, size)
+                  .stroke(strokeLine)
+
+  var diag2 = draw.line(0, size, size, 0)
+                  .stroke(strokeLine)
+
+  group.add(diag1)
+       .add(diag2)
+       .hide()
+
+  this.group = group
+
+  function delNode () {
+    var canvas = this.canvas,
+        node   = this.node
+
+    var key = node.key
+
+    canvas.nodeControls.detach()
+
+    canvas.delNode(key)
+  }
+
+  function deselectButton () {
+    group.off('click')
+
+    diag1.stroke(strokeLine)
+    diag2.stroke(strokeLine)
+  }
+
+  group.on('mouseout', deselectButton.bind(this))
+
+  function selectButton () {
+    group.on('click', delNode.bind(this))
+
+    diag1.stroke(strokeLineHighlighted)
+    diag2.stroke(strokeLineHighlighted)
+  }
+
+  group.on('mouseover', selectButton.bind(this))
+}
+
+inherits(DeleteNode, NodeButton)
+
+function attachTo (node) {
+  var group = this.group,
+      size  = this.size
+
+  group.move(node.x + node.w, node.y - size)
+       .show()
+
+  this.node = node
+}
+
+DeleteNode.prototype.attachTo = attachTo
+
+module.exports = DeleteNode
+
+
+},{"../NodeButton":13,"inherits":5}],17:[function(require,module,exports){
+
+var AddInputButton   = require('./NodeButton/AddInput'),
+    AddOutputButton  = require('./NodeButton/AddOutput'),
+    DeleteNodeButton = require('./NodeButton/DeleteNode')
+
+function NodeControls (canvas) {
+  this.canvas = canvas
+
+  this.node = null
+
+  var addInputButton   = new AddInputButton(canvas),
+      addOutputButton  = new AddOutputButton(canvas),
+      deleteNodeButton = new DeleteNodeButton(canvas)
+
+  this.addInputButton   = addInputButton
+  this.addOutputButton  = addOutputButton
+  this.deleteNodeButton = deleteNodeButton
+}
+
+function nodeControlsAttachTo (node) {
+  this.addInputButton.attachTo(node)
+  this.addOutputButton.attachTo(node)
+  this.deleteNodeButton.attachTo(node)
+}
+
+NodeControls.prototype.attachTo = nodeControlsAttachTo
+
+function nodeControlsDetach () {
+  this.addInputButton.detach()
+  this.addOutputButton.detach()
+  this.deleteNodeButton.detach()
+}
+
+NodeControls.prototype.detach = nodeControlsDetach
+
+module.exports = NodeControls
+
+
+},{"./NodeButton/AddInput":14,"./NodeButton/AddOutput":15,"./NodeButton/DeleteNode":16}],18:[function(require,module,exports){
+
 // TODO autocompletion from json
 // http://blog.teamtreehouse.com/creating-autocomplete-dropdowns-datalist-element
 
-function NodeSelector (canvas) {
+function NodeCreator (canvas) {
   var draw  = canvas.draw
   this.draw = draw
 
@@ -5250,10 +5763,14 @@ function NodeSelector (canvas) {
   var foreignObject = draw.foreignObject(100,100)
                           .attr({id: 'flow-view-selector'})
 
-  foreignObject.appendChild('form', {id: 'flow-view-selector-form'})
+  foreignObject.appendChild('form', {id: 'flow-view-selector-form', name: 'nodecreator'})
 
   var form = foreignObject.getChild(0)
-  form.innerHTML = '<input id="flow-view-selector-input" name="node" type="text" autofocus />'
+
+  form.innerHTML = '<input id="flow-view-selector-input" name="selectnode" type="text" autofocus />'
+
+  // TODO give focus to input text
+  form.selectnode.focus()
 
   function createNode () {
     foreignObject.hide()
@@ -5274,7 +5791,7 @@ function NodeSelector (canvas) {
     inputText.value = ''
 
     // It is required to return false to have a form with no action.
-    return false;
+    return false
   }
 
   form.onsubmit = createNode.bind(this)
@@ -5287,7 +5804,13 @@ function NodeSelector (canvas) {
   this.foreignObject = foreignObject
 }
 
-function showNodeSelector (ev) {
+function hideNodeCreator (ev) {
+  this.foreignObject.hide()
+}
+
+NodeCreator.prototype.hide = hideNodeCreator
+
+function showNodeCreator (ev) {
   var x = ev.clientX,
       y = ev.clientY
 
@@ -5298,35 +5821,92 @@ function showNodeSelector (ev) {
                     .show()
 }
 
-NodeSelector.prototype.show = showNodeSelector
+NodeCreator.prototype.show = showNodeCreator
 
-module.exports = NodeSelector
+module.exports = NodeCreator
 
 
-},{}],15:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 
-var PreLink = require('./PreLink')
+function NodeInspector (canvas) {
 
-function Output (node, position, numOuts) {
+}
+
+module.exports = NodeInspector
+
+
+},{}],20:[function(require,module,exports){
+
+var inherits = require('inherits'),
+    Pin      = require('./Pin'),
+    PreLink  = require('./PreLink')
+
+function Output (node, position) {
+  Pin.call(this, 'outs', node, position)
+
+  this.link = {}
+}
+
+inherits(Output, Pin)
+
+function createView () {
+  // TODO for var i in view this.set(i, view[i])
+  var self = this
+
+  var fill   = this.fill,
+      node   = this.node,
+      size   = this.size,
+      vertex = this.vertex.relative
+
+  var canvas = node.canvas
+
+  var draw  = canvas.draw,
+      theme = canvas.theme
+
+  var rect = draw.rect(size, size)
+                 .move(vertex.x, vertex.y)
+                 .fill(fill)
+
+  this.rect = rect
+
+  node.group.add(rect)
+
+  var preLink = null
+
+  function mouseoverOutput () {
+    preLink = new PreLink(canvas, self)
+  }
+
+  rect.on('mouseover', mouseoverOutput)
+}
+
+Output.prototype.createView = createView
+
+module.exports = Output
+
+
+},{"./Pin":21,"./PreLink":22,"inherits":5}],21:[function(require,module,exports){
+
+function Pin (type, node, position) {
+  var self = this
+
+  this.type     = type
   this.node     = node
   this.position = position
 
-  function getData () { return box.node[position] }
-
-  Object.defineProperty(this, 'data', { get: getData })
-
-  this.link = {}
-
-  var canvas = box.canvas
+  var canvas = node.canvas
 
   var theme = canvas.theme
 
-  var fillPin     = theme.fillPin,
-      halfPinSize = theme.halfPinSize
+  var fill     = theme.fillPin,
+      halfSize = theme.halfPinSize
 
-  var size = halfPinSize * 2
+  this.fill = fill
 
-  var draw = canvas.draw
+  this.halfSize = halfSize
+
+  var size = halfSize * 2
+  this.size = size
 
   function getVertex () {
     var vertex = {
@@ -5334,12 +5914,13 @@ function Output (node, position, numOuts) {
           relative: {}
         }
 
-    if (numOuts > 1)
-      vertex.relative.x = position * ((node.w - size) / (numOuts - 1))
-    else
-      vertex.relative.x = 0
+    vertex.relative.x = node.xCoordinateOf(self)
 
-    vertex.relative.y = node.h - size
+    if (type === 'ins')
+      vertex.relative.y = 0
+    if (type === 'outs')
+      vertex.relative.y = node.h - size
+
     vertex.absolute.x = vertex.relative.x + node.x
     vertex.absolute.y = vertex.relative.y + node.y
 
@@ -5356,8 +5937,8 @@ function Output (node, position, numOuts) {
 
     var vertex = this.vertex
 
-    center.relative.x = vertex.relative.x + halfPinSize
-    center.relative.y = vertex.relative.y + halfPinSize
+    center.relative.x = vertex.relative.x + halfSize
+    center.relative.y = vertex.relative.y + halfSize
     center.absolute.x = center.relative.x + node.x
     center.absolute.y = center.relative.y + node.y
 
@@ -5366,27 +5947,42 @@ function Output (node, position, numOuts) {
 
   Object.defineProperty(this, 'center', { get: getCenter })
 
-  var vertex = this.vertex.relative
-
-  var rect = this.rect = draw.rect(size, size)
-                             .move(vertex.x, vertex.y)
-                             .fill(fillPin)
-
-  box.group.add(rect)
-
-  var preLink = null
-
-  function mouseover () {
-    preLink = new PreLink(canvas, this)
-  }
-
-  rect.on('mouseover', mouseover.bind(this))
 }
 
-module.exports = Output
+function get (key) {
+  var node     = this.node,
+      position = this.position,
+      type     = this.type
+
+  return node[type][position][key]
+}
+
+Pin.prototype.get = get
+
+function has (key) {
+  var node     = this.node,
+      position = this.position,
+      type     = this.type
+
+  return typeof node[type][position][key] !== 'undefined'
+}
+
+Pin.prototype.has = has
+
+function set (key, data) {
+  var node     = this.node,
+      position = this.position,
+      type     = this.type
+
+  this.node[type][position][key] = data
+}
+
+Pin.prototype.set = set
+
+module.exports = Pin
 
 
-},{"./PreLink":16}],16:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 
 var Link = require('./Link')
 
@@ -5461,31 +6057,25 @@ function PreLink (canvas, output) {
     var centerIsInside = isInside(center)
 
     /**
-     * Given a box, loop over its ins.
+     * Given a node, loop over its ins.
      * If center is inside input, create a Link.
      */
 
-    function dropOn (box) {
-      box.ins.forEach(function (input) {
+    function dropOn (node) {
+      node.ins.forEach(function (input) {
         if (input.link !== null)
           return
 
         var bbox = input.rect.bbox(),
-            x    = input.box.group.x(),
-            y    = input.box.group.y()
+            x    = input.node.group.x(),
+            y    = input.node.group.y()
 
-        /*
-        var centerIsInsideX = ((center.x >= bbox.x + x) && (center.x <= bbox.x2 + x)),
-            centerIsInsideY = ((center.y >= bbox.y + y) && (center.y <= bbox.y2 + y))
-
-            */
-        //var centerIsInsideInput = centerIsInsideX && centerIsInsideY
         var centerIsInsideInput = centerIsInside(bbox, x, y)
 
         if (centerIsInsideInput) {
           var view = {
-            from: [output.box.key, output.position],
-            to: [box.key, input.position]
+            from: [output.node.key, output.position],
+            to: [node.key, input.position]
           }
 
           canvas.addLink(view)
@@ -5493,29 +6083,18 @@ function PreLink (canvas, output) {
       })
     }
 
-    // Loop over all boxes. If center is inside box, drop on it.
-    Object.keys(canvas.box).forEach(function (key) {
-      var box = canvas.box[key]
+    // Loop over all nodes. If center is inside node, drop on it.
+    Object.keys(canvas.node).forEach(function (key) {
+      var node = canvas.node[key]
 
-      var bbox = box.group.bbox(),
-            x  = box.x,
-            y  = box.y
+      var bbox = node.group.bbox(),
+            x  = node.x,
+            y  = node.y
 
-      /*
-        bbox.x  += x
-        bbox.x2 += x
-        bbox.y  += y
-        bbox.y2 += y
-
-      var centerIsInsideX = ((center.x >= bbox.x) && (center.x <= bbox.x2)),
-          centerIsInsideY = ((center.y >= bbox.y) && (center.y <= bbox.y2))
-
-      var centerIsInsideBox = centerIsInsideX && centerIsInsideY
-      */
         var centerIsInsideBox = centerIsInside(bbox, x, y)
 
       if (centerIsInsideBox)
-        dropOn(box)
+        dropOn(node)
     })
   }
 
@@ -5525,8 +6104,7 @@ function PreLink (canvas, output) {
 module.exports = PreLink
 
 
-
-},{"./Link":11}],17:[function(require,module,exports){
+},{"./Link":11}],23:[function(require,module,exports){
 
 // Consider this module will be browserified.
 
@@ -5547,7 +6125,7 @@ require('svg.foreignobject.js')
 module.exports = SVG
 
 
-},{"svg.draggable.js":6,"svg.foreignobject.js":7,"svg.js":8}],18:[function(require,module,exports){
+},{"svg.draggable.js":6,"svg.foreignobject.js":7,"svg.js":8}],24:[function(require,module,exports){
 module.exports={
   "fillCircle": "#fff",
   "fillLabel": "#333",
@@ -5567,41 +6145,40 @@ module.exports={
   },
   "strokeLineHighlighted": {
     "color": "#d63518",
-    "width": 5
+    "width": 4
   },
   "unitHeight": 40,
   "unitWidth": 10
 }
 
-},{}],19:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports={
   "node": {},
   "link": {}
 }
 
-},{}],20:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 
-var Canvas = require('./Canvas')
-exports.Canvas = Canvas
+exports.Canvas = require('./Canvas')
 
-function render (element, callback) {
-  return function loading (graph) {
-    try {
-    if (typeof callback === 'function')
-      callback(graph)
-    }
-    catch (message) {
-      console.error(message)
-    }
 
-    return new Canvas(element, graph.view)
-  }
+},{"./Canvas":9}],27:[function(require,module,exports){
+
+function validate (view) {
+  if (typeof view !== 'object')
+    throw new TypeError()
+
+  if (typeof view.node !== 'object')
+    throw new TypeError()
+
+  if (typeof view.link !== 'object')
+    throw new TypeError()
 }
 
-exports.render = render
+module.exports = validate
 
 
-},{"./Canvas":9}],21:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -5830,7 +6407,7 @@ exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
 
 
-},{}],22:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "&Math.cos",
@@ -5855,7 +6432,7 @@ module.exports={
   }
 }
 
-},{}],23:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -5869,7 +6446,7 @@ module.exports={
     "results": []
   },
   "view": {
-    "box": {
+    "node": {
       "1": {
         "x": 80,
         "y": 20,
@@ -5891,7 +6468,7 @@ module.exports={
         "y": 10,
         "w": 45,
         "h": 4,
-        "text": "This is a comment\n ... on few rows. It is a box without a task"
+        "text": "This is a comment ...\n  * you can drag a node,\n  * delete it by pressing the x button,\n * add inputs and outputs by pressing +\n * connect them creatink links.\n Double click on the canvas,\n to open an input text and create a new node."
       }
    },
    "link": {
@@ -5903,7 +6480,7 @@ module.exports={
   }
 }
 
-},{}],24:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 
 exports['apply']       = require('./apply.json')
 exports['hello-world'] = require('./hello-world.json')
@@ -5911,7 +6488,7 @@ exports['or']          = require('./or.json')
 exports['sum']         = require('./sum.json')
 
 
-},{"./apply.json":22,"./hello-world.json":23,"./or.json":25,"./sum.json":26}],25:[function(require,module,exports){
+},{"./apply.json":29,"./hello-world.json":30,"./or.json":32,"./sum.json":33}],32:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -5934,7 +6511,7 @@ module.exports={
   }
 }
 
-},{}],26:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -5957,7 +6534,7 @@ module.exports={
   }
 }
 
-},{}],27:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 
 var builtinFunctions          = require('./builtinFunctions'),
     injectAdditionalFunctions = require('./injectAdditionalFunctions'),
@@ -6080,7 +6657,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./builtinFunctions":21,"./injectAccessors":28,"./injectAdditionalFunctions":29,"./injectArguments":30,"./injectReferences":31,"./inputArgs":32,"./isDflowFun":34,"./level":35,"./validate":40}],28:[function(require,module,exports){
+},{"./builtinFunctions":28,"./injectAccessors":35,"./injectAdditionalFunctions":36,"./injectArguments":37,"./injectReferences":38,"./inputArgs":39,"./isDflowFun":41,"./level":42,"./validate":47}],35:[function(require,module,exports){
 
 var accessorRegex = require('./regex/accessor')
 
@@ -6121,7 +6698,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"./regex/accessor":37}],29:[function(require,module,exports){
+},{"./regex/accessor":44}],36:[function(require,module,exports){
 
 var builtinFunctions = require('./builtinFunctions')
 
@@ -6153,7 +6730,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{"./builtinFunctions":21}],30:[function(require,module,exports){
+},{"./builtinFunctions":28}],37:[function(require,module,exports){
 
 var argumentRegex = require('./regex/argument')
 
@@ -6190,7 +6767,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"./regex/argument":38}],31:[function(require,module,exports){
+},{"./regex/argument":45}],38:[function(require,module,exports){
 
 var referenceRegex = require('./regex/reference')
 
@@ -6223,7 +6800,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"./regex/reference":39}],32:[function(require,module,exports){
+},{"./regex/reference":46}],39:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6256,7 +6833,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":33}],33:[function(require,module,exports){
+},{"./inputPipes":40}],40:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -6286,7 +6863,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],34:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -6313,7 +6890,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":40}],35:[function(require,module,exports){
+},{"./validate":47}],42:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -6349,7 +6926,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":36}],36:[function(require,module,exports){
+},{"./parents":43}],43:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6378,22 +6955,22 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":33}],37:[function(require,module,exports){
+},{"./inputPipes":40}],44:[function(require,module,exports){
 
 module.exports = /^@(.+)$/
 
 
-},{}],38:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],39:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],40:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 
 var accessorRegex  = require('./regex/accessor'),
     argumentRegex  = require('./regex/argument'),
@@ -6516,14 +7093,16 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":37,"./regex/argument":38,"./regex/reference":39}],"examples-render":[function(require,module,exports){
+},{"./regex/accessor":44,"./regex/argument":45,"./regex/reference":46}],"examples-render":[function(require,module,exports){
 
-var dflow    = require('dflow'),
-    examples = require('./index'),
-    flowView = require('flow-view')
+var Canvas = require('flow-view').Canvas,
+    dflow    = require('dflow'),
+    examples = require('./index')
 
 /**
  * Render example into given div.
+ *
+ * Alos, execute dflow graph.
  *
  * @param {String} divId
  * @param {String} example
@@ -6531,15 +7110,17 @@ var dflow    = require('dflow'),
  * @returns {Object} graph
  */
 
-function render (divId, example) {
+function renderExample (divId, example) {
   var graph = examples[example]
 
-  flowView.render(divId)(graph)
+  var canvas = new Canvas(divId)
 
-  return graph
+  canvas.createView(graph.view)
+
+  dflow.fun(graph)()
 }
 
-module.exports = render
+module.exports = renderExample
 
 
-},{"./index":24,"dflow":3,"flow-view":4}]},{},[]);
+},{"./index":31,"dflow":3,"flow-view":4}]},{},[]);

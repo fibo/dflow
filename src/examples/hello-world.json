@@ -11,7 +11,7 @@
     "results": []
   },
   "view": {
-    "box": {
+    "node": {
       "1": {
         "x": 80,
         "y": 20,
@@ -33,7 +33,7 @@
         "y": 10,
         "w": 45,
         "h": 4,
-        "text": "This is a comment\n ... on few rows. It is a box without a task"
+        "text": "This is a comment ...\n  * you can drag a node,\n  * delete it by pressing the x button,\n * add inputs and outputs by pressing +\n * connect them creatink links.\n Double click on the canvas,\n to open an input text and create a new node."
       }
    },
    "link": {
