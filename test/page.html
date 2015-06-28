@@ -11,7 +11,7 @@
     <script type="text/javascript">
       function dflowTest () {
         var dflow  = require('dflow'),
-            render = require('flow-view').render('flow')
+            Canvas = require('flow-view').Canvas
             funcs  = {
               createElement: document.createElement.bind(document),
               appendChild: function (parent, child) { return parent.appendChild(child) },
@@ -42,7 +42,7 @@
                 f: ['body.appendChild', 'return'            ]
               },
               view: {
-                box: {
+                node: {
                   arg0:               { text: 'arguments[0]',     x: 10,  y: 10,                 outs: [{}] },
                   arg1:               { text: 'arguments[1]',     x: 210, y: 10,                 outs: [{}] },
                   createElement:      { text: 'createElement',    x: 10,  y: 100, ins: [{}],     outs: [{}] },
@@ -65,7 +65,7 @@
         // Add comments.
         var commentRows = [
               'This is a comment',
-              '=================',
+              '==============',
               '1. Read arguments[0] and arguments[1],',
               '   and pass them to createElement and createTextNode respectively.',
               '2. appendChild takes inputs from both createElement and createTextNode.',
@@ -73,10 +73,10 @@
               '4. body.appendChild returns a DOM node that is returned by the dflow graph.'
             ]
 
-        graph.view.box.comment = {
+        graph.view.node.comment = {
           text: commentRows.join('\n'),
-          x: 370, y: 10,
-          w: 200, h: 5
+          x: 400, y: 10,
+          w: 71, h: 5
         }
 
         var test = dflow.fun(graph, funcs)
@@ -87,7 +87,9 @@
         // Create a div to show the graph.view
         // <div id="flow"></div>
         test('div', 'you should see a graph view here').id = 'flow'
-        render(graph)
+
+        var canvas = new Canvas('flow')
+        canvas.createView(graph.view)
       }
     </script>
   </body>
