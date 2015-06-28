@@ -6468,7 +6468,7 @@ module.exports={
         "y": 10,
         "w": 45,
         "h": 4,
-        "text": "This is a comment ...\n  * you can drag a node,\n  * delete it by pressing the x button,\n * add inputs and outputs by pressing +\n * connect them creatink links.\n Double click on the canvas,\n to open an input text and create a new node."
+        "text": "This is a comment ...\n  * you can drag a node,\n  * delete it by pressing the x button,\n * add inputs and outputs by pressing a + button\n * connect them by dragging an output to an input to create a link.\n Double click on the canvas,\n to open an input text and create a new node."
       }
    },
    "link": {
