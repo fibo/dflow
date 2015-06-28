@@ -1,10 +1,12 @@
 
-var dflow    = require('dflow'),
-    examples = require('./index'),
-    flowView = require('flow-view')
+var Canvas = require('flow-view').Canvas,
+    dflow    = require('dflow'),
+    examples = require('./index')
 
 /**
  * Render example into given div.
+ *
+ * Alos, execute dflow graph.
  *
  * @param {String} divId
  * @param {String} example
@@ -12,13 +14,15 @@ var dflow    = require('dflow'),
  * @returns {Object} graph
  */
 
-function render (divId, example) {
+function renderExample (divId, example) {
   var graph = examples[example]
 
-  flowView.render(divId)(graph)
+  var canvas = new Canvas(divId)
 
-  return graph
+  canvas.createView(graph.view)
+
+  dflow.fun(graph)()
 }
 
-module.exports = render
+module.exports = renderExample
 
