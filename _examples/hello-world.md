@@ -1,5 +1,6 @@
 ---
-title: hello-world
+title: Hello World
+graph: hello-world
 ---
 
 # Hello World
