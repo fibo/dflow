@@ -585,13 +585,13 @@ SVG.extend(SVG.Container, {
 },{}],8:[function(require,module,exports){
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
-* @version 2.0.4
+* @version 2.0.5
 * http://www.svgjs.com
 *
 * @copyright Wout Fierens <wout@impinc.co.uk>
 * @license MIT
 *
-* BUILT: Sun Jun 28 2015 21:25:11 GMT+0200 (Mitteleuropäische Sommerzeit)
+* BUILT: Sun Jul 05 2015 01:42:48 GMT+0200 (Mitteleuropäische Sommerzeit)
 */;
 
 (function(root, factory) {
@@ -1558,14 +1558,14 @@ SVG.Element = SVG.invent({
 
       // insert the clone after myself
       this.after(clone)
-      
+
       return clone
     }
     // Remove element
   , remove: function() {
       if (this.parent())
         this.parent().removeElement(this)
-      
+
       return this
     }
     // Replace element
@@ -1589,7 +1589,7 @@ SVG.Element = SVG.invent({
     // Checks whether the given point inside the bounding box of the element
   , inside: function(x, y) {
       var box = this.bbox()
-      
+
       return x > box.x
           && y > box.y
           && x < box.x + box.width
@@ -1683,7 +1683,7 @@ SVG.Element = SVG.invent({
 
         // transplant nodes
         for (var i = 0, il = well.firstChild.childNodes.length; i < il; i++)
-          this.node.appendChild(well.firstChild.childNodes[i])
+          this.node.appendChild(well.firstChild.firstChild)
 
       // otherwise act as a getter
       } else {
@@ -2329,8 +2329,8 @@ SVG.Matrix = SVG.invent({
     var i, base = arrayToMatrix([1, 0, 0, 1, 0, 0])
 
     // ensure source as object
-    source = source && source.node && source.node.getCTM ?
-      source.node.getCTM() :
+    source = source instanceof SVG.Element ?
+      source.matrixify() :
     typeof source === 'string' ?
       stringToMatrix(source) :
     arguments.length == 6 ?
@@ -2343,7 +2343,7 @@ SVG.Matrix = SVG.invent({
       this[abcdef[i]] = source && typeof source[abcdef[i]] === 'number' ?
         source[abcdef[i]] : base[abcdef[i]]
   }
-  
+
   // Add methods
 , extend: {
     // Extract individual transformations
@@ -2352,7 +2352,7 @@ SVG.Matrix = SVG.invent({
       var px    = deltaTransformPoint(this, 0, 1)
         , py    = deltaTransformPoint(this, 1, 0)
         , skewX = 180 / Math.PI * Math.atan2(px.y, px.x) - 90
-  
+
       return {
         // translation
         x:        this.e
@@ -2425,7 +2425,7 @@ SVG.Matrix = SVG.invent({
     }
     // Translate matrix
   , translate: function(x, y) {
-      return new SVG.Matrix(this.native().translate(x || 0, y || 0))  
+      return new SVG.Matrix(this.native().translate(x || 0, y || 0))
     }
     // Scale matrix
   , scale: function(x, y, cx, cy) {
@@ -2443,7 +2443,7 @@ SVG.Matrix = SVG.invent({
   , rotate: function(r, cx, cy) {
       // convert degrees to radians
       r = SVG.utils.radians(r)
-      
+
       return this.around(cx, cy, new SVG.Matrix(Math.cos(r), Math.sin(r), -Math.sin(r), Math.cos(r), 0, 0))
     }
     // Flip matrix on x or y, at a given offset
@@ -2465,7 +2465,7 @@ SVG.Matrix = SVG.invent({
   , native: function() {
       // create new matrix
       var matrix = SVG.parser.draw.node.createSVGMatrix()
-  
+
       // update with current values
       for (var i = abcdef.length - 1; i >= 0; i--)
         matrix[abcdef[i]] = this[abcdef[i]]
@@ -2485,9 +2485,9 @@ SVG.Matrix = SVG.invent({
 , construct: {
     // Get current matrix
     ctm: function() {
-      return new SVG.Matrix(this)
+      return new SVG.Matrix(this.node.getCTM())
     }
-  
+
   }
 
 })
@@ -2584,7 +2584,7 @@ SVG.extend(SVG.Element, SVG.FX, {
     // act as a getter
     if (typeof o !== 'object') {
       // get current matrix
-      matrix = target.ctm().extract()
+      matrix = new SVG.Matrix(target).extract()
 
       // add parametric rotation
       if (typeof this.param === 'object') {
@@ -2603,7 +2603,7 @@ SVG.extend(SVG.Element, SVG.FX, {
 
     // ensure relative flag
     relative = !!relative || !!o.relative
-    
+
     // act on matrix
     if (o.a != null) {
       matrix = relative ?
@@ -2611,7 +2611,7 @@ SVG.extend(SVG.Element, SVG.FX, {
         matrix.multiply(new SVG.Matrix(o)) :
         // absolute
         new SVG.Matrix(o)
-    
+
     // act on rotation
     } else if (o.rotation != null) {
       // ensure centre point
@@ -2631,11 +2631,11 @@ SVG.extend(SVG.Element, SVG.FX, {
       if (this instanceof SVG.Element) {
         matrix = relative ?
           // relative
-          target.attr('transform', matrix + ' rotate(' + [o.rotation, o.cx, o.cy].join() + ')').ctm() :
+          matrix.rotate(o.rotation, o.cx, o.cy) :
           // absolute
           matrix.rotate(o.rotation - matrix.extract().rotation, o.cx, o.cy)
       }
-    
+
     // act on scale
     } else if (o.scale != null || o.scaleX != null || o.scaleY != null) {
       // ensure centre point
@@ -2668,7 +2668,7 @@ SVG.extend(SVG.Element, SVG.FX, {
         var e = matrix.extract()
         matrix = matrix.multiply(new SVG.Matrix().skew(e.skewX, e.skewY, o.cx, o.cy).inverse())
       }
-      
+
       matrix = matrix.skew(o.skewX, o.skewY, o.cx, o.cy)
 
     // act on flip
@@ -2689,7 +2689,7 @@ SVG.extend(SVG.Element, SVG.FX, {
         if (o.y != null) matrix.f = o.y
       }
     }
-    
+
     return this.attr('transform', matrix)
   }
 })
@@ -2698,6 +2698,27 @@ SVG.extend(SVG.Element, {
   // Reset all transformations
   untransform: function() {
     return this.attr('transform', null)
+  },
+  matrixify: function() {
+
+    var matrix = (this.attr('transform') || '')
+      // split transformations
+      .split(/\)\s*/).slice(0,-1).map(function(str){
+        // generate key => value pairs
+        var kv = str.trim().split('(')
+        return [kv[0], kv[1].split(',').map(function(str){ return parseFloat(str) })]
+      })
+      // calculate every transformation into one matrix
+      .reduce(function(matrix, transform){
+
+        if(transform[0] == 'matrix') return matrix.multiply(arrayToMatrix(transform[1]))
+        return matrix[transform[0]].apply(matrix, transform[1])
+
+      }, new SVG.Matrix())
+    // apply calculated matrix to element
+    this.attr('transform', matrix)
+
+    return matrix
   }
 })
 SVG.extend(SVG.Element, {
@@ -5420,7 +5441,6 @@ function addPin (type, position) {
       if (i < position)
         pin = this[type][i]
 
-      // After new pin position, it is necessary to use i + 1 as index.
       if (i > position)
         pin = this[type][i + 1]
 
@@ -5428,16 +5448,6 @@ function addPin (type, position) {
           vertex = pin.vertex.relative
 
       rect.move(vertex.x, vertex.y)
-
-      // Move also any link connected to pin.
-      if (type === 'ins')
-        if (pin.link)
-          pin.link.linePlot()
-
-      if (type === 'outs')
-        Object.keys(pin.link).forEach(function (key) {
-          pin.link[key].linePlot()
-        })
     }
   }
 }
@@ -5774,7 +5784,10 @@ function NodeCreator (canvas) {
 
   var form = foreignObject.getChild(0)
 
-  form.innerHTML = '<input id="flow-view-selector-input" name="selectnode" type="text" />'
+  form.innerHTML = '<input id="flow-view-selector-input" name="selectnode" type="text" autofocus />'
+
+  // TODO give focus to input text
+  form.selectnode.focus()
 
   function createNode () {
     foreignObject.hide()
@@ -5815,19 +5828,14 @@ function hideNodeCreator (ev) {
 NodeCreator.prototype.hide = hideNodeCreator
 
 function showNodeCreator (ev) {
-  var x = ev.offsetX,
-      y = ev.offsetY
-
-  var foreignObject = this.foreignObject
+  var x = ev.clientX,
+      y = ev.clientY
 
   this.x = x
   this.y = y
 
-  foreignObject.move(x, y)
-               .show()
-
-  var form = foreignObject.getChild(0)
-  form.selectnode.focus()
+  this.foreignObject.move(x, y)
+                    .show()
 }
 
 NodeCreator.prototype.show = showNodeCreator
@@ -6546,10 +6554,11 @@ exports.sum            = require('./graph/sum.json')
 },{"./graph/apply.json":29,"./graph/hello-world.json":30,"./graph/or.json":31,"./graph/sum.json":32}],34:[function(require,module,exports){
 
 var builtinFunctions          = require('./builtinFunctions'),
-    injectAdditionalFunctions = require('./injectAdditionalFunctions'),
-    injectArguments           = require('./injectArguments'),
-    injectAccessors           = require('./injectAccessors'),
-    injectReferences          = require('./injectReferences'),
+    injectAdditionalFunctions = require('./inject/additionalFunctions'),
+    injectArguments           = require('./inject/arguments'),
+    injectAccessors           = require('./inject/accessors'),
+    injectDotOperators        = require('./inject/dotOperators'),
+    injectReferences          = require('./inject/references'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
@@ -6666,9 +6675,9 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./builtinFunctions":28,"./injectAccessors":35,"./injectAdditionalFunctions":36,"./injectArguments":37,"./injectReferences":38,"./inputArgs":39,"./isDflowFun":41,"./level":42,"./validate":47}],35:[function(require,module,exports){
+},{"./builtinFunctions":28,"./inject/accessors":35,"./inject/additionalFunctions":36,"./inject/arguments":37,"./inject/dotOperators":38,"./inject/references":39,"./inputArgs":40,"./isDflowFun":42,"./level":43,"./validate":49}],35:[function(require,module,exports){
 
-var accessorRegex = require('./regex/accessor')
+var accessorRegex = require('../regex/accessor')
 
 /**
  * Inject functions to set or get context keywords.
@@ -6683,9 +6692,17 @@ function injectAccessors (funcs, graph) {
   if (typeof graph.data === 'undefined')
     graph.data = {}
 
+  /**
+   * Inject accessor.
+   */
+
   function inject (taskKey) {
     var accessorName,
         taskName = graph.task[taskKey]
+
+    /**
+     * Accessor-like function.
+     */
 
     function accessor () {
       if (arguments.length === 1)
@@ -6707,9 +6724,9 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"./regex/accessor":44}],36:[function(require,module,exports){
+},{"../regex/accessor":45}],36:[function(require,module,exports){
 
-var builtinFunctions = require('./builtinFunctions')
+var builtinFunctions = require('../builtinFunctions')
 
 /**
  * @params {Object} funcs
@@ -6739,9 +6756,9 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{"./builtinFunctions":28}],37:[function(require,module,exports){
+},{"../builtinFunctions":28}],37:[function(require,module,exports){
 
-var argumentRegex = require('./regex/argument')
+var argumentRegex = require('../regex/argument')
 
 /**
  * Inject functions to retrieve arguments.
@@ -6755,6 +6772,10 @@ function injectArguments (funcs, task, args) {
   function getArgument (index) {
     return args[index]
   }
+
+  /**
+   * Inject arguments.
+   */
 
   function inject (taskKey) {
     var funcName = task[taskKey]
@@ -6776,9 +6797,61 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"./regex/argument":45}],38:[function(require,module,exports){
+},{"../regex/argument":46}],38:[function(require,module,exports){
 
-var referenceRegex = require('./regex/reference')
+var dotOperatorRegex = require('../regex/dotOperator')
+
+/**
+ * Inject functions that emulate dot operator.
+ *
+ * @api private
+ *
+ * @param {Object} funcs reference
+ * @param {Object} graph
+ */
+
+function injectDotOperators (funcs, graph) {
+
+  /**
+   * Inject dot operator.
+   */
+
+  function inject (taskKey) {
+    var accessorName,
+        taskName = graph.task[taskKey]
+
+    /**
+     * Dot operator like function.
+     *
+     * @param {String} attributeName
+     * @param {Object} obj
+     *
+     * @returns {*} attribute
+     */
+
+    function dotOperator (attributeName, obj) {
+      if (typeof obj !== 'object')
+        obj = {}
+
+      return obj[attributeName]
+    }
+
+    if (dotOperatorRegex.attr.test(taskName)) {
+      attributeName = taskName.substring(1)
+
+      funcs[taskName] = dotOperator.bind(null, attributeName)
+    }
+  }
+
+  Object.keys(graph.task).forEach(inject)
+}
+
+module.exports = injectDotOperators
+
+
+},{"../regex/dotOperator":47}],39:[function(require,module,exports){
+
+var referenceRegex = require('../regex/reference')
 
 /**
  * Inject references to functions.
@@ -6791,6 +6864,10 @@ function injectReferences (funcs, task) {
   function inject (taskKey) {
     var referenceName,
         taskName       = task[taskKey]
+
+    /**
+     * Inject reference.
+     */
 
     function reference () {
       return funcs[referenceName]
@@ -6809,7 +6886,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"./regex/reference":46}],39:[function(require,module,exports){
+},{"../regex/reference":48}],40:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6842,7 +6919,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":40}],40:[function(require,module,exports){
+},{"./inputPipes":41}],41:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -6872,7 +6949,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -6899,7 +6976,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":47}],42:[function(require,module,exports){
+},{"./validate":49}],43:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -6935,7 +7012,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":43}],43:[function(require,module,exports){
+},{"./parents":44}],44:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6964,26 +7041,34 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":40}],44:[function(require,module,exports){
+},{"./inputPipes":41}],45:[function(require,module,exports){
 
 module.exports = /^@(.+)$/
 
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
+
+exports.attr = /^\.(.+)$/
+
+exports.func = /^\.(.+)\(\)$/
+
+
+},{}],48:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 
-var accessorRegex  = require('./regex/accessor'),
-    argumentRegex  = require('./regex/argument'),
-    referenceRegex = require('./regex/reference')
+var accessorRegex    = require('./regex/accessor'),
+    argumentRegex    = require('./regex/argument'),
+    dotOperatorRegex = require('./regex/dotOperator')
+    referenceRegex   = require('./regex/reference')
 
 /**
  * Check graph consistency.
@@ -7021,6 +7106,9 @@ function validate (graph, additionalFunctions) {
 
       if (accessorRegex.test(taskName))
         throw new TypeError('Function name cannot start with @')
+
+      if (dotOperatorRegex.attr.test(taskName))
+        throw new TypeError('Function name cannot start with .')
 
       if (referenceRegex.test(taskName))
         throw new TypeError('Function name cannot start with &')
@@ -7102,7 +7190,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":44,"./regex/argument":45,"./regex/reference":46}],"examples-render":[function(require,module,exports){
+},{"./regex/accessor":45,"./regex/argument":46,"./regex/dotOperator":47,"./regex/reference":48}],"examples-render":[function(require,module,exports){
 
 var Canvas = require('flow-view').Canvas,
     dflow    = require('dflow'),

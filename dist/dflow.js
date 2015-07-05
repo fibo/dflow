@@ -230,10 +230,11 @@ exports['String.prototype.trim']              = String.prototype.trim
 },{}],2:[function(require,module,exports){
 
 var builtinFunctions          = require('./builtinFunctions'),
-    injectAdditionalFunctions = require('./injectAdditionalFunctions'),
-    injectArguments           = require('./injectArguments'),
-    injectAccessors           = require('./injectAccessors'),
-    injectReferences          = require('./injectReferences'),
+    injectAdditionalFunctions = require('./inject/additionalFunctions'),
+    injectArguments           = require('./inject/arguments'),
+    injectAccessors           = require('./inject/accessors'),
+    injectDotOperators        = require('./inject/dotOperators'),
+    injectReferences          = require('./inject/references'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
@@ -350,9 +351,9 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./builtinFunctions":1,"./injectAccessors":3,"./injectAdditionalFunctions":4,"./injectArguments":5,"./injectReferences":6,"./inputArgs":7,"./isDflowFun":9,"./level":10,"./validate":15}],3:[function(require,module,exports){
+},{"./builtinFunctions":1,"./inject/accessors":3,"./inject/additionalFunctions":4,"./inject/arguments":5,"./inject/dotOperators":6,"./inject/references":7,"./inputArgs":8,"./isDflowFun":10,"./level":11,"./validate":17}],3:[function(require,module,exports){
 
-var accessorRegex = require('./regex/accessor')
+var accessorRegex = require('../regex/accessor')
 
 /**
  * Inject functions to set or get context keywords.
@@ -367,9 +368,17 @@ function injectAccessors (funcs, graph) {
   if (typeof graph.data === 'undefined')
     graph.data = {}
 
+  /**
+   * Inject accessor.
+   */
+
   function inject (taskKey) {
     var accessorName,
         taskName = graph.task[taskKey]
+
+    /**
+     * Accessor-like function.
+     */
 
     function accessor () {
       if (arguments.length === 1)
@@ -391,9 +400,9 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"./regex/accessor":12}],4:[function(require,module,exports){
+},{"../regex/accessor":13}],4:[function(require,module,exports){
 
-var builtinFunctions = require('./builtinFunctions')
+var builtinFunctions = require('../builtinFunctions')
 
 /**
  * @params {Object} funcs
@@ -423,9 +432,9 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{"./builtinFunctions":1}],5:[function(require,module,exports){
+},{"../builtinFunctions":1}],5:[function(require,module,exports){
 
-var argumentRegex = require('./regex/argument')
+var argumentRegex = require('../regex/argument')
 
 /**
  * Inject functions to retrieve arguments.
@@ -439,6 +448,10 @@ function injectArguments (funcs, task, args) {
   function getArgument (index) {
     return args[index]
   }
+
+  /**
+   * Inject arguments.
+   */
 
   function inject (taskKey) {
     var funcName = task[taskKey]
@@ -460,9 +473,61 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"./regex/argument":13}],6:[function(require,module,exports){
+},{"../regex/argument":14}],6:[function(require,module,exports){
 
-var referenceRegex = require('./regex/reference')
+var dotOperatorRegex = require('../regex/dotOperator')
+
+/**
+ * Inject functions that emulate dot operator.
+ *
+ * @api private
+ *
+ * @param {Object} funcs reference
+ * @param {Object} graph
+ */
+
+function injectDotOperators (funcs, graph) {
+
+  /**
+   * Inject dot operator.
+   */
+
+  function inject (taskKey) {
+    var accessorName,
+        taskName = graph.task[taskKey]
+
+    /**
+     * Dot operator like function.
+     *
+     * @param {String} attributeName
+     * @param {Object} obj
+     *
+     * @returns {*} attribute
+     */
+
+    function dotOperator (attributeName, obj) {
+      if (typeof obj !== 'object')
+        obj = {}
+
+      return obj[attributeName]
+    }
+
+    if (dotOperatorRegex.attr.test(taskName)) {
+      attributeName = taskName.substring(1)
+
+      funcs[taskName] = dotOperator.bind(null, attributeName)
+    }
+  }
+
+  Object.keys(graph.task).forEach(inject)
+}
+
+module.exports = injectDotOperators
+
+
+},{"../regex/dotOperator":15}],7:[function(require,module,exports){
+
+var referenceRegex = require('../regex/reference')
 
 /**
  * Inject references to functions.
@@ -475,6 +540,10 @@ function injectReferences (funcs, task) {
   function inject (taskKey) {
     var referenceName,
         taskName       = task[taskKey]
+
+    /**
+     * Inject reference.
+     */
 
     function reference () {
       return funcs[referenceName]
@@ -493,7 +562,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"./regex/reference":14}],7:[function(require,module,exports){
+},{"../regex/reference":16}],8:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -526,7 +595,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":8}],8:[function(require,module,exports){
+},{"./inputPipes":9}],9:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -556,7 +625,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -583,7 +652,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":15}],10:[function(require,module,exports){
+},{"./validate":17}],11:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -619,7 +688,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":11}],11:[function(require,module,exports){
+},{"./parents":12}],12:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -648,26 +717,34 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":8}],12:[function(require,module,exports){
+},{"./inputPipes":9}],13:[function(require,module,exports){
 
 module.exports = /^@(.+)$/
 
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
+
+exports.attr = /^\.(.+)$/
+
+exports.func = /^\.(.+)\(\)$/
+
+
+},{}],16:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 
-var accessorRegex  = require('./regex/accessor'),
-    argumentRegex  = require('./regex/argument'),
-    referenceRegex = require('./regex/reference')
+var accessorRegex    = require('./regex/accessor'),
+    argumentRegex    = require('./regex/argument'),
+    dotOperatorRegex = require('./regex/dotOperator')
+    referenceRegex   = require('./regex/reference')
 
 /**
  * Check graph consistency.
@@ -705,6 +782,9 @@ function validate (graph, additionalFunctions) {
 
       if (accessorRegex.test(taskName))
         throw new TypeError('Function name cannot start with @')
+
+      if (dotOperatorRegex.attr.test(taskName))
+        throw new TypeError('Function name cannot start with .')
 
       if (referenceRegex.test(taskName))
         throw new TypeError('Function name cannot start with &')
@@ -786,7 +866,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":12,"./regex/argument":13,"./regex/reference":14}],"dflow":[function(require,module,exports){
+},{"./regex/accessor":13,"./regex/argument":14,"./regex/dotOperator":15,"./regex/reference":16}],"dflow":[function(require,module,exports){
 
 //
 // Dependency graph
