@@ -1,5 +1,155 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
+//
+// Dependency graph
+//
+// fun.js
+// ├── builtinFunctions.js
+// ├── inject/accessors.js
+// │   └── regex/accessors.js
+// ├── inject/additionalFunctions.js
+// ├── inject/arguments.js
+// │   └── regex/arguments.js
+// ├── inject/dotOperator.js
+// │   └── regex/dotOperator.js
+// ├── inject/references.js
+// │   └── regex/references.js
+// ├── inputArgs.js
+// │   └── inputPipes.js
+// ├── isDflowFun.js
+// ├── level.js
+// │   └── parents.js
+// │       └── inputPipes.js
+// └── validate.js
+//     ├── regex/accessors.js
+//     ├── regex/arguments.js
+//     ├── regex/dotOperator.js
+//     └── regex/references.js
+//
+
+var builtinFunctions          = require('./functions/builtin'),
+    injectAdditionalFunctions = require('./inject/additionalFunctions'),
+    injectArguments           = require('./inject/arguments'),
+    injectAccessors           = require('./inject/accessors'),
+    injectDotOperators        = require('./inject/dotOperators'),
+    injectReferences          = require('./inject/references'),
+    inputArgs                 = require('./inputArgs'),
+    isDflowFun                = require('./isDflowFun'),
+    level                     = require('./level'),
+    validate                  = require('./validate')
+
+/**
+ * Create a dflow function.
+ *
+ * @param {Object} graph to be executed
+ * @param {Object} [additionalFunctions] is a collection of functions
+ *
+ * @returns {Function} dflowFun that executes the given graph.
+ */
+
+function fun (graph, additionalFunctions) {
+  // First of all, check if graph is valid.
+  try { validate(graph, additionalFunctions) }
+  catch (err) { throw err }
+
+  var func = graph.func || {},
+      pipe = graph.pipe,
+      task = graph.task
+
+  var cachedLevelOf  = {},
+      computeLevelOf = level.bind(null, pipe, cachedLevelOf),
+      funcs          = builtinFunctions
+
+  // Expose dflow functions.
+  funcs['dflow.fun']              = fun
+  funcs['dflow.isDflowFun']       = isDflowFun
+  funcs['dflow.validate']         = validate
+
+  /**
+   * Compile each sub graph.
+   */
+
+  function compileSubgraph (key) {
+    if (typeof funcs[key] === 'undefined')
+      funcs[key] = fun(graph.func[key], additionalFunctions)
+  }
+
+  Object.keys(func)
+        .forEach(compileSubgraph)
+
+  /**
+   * Here we are, this is the ❤ of dflow.
+   */
+
+  function dflowFun () {
+    var gotReturn = false,
+        outs = {},
+        returnValue
+
+    var inputArgsOf = inputArgs.bind(null, outs, pipe)
+
+    // Inject builtin tasks.
+    injectAccessors(funcs, graph)
+    injectAdditionalFunctions(funcs, additionalFunctions)
+    injectArguments(funcs, task, arguments)
+    injectReferences(funcs, task)
+
+    /**
+     * Sorts tasks by their level.
+     */
+
+    function byLevel (a, b) {
+      if (typeof cachedLevelOf[a] === 'undefined')
+        cachedLevelOf[a] = computeLevelOf(a)
+
+      if (typeof cachedLevelOf[b] === 'undefined')
+        cachedLevelOf[b] = computeLevelOf(b)
+
+      return cachedLevelOf[a] - cachedLevelOf[b]
+    }
+
+    /**
+     * Execute task.
+     */
+
+    function run (taskKey) {
+      var args     = inputArgsOf(taskKey),
+          funcName = task[taskKey],
+          f        = funcs[funcName]
+
+      // Behave like a JavaScript function:
+      // if found a return, skip all other tasks.
+      if (gotReturn)
+        return
+
+      if ((funcName === 'return') && (!gotReturn)) {
+        returnValue = args[0]
+        gotReturn = true
+        return
+      }
+
+      outs[taskKey] = f.apply(null, args)
+    }
+
+    // Run every graph task, sorted by level.
+    Object.keys(task)
+          .sort(byLevel)
+          .forEach(run)
+
+    return returnValue
+  }
+
+  // Remember function was created from a dflow graph.
+  dflowFun.graph = graph
+
+  return dflowFun
+}
+
+module.exports = fun
+
+
+},{"./functions/builtin":2,"./inject/accessors":4,"./inject/additionalFunctions":5,"./inject/arguments":6,"./inject/dotOperators":7,"./inject/references":8,"./inputArgs":9,"./isDflowFun":11,"./level":12,"./validate":18}],2:[function(require,module,exports){
+
 // Arithmetic operators
 
 function addition (a, b) { return a + b }
@@ -227,131 +377,20 @@ exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
 
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 
-var builtinFunctions          = require('./builtinFunctions'),
-    injectAdditionalFunctions = require('./inject/additionalFunctions'),
-    injectArguments           = require('./inject/arguments'),
-    injectAccessors           = require('./inject/accessors'),
-    injectDotOperators        = require('./inject/dotOperators'),
-    injectReferences          = require('./inject/references'),
-    inputArgs                 = require('./inputArgs'),
-    isDflowFun                = require('./isDflowFun'),
-    level                     = require('./level'),
-    validate                  = require('./validate')
+exports.Audio = function () { return window.Audio }
 
-/**
- * Create a dflow function.
- *
- * @param {Object} graph to be executed
- * @param {Object} [additionalFunctions] is a collection of functions
- *
- * @returns {Function} dflowFun that executes the given graph.
- */
+exports.document = function _document () { return document }
 
-function fun (graph, additionalFunctions) {
-  // First of all, check if graph is valid.
-  try { validate(graph, additionalFunctions) }
-  catch (err) { throw err }
+exports['document.body'] = function body () { return document.body }
 
-  var func = graph.func || {},
-      pipe = graph.pipe,
-      task = graph.task
+exports['document.head'] = function head () { return document.head }
 
-  var cachedLevelOf  = {},
-      computeLevelOf = level.bind(null, pipe, cachedLevelOf),
-      funcs          = builtinFunctions
-
-  // Expose dflow functions.
-  funcs['dflow.builtinFunctions'] = builtinFunctions
-  funcs['dflow.fun']              = fun
-  funcs['dflow.isDflowFun']       = isDflowFun
-  funcs['dflow.validate']         = validate
-
-  /**
-   * Compile each sub graph.
-   */
-
-  function compileSubgraph (key) {
-    if (typeof funcs[key] === 'undefined')
-      funcs[key] = fun(graph.func[key], additionalFunctions)
-  }
-
-  Object.keys(func)
-        .forEach(compileSubgraph)
-
-  /**
-   * Here we are, this is the ❤ of dflow.
-   */
-
-  function dflowFun () {
-    var gotReturn = false,
-        outs = {},
-        returnValue
-
-    var inputArgsOf = inputArgs.bind(null, outs, pipe)
-
-    // Inject builtin tasks.
-    injectAccessors(funcs, graph)
-    injectAdditionalFunctions(funcs, additionalFunctions)
-    injectArguments(funcs, task, arguments)
-    injectReferences(funcs, task)
-
-    /**
-     * Sorts tasks by their level.
-     */
-
-    function byLevel (a, b) {
-      if (typeof cachedLevelOf[a] === 'undefined')
-        cachedLevelOf[a] = computeLevelOf(a)
-
-      if (typeof cachedLevelOf[b] === 'undefined')
-        cachedLevelOf[b] = computeLevelOf(b)
-
-      return cachedLevelOf[a] - cachedLevelOf[b]
-    }
-
-    /**
-     * Execute task.
-     */
-
-    function run (taskKey) {
-      var args     = inputArgsOf(taskKey),
-          funcName = task[taskKey],
-          f        = funcs[funcName]
-
-      // Behave like a JavaScript function:
-      // if found a return, skip all other tasks.
-      if (gotReturn)
-        return
-
-      if ((funcName === 'return') && (!gotReturn)) {
-        returnValue = args[0]
-        gotReturn = true
-        return
-      }
-
-      outs[taskKey] = f.apply(null, args)
-    }
-
-    // Run every graph task, sorted by level.
-    Object.keys(task)
-          .sort(byLevel)
-          .forEach(run)
-
-    return returnValue
-  }
-
-  // Remember function was created from a dflow graph.
-  dflowFun.graph = graph
-
-  return dflowFun
-}
-
-module.exports = fun
+exports.window = function _window () { return window }
 
 
-},{"./builtinFunctions":1,"./inject/accessors":3,"./inject/additionalFunctions":4,"./inject/arguments":5,"./inject/dotOperators":6,"./inject/references":7,"./inputArgs":8,"./isDflowFun":10,"./level":11,"./validate":17}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 
 var accessorRegex = require('../regex/accessor')
 
@@ -400,9 +439,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"../regex/accessor":13}],4:[function(require,module,exports){
-
-var builtinFunctions = require('../builtinFunctions')
+},{"../regex/accessor":14}],5:[function(require,module,exports){
 
 /**
  * @params {Object} funcs
@@ -432,7 +469,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{"../builtinFunctions":1}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 
 var argumentRegex = require('../regex/argument')
 
@@ -473,7 +510,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"../regex/argument":14}],6:[function(require,module,exports){
+},{"../regex/argument":15}],7:[function(require,module,exports){
 
 var dotOperatorRegex = require('../regex/dotOperator')
 
@@ -493,11 +530,37 @@ function injectDotOperators (funcs, graph) {
    */
 
   function inject (taskKey) {
-    var accessorName,
-        taskName = graph.task[taskKey]
+    var taskName = graph.task[taskKey]
 
     /**
-     * Dot operator like function.
+     * Dot operator function.
+     *
+     * @param {String} attributeName
+     * @param {Object} obj
+     * @param {...} rest of arguments
+     *
+     * @returns {*} result
+     */
+
+    function dotOperatorFunc (attributeName, obj) {
+      var func
+
+      if (typeof obj === 'object')
+        func = obj[attributeName]
+
+      if (typeof func === 'function')
+        return func.apply(obj, Array.prototype.slice.call(arguments, 2))
+    }
+
+    if (dotOperatorRegex.func.test(taskName)) {
+      // .foo() -> foo
+      attributeName = taskName.substring(1, taskName.length - 2)
+
+      funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
+    }
+
+    /**
+     * Dot operator attribute.
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -505,17 +568,16 @@ function injectDotOperators (funcs, graph) {
      * @returns {*} attribute
      */
 
-    function dotOperator (attributeName, obj) {
-      if (typeof obj !== 'object')
-        obj = {}
-
-      return obj[attributeName]
+    function dotOperatorAttr (attributeName, obj) {
+      if (typeof obj === 'object')
+        return obj[attributeName]
     }
 
     if (dotOperatorRegex.attr.test(taskName)) {
+      // .foo -> foo
       attributeName = taskName.substring(1)
 
-      funcs[taskName] = dotOperator.bind(null, attributeName)
+      funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
     }
   }
 
@@ -525,7 +587,7 @@ function injectDotOperators (funcs, graph) {
 module.exports = injectDotOperators
 
 
-},{"../regex/dotOperator":15}],7:[function(require,module,exports){
+},{"../regex/dotOperator":16}],8:[function(require,module,exports){
 
 var referenceRegex = require('../regex/reference')
 
@@ -562,7 +624,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"../regex/reference":16}],8:[function(require,module,exports){
+},{"../regex/reference":17}],9:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -595,7 +657,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":9}],9:[function(require,module,exports){
+},{"./inputPipes":10}],10:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -625,7 +687,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -652,7 +714,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":17}],11:[function(require,module,exports){
+},{"./validate":18}],12:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -688,7 +750,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":12}],12:[function(require,module,exports){
+},{"./parents":13}],13:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -717,29 +779,29 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":9}],13:[function(require,module,exports){
+},{"./inputPipes":10}],14:[function(require,module,exports){
 
 module.exports = /^@(.+)$/
 
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],15:[function(require,module,exports){
-
-exports.attr = /^\.(.+)$/
-
-exports.func = /^\.(.+)\(\)$/
-
-
 },{}],16:[function(require,module,exports){
+
+exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
+
+exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
+
+
+},{}],17:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
@@ -866,24 +928,24 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":13,"./regex/argument":14,"./regex/dotOperator":15,"./regex/reference":16}],"dflow":[function(require,module,exports){
+},{"./regex/accessor":14,"./regex/argument":15,"./regex/dotOperator":16,"./regex/reference":17}],"dflow":[function(require,module,exports){
 
-//
-// Dependency graph
-//
-// fun.js
-// ├── injectAccessors.js
-// ├── injectArguments.js
-// ├── injectReferences.js
-// ├── inputArgs.js
-// │   └── inputPipes.js
-// ├── level.js
-// │   └── parents.js
-// │       └── inputPipes.js
-// └── validate.js
-//
+var windowFunctions = require('./functions/window'),
+    fun             = require('./fun')
 
-exports.fun = require('./src/fun')
+function funBrowser (graph) {
+  var additionalFunctions = arguments[1] || {}
+
+  function inject (key) {
+    additionalFunctions.key = windowFunctions.key
+  }
+
+  Object.keys(windowFunctions).forEach(inject)
+
+  return fun(graph, additionalFunctions)
+}
+
+exports.fun = funBrowser
 
 
-},{"./src/fun":2}]},{},[]);
+},{"./fun":1,"./functions/window":3}]},{},[]);
