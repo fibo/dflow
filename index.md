@@ -105,6 +105,7 @@ A *graph* has the following properties
   * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*.
   * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
+  * `.quz`, `.quz()`: returns a dot-operator-like function.
 
 Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:
 
