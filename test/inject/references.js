@@ -1,5 +1,5 @@
 
-var injectReferences = require('../src/injectReferences'),
+var injectReferences = require('../../src/inject/references'),
     should           = require('should')
 
 var funcs = {
