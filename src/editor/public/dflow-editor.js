@@ -5415,6 +5415,7 @@ function addPin (type, position) {
       if (i < position)
         pin = this[type][i]
 
+      // After new pin position, it is necessary to use i + 1 as index.
       if (i > position)
         pin = this[type][i + 1]
 
@@ -5422,6 +5423,16 @@ function addPin (type, position) {
           vertex = pin.vertex.relative
 
       rect.move(vertex.x, vertex.y)
+
+      // Move also any link connected to pin.
+      if (type === 'ins')
+        if (pin.link)
+          pin.link.linePlot()
+
+      if (type === 'outs')
+        Object.keys(pin.link).forEach(function (key) {
+          pin.link[key].linePlot()
+        })
     }
   }
 }
@@ -5758,10 +5769,7 @@ function NodeCreator (canvas) {
 
   var form = foreignObject.getChild(0)
 
-  form.innerHTML = '<input id="flow-view-selector-input" name="selectnode" type="text" autofocus />'
-
-  // TODO give focus to input text
-  form.selectnode.focus()
+  form.innerHTML = '<input id="flow-view-selector-input" name="selectnode" type="text" />'
 
   function createNode () {
     foreignObject.hide()
@@ -5802,14 +5810,19 @@ function hideNodeCreator (ev) {
 NodeCreator.prototype.hide = hideNodeCreator
 
 function showNodeCreator (ev) {
-  var x = ev.clientX,
-      y = ev.clientY
+  var x = ev.offsetX,
+      y = ev.offsetY
+
+  var foreignObject = this.foreignObject
 
   this.x = x
   this.y = y
 
-  this.foreignObject.move(x, y)
-                    .show()
+  foreignObject.move(x, y)
+               .show()
+
+  var form = foreignObject.getChild(0)
+  form.selectnode.focus()
 }
 
 NodeCreator.prototype.show = showNodeCreator
