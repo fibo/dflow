@@ -33,7 +33,7 @@ describe('example', function () {
 
   describe('packagedGraph', function () {
     it('is a dflow graph packages with npm', function () {
-      var graph = require('./examples/packagedGraph')
+      var graph = require('../src/examples/packagedGraph')
 
       var sum = dflow.fun(graph)
 

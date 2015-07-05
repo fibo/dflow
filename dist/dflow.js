@@ -56,14 +56,14 @@ exports['<='] = lessThenOrEqualTo
 
 // Other operators
 
-function typeofOperator (operand) { return typeof operand }
-exports['typeof'] = typeofOperator
-
 function applyMethod (fun, thisArg, argsArray) { return fun.apply(thisArg, argsArray) }
 exports.apply = applyMethod
 
 function dot (obj, prop) { return obj[prop] }
 exports['.'] = dot
+
+function typeofOperator (operand) { return typeof operand }
+exports['typeof'] = typeofOperator
 
 // Array
 

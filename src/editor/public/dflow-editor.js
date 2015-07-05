@@ -559,13 +559,13 @@ SVG.extend(SVG.Container, {
 },{}],6:[function(require,module,exports){
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
-* @version 2.0.3
+* @version 2.0.4
 * http://www.svgjs.com
 *
 * @copyright Wout Fierens <wout@impinc.co.uk>
 * @license MIT
 *
-* BUILT: Sat Jun 27 2015 14:02:53 GMT+0200 (Mitteleuropäische Sommerzeit)
+* BUILT: Sun Jun 28 2015 21:25:11 GMT+0200 (Mitteleuropäische Sommerzeit)
 */;
 
 (function(root, factory) {
@@ -760,12 +760,12 @@ SVG.regex = {
 
 }
 SVG.utils = {
-  // Map function
-  map: function(array, block) {
+    // Map function
+    map: function(array, block) {
     var i
       , il = array.length
       , result = []
-
+    
     for (i = 0; i < il; i++)
       result.push(block(array[i]))
     
@@ -774,12 +774,15 @@ SVG.utils = {
 
   // Degrees to radians
 , radians: function(d) {
-		return d % 360 * Math.PI / 180
-	}
-	// Radians to degrees
+    return d % 360 * Math.PI / 180
+  }
+  // Radians to degrees
 , degrees: function(r) {
-		return r * 180 / Math.PI % 360
-	}
+    return r * 180 / Math.PI % 360
+  }
+, filterSVGElements: function(p) {
+    return [].filter.call(p, function(el){ return el instanceof SVGElement })
+  }
 
 }
 
@@ -2717,7 +2720,7 @@ SVG.Parent = SVG.invent({
 , extend: {
     // Returns all child elements
     children: function() {
-      return SVG.utils.map(this.node.childNodes, function(node) {
+      return SVG.utils.map(SVG.utils.filterSVGElements(this.node.childNodes), function(node) {
         return SVG.adopt(node)
       })
     }
@@ -3824,7 +3827,7 @@ SVG.Image = SVG.invent({
       
       // preload image
       img.onload = function() {
-        var p = self.doc(SVG.Pattern)
+        var p = self.parent(SVG.Pattern)
 
         // ensure image size
         if (self.width() == 0 && self.height() == 0)
@@ -3953,10 +3956,10 @@ SVG.Text = SVG.invent({
     // Get all the first level lines
   , lines: function() {
       // filter tspans and map them to SVG.js instances
-      for (var i = 0, il = this.node.childNodes.length, lines = []; i < il; i++)
-        if (this.node.childNodes[i] instanceof SVGElement)
-          lines.push(SVG.adopt(this.node.childNodes[i]))
-      
+      var lines = SVG.utils.map(SVG.utils.filterSVGElements(this.node.childNodes), function(el){
+        return SVG.adopt(el)
+      })
+
       // return an instance of SVG.set
       return new SVG.Set(lines)
     }
@@ -4031,7 +4034,7 @@ SVG.Tspan = SVG.invent({
     // Create new line
   , newLine: function() {
       // fetch text parent
-      var t = this.doc(SVG.Text)
+      var t = this.parent(SVG.Text)
 
       // mark new line
       this.newLined = true
@@ -4066,13 +4069,6 @@ SVG.extend(SVG.Text, SVG.Tspan, {
     
     // add new tspan
     node.appendChild(tspan.node)
-
-    // only first level tspans are considered to be "lines"
-    // that doenst make sence. A line is added to a SVG.Set which is never used or returned.
-    // So why bother adding it?
-    // Also: lines() reads all children so it already has this tspan in it because we added it before
-    if (this instanceof SVG.Text)
-      this.lines().add(tspan)
 
     return tspan.text(text)
   }
@@ -5398,6 +5394,7 @@ function addPin (type, position) {
       if (i < position)
         pin = this[type][i]
 
+      // After new pin position, it is necessary to use i + 1 as index.
       if (i > position)
         pin = this[type][i + 1]
 
@@ -5405,6 +5402,16 @@ function addPin (type, position) {
           vertex = pin.vertex.relative
 
       rect.move(vertex.x, vertex.y)
+
+      // Move also any link connected to pin.
+      if (type === 'ins')
+        if (pin.link)
+          pin.link.linePlot()
+
+      if (type === 'outs')
+        Object.keys(pin.link).forEach(function (key) {
+          pin.link[key].linePlot()
+        })
     }
   }
 }
@@ -5741,10 +5748,7 @@ function NodeCreator (canvas) {
 
   var form = foreignObject.getChild(0)
 
-  form.innerHTML = '<input id="flow-view-selector-input" name="selectnode" type="text" autofocus />'
-
-  // TODO give focus to input text
-  form.selectnode.focus()
+  form.innerHTML = '<input id="flow-view-selector-input" name="selectnode" type="text" />'
 
   function createNode () {
     foreignObject.hide()
@@ -5785,14 +5789,19 @@ function hideNodeCreator (ev) {
 NodeCreator.prototype.hide = hideNodeCreator
 
 function showNodeCreator (ev) {
-  var x = ev.clientX,
-      y = ev.clientY
+  var x = ev.offsetX,
+      y = ev.offsetY
+
+  var foreignObject = this.foreignObject
 
   this.x = x
   this.y = y
 
-  this.foreignObject.move(x, y)
-                    .show()
+  foreignObject.move(x, y)
+               .show()
+
+  var form = foreignObject.getChild(0)
+  form.selectnode.focus()
 }
 
 NodeCreator.prototype.show = showNodeCreator
@@ -6154,26 +6163,29 @@ module.exports = validate
 
 },{}],26:[function(require,module,exports){
 
-      var request = new XMLHttpRequest()
-      request.open('GET', '/graph.json', true)
+var request = new XMLHttpRequest()
+  request.open('GET', '/graph.json', true)
 
-      request.onload = function() {
-        if (request.status >= 200 && request.status < 400) {
-          // Success!
-          var graph = JSON.parse(request.responseText)
-          require('flow-view').render('flow')(graph)
-          // TODO run graph depending on dflow-cli arguments
-          //require('dflow').fun(graph)()
-        } else {
-          // We reached our target server, but it returned an error
+  request.onload = function() {
+    if (request.status >= 200 && request.status < 400) {
+      // Success!
+      var graph = JSON.parse(request.responseText)
+        var Canvas = require('flow-view').Canvas
+        var canvas = new Canvas('flow')
 
-        }
-      }
+        canvas.createView(graph.view)
+        // TODO run graph depending on dflow-cli arguments
+        //require('dflow').fun(graph)()
+    } else {
+      // We reached our target server, but it returned an error
 
-      request.onerror = function() {
-        // There was a connection error of some sort
-      }
+    }
+  }
 
-      request.send()
+request.onerror = function() {
+  // There was a connection error of some sort
+}
+
+request.send()
 
 },{"flow-view":2}]},{},[26]);
