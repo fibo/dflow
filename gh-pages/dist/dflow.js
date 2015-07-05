@@ -128,6 +128,9 @@ function fun (graph, additionalFunctions) {
         return
       }
 
+      if (typeof f === 'undefined')
+        throw new TypeError('Task ' + funcName + ' [' + taskKey + '] is not defined')
+
       outs[taskKey] = f.apply(null, args)
     }
 
@@ -569,8 +572,15 @@ function injectDotOperators (funcs, graph) {
      */
 
     function dotOperatorAttr (attributeName, obj) {
+      var attr
+
       if (typeof obj === 'object')
-        return obj[attributeName]
+        attr = obj[attributeName]
+
+      if (typeof attr === 'function')
+        return attr.bind(obj)
+
+      return attr
     }
 
     if (dotOperatorRegex.attr.test(taskName)) {
@@ -937,7 +947,7 @@ function funBrowser (graph) {
   var additionalFunctions = arguments[1] || {}
 
   function inject (key) {
-    additionalFunctions.key = windowFunctions.key
+    additionalFunctions[key] = windowFunctions[key]
   }
 
   Object.keys(windowFunctions).forEach(inject)

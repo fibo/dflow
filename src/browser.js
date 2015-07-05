@@ -6,7 +6,7 @@ function funBrowser (graph) {
   var additionalFunctions = arguments[1] || {}
 
   function inject (key) {
-    additionalFunctions.key = windowFunctions.key
+    additionalFunctions[key] = windowFunctions[key]
   }
 
   Object.keys(windowFunctions).forEach(inject)
