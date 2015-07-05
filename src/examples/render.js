@@ -16,6 +16,7 @@ var Canvas = require('flow-view').Canvas,
 
 function renderExample (divId, example) {
   var graph = examples[example]
+  console.log(graph)
 
   var canvas = new Canvas(divId)
 
