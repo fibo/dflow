@@ -1,7 +1,8 @@
 
-var accessorRegex  = require('./regex/accessor'),
-    argumentRegex  = require('./regex/argument'),
-    referenceRegex = require('./regex/reference')
+var accessorRegex    = require('./regex/accessor'),
+    argumentRegex    = require('./regex/argument'),
+    dotOperatorRegex = require('./regex/dotOperatorRegex')
+    referenceRegex   = require('./regex/reference')
 
 /**
  * Check graph consistency.
@@ -39,6 +40,9 @@ function validate (graph, additionalFunctions) {
 
       if (accessorRegex.test(taskName))
         throw new TypeError('Function name cannot start with @')
+
+      if (dotOperatorRegex.test(taskName))
+        throw new TypeError('Function name cannot start with .')
 
       if (referenceRegex.test(taskName))
         throw new TypeError('Function name cannot start with &')

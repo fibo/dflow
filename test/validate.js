@@ -46,7 +46,7 @@ describe('validate', function () {
     }).should.throwError(/Reserved function name/)
   })
 
-  it('throws if an additional function name start with a @', function () {
+  it('throws if an additional function name starts with a @', function () {
     ;(function () {
       validate({ task: {}, pipe: {} },
                {
@@ -55,13 +55,22 @@ describe('validate', function () {
     }).should.throwError(/Function name cannot start with @/)
   })
 
-  it('throws if an additional function name start with &', function () {
+  it('throws if an additional function name starts with a &', function () {
     ;(function () {
       validate({ task: {}, pipe: {} },
                {
                  '&bar': Function.prototype
                })
     }).should.throwError(/Function name cannot start with &/)
+  })
+
+  it('throws if an additional function name starts with a .', function () {
+    ;(function () {
+      validate({ task: {}, pipe: {} },
+               {
+                 '.quz': Function.prototype
+               })
+    }).should.throwError(/Function name cannot start with \./)
   })
 
   it('throws if pipe or task is not an object', function () {

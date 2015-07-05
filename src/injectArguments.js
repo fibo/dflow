@@ -14,6 +14,10 @@ function injectArguments (funcs, task, args) {
     return args[index]
   }
 
+  /**
+   * Inject arguments.
+   */
+
   function inject (taskKey) {
     var funcName = task[taskKey]
 
