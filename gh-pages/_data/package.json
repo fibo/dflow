@@ -1,9 +1,10 @@
 {
   "name": "dflow",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Dataflow programming",
   "bin": "bin/dflow",
   "main": "index.js",
+  "browser": "./src/browser.js",
   "scripts": {
     "_build": "npm test && npm run browserify && npm run jekyll; git status",
     "_push": "git push origin master && npm run gh-pages:push",

@@ -1,6 +1,4 @@
 
-var builtinFunctions = require('../builtinFunctions')
-
 /**
  * @params {Object} funcs
  * @params {Object} additionalFunctions
