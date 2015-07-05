@@ -135,7 +135,7 @@ fs.createReadStream("input/people.json")
     .pipe(fs.createWriteStream("output/people.json"));
 ```
 
-It is ported to script [stream.js](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/stream.js) which evaluates [graph stream.json](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/stream.json) using [few custom functions](https://github.com/fibo/dflow/blob/master/test/examples/stream-playground/funcs.js).
+It is ported to script [stream.js](https://github.com/fibo/dflow/blob/master/src/examples/stream-playground/stream.js) which evaluates [graph stream.json](https://github.com/fibo/dflow/blob/master/src/examples/stream-playground/stream.json) using [few custom functions](https://github.com/fibo/dflow/blob/master/src/examples/stream-playground/funcs.js).
 
 ### Packaged graph
 
@@ -145,7 +145,7 @@ Also every *dflow* graph is a function itself, so why not packaging it and put i
 
 It is really easy: create your *dflow* graph and save it to a JSON file, *index.json* for instance; then launch `npm init` as usual and when prompted for the *entry point* write *index.json*.
 
-Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/test/examples/packagedGraph) as an example.
+Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/src/examples/packagedGraph) as an example.
 
 ## Support and License
 
