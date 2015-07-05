@@ -1,37 +1,24 @@
 
-var injectdotOperators = require('../src/injectdotOperators'),
-    should          = require('should')
+var injectDotOperators = require('../src/inject/dotOperators'),
+    should             = require('should')
 
 describe('injectdotOperators', function () {
   it('modifies funcs object with accessors injected', function () {
     var data,
-        funcs = {},
+        funcs = {
+          proc: function () { return process }
+        },
         graph = {
           task: {
-          '1': '@foo',
-          '2': '@bar'
-          },
-          data: {
-            'foo': 1,
-            'bar': [2]
+            '1': '.version'
           }
         }
 
-    injectdotOperators(funcs, graph)
+    injectDotOperators(funcs, graph)
 
-    var bar = funcs['@bar']
-    var foo = funcs['@foo']
+    var getVersion = funcs['.version']
 
-    foo.should.be.instanceOf(Function)
-    bar.should.be.instanceOf(Function)
-
-    foo().should.be.eql(graph.data.foo)
-    bar().should.be.eql(graph.data.bar)
-
-    data = { a: [2, 3] }
-    foo(data)
-    foo().should.be.eql(graph.data.foo)
-    foo().should.be.eql(data)
+    getVersion(process).should.be.eql(process.version)
   })
 })
 

@@ -1,7 +1,7 @@
 
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
-    dotOperatorRegex = require('./regex/dotOperatorRegex')
+    dotOperatorRegex = require('./regex/dotOperator')
     referenceRegex   = require('./regex/reference')
 
 /**
@@ -41,7 +41,7 @@ function validate (graph, additionalFunctions) {
       if (accessorRegex.test(taskName))
         throw new TypeError('Function name cannot start with @')
 
-      if (dotOperatorRegex.test(taskName))
+      if (dotOperatorRegex.attr.test(taskName))
         throw new TypeError('Function name cannot start with .')
 
       if (referenceRegex.test(taskName))

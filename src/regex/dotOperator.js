@@ -1,5 +1,5 @@
 
-export.attribute = /^\.(.+)$/
+exports.attr = /^\.(.+)$/
 
-export.function = /^\.(.+)\(\)$/
+exports.func = /^\.(.+)\(\)$/
 
