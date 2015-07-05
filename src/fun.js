@@ -1,5 +1,32 @@
 
-var builtinFunctions          = require('./builtinFunctions'),
+//
+// Dependency graph
+//
+// fun.js
+// ├── builtinFunctions.js
+// ├── inject/accessors.js
+// │   └── regex/accessors.js
+// ├── inject/additionalFunctions.js
+// ├── inject/arguments.js
+// │   └── regex/arguments.js
+// ├── inject/dotOperator.js
+// │   └── regex/dotOperator.js
+// ├── inject/references.js
+// │   └── regex/references.js
+// ├── inputArgs.js
+// │   └── inputPipes.js
+// ├── isDflowFun.js
+// ├── level.js
+// │   └── parents.js
+// │       └── inputPipes.js
+// └── validate.js
+//     ├── regex/accessors.js
+//     ├── regex/arguments.js
+//     ├── regex/dotOperator.js
+//     └── regex/references.js
+//
+
+var builtinFunctions          = require('./functions/builtin'),
     injectAdditionalFunctions = require('./inject/additionalFunctions'),
     injectArguments           = require('./inject/arguments'),
     injectAccessors           = require('./inject/accessors'),
@@ -33,7 +60,6 @@ function fun (graph, additionalFunctions) {
       funcs          = builtinFunctions
 
   // Expose dflow functions.
-  funcs['dflow.builtinFunctions'] = builtinFunctions
   funcs['dflow.fun']              = fun
   funcs['dflow.isDflowFun']       = isDflowFun
   funcs['dflow.validate']         = validate

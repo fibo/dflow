@@ -1,24 +1,4 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-
-//
-// Dependency graph
-//
-// fun.js
-// ├── injectAccessors.js
-// ├── injectArguments.js
-// ├── injectReferences.js
-// ├── inputArgs.js
-// │   └── inputPipes.js
-// ├── level.js
-// │   └── parents.js
-// │       └── inputPipes.js
-// └── validate.js
-//
-
-exports.fun = require('./src/fun')
-
-
-},{"./src/fun":34}],2:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -321,18 +301,18 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 
 // Cheating npm require.
 module.exports = require('../..')
 
 
-},{"../..":1}],4:[function(require,module,exports){
+},{"../..":27}],3:[function(require,module,exports){
 
 module.exports = require('./src')
 
 
-},{"./src":26}],5:[function(require,module,exports){
+},{"./src":25}],4:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -357,7 +337,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /*! svg.draggable.js - v1.0.0 - 2015-06-12
 * https://github.com/wout/svg.draggable.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -549,7 +529,7 @@ if (typeof Object.create === 'function') {
   })
 
 }).call(this);
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*! svg.foreignobject.js - v1.0.0 - 2015-06-14
 * https://github.com/fibo/svg.foreignobject.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -582,16 +562,16 @@ SVG.extend(SVG.Container, {
   }
 })
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
-* @version 2.0.5
+* @version 2.0.4
 * http://www.svgjs.com
 *
 * @copyright Wout Fierens <wout@impinc.co.uk>
 * @license MIT
 *
-* BUILT: Sun Jul 05 2015 01:42:48 GMT+0200 (Mitteleuropäische Sommerzeit)
+* BUILT: Sun Jun 28 2015 21:25:11 GMT+0200 (Mitteleuropäische Sommerzeit)
 */;
 
 (function(root, factory) {
@@ -1558,14 +1538,14 @@ SVG.Element = SVG.invent({
 
       // insert the clone after myself
       this.after(clone)
-
+      
       return clone
     }
     // Remove element
   , remove: function() {
       if (this.parent())
         this.parent().removeElement(this)
-
+      
       return this
     }
     // Replace element
@@ -1589,7 +1569,7 @@ SVG.Element = SVG.invent({
     // Checks whether the given point inside the bounding box of the element
   , inside: function(x, y) {
       var box = this.bbox()
-
+      
       return x > box.x
           && y > box.y
           && x < box.x + box.width
@@ -1683,7 +1663,7 @@ SVG.Element = SVG.invent({
 
         // transplant nodes
         for (var i = 0, il = well.firstChild.childNodes.length; i < il; i++)
-          this.node.appendChild(well.firstChild.firstChild)
+          this.node.appendChild(well.firstChild.childNodes[i])
 
       // otherwise act as a getter
       } else {
@@ -2329,8 +2309,8 @@ SVG.Matrix = SVG.invent({
     var i, base = arrayToMatrix([1, 0, 0, 1, 0, 0])
 
     // ensure source as object
-    source = source instanceof SVG.Element ?
-      source.matrixify() :
+    source = source && source.node && source.node.getCTM ?
+      source.node.getCTM() :
     typeof source === 'string' ?
       stringToMatrix(source) :
     arguments.length == 6 ?
@@ -2343,7 +2323,7 @@ SVG.Matrix = SVG.invent({
       this[abcdef[i]] = source && typeof source[abcdef[i]] === 'number' ?
         source[abcdef[i]] : base[abcdef[i]]
   }
-
+  
   // Add methods
 , extend: {
     // Extract individual transformations
@@ -2352,7 +2332,7 @@ SVG.Matrix = SVG.invent({
       var px    = deltaTransformPoint(this, 0, 1)
         , py    = deltaTransformPoint(this, 1, 0)
         , skewX = 180 / Math.PI * Math.atan2(px.y, px.x) - 90
-
+  
       return {
         // translation
         x:        this.e
@@ -2425,7 +2405,7 @@ SVG.Matrix = SVG.invent({
     }
     // Translate matrix
   , translate: function(x, y) {
-      return new SVG.Matrix(this.native().translate(x || 0, y || 0))
+      return new SVG.Matrix(this.native().translate(x || 0, y || 0))  
     }
     // Scale matrix
   , scale: function(x, y, cx, cy) {
@@ -2443,7 +2423,7 @@ SVG.Matrix = SVG.invent({
   , rotate: function(r, cx, cy) {
       // convert degrees to radians
       r = SVG.utils.radians(r)
-
+      
       return this.around(cx, cy, new SVG.Matrix(Math.cos(r), Math.sin(r), -Math.sin(r), Math.cos(r), 0, 0))
     }
     // Flip matrix on x or y, at a given offset
@@ -2465,7 +2445,7 @@ SVG.Matrix = SVG.invent({
   , native: function() {
       // create new matrix
       var matrix = SVG.parser.draw.node.createSVGMatrix()
-
+  
       // update with current values
       for (var i = abcdef.length - 1; i >= 0; i--)
         matrix[abcdef[i]] = this[abcdef[i]]
@@ -2485,9 +2465,9 @@ SVG.Matrix = SVG.invent({
 , construct: {
     // Get current matrix
     ctm: function() {
-      return new SVG.Matrix(this.node.getCTM())
+      return new SVG.Matrix(this)
     }
-
+  
   }
 
 })
@@ -2584,7 +2564,7 @@ SVG.extend(SVG.Element, SVG.FX, {
     // act as a getter
     if (typeof o !== 'object') {
       // get current matrix
-      matrix = new SVG.Matrix(target).extract()
+      matrix = target.ctm().extract()
 
       // add parametric rotation
       if (typeof this.param === 'object') {
@@ -2603,7 +2583,7 @@ SVG.extend(SVG.Element, SVG.FX, {
 
     // ensure relative flag
     relative = !!relative || !!o.relative
-
+    
     // act on matrix
     if (o.a != null) {
       matrix = relative ?
@@ -2611,7 +2591,7 @@ SVG.extend(SVG.Element, SVG.FX, {
         matrix.multiply(new SVG.Matrix(o)) :
         // absolute
         new SVG.Matrix(o)
-
+    
     // act on rotation
     } else if (o.rotation != null) {
       // ensure centre point
@@ -2631,11 +2611,11 @@ SVG.extend(SVG.Element, SVG.FX, {
       if (this instanceof SVG.Element) {
         matrix = relative ?
           // relative
-          matrix.rotate(o.rotation, o.cx, o.cy) :
+          target.attr('transform', matrix + ' rotate(' + [o.rotation, o.cx, o.cy].join() + ')').ctm() :
           // absolute
           matrix.rotate(o.rotation - matrix.extract().rotation, o.cx, o.cy)
       }
-
+    
     // act on scale
     } else if (o.scale != null || o.scaleX != null || o.scaleY != null) {
       // ensure centre point
@@ -2668,7 +2648,7 @@ SVG.extend(SVG.Element, SVG.FX, {
         var e = matrix.extract()
         matrix = matrix.multiply(new SVG.Matrix().skew(e.skewX, e.skewY, o.cx, o.cy).inverse())
       }
-
+      
       matrix = matrix.skew(o.skewX, o.skewY, o.cx, o.cy)
 
     // act on flip
@@ -2689,7 +2669,7 @@ SVG.extend(SVG.Element, SVG.FX, {
         if (o.y != null) matrix.f = o.y
       }
     }
-
+    
     return this.attr('transform', matrix)
   }
 })
@@ -2698,27 +2678,6 @@ SVG.extend(SVG.Element, {
   // Reset all transformations
   untransform: function() {
     return this.attr('transform', null)
-  },
-  matrixify: function() {
-
-    var matrix = (this.attr('transform') || '')
-      // split transformations
-      .split(/\)\s*/).slice(0,-1).map(function(str){
-        // generate key => value pairs
-        var kv = str.trim().split('(')
-        return [kv[0], kv[1].split(',').map(function(str){ return parseFloat(str) })]
-      })
-      // calculate every transformation into one matrix
-      .reduce(function(matrix, transform){
-
-        if(transform[0] == 'matrix') return matrix.multiply(arrayToMatrix(transform[1]))
-        return matrix[transform[0]].apply(matrix, transform[1])
-
-      }, new SVG.Matrix())
-    // apply calculated matrix to element
-    this.attr('transform', matrix)
-
-    return matrix
   }
 })
 SVG.extend(SVG.Element, {
@@ -4908,7 +4867,7 @@ return SVG;
 
 }));
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 
 var EventEmitter = require('events').EventEmitter,
     inherits     = require('inherits'),
@@ -5084,7 +5043,7 @@ Canvas.prototype.delLink = delLink
 module.exports = Canvas
 
 
-},{"./Link":11,"./Node":12,"./NodeControls":17,"./NodeCreator":18,"./NodeInspector":19,"./SVG":23,"./default/theme.json":24,"./default/view.json":25,"./validate":27,"events":2,"inherits":5}],10:[function(require,module,exports){
+},{"./Link":10,"./Node":11,"./NodeControls":16,"./NodeCreator":17,"./NodeInspector":18,"./SVG":22,"./default/theme.json":23,"./default/view.json":24,"./validate":26,"events":1,"inherits":4}],9:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin')
@@ -5119,7 +5078,7 @@ Input.prototype.createView = createView
 module.exports = Input
 
 
-},{"./Pin":21,"inherits":5}],11:[function(require,module,exports){
+},{"./Pin":20,"inherits":4}],10:[function(require,module,exports){
 
 function Link (canvas, key) {
   this.canvas = canvas
@@ -5235,7 +5194,7 @@ Link.prototype.linePlot = linePlot
 module.exports = Link
 
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 
 var Input   = require('./Input'),
     Output  = require('./Output')
@@ -5478,7 +5437,7 @@ Node.prototype.addOutput = addOutput
 module.exports = Node
 
 
-},{"./Input":10,"./Output":20}],13:[function(require,module,exports){
+},{"./Input":9,"./Output":19}],12:[function(require,module,exports){
 
 function NodeButton (canvas, relativeCoordinate) {
   this.relativeCoordinate = relativeCoordinate
@@ -5510,7 +5469,7 @@ NodeButton.prototype.detach = detachNodeButton
 module.exports = NodeButton
 
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -5582,7 +5541,7 @@ AddInput.prototype.attachTo = attachTo
 module.exports = AddInput
 
 
-},{"../NodeButton":13,"inherits":5}],15:[function(require,module,exports){
+},{"../NodeButton":12,"inherits":4}],14:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -5655,7 +5614,7 @@ module.exports = AddOutput
 
 
 
-},{"../NodeButton":13,"inherits":5}],16:[function(require,module,exports){
+},{"../NodeButton":12,"inherits":4}],15:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -5734,7 +5693,7 @@ DeleteNode.prototype.attachTo = attachTo
 module.exports = DeleteNode
 
 
-},{"../NodeButton":13,"inherits":5}],17:[function(require,module,exports){
+},{"../NodeButton":12,"inherits":4}],16:[function(require,module,exports){
 
 var AddInputButton   = require('./NodeButton/AddInput'),
     AddOutputButton  = require('./NodeButton/AddOutput'),
@@ -5773,7 +5732,7 @@ NodeControls.prototype.detach = nodeControlsDetach
 module.exports = NodeControls
 
 
-},{"./NodeButton/AddInput":14,"./NodeButton/AddOutput":15,"./NodeButton/DeleteNode":16}],18:[function(require,module,exports){
+},{"./NodeButton/AddInput":13,"./NodeButton/AddOutput":14,"./NodeButton/DeleteNode":15}],17:[function(require,module,exports){
 
 // TODO autocompletion from json
 // http://blog.teamtreehouse.com/creating-autocomplete-dropdowns-datalist-element
@@ -5856,7 +5815,7 @@ NodeCreator.prototype.show = showNodeCreator
 module.exports = NodeCreator
 
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 
 function NodeInspector (canvas) {
 
@@ -5865,7 +5824,7 @@ function NodeInspector (canvas) {
 module.exports = NodeInspector
 
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin'),
@@ -5915,7 +5874,7 @@ Output.prototype.createView = createView
 module.exports = Output
 
 
-},{"./Pin":21,"./PreLink":22,"inherits":5}],21:[function(require,module,exports){
+},{"./Pin":20,"./PreLink":21,"inherits":4}],20:[function(require,module,exports){
 
 function Pin (type, node, position) {
   var self = this
@@ -6012,7 +5971,7 @@ Pin.prototype.set = set
 module.exports = Pin
 
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 
 var Link = require('./Link')
 
@@ -6134,7 +6093,7 @@ function PreLink (canvas, output) {
 module.exports = PreLink
 
 
-},{"./Link":11}],23:[function(require,module,exports){
+},{"./Link":10}],22:[function(require,module,exports){
 
 // Consider this module will be browserified.
 
@@ -6155,7 +6114,7 @@ require('svg.foreignobject.js')
 module.exports = SVG
 
 
-},{"svg.draggable.js":6,"svg.foreignobject.js":7,"svg.js":8}],24:[function(require,module,exports){
+},{"svg.draggable.js":5,"svg.foreignobject.js":6,"svg.js":7}],23:[function(require,module,exports){
 module.exports={
   "fillCircle": "#fff",
   "fillLabel": "#333",
@@ -6181,18 +6140,18 @@ module.exports={
   "unitWidth": 10
 }
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports={
   "node": {},
   "link": {}
 }
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 
 exports.Canvas = require('./Canvas')
 
 
-},{"./Canvas":9}],27:[function(require,module,exports){
+},{"./Canvas":8}],26:[function(require,module,exports){
 
 function validate (view) {
   if (typeof view !== 'object')
@@ -6208,7 +6167,304 @@ function validate (view) {
 module.exports = validate
 
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
+
+var windowFunctions = require('./functions/window'),
+    fun             = require('./fun')
+
+function funBrowser (graph) {
+  var additionalFunctions = arguments[1] || {}
+
+  function inject (key) {
+    additionalFunctions.key = windowFunctions.key
+  }
+
+  Object.keys(windowFunctions).forEach(inject)
+
+  return fun(graph, additionalFunctions)
+}
+
+exports.fun = funBrowser
+
+
+},{"./fun":33,"./functions/window":35}],28:[function(require,module,exports){
+module.exports={
+  "task": {
+    "1": "&Math.cos",
+    "2": "null",
+    "3": "arguments",
+    "4": "apply",
+    "5": "return"
+  },
+  "pipe": {
+    "6": [ "1", "4", 0 ],
+    "7": [ "2", "4", 1 ],
+    "8": [ "3", "4", 2 ],
+    "9": [ "4", "5", 0 ]
+  },
+  "data": {
+    "results": [
+      {
+        "args": [0],
+        "expected": [1]
+      }
+    ]
+  }
+}
+
+},{}],29:[function(require,module,exports){
+module.exports={
+  "task": {
+    "1": "@message",
+    "2": "console.log"
+  },
+  "pipe": {
+    "3": [ "1", "2" ]
+  },
+  "data": {
+    "message": "Hello World, by dflow",
+    "results": []
+  },
+  "view": {
+    "node": {
+      "1": {
+        "x": 80,
+        "y": 20,
+        "w": 15,
+        "task": "1",
+        "text": "@message",
+        "outs": [{"name": "out0", "data": 1}]
+      },
+      "2": {
+        "x": 80,
+        "y": 150,
+        "w": 15,
+        "task": "2",
+        "text": "console.log",
+        "ins": [{"name": "in0", "data": 2}]
+      },
+      "comment": {
+        "x": 280,
+        "y": 10,
+        "w": 45,
+        "h": 4,
+        "text": "This is a comment ...\n  * you can drag a node,\n  * delete it by pressing the x button,\n * add inputs and outputs by pressing a + button\n * connect them by dragging an output to an input to create a link.\n Double click on the canvas,\n to open an input text and create a new node."
+      }
+   },
+   "link": {
+     "3": {
+       "from": ["1", 0],
+       "to": ["2", 0]
+      }
+    }
+  }
+}
+
+},{}],30:[function(require,module,exports){
+module.exports={
+  "task": {
+    "1": "arguments[0]",
+    "2": "arguments[1]",
+    "3": "||",
+    "4": "return"
+  },
+  "pipe": {
+    "5": [ "1", "3", 0 ],
+    "6": [ "2", "3", 1 ],
+    "7": [ "3", "4" ]
+  },
+  "data": {
+    "results": [
+      {
+        "args": [true, false],
+        "expected": true
+      }
+    ]
+  }
+}
+
+},{}],31:[function(require,module,exports){
+module.exports={
+  "task": {
+    "1": "arguments[0]",
+    "2": "arguments[1]",
+    "3": "+",
+    "4": "return"
+  },
+  "pipe": {
+    "5": [ "1", "3", 0 ],
+    "6": [ "2", "3", 1 ],
+    "7": [ "3", "4" ]
+  },
+  "data": {
+    "results": [
+      {
+        "args": [1, 2],
+        "expected": 3
+      }
+    ]
+  }
+}
+
+},{}],32:[function(require,module,exports){
+
+exports.apply          = require('./graph/apply.json')
+exports['hello-world'] = require('./graph/hello-world.json')
+exports.or             = require('./graph/or.json')
+exports.sum            = require('./graph/sum.json')
+
+
+},{"./graph/apply.json":28,"./graph/hello-world.json":29,"./graph/or.json":30,"./graph/sum.json":31}],33:[function(require,module,exports){
+
+//
+// Dependency graph
+//
+// fun.js
+// ├── builtinFunctions.js
+// ├── inject/accessors.js
+// │   └── regex/accessors.js
+// ├── inject/additionalFunctions.js
+// ├── inject/arguments.js
+// │   └── regex/arguments.js
+// ├── inject/dotOperator.js
+// │   └── regex/dotOperator.js
+// ├── inject/references.js
+// │   └── regex/references.js
+// ├── inputArgs.js
+// │   └── inputPipes.js
+// ├── isDflowFun.js
+// ├── level.js
+// │   └── parents.js
+// │       └── inputPipes.js
+// └── validate.js
+//     ├── regex/accessors.js
+//     ├── regex/arguments.js
+//     ├── regex/dotOperator.js
+//     └── regex/references.js
+//
+
+var builtinFunctions          = require('./functions/builtin'),
+    injectAdditionalFunctions = require('./inject/additionalFunctions'),
+    injectArguments           = require('./inject/arguments'),
+    injectAccessors           = require('./inject/accessors'),
+    injectDotOperators        = require('./inject/dotOperators'),
+    injectReferences          = require('./inject/references'),
+    inputArgs                 = require('./inputArgs'),
+    isDflowFun                = require('./isDflowFun'),
+    level                     = require('./level'),
+    validate                  = require('./validate')
+
+/**
+ * Create a dflow function.
+ *
+ * @param {Object} graph to be executed
+ * @param {Object} [additionalFunctions] is a collection of functions
+ *
+ * @returns {Function} dflowFun that executes the given graph.
+ */
+
+function fun (graph, additionalFunctions) {
+  // First of all, check if graph is valid.
+  try { validate(graph, additionalFunctions) }
+  catch (err) { throw err }
+
+  var func = graph.func || {},
+      pipe = graph.pipe,
+      task = graph.task
+
+  var cachedLevelOf  = {},
+      computeLevelOf = level.bind(null, pipe, cachedLevelOf),
+      funcs          = builtinFunctions
+
+  // Expose dflow functions.
+  funcs['dflow.fun']              = fun
+  funcs['dflow.isDflowFun']       = isDflowFun
+  funcs['dflow.validate']         = validate
+
+  /**
+   * Compile each sub graph.
+   */
+
+  function compileSubgraph (key) {
+    if (typeof funcs[key] === 'undefined')
+      funcs[key] = fun(graph.func[key], additionalFunctions)
+  }
+
+  Object.keys(func)
+        .forEach(compileSubgraph)
+
+  /**
+   * Here we are, this is the ❤ of dflow.
+   */
+
+  function dflowFun () {
+    var gotReturn = false,
+        outs = {},
+        returnValue
+
+    var inputArgsOf = inputArgs.bind(null, outs, pipe)
+
+    // Inject builtin tasks.
+    injectAccessors(funcs, graph)
+    injectAdditionalFunctions(funcs, additionalFunctions)
+    injectArguments(funcs, task, arguments)
+    injectReferences(funcs, task)
+
+    /**
+     * Sorts tasks by their level.
+     */
+
+    function byLevel (a, b) {
+      if (typeof cachedLevelOf[a] === 'undefined')
+        cachedLevelOf[a] = computeLevelOf(a)
+
+      if (typeof cachedLevelOf[b] === 'undefined')
+        cachedLevelOf[b] = computeLevelOf(b)
+
+      return cachedLevelOf[a] - cachedLevelOf[b]
+    }
+
+    /**
+     * Execute task.
+     */
+
+    function run (taskKey) {
+      var args     = inputArgsOf(taskKey),
+          funcName = task[taskKey],
+          f        = funcs[funcName]
+
+      // Behave like a JavaScript function:
+      // if found a return, skip all other tasks.
+      if (gotReturn)
+        return
+
+      if ((funcName === 'return') && (!gotReturn)) {
+        returnValue = args[0]
+        gotReturn = true
+        return
+      }
+
+      outs[taskKey] = f.apply(null, args)
+    }
+
+    // Run every graph task, sorted by level.
+    Object.keys(task)
+          .sort(byLevel)
+          .forEach(run)
+
+    return returnValue
+  }
+
+  // Remember function was created from a dflow graph.
+  dflowFun.graph = graph
+
+  return dflowFun
+}
+
+module.exports = fun
+
+
+},{"./functions/builtin":34,"./inject/accessors":36,"./inject/additionalFunctions":37,"./inject/arguments":38,"./inject/dotOperators":39,"./inject/references":40,"./inputArgs":41,"./isDflowFun":43,"./level":44,"./validate":50}],34:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -6437,258 +6693,20 @@ exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
 
 
-},{}],29:[function(require,module,exports){
-module.exports={
-  "task": {
-    "1": "&Math.cos",
-    "2": "null",
-    "3": "arguments",
-    "4": "apply",
-    "5": "return"
-  },
-  "pipe": {
-    "6": [ "1", "4", 0 ],
-    "7": [ "2", "4", 1 ],
-    "8": [ "3", "4", 2 ],
-    "9": [ "4", "5", 0 ]
-  },
-  "data": {
-    "results": [
-      {
-        "args": [0],
-        "expected": [1]
-      }
-    ]
-  }
-}
+},{}],35:[function(require,module,exports){
 
-},{}],30:[function(require,module,exports){
-module.exports={
-  "task": {
-    "1": "@message",
-    "2": "console.log"
-  },
-  "pipe": {
-    "3": [ "1", "2" ]
-  },
-  "data": {
-    "message": "Hello World, by dflow",
-    "results": []
-  },
-  "view": {
-    "node": {
-      "1": {
-        "x": 80,
-        "y": 20,
-        "w": 15,
-        "task": "1",
-        "text": "@message",
-        "outs": [{"name": "out0", "data": 1}]
-      },
-      "2": {
-        "x": 80,
-        "y": 150,
-        "w": 15,
-        "task": "2",
-        "text": "console.log",
-        "ins": [{"name": "in0", "data": 2}]
-      },
-      "comment": {
-        "x": 280,
-        "y": 10,
-        "w": 45,
-        "h": 4,
-        "text": "This is a comment ...\n  * you can drag a node,\n  * delete it by pressing the x button,\n * add inputs and outputs by pressing a + button\n * connect them by dragging an output to an input to create a link.\n Double click on the canvas,\n to open an input text and create a new node."
-      }
-   },
-   "link": {
-     "3": {
-       "from": ["1", 0],
-       "to": ["2", 0]
-      }
-    }
-  }
-}
+exports.Audio = function () { return window.Audio }
 
-},{}],31:[function(require,module,exports){
-module.exports={
-  "task": {
-    "1": "arguments[0]",
-    "2": "arguments[1]",
-    "3": "||",
-    "4": "return"
-  },
-  "pipe": {
-    "5": [ "1", "3", 0 ],
-    "6": [ "2", "3", 1 ],
-    "7": [ "3", "4" ]
-  },
-  "data": {
-    "results": [
-      {
-        "args": [true, false],
-        "expected": true
-      }
-    ]
-  }
-}
+exports.document = function _document () { return document }
 
-},{}],32:[function(require,module,exports){
-module.exports={
-  "task": {
-    "1": "arguments[0]",
-    "2": "arguments[1]",
-    "3": "+",
-    "4": "return"
-  },
-  "pipe": {
-    "5": [ "1", "3", 0 ],
-    "6": [ "2", "3", 1 ],
-    "7": [ "3", "4" ]
-  },
-  "data": {
-    "results": [
-      {
-        "args": [1, 2],
-        "expected": 3
-      }
-    ]
-  }
-}
+exports['document.body'] = function body () { return document.body }
 
-},{}],33:[function(require,module,exports){
+exports['document.head'] = function head () { return document.head }
 
-exports.apply          = require('./graph/apply.json')
-exports['hello-world'] = require('./graph/hello-world.json')
-exports.or             = require('./graph/or.json')
-exports.sum            = require('./graph/sum.json')
+exports.window = function _window () { return window }
 
 
-},{"./graph/apply.json":29,"./graph/hello-world.json":30,"./graph/or.json":31,"./graph/sum.json":32}],34:[function(require,module,exports){
-
-var builtinFunctions          = require('./builtinFunctions'),
-    injectAdditionalFunctions = require('./inject/additionalFunctions'),
-    injectArguments           = require('./inject/arguments'),
-    injectAccessors           = require('./inject/accessors'),
-    injectDotOperators        = require('./inject/dotOperators'),
-    injectReferences          = require('./inject/references'),
-    inputArgs                 = require('./inputArgs'),
-    isDflowFun                = require('./isDflowFun'),
-    level                     = require('./level'),
-    validate                  = require('./validate')
-
-/**
- * Create a dflow function.
- *
- * @param {Object} graph to be executed
- * @param {Object} [additionalFunctions] is a collection of functions
- *
- * @returns {Function} dflowFun that executes the given graph.
- */
-
-function fun (graph, additionalFunctions) {
-  // First of all, check if graph is valid.
-  try { validate(graph, additionalFunctions) }
-  catch (err) { throw err }
-
-  var func = graph.func || {},
-      pipe = graph.pipe,
-      task = graph.task
-
-  var cachedLevelOf  = {},
-      computeLevelOf = level.bind(null, pipe, cachedLevelOf),
-      funcs          = builtinFunctions
-
-  // Expose dflow functions.
-  funcs['dflow.builtinFunctions'] = builtinFunctions
-  funcs['dflow.fun']              = fun
-  funcs['dflow.isDflowFun']       = isDflowFun
-  funcs['dflow.validate']         = validate
-
-  /**
-   * Compile each sub graph.
-   */
-
-  function compileSubgraph (key) {
-    if (typeof funcs[key] === 'undefined')
-      funcs[key] = fun(graph.func[key], additionalFunctions)
-  }
-
-  Object.keys(func)
-        .forEach(compileSubgraph)
-
-  /**
-   * Here we are, this is the ❤ of dflow.
-   */
-
-  function dflowFun () {
-    var gotReturn = false,
-        outs = {},
-        returnValue
-
-    var inputArgsOf = inputArgs.bind(null, outs, pipe)
-
-    // Inject builtin tasks.
-    injectAccessors(funcs, graph)
-    injectAdditionalFunctions(funcs, additionalFunctions)
-    injectArguments(funcs, task, arguments)
-    injectReferences(funcs, task)
-
-    /**
-     * Sorts tasks by their level.
-     */
-
-    function byLevel (a, b) {
-      if (typeof cachedLevelOf[a] === 'undefined')
-        cachedLevelOf[a] = computeLevelOf(a)
-
-      if (typeof cachedLevelOf[b] === 'undefined')
-        cachedLevelOf[b] = computeLevelOf(b)
-
-      return cachedLevelOf[a] - cachedLevelOf[b]
-    }
-
-    /**
-     * Execute task.
-     */
-
-    function run (taskKey) {
-      var args     = inputArgsOf(taskKey),
-          funcName = task[taskKey],
-          f        = funcs[funcName]
-
-      // Behave like a JavaScript function:
-      // if found a return, skip all other tasks.
-      if (gotReturn)
-        return
-
-      if ((funcName === 'return') && (!gotReturn)) {
-        returnValue = args[0]
-        gotReturn = true
-        return
-      }
-
-      outs[taskKey] = f.apply(null, args)
-    }
-
-    // Run every graph task, sorted by level.
-    Object.keys(task)
-          .sort(byLevel)
-          .forEach(run)
-
-    return returnValue
-  }
-
-  // Remember function was created from a dflow graph.
-  dflowFun.graph = graph
-
-  return dflowFun
-}
-
-module.exports = fun
-
-
-},{"./builtinFunctions":28,"./inject/accessors":35,"./inject/additionalFunctions":36,"./inject/arguments":37,"./inject/dotOperators":38,"./inject/references":39,"./inputArgs":40,"./isDflowFun":42,"./level":43,"./validate":49}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 
 var accessorRegex = require('../regex/accessor')
 
@@ -6737,9 +6755,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"../regex/accessor":45}],36:[function(require,module,exports){
-
-var builtinFunctions = require('../builtinFunctions')
+},{"../regex/accessor":46}],37:[function(require,module,exports){
 
 /**
  * @params {Object} funcs
@@ -6769,7 +6785,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{"../builtinFunctions":28}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 
 var argumentRegex = require('../regex/argument')
 
@@ -6810,7 +6826,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"../regex/argument":46}],38:[function(require,module,exports){
+},{"../regex/argument":47}],39:[function(require,module,exports){
 
 var dotOperatorRegex = require('../regex/dotOperator')
 
@@ -6830,11 +6846,37 @@ function injectDotOperators (funcs, graph) {
    */
 
   function inject (taskKey) {
-    var accessorName,
-        taskName = graph.task[taskKey]
+    var taskName = graph.task[taskKey]
 
     /**
-     * Dot operator like function.
+     * Dot operator function.
+     *
+     * @param {String} attributeName
+     * @param {Object} obj
+     * @param {...} rest of arguments
+     *
+     * @returns {*} result
+     */
+
+    function dotOperatorFunc (attributeName, obj) {
+      var func
+
+      if (typeof obj === 'object')
+        func = obj[attributeName]
+
+      if (typeof func === 'function')
+        return func.apply(obj, Array.prototype.slice.call(arguments, 2))
+    }
+
+    if (dotOperatorRegex.func.test(taskName)) {
+      // .foo() -> foo
+      attributeName = taskName.substring(1, taskName.length - 2)
+
+      funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
+    }
+
+    /**
+     * Dot operator attribute.
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -6842,17 +6884,16 @@ function injectDotOperators (funcs, graph) {
      * @returns {*} attribute
      */
 
-    function dotOperator (attributeName, obj) {
-      if (typeof obj !== 'object')
-        obj = {}
-
-      return obj[attributeName]
+    function dotOperatorAttr (attributeName, obj) {
+      if (typeof obj === 'object')
+        return obj[attributeName]
     }
 
     if (dotOperatorRegex.attr.test(taskName)) {
+      // .foo -> foo
       attributeName = taskName.substring(1)
 
-      funcs[taskName] = dotOperator.bind(null, attributeName)
+      funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
     }
   }
 
@@ -6862,7 +6903,7 @@ function injectDotOperators (funcs, graph) {
 module.exports = injectDotOperators
 
 
-},{"../regex/dotOperator":47}],39:[function(require,module,exports){
+},{"../regex/dotOperator":48}],40:[function(require,module,exports){
 
 var referenceRegex = require('../regex/reference')
 
@@ -6899,7 +6940,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"../regex/reference":48}],40:[function(require,module,exports){
+},{"../regex/reference":49}],41:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6932,7 +6973,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":41}],41:[function(require,module,exports){
+},{"./inputPipes":42}],42:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -6962,7 +7003,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -6989,7 +7030,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":49}],43:[function(require,module,exports){
+},{"./validate":50}],44:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -7025,7 +7066,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":44}],44:[function(require,module,exports){
+},{"./parents":45}],45:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -7054,29 +7095,29 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":41}],45:[function(require,module,exports){
+},{"./inputPipes":42}],46:[function(require,module,exports){
 
 module.exports = /^@(.+)$/
 
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],47:[function(require,module,exports){
-
-exports.attr = /^\.(.+)$/
-
-exports.func = /^\.(.+)\(\)$/
-
-
 },{}],48:[function(require,module,exports){
+
+exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
+
+exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
+
+
+},{}],49:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
@@ -7203,7 +7244,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":45,"./regex/argument":46,"./regex/dotOperator":47,"./regex/reference":48}],"examples-render":[function(require,module,exports){
+},{"./regex/accessor":46,"./regex/argument":47,"./regex/dotOperator":48,"./regex/reference":49}],"examples-render":[function(require,module,exports){
 
 var Canvas = require('flow-view').Canvas,
     dflow    = require('dflow'),
@@ -7234,4 +7275,4 @@ function renderExample (divId, example) {
 module.exports = renderExample
 
 
-},{"./index":33,"dflow":3,"flow-view":4}]},{},[]);
+},{"./index":32,"dflow":2,"flow-view":3}]},{},[]);
