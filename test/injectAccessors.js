@@ -8,8 +8,8 @@ describe('injectAccessors', function () {
         funcs = {},
         graph = {
           task: {
-          '1': '@foo',
-          '2': '@bar'
+            '1': '@foo',
+            '2': '@bar'
           },
           data: {
             'foo': 1,

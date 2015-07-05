@@ -1,5 +1,5 @@
 
-var dotOperatorRegex = require('../regex/accessor')
+var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
  * Inject functions that emulate dot operator.
@@ -10,7 +10,7 @@ var dotOperatorRegex = require('../regex/accessor')
  * @param {Object} graph
  */
 
-function injectDotOperator (funcs, graph) {
+function injectDotOperators (funcs, graph) {
 
   /**
    * Inject dot operator.
@@ -36,7 +36,7 @@ function injectDotOperator (funcs, graph) {
       return obj[attributeName]
     }
 
-    if (dotOperatorRegex.test(taskName)) {
+    if (dotOperatorRegex.attr.test(taskName)) {
       attributeName = taskName.substring(1)
 
       funcs[taskName] = dotOperator.bind(null, attributeName)
@@ -46,5 +46,5 @@ function injectDotOperator (funcs, graph) {
   Object.keys(graph.task).forEach(inject)
 }
 
-module.exports = injectDotOperator
+module.exports = injectDotOperators
 
