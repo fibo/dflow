@@ -1,0 +1,5 @@
+
+export.attribute = /^\.(.+)$/
+
+export.function = /^\.(.+)\(\)$/
+

@@ -14,6 +14,10 @@ function injectAccessors (funcs, graph) {
   if (typeof graph.data === 'undefined')
     graph.data = {}
 
+  /**
+   * Inject accessor.
+   */
+
   function inject (taskKey) {
     var accessorName,
         taskName = graph.task[taskKey]
