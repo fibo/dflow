@@ -56,8 +56,15 @@ function injectDotOperators (funcs, graph) {
      */
 
     function dotOperatorAttr (attributeName, obj) {
+      var attr
+
       if (typeof obj === 'object')
-        return obj[attributeName]
+        attr = obj[attributeName]
+
+      if (typeof attr === 'function')
+        return attr.bind(obj)
+
+      return attr
     }
 
     if (dotOperatorRegex.attr.test(taskName)) {

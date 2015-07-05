@@ -127,6 +127,9 @@ function fun (graph, additionalFunctions) {
         return
       }
 
+      if (typeof f === 'undefined')
+        throw new TypeError('Task ' + funcName + ' [' + taskKey + '] is not defined')
+
       outs[taskKey] = f.apply(null, args)
     }
 
