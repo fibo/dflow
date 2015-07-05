@@ -1,5 +1,5 @@
 
-var referenceRegex = require('./regex/reference')
+var referenceRegex = require('../regex/reference')
 
 /**
  * Inject references to functions.
@@ -12,6 +12,10 @@ function injectReferences (funcs, task) {
   function inject (taskKey) {
     var referenceName,
         taskName       = task[taskKey]
+
+    /**
+     * Inject reference.
+     */
 
     function reference () {
       return funcs[referenceName]

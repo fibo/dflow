@@ -1,5 +1,5 @@
 
-var injectArguments = require('../src/injectArguments'),
+var injectArguments = require('../../src/inject/arguments'),
     should          = require('should')
 
 var funcs = {}

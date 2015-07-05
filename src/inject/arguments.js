@@ -1,5 +1,5 @@
 
-var argumentRegex = require('./regex/argument')
+var argumentRegex = require('../regex/argument')
 
 /**
  * Inject functions to retrieve arguments.

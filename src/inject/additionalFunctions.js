@@ -1,5 +1,5 @@
 
-var builtinFunctions = require('./builtinFunctions')
+var builtinFunctions = require('../builtinFunctions')
 
 /**
  * @params {Object} funcs
