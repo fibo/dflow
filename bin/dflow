@@ -25,9 +25,10 @@ function appendCurrentWorkingDir (givenPath) {
   return path.join(process.cwd(), givenPath)
 }
 
-var graphPath = opt.argv.remain.map(appendCurrentWorkingDir).shift()
+var graphPath = opt.argv.remain.map(appendCurrentWorkingDir).shift() || appendCurrentWorkingDir('src/examples/graph/hello-world.json')
 
 function checkGraphPath (err, stats) {
+console.log(graphPath)
   if (err) {
     console.error(err)
     process.exit(1)
