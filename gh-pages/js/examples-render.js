@@ -565,13 +565,13 @@ SVG.extend(SVG.Container, {
 },{}],7:[function(require,module,exports){
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
-* @version 2.0.4
+* @version 2.0.5
 * http://www.svgjs.com
 *
 * @copyright Wout Fierens <wout@impinc.co.uk>
 * @license MIT
 *
-* BUILT: Sun Jun 28 2015 21:25:11 GMT+0200 (Mitteleuropäische Sommerzeit)
+* BUILT: Sun Jul 05 2015 01:42:48 GMT+0200 (Mitteleuropäische Sommerzeit)
 */;
 
 (function(root, factory) {
@@ -1538,14 +1538,14 @@ SVG.Element = SVG.invent({
 
       // insert the clone after myself
       this.after(clone)
-      
+
       return clone
     }
     // Remove element
   , remove: function() {
       if (this.parent())
         this.parent().removeElement(this)
-      
+
       return this
     }
     // Replace element
@@ -1569,7 +1569,7 @@ SVG.Element = SVG.invent({
     // Checks whether the given point inside the bounding box of the element
   , inside: function(x, y) {
       var box = this.bbox()
-      
+
       return x > box.x
           && y > box.y
           && x < box.x + box.width
@@ -1663,7 +1663,7 @@ SVG.Element = SVG.invent({
 
         // transplant nodes
         for (var i = 0, il = well.firstChild.childNodes.length; i < il; i++)
-          this.node.appendChild(well.firstChild.childNodes[i])
+          this.node.appendChild(well.firstChild.firstChild)
 
       // otherwise act as a getter
       } else {
@@ -2309,8 +2309,8 @@ SVG.Matrix = SVG.invent({
     var i, base = arrayToMatrix([1, 0, 0, 1, 0, 0])
 
     // ensure source as object
-    source = source && source.node && source.node.getCTM ?
-      source.node.getCTM() :
+    source = source instanceof SVG.Element ?
+      source.matrixify() :
     typeof source === 'string' ?
       stringToMatrix(source) :
     arguments.length == 6 ?
@@ -2323,7 +2323,7 @@ SVG.Matrix = SVG.invent({
       this[abcdef[i]] = source && typeof source[abcdef[i]] === 'number' ?
         source[abcdef[i]] : base[abcdef[i]]
   }
-  
+
   // Add methods
 , extend: {
     // Extract individual transformations
@@ -2332,7 +2332,7 @@ SVG.Matrix = SVG.invent({
       var px    = deltaTransformPoint(this, 0, 1)
         , py    = deltaTransformPoint(this, 1, 0)
         , skewX = 180 / Math.PI * Math.atan2(px.y, px.x) - 90
-  
+
       return {
         // translation
         x:        this.e
@@ -2405,7 +2405,7 @@ SVG.Matrix = SVG.invent({
     }
     // Translate matrix
   , translate: function(x, y) {
-      return new SVG.Matrix(this.native().translate(x || 0, y || 0))  
+      return new SVG.Matrix(this.native().translate(x || 0, y || 0))
     }
     // Scale matrix
   , scale: function(x, y, cx, cy) {
@@ -2423,7 +2423,7 @@ SVG.Matrix = SVG.invent({
   , rotate: function(r, cx, cy) {
       // convert degrees to radians
       r = SVG.utils.radians(r)
-      
+
       return this.around(cx, cy, new SVG.Matrix(Math.cos(r), Math.sin(r), -Math.sin(r), Math.cos(r), 0, 0))
     }
     // Flip matrix on x or y, at a given offset
@@ -2445,7 +2445,7 @@ SVG.Matrix = SVG.invent({
   , native: function() {
       // create new matrix
       var matrix = SVG.parser.draw.node.createSVGMatrix()
-  
+
       // update with current values
       for (var i = abcdef.length - 1; i >= 0; i--)
         matrix[abcdef[i]] = this[abcdef[i]]
@@ -2465,9 +2465,9 @@ SVG.Matrix = SVG.invent({
 , construct: {
     // Get current matrix
     ctm: function() {
-      return new SVG.Matrix(this)
+      return new SVG.Matrix(this.node.getCTM())
     }
-  
+
   }
 
 })
@@ -2564,7 +2564,7 @@ SVG.extend(SVG.Element, SVG.FX, {
     // act as a getter
     if (typeof o !== 'object') {
       // get current matrix
-      matrix = target.ctm().extract()
+      matrix = new SVG.Matrix(target).extract()
 
       // add parametric rotation
       if (typeof this.param === 'object') {
@@ -2583,7 +2583,7 @@ SVG.extend(SVG.Element, SVG.FX, {
 
     // ensure relative flag
     relative = !!relative || !!o.relative
-    
+
     // act on matrix
     if (o.a != null) {
       matrix = relative ?
@@ -2591,7 +2591,7 @@ SVG.extend(SVG.Element, SVG.FX, {
         matrix.multiply(new SVG.Matrix(o)) :
         // absolute
         new SVG.Matrix(o)
-    
+
     // act on rotation
     } else if (o.rotation != null) {
       // ensure centre point
@@ -2611,11 +2611,11 @@ SVG.extend(SVG.Element, SVG.FX, {
       if (this instanceof SVG.Element) {
         matrix = relative ?
           // relative
-          target.attr('transform', matrix + ' rotate(' + [o.rotation, o.cx, o.cy].join() + ')').ctm() :
+          matrix.rotate(o.rotation, o.cx, o.cy) :
           // absolute
           matrix.rotate(o.rotation - matrix.extract().rotation, o.cx, o.cy)
       }
-    
+
     // act on scale
     } else if (o.scale != null || o.scaleX != null || o.scaleY != null) {
       // ensure centre point
@@ -2648,7 +2648,7 @@ SVG.extend(SVG.Element, SVG.FX, {
         var e = matrix.extract()
         matrix = matrix.multiply(new SVG.Matrix().skew(e.skewX, e.skewY, o.cx, o.cy).inverse())
       }
-      
+
       matrix = matrix.skew(o.skewX, o.skewY, o.cx, o.cy)
 
     // act on flip
@@ -2669,7 +2669,7 @@ SVG.extend(SVG.Element, SVG.FX, {
         if (o.y != null) matrix.f = o.y
       }
     }
-    
+
     return this.attr('transform', matrix)
   }
 })
@@ -2678,6 +2678,27 @@ SVG.extend(SVG.Element, {
   // Reset all transformations
   untransform: function() {
     return this.attr('transform', null)
+  },
+  matrixify: function() {
+
+    var matrix = (this.attr('transform') || '')
+      // split transformations
+      .split(/\)\s*/).slice(0,-1).map(function(str){
+        // generate key => value pairs
+        var kv = str.trim().split('(')
+        return [kv[0], kv[1].split(',').map(function(str){ return parseFloat(str) })]
+      })
+      // calculate every transformation into one matrix
+      .reduce(function(matrix, transform){
+
+        if(transform[0] == 'matrix') return matrix.multiply(arrayToMatrix(transform[1]))
+        return matrix[transform[0]].apply(matrix, transform[1])
+
+      }, new SVG.Matrix())
+    // apply calculated matrix to element
+    this.attr('transform', matrix)
+
+    return matrix
   }
 })
 SVG.extend(SVG.Element, {
@@ -4923,7 +4944,11 @@ function Canvas (id) {
 
   var element = document.getElementById(id)
 
-  SVG.on(element, 'dblclick', nodeCreator.show.bind(nodeCreator))
+  var hideNodeCreator = nodeCreator.hide.bind(nodeCreator),
+      showNodeCreator = nodeCreator.show.bind(nodeCreator)
+
+  SVG.on(element, 'click',    hideNodeCreator)
+  SVG.on(element, 'dblclick', showNodeCreator)
 }
 
 inherits(Canvas, EventEmitter)
@@ -4989,7 +5014,10 @@ function addLink (view, key) {
 
   this.link[key] = link
 
-  this.emit('addLink', { link: { key: view } })
+  var eventData = { link: {} }
+  eventData.link[key] = view
+
+  this.emit('addLink', eventData)
 }
 
 Canvas.prototype.addLink = addLink
@@ -5004,7 +5032,10 @@ function addNode (view, key) {
 
   this.node[key] = node
 
-  this.emit('addNode', { node: { key: view } })
+  var eventData = { node: {} }
+  eventData.node[key] = view
+
+  this.emit('addNode', eventData)
 }
 
 Canvas.prototype.addNode = addNode
@@ -5274,7 +5305,7 @@ function createView (view) {
        .draggable()
 
   function dragmove () {
-    this.outs.forEach(function (output) {
+    self.outs.forEach(function (output) {
       Object.keys(output.link).forEach(function (key) {
         var link = output.link[key]
 
@@ -5283,7 +5314,7 @@ function createView (view) {
       })
     })
 
-    this.ins.forEach(function (input) {
+    self.ins.forEach(function (input) {
       var link = input.link
 
       if (link)
@@ -5291,13 +5322,13 @@ function createView (view) {
     })
   }
 
-  group.on('dragmove', dragmove.bind(this))
+  group.on('dragmove', dragmove)
 
   function dragstart () {
     canvas.nodeControls.detach()
   }
 
-  group.on('dragstart', dragstart.bind(this))
+  group.on('dragstart', dragstart)
 
   function showNodeControls (ev) {
     ev.stopPropagation()
@@ -5319,11 +5350,11 @@ function readView () {
   view.text = this.text
 
   ins.forEach(function (position) {
-    view.ins[position] = {} // TODO get input data
+    view.ins[position] = ins[position].readView()
   })
 
   outs.forEach(function (position) {
-    view.outs[position] = {} // TODO get output data
+    view.outs[position] = outs[position].readView()
   })
 
   return view
@@ -5384,41 +5415,44 @@ function addPin (type, position) {
 
   newPin.createView()
 
+  // Nothing more to do it there is no pin yet.
+  if (numPins === 0)
+    return
+
+  // Update link view for outputs.
+  function updateLinkViews (pin, key) {
+    pin.link[key].linePlot()
+  }
+
   // Move existing pins to new position.
-  //
-  // Nothing to do it there is no pin yet.
-  if (numPins > 0) {
-    // Start loop on i = 1, the second position. The first pin is not moved.
-    // The loop ends at numPins + 1 cause one pin was added.
-    for (var i = 1; i < numPins + 1; i++) {
-      // Nothing to do for input added right now.
-      if (i === position)
-        continue
+  // Start loop on i = 1, the second position. The first pin is not moved.
+  // The loop ends at numPins + 1 cause one pin was added.
+  for (var i = 1; i < numPins + 1; i++) {
+    // Nothing to do for input added right now.
+    if (i === position)
+      continue
 
-      var pin
+    var pin
 
-      if (i < position)
-        pin = this[type][i]
+    if (i < position)
+      pin = this[type][i]
 
-      // After new pin position, it is necessary to use i + 1 as index.
-      if (i > position)
-        pin = this[type][i + 1]
+    // After new pin position, it is necessary to use i + 1 as index.
+    if (i > position)
+      pin = this[type][i + 1]
 
-      var rect   = pin.rect,
-          vertex = pin.vertex.relative
+    var rect   = pin.rect,
+        vertex = pin.vertex.relative
 
-      rect.move(vertex.x, vertex.y)
+    rect.move(vertex.x, vertex.y)
 
-      // Move also any link connected to pin.
-      if (type === 'ins')
-        if (pin.link)
-          pin.link.linePlot()
+    // Move also any link connected to pin.
+    if (type === 'ins')
+      if (pin.link)
+        pin.link.linePlot()
 
-      if (type === 'outs')
-        Object.keys(pin.link).forEach(function (key) {
-          pin.link[key].linePlot()
-        })
-    }
+    if (type === 'outs')
+      Object.keys(pin.link).forEach(updateLinkViews.bind(null, pin))
   }
 }
 
@@ -5959,14 +5993,23 @@ function has (key) {
 Pin.prototype.has = has
 
 function set (key, data) {
-  var node     = this.node,
-      position = this.position,
+  var position = this.position,
       type     = this.type
 
   this.node[type][position][key] = data
 }
 
 Pin.prototype.set = set
+
+function readView () {
+  var node     = this.node,
+      position = this.position,
+      type     = this.type
+
+  return node[type][position]
+}
+
+Pin.prototype.readView = readView
 
 module.exports = Pin
 
