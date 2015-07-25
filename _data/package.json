@@ -6,6 +6,7 @@
   "main": "index.js",
   "browser": "./src/browser.js",
   "scripts": {
+    "start": "node bin/dflow",
     "_build": "npm test && npm run browserify && npm run jekyll; git status",
     "_push": "git push origin master && npm run gh-pages:push",
     "_pull": "git pull origin master && npm run gh-pages:pull",
