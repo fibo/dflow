@@ -26,6 +26,10 @@ With [bower](http://bower.io/) do
 $ bower install dflow
 ```
 
+## Cli
+
+Launch *dflow* from command line, and start editing your first graph.
+
 ## Synopsis
 
 Say **Hello World** with *dflow*.
