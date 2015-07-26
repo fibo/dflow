@@ -13,14 +13,13 @@ request.onload = function() {
 
     canvas.createView(graph.view)
 
-    canvas.on('addNode', function (ev) {
-      console.log(ev)
-      socket.emit('addNode', ev)
-    })
+    var events = ['addLink', 'addNode', 'addInput', 'addOutput',
+                  'delLink', 'delNode', 'moveNode']
 
-    canvas.on('addLink', function (ev) {
-      console.log(ev)
-      socket.emit('addLink', ev)
+    events.forEach(function (eventName) {
+      canvas.on(eventName, function (ev) {
+        socket.emit(eventName, ev)
+      })
     })
 
     // TODO run graph depending on dflow-cli arguments

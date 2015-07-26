@@ -5050,7 +5050,7 @@ function delNode (key) {
   // Then remove node.
   node.deleteView()
 
-  this.emit('delNode', key)
+  this.emit('delNode', [key])
 }
 
 Canvas.prototype.delNode = delNode
@@ -5060,7 +5060,7 @@ function delLink (key) {
 
   link.deleteView()
 
-  this.emit('delLink', key)
+  this.emit('delLink', [key])
 }
 
 Canvas.prototype.delLink = delLink
@@ -5240,7 +5240,8 @@ function createView (view) {
   var self = this
 
   var canvas = this.canvas,
-      group  = this.group
+      group  = this.group,
+      key    = this.key
 
   var draw  = canvas.draw,
       theme = canvas.theme
@@ -5276,7 +5277,7 @@ function createView (view) {
   group.add(rect)
        .add(text)
 
-  Object.defineProperties(this, {
+  Object.defineProperties(self, {
     'x': { get: function () { return group.x()     } },
     'y': { get: function () { return group.y()     } },
     'w': { get: function () { return rect.width()  } },
@@ -5297,6 +5298,15 @@ function createView (view) {
 
   group.move(view.x, view.y)
        .draggable()
+
+  function dragend () {
+    var eventData = { node: {} }
+    eventData.node[key] = {x: self.x, y: self.y}
+
+    canvas.emit('moveNode', eventData)
+  }
+
+  group.on('dragend', dragend)
 
   function dragmove () {
     self.outs.forEach(function (output) {
@@ -5452,12 +5462,32 @@ function addPin (type, position) {
 
 function addInput (position) {
   addPin.bind(this)('ins', position)
+
+  var canvas = this.canvas,
+      key    = this.key
+
+  var eventData = { node: {} }
+  eventData.node[key] = {
+    ins: [{position: position}]
+  }
+
+  this.canvas.emit('addInput', eventData)
 }
 
 Node.prototype.addInput = addInput
 
 function addOutput (position) {
   addPin.bind(this)('outs', position)
+
+  var canvas = this.canvas,
+      key    = this.key
+
+  var eventData = { node: {} }
+  eventData.node[key] = {
+    outs: [{position: position}]
+  }
+
+  this.canvas.emit('addOutput', eventData)
 }
 
 Node.prototype.addOutput = addOutput
@@ -6220,14 +6250,13 @@ request.onload = function() {
 
     canvas.createView(graph.view)
 
-    canvas.on('addNode', function (ev) {
-      console.log(ev)
-      socket.emit('addNode', ev)
-    })
+    var events = ['addLink', 'addNode', 'addInput', 'addOutput',
+                  'delLink', 'delNode', 'moveNode']
 
-    canvas.on('addLink', function (ev) {
-      console.log(ev)
-      socket.emit('addLink', ev)
+    events.forEach(function (eventName) {
+      canvas.on(eventName, function (ev) {
+        socket.emit(eventName, ev)
+      })
     })
 
     // TODO run graph depending on dflow-cli arguments
