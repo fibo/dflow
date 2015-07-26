@@ -28,35 +28,20 @@ $ bower install dflow
 
 ## Cli
 
-Launch *dflow* from command line, and start editing your first graph.
-
-## Synopsis
-
-Say **Hello World** with *dflow*.
-
-```js
-
-var dflow = require('dflow')
-
-// A JSON that represents the execution graph.
-//
-// arguments[0] ==> console.log
-var graph = {
-  "task": {
-    "1": "arguments[0]",
-    "2": "console.log"
-  },
-  "pipe": {
-    "3": [ "1", "2" ]
-  }
-}
-
-// Create a dflow function.
-var f = dflow.fun(graph)
-
-f('Hello World') // prints "Hello World"
+Launch *dflow* from command line, and start editing your first graph using your favourite browser.
 
 ```
+Usage:
+       dflow [path/to/graph.json]
+```
+
+If no graph is given an empty graph named *graph.json* will be created.
+
+Double click on the canvas to open a text input where you can write the task name you want to create.
+
+Click on a task to select it: addInput, addOutput and deleteTask buttons will appear.
+
+Drag an output into an input to create a pipe.
 
 ## Api
 
@@ -107,6 +92,8 @@ A *graph* has the following properties
   * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
   * `.quz`, `.quz()`: returns a dot-operator-like function.
+  * `this`: refers the *dflowFun* function.
+  * `this.graph`: contains the graph itself.
 
 Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:
 

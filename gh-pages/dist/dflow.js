@@ -93,6 +93,8 @@ function fun (graph, additionalFunctions) {
     injectAdditionalFunctions(funcs, additionalFunctions)
     injectArguments(funcs, task, arguments)
     injectReferences(funcs, task)
+    funcs['this'] = function () { return dflowFun }
+    funcs['this.graph'] = function () { return graph }
 
     /**
      * Sorts tasks by their level.
