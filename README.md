@@ -30,10 +30,7 @@ $ bower install dflow
 
 Launch *dflow* from command line, and start editing your first graph using your favourite browser.
 
-```
-Usage:
-       dflow [path/to/graph.json]
-```
+> Usage: dflow [path/to/graph.json]
 
 If no graph is given an empty graph named *graph.json* will be created.
 
