@@ -6,23 +6,38 @@ var fs   = require('fs'),
     nopt = require('nopt'),
     path = require('path')
 
+var pkg = require('../package.json')
+
 var createEmptyGraph = require('../src/createEmptyGraph'),
     editorServer     = require('../src/editor/server')
 
 // Process arguments.
 
-var known = {
+var knownOpts = {
       help: Boolean,
       version: Boolean
     },
-    aliases = {
+    shortHandOpts = {
       h: '--help',
       V: '--version'
     }
 
 var command = process.argv[2]
 
-var opt = nopt(known, aliases, process.argv, 2)
+var opt = nopt(knownOpts, shortHandOpts, process.argv, 2)
+
+if (opt.help) {
+  console.log('Usage: dflow [options] [path/to/graph.json]\n')
+  console.log('  -h, --help                print this message and exit')
+  console.log('  -v, --version             print current version and exit')
+  console.log('\nFor more info point your browser to ' + pkg.homepage)
+  process.exit(0)
+}
+
+if (opt.version) {
+  console.log(pkg.version)
+  process.exit(0)
+}
 
 function appendCurrentWorkingDir (givenPath) {
   return path.join(process.cwd(), givenPath)

@@ -24,11 +24,19 @@ With [npm](https://npmjs.org/) do
 $ npm install dflow
 ```
 
+or install globally if you want *dflow* cli in your path
+
+```bash
+$ npm install dflow -g
+```
+
 With [bower](http://bower.io/) do
 
 ```bash
 $ bower install dflow
 ```
+
+and it will install only the engine, client side.
 
 ## Examples
 
