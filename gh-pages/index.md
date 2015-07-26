@@ -11,9 +11,13 @@ title: dflow
 
 *dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
 
-The following simple graph is executed by *dflow* and rendered by [flow-view][1].
-
-[![HelloWorld](http://g14n.info/dflow/examples/hello-world.png)][2]
+Table Of Contents:
+* [Installation](#installation)
+* [Examples](#examples)
+* [Editor](#editor)
+* [Api](#api)
+* [Specification](#specification)
+* [Support and license](#support-and-license)
 
 ## Installation
 
@@ -29,22 +33,58 @@ With [bower](http://bower.io/) do
 $ bower install dflow
 ```
 
-## Cli
+## Examples
+
+### Hello world
+
+The following simple graph is executed client side by *dflow* engine.
+
+[![HelloWorld](http://g14n.info/dflow/examples/hello-world.png)][2]
+
+### Test page
+
+See [test/page.html](http://g14n.info/dflow/test/page.html) for another working example of *dflow* in a browser context.
+
+### Stream playground
+
+[Node.js Stream Playground](http://ejohn.org/blog/node-js-stream-playground/) first example is
+
+```js
+var fs = require("fs");
+
+// Read File
+fs.createReadStream("input/people.json")
+    // Write File
+    .pipe(fs.createWriteStream("output/people.json"));
+```
+
+It is ported to script [stream.js](https://github.com/fibo/dflow/blob/master/src/examples/stream-playground/stream.js) which evaluates [graph stream.json](https://github.com/fibo/dflow/blob/master/src/examples/stream-playground/stream.json) using [few custom functions](https://github.com/fibo/dflow/blob/master/src/examples/stream-playground/funcs.js).
+
+### Packaged graph
+
+The main advantage of *dflow* design is that you do not need to write components or plugins to extend it. You can use one of the most powerful JavaScript features: functions. Write your functions or import them from other packages like *JQuery* or *underscore* and you are able to use them as *tasks* and connect them with *pipes*.
+
+Also every *dflow* graph is a function itself, so why not packaging it and put it on [npm](https://npm.im)!?
+
+It is really easy: create your *dflow* graph and save it to a JSON file, *index.json* for instance; then launch `npm init` as usual and when prompted for the *entry point* write *index.json*.
+
+Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/src/examples/packagedGraph) as an example.
+
+## Editor
 
 Launch *dflow* from command line, and start editing your first graph using your favourite browser.
 
-```
-Usage:
-       dflow [path/to/graph.json]
-```
+> Usage: dflow [path/to/graph.json]
 
-If no graph is given an empty graph named *graph.json* will be created.
+If no graph is given, an empty graph named *graph.json* will be created.
 
 Double click on the canvas to open a text input where you can write the task name you want to create.
 
 Click on a task to select it: addInput, addOutput and deleteTask buttons will appear.
 
 Drag an output into an input to create a pipe.
+
+Click on a pipe to delete it.
 
 ## Api
 
@@ -104,41 +144,6 @@ Note that optional collection of *additionalFunctions*, in order to avoid confli
   * cannot start with a dot: name `.foo` for an additional function is not allowed.
   * idem for the ampersand: name `&bar` for an additional function is not allowed.
 
-## Examples
-
-### Sample graphs
-
-* [Hello World][2]
-
-### test page
-
-See [test/page.html](http://g14n.info/dflow/test/page.html) for a working example of *dflow* in a browser context.
-
-### Stream playground
-
-[Node.js Stream Playground](http://ejohn.org/blog/node-js-stream-playground/) first example is
-
-```js
-var fs = require("fs");
-
-// Read File
-fs.createReadStream("input/people.json")
-    // Write File
-    .pipe(fs.createWriteStream("output/people.json"));
-```
-
-It is ported to script [stream.js](https://github.com/fibo/dflow/blob/master/src/examples/stream-playground/stream.js) which evaluates [graph stream.json](https://github.com/fibo/dflow/blob/master/src/examples/stream-playground/stream.json) using [few custom functions](https://github.com/fibo/dflow/blob/master/src/examples/stream-playground/funcs.js).
-
-### Packaged graph
-
-The main advantage of *dflow* design is that you do not need to write components or plugins to extend it. You can use one of the most powerful JavaScript features: functions. Write your functions or import them from other packages like *JQuery* or *underscore* and you are able to use them as *tasks* and connect them with *pipes*.
-
-Also every *dflow* graph is a function itself, so why not packaging it and put it on [npm](https://npm.im)!?
-
-It is really easy: create your *dflow* graph and save it to a JSON file, *index.json* for instance; then launch `npm init` as usual and when prompted for the *entry point* write *index.json*.
-
-Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/src/examples/packagedGraph) as an example.
-
 ## Support and License
 
 *dflow* is [MIT](http://g14n.info/mit-license) licensed.
@@ -147,7 +152,7 @@ It is developed in my spare time and, as far as I know, by now *I am my only use
 
 I wrote few times a dataflow engine, the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
 
-Use cases I can think about *dflow* right now are many, but, the possibilities are I.M.H.O outstanding: from client to server, from JavaScript to cross language, from mono-thread to graphs distributed on a network and, above all, from skilled programmer who write functions code … to artists, genetic engineers, data scientists, etc. that use those functions to create *dflow* graphs and get results nobody could even imagine.
+Use cases I can think about *dflow* right now are many, but, the possibilities are I.M.H.O. outstanding: from client to server, from JavaScript to cross language, from mono-thread to graphs distributed on a network and, above all, from skilled programmer who write functions code … to artists, genetic engineers, data scientists, etc. that use those functions to create *dflow* graphs and get results nobody could even imagine.
 
 If this is also your vision or you just want to use *dflow*, [contact me](http://g14n.info).
 
@@ -157,5 +162,4 @@ My goal is to say to a *dflow* user:
 
  [1]: http://g14n.info/flow-view "flow-view"
  [2]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
-
 
