@@ -108,6 +108,9 @@ function editorServer (graphPath, opt) {
 
         // Add task.
         graph.task[key] = node.text
+
+        // Associate node and task.
+        graph.view.node[key].task = key
       })
 
       if (autosave) save(graph)
