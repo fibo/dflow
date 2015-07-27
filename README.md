@@ -8,7 +8,7 @@
 
 *dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
 
-Table Of Contents:
+**Table Of Contents:**
 * [Installation](#installation)
 * [Examples](#examples)
 * [Editor](#editor)
@@ -83,7 +83,9 @@ Launch *dflow* from command line, and start editing your first graph using your 
 
 If no graph is given, an empty graph named *graph.json* will be created.
 
-Double click on the canvas to open a text input where you can write the task name you want to create.
+Open your browser and go to `http://hostname-where-you-launched-dflow.example.org:3000`.
+
+Double click on the SVG canvas to open a text input where you can write the task name you want to create.
 
 Click on a task to select it: addInput, addOutput and deleteTask buttons will appear.
 
