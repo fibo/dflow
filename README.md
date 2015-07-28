@@ -139,17 +139,16 @@ A *graph* has the following properties
   * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement).
   * `arguments`: task that returns the *arguments* of *dflowFun*.
   * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*.
+  * `this`: refers the *dflowFun* function.
+  * `this.graph`: contains the graph itself.
   * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
   * `.quz`, `.quz()`: returns a dot-operator-like function.
-  * `this`: refers the *dflowFun* function.
-  * `this.graph`: contains the graph itself.
 
 Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:
 
-  * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]` are reserved names.
-  * cannot start with a dot: name `.foo` for an additional function is not allowed.
-  * idem for the ampersand: name `&bar` for an additional function is not allowed.
+  * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]`, `this` and `this.graph` are reserved names.
+  * cannot start with a dot, ampersand or at sign: names `@foo`, `&bar`, `.quz` and `.quz()` for an additional function are not allowed.
 
 ## Support and License
 

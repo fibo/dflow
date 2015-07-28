@@ -12,7 +12,7 @@ describe('validate', function () {
              }).should.be.ok
   })
 
-  it('throws if an additional function name is `return`', function () {
+  it('throws if an additional function name is "return"', function () {
     ;(function () {
       validate({ task: {}, pipe: {} },
                {
@@ -21,7 +21,7 @@ describe('validate', function () {
     }).should.throwError(/Reserved function name/)
   })
 
-  it('throws if an additional function name is `arguments`', function () {
+  it('throws if an additional function name is "arguments"', function () {
     ;(function () {
       validate({ task: {}, pipe: {} },
                {
@@ -30,7 +30,7 @@ describe('validate', function () {
     }).should.throwError(/Reserved function name/)
   })
 
-  it('throws if an additional function name is `argument[N]`', function () {
+  it('throws if an additional function name is "argument[N]"', function () {
     ;(function () {
       validate({ task: {}, pipe: {} },
                {
@@ -46,31 +46,56 @@ describe('validate', function () {
     }).should.throwError(/Reserved function name/)
   })
 
-  it('throws if an additional function name starts with a @', function () {
+  it('throws if an additional function name is "this"', function () {
+    ;(function () {
+      validate({ task: {}, pipe: {} },
+               {
+                 'this': Function.prototype
+               })
+    }).should.throwError(/Reserved function name/)
+  })
+
+  it('throws if an additional function name is "this.graph"', function () {
+    ;(function () {
+      validate({ task: {}, pipe: {} },
+               {
+                 'this.graph': Function.prototype
+               })
+    }).should.throwError(/Reserved function name/)
+  })
+
+  it('throws if an additional function name starts with a "@"', function () {
     ;(function () {
       validate({ task: {}, pipe: {} },
                {
                  '@foo': Function.prototype
                })
-    }).should.throwError(/Function name cannot start with @/)
+    }).should.throwError(/Function name cannot start with "@"/)
   })
 
-  it('throws if an additional function name starts with a &', function () {
+  it('throws if an additional function name starts with a "&"', function () {
     ;(function () {
       validate({ task: {}, pipe: {} },
                {
                  '&bar': Function.prototype
                })
-    }).should.throwError(/Function name cannot start with &/)
+    }).should.throwError(/Function name cannot start with "&"/)
   })
 
-  it('throws if an additional function name starts with a .', function () {
+  it('throws if an additional function name starts with a "."', function () {
     ;(function () {
       validate({ task: {}, pipe: {} },
                {
                  '.quz': Function.prototype
                })
-    }).should.throwError(/Function name cannot start with \./)
+    }).should.throwError(/Function name cannot start with "\."/)
+
+    ;(function () {
+      validate({ task: {}, pipe: {} },
+               {
+                 '.quz()': Function.prototype
+               })
+    }).should.throwError(/Function name cannot start with "\."/)
   })
 
   it('throws if pipe or task is not an object', function () {
