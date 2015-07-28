@@ -1,5 +1,5 @@
 
-var Canvas = require('flow-view').Canvas,
+var Canvas   = require('flow-view').Canvas,
     dflow    = require('dflow'),
     examples = require('./index')
 
@@ -16,7 +16,6 @@ var Canvas = require('flow-view').Canvas,
 
 function renderExample (divId, example) {
   var graph = examples[example]
-  console.log(graph)
 
   var canvas = new Canvas(divId)
 

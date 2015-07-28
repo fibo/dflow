@@ -3,10 +3,6 @@ nodo [pippo] che fa il dot operator e prende l'attributo pippo
 
 nodo 'foo' che restituisce una funzione che ritorna la stringa contenuta
 
-prendere dal global context
-
-implementa this, in modo da poter usare requestAnimationFrame ... il this l'ho fatto con la versione 0.8.0
-
 window.open per tutti gli esempi, con finestra intera che ha il risultato e la open con la patch
 
 rifai hello-world.png

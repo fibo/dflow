@@ -117,7 +117,7 @@ It has the following signature.
 
 Actually *dflow* exposes also the following functions, available only inside a *dflow* graph:
 
-  * [dflow.builtinFunctions](https://github.com/fibo/dflow/blob/master/src/functions/builtin.js)
+  * [dflow.builtinFunctions][3]
   * [dflow.fun](https://github.com/fibo/dflow/blob/master/src/fun.js)
   * [dflow.isDflowFun](https://github.com/fibo/dflow/blob/master/src/isDflowFun.js)
   * [dflow.validate](https://github.com/fibo/dflow/blob/master/src/validate.js)
@@ -137,7 +137,7 @@ A *graph* has the following properties
   * **view**: (ignored) object containing information used by [flow-view][1] to render a graphic representation of the graph.
   * **info**: (to be defined) meta data, like *author*, *version* and, above all, *doc* which is a dflow graph itself.
 
-*dflow* provides few [builtin functions](https://github.com/fibo/dflow/blob/master/src/functions/builtin.js) and injects the following ones
+*dflow* provides few [builtin functions][3] and injects the following ones
 
   * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement).
   * `arguments`: task that returns the *arguments* of *dflowFun*.
@@ -171,4 +171,5 @@ My goal is to say to a *dflow* user:
 
  [1]: http://g14n.info/flow-view "flow-view"
  [2]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
+ [3]: https://github.com/fibo/dflow/blob/master/src/functions/builtin.js "builtin functions"
 

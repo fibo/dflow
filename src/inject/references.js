@@ -10,8 +10,9 @@ var referenceRegex = require('../regex/reference')
 
 function injectReferences (funcs, task) {
   function inject (taskKey) {
-    var referenceName,
-        taskName       = task[taskKey]
+    var referenceName
+
+    var taskName = task[taskKey]
 
     /**
      * Inject reference.
