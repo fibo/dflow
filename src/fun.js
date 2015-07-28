@@ -11,6 +11,7 @@
 // │   └── regex/arguments.js
 // ├── inject/dotOperator.js
 // │   └── regex/dotOperator.js
+// ├── inject/globals.js
 // ├── inject/references.js
 // │   └── regex/references.js
 // ├── inputArgs.js
@@ -31,6 +32,7 @@ var builtinFunctions          = require('./functions/builtin'),
     injectArguments           = require('./inject/arguments'),
     injectAccessors           = require('./inject/accessors'),
     injectDotOperators        = require('./inject/dotOperators'),
+    injectGlobals             = require('./inject/globals'),
     injectReferences          = require('./inject/references'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
@@ -88,12 +90,13 @@ function fun (graph, additionalFunctions) {
     var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
     // Inject builtin tasks.
+    funcs['this'] = function () { return dflowFun }
+    funcs['this.graph'] = function () { return graph }
     injectAccessors(funcs, graph)
     injectAdditionalFunctions(funcs, additionalFunctions)
     injectArguments(funcs, task, arguments)
     injectReferences(funcs, task)
-    funcs['this'] = function () { return dflowFun }
-    funcs['this.graph'] = function () { return graph }
+    injectGlobals(funcs, task)
 
     /**
      * Sorts tasks by their level.
