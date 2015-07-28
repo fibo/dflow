@@ -1,7 +1,7 @@
 
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
-    dotOperatorRegex = require('./regex/dotOperator')
+    dotOperatorRegex = require('./regex/dotOperator'),
     referenceRegex   = require('./regex/reference')
 
 /**
@@ -25,14 +25,15 @@ function validate (graph, additionalFunctions) {
 
   var seenPipe = {}
 
-  // Validate addition functions, if any. Check there are no reserved keys.
+  // Validate addition functions, if any.
+  // Check there are no reserved keys.
+
+  function throwIfEquals (taskName, reservedKey) {
+    if (taskName === reservedKey)
+      throw new TypeError('Reserved function name: ' + taskName)
+  }
 
   if (typeof additionalFunctions === 'object') {
-    function throwIfEquals (taskName, reservedKey) {
-      if (taskName === reservedKey)
-        throw new TypeError('Reserved function name: ' + taskName)
-    }
-
     for (var taskName in additionalFunctions) {
       var reservedKeys = ['return', 'arguments', 'this', 'this.graph'],
           throwIfEqualsTaskName = throwIfEquals.bind(null, taskName)
