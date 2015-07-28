@@ -4944,11 +4944,7 @@ function Canvas (id) {
 
   var element = document.getElementById(id)
 
-  var hideNodeCreator = nodeCreator.hide.bind(nodeCreator),
-      showNodeCreator = nodeCreator.show.bind(nodeCreator)
-
-  SVG.on(element, 'click',    hideNodeCreator)
-  SVG.on(element, 'dblclick', showNodeCreator)
+  SVG.on(element, 'dblclick', nodeCreator.show.bind(nodeCreator))
 }
 
 inherits(Canvas, EventEmitter)
@@ -5014,10 +5010,7 @@ function addLink (view, key) {
 
   this.link[key] = link
 
-  var eventData = { link: {} }
-  eventData.link[key] = view
-
-  this.emit('addLink', eventData)
+  this.emit('addLink', { link: { key: view } })
 }
 
 Canvas.prototype.addLink = addLink
@@ -5032,10 +5025,7 @@ function addNode (view, key) {
 
   this.node[key] = node
 
-  var eventData = { node: {} }
-  eventData.node[key] = view
-
-  this.emit('addNode', eventData)
+  this.emit('addNode', { node: { key: view } })
 }
 
 Canvas.prototype.addNode = addNode
@@ -5056,7 +5046,7 @@ function delNode (key) {
   // Then remove node.
   node.deleteView()
 
-  this.emit('delNode', [key])
+  this.emit('delNode', key)
 }
 
 Canvas.prototype.delNode = delNode
@@ -5066,7 +5056,7 @@ function delLink (key) {
 
   link.deleteView()
 
-  this.emit('delLink', [key])
+  this.emit('delLink', key)
 }
 
 Canvas.prototype.delLink = delLink
@@ -5246,8 +5236,7 @@ function createView (view) {
   var self = this
 
   var canvas = this.canvas,
-      group  = this.group,
-      key    = this.key
+      group  = this.group
 
   var draw  = canvas.draw,
       theme = canvas.theme
@@ -5283,7 +5272,7 @@ function createView (view) {
   group.add(rect)
        .add(text)
 
-  Object.defineProperties(self, {
+  Object.defineProperties(this, {
     'x': { get: function () { return group.x()     } },
     'y': { get: function () { return group.y()     } },
     'w': { get: function () { return rect.width()  } },
@@ -5305,17 +5294,8 @@ function createView (view) {
   group.move(view.x, view.y)
        .draggable()
 
-  function dragend () {
-    var eventData = { node: {} }
-    eventData.node[key] = {x: self.x, y: self.y}
-
-    canvas.emit('moveNode', eventData)
-  }
-
-  group.on('dragend', dragend)
-
   function dragmove () {
-    self.outs.forEach(function (output) {
+    this.outs.forEach(function (output) {
       Object.keys(output.link).forEach(function (key) {
         var link = output.link[key]
 
@@ -5324,7 +5304,7 @@ function createView (view) {
       })
     })
 
-    self.ins.forEach(function (input) {
+    this.ins.forEach(function (input) {
       var link = input.link
 
       if (link)
@@ -5332,13 +5312,13 @@ function createView (view) {
     })
   }
 
-  group.on('dragmove', dragmove)
+  group.on('dragmove', dragmove.bind(this))
 
   function dragstart () {
     canvas.nodeControls.detach()
   }
 
-  group.on('dragstart', dragstart)
+  group.on('dragstart', dragstart.bind(this))
 
   function showNodeControls (ev) {
     ev.stopPropagation()
@@ -5360,11 +5340,11 @@ function readView () {
   view.text = this.text
 
   ins.forEach(function (position) {
-    view.ins[position] = ins[position].readView()
+    view.ins[position] = {} // TODO get input data
   })
 
   outs.forEach(function (position) {
-    view.outs[position] = outs[position].readView()
+    view.outs[position] = {} // TODO get output data
   })
 
   return view
@@ -5425,75 +5405,52 @@ function addPin (type, position) {
 
   newPin.createView()
 
-  // Nothing more to do it there is no pin yet.
-  if (numPins === 0)
-    return
-
-  // Update link view for outputs.
-  function updateLinkViews (pin, key) {
-    pin.link[key].linePlot()
-  }
-
   // Move existing pins to new position.
-  // Start loop on i = 1, the second position. The first pin is not moved.
-  // The loop ends at numPins + 1 cause one pin was added.
-  for (var i = 1; i < numPins + 1; i++) {
-    // Nothing to do for input added right now.
-    if (i === position)
-      continue
+  //
+  // Nothing to do it there is no pin yet.
+  if (numPins > 0) {
+    // Start loop on i = 1, the second position. The first pin is not moved.
+    // The loop ends at numPins + 1 cause one pin was added.
+    for (var i = 1; i < numPins + 1; i++) {
+      // Nothing to do for input added right now.
+      if (i === position)
+        continue
 
-    var pin
+      var pin
 
-    if (i < position)
-      pin = this[type][i]
+      if (i < position)
+        pin = this[type][i]
 
-    // After new pin position, it is necessary to use i + 1 as index.
-    if (i > position)
-      pin = this[type][i + 1]
+      // After new pin position, it is necessary to use i + 1 as index.
+      if (i > position)
+        pin = this[type][i + 1]
 
-    var rect   = pin.rect,
-        vertex = pin.vertex.relative
+      var rect   = pin.rect,
+          vertex = pin.vertex.relative
 
-    rect.move(vertex.x, vertex.y)
+      rect.move(vertex.x, vertex.y)
 
-    // Move also any link connected to pin.
-    if (type === 'ins')
-      if (pin.link)
-        pin.link.linePlot()
+      // Move also any link connected to pin.
+      if (type === 'ins')
+        if (pin.link)
+          pin.link.linePlot()
 
-    if (type === 'outs')
-      Object.keys(pin.link).forEach(updateLinkViews.bind(null, pin))
+      if (type === 'outs')
+        Object.keys(pin.link).forEach(function (key) {
+          pin.link[key].linePlot()
+        })
+    }
   }
 }
 
 function addInput (position) {
   addPin.bind(this)('ins', position)
-
-  var canvas = this.canvas,
-      key    = this.key
-
-  var eventData = { node: {} }
-  eventData.node[key] = {
-    ins: [{position: position}]
-  }
-
-  this.canvas.emit('addInput', eventData)
 }
 
 Node.prototype.addInput = addInput
 
 function addOutput (position) {
   addPin.bind(this)('outs', position)
-
-  var canvas = this.canvas,
-      key    = this.key
-
-  var eventData = { node: {} }
-  eventData.node[key] = {
-    outs: [{position: position}]
-  }
-
-  this.canvas.emit('addOutput', eventData)
 }
 
 Node.prototype.addOutput = addOutput
@@ -6023,23 +5980,14 @@ function has (key) {
 Pin.prototype.has = has
 
 function set (key, data) {
-  var position = this.position,
+  var node     = this.node,
+      position = this.position,
       type     = this.type
 
   this.node[type][position][key] = data
 }
 
 Pin.prototype.set = set
-
-function readView () {
-  var node     = this.node,
-      position = this.position,
-      type     = this.type
-
-  return node[type][position]
-}
-
-Pin.prototype.readView = readView
 
 module.exports = Pin
 
@@ -7233,24 +7181,31 @@ function validate (graph, additionalFunctions) {
   // Validate addition functions, if any. Check there are no reserved keys.
 
   if (typeof additionalFunctions === 'object') {
-    for (var taskName in additionalFunctions) {
-      if (taskName === 'return')
-        throw new TypeError('Reserved function name')
+    function throwIfEquals (taskName, reservedKey) {
+      if (taskName === reservedKey)
+        throw new TypeError('Reserved function name: ' + taskName)
+    }
 
-      if (taskName === 'arguments')
-        throw new TypeError('Reserved function name')
+    for (var taskName in additionalFunctions) {
+      var reservedKeys = ['return', 'arguments', 'this', 'this.graph'],
+          throwIfEqualsTaskName = throwIfEquals.bind(null, taskName)
+
+      reservedKeys.forEach(throwIfEqualsTaskName)
 
       if (argumentRegex.test(taskName))
-        throw new TypeError('Reserved function name')
+        throw new TypeError('Reserved function name: ' + taskName)
 
       if (accessorRegex.test(taskName))
-        throw new TypeError('Function name cannot start with @')
+        throw new TypeError('Function name cannot start with "@": ' + taskName)
 
       if (dotOperatorRegex.attr.test(taskName))
-        throw new TypeError('Function name cannot start with .')
+        throw new TypeError('Function name cannot start with ".":' + taskName)
+
+      if (dotOperatorRegex.func.test(taskName))
+        throw new TypeError('Function name cannot start with "." and end with "()":' + taskName)
 
       if (referenceRegex.test(taskName))
-        throw new TypeError('Function name cannot start with &')
+        throw new TypeError('Function name cannot start with "&": ' + taskName)
     }
   }
 
