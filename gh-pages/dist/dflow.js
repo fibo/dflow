@@ -844,24 +844,31 @@ function validate (graph, additionalFunctions) {
   // Validate addition functions, if any. Check there are no reserved keys.
 
   if (typeof additionalFunctions === 'object') {
-    for (var taskName in additionalFunctions) {
-      if (taskName === 'return')
-        throw new TypeError('Reserved function name')
+    function throwIfEquals (taskName, reservedKey) {
+      if (taskName === reservedKey)
+        throw new TypeError('Reserved function name: ' + taskName)
+    }
 
-      if (taskName === 'arguments')
-        throw new TypeError('Reserved function name')
+    for (var taskName in additionalFunctions) {
+      var reservedKeys = ['return', 'arguments', 'this', 'this.graph'],
+          throwIfEqualsTaskName = throwIfEquals.bind(null, taskName)
+
+      reservedKeys.forEach(throwIfEqualsTaskName)
 
       if (argumentRegex.test(taskName))
-        throw new TypeError('Reserved function name')
+        throw new TypeError('Reserved function name: ' + taskName)
 
       if (accessorRegex.test(taskName))
-        throw new TypeError('Function name cannot start with @')
+        throw new TypeError('Function name cannot start with "@": ' + taskName)
 
       if (dotOperatorRegex.attr.test(taskName))
-        throw new TypeError('Function name cannot start with .')
+        throw new TypeError('Function name cannot start with ".":' + taskName)
+
+      if (dotOperatorRegex.func.test(taskName))
+        throw new TypeError('Function name cannot start with "." and end with "()":' + taskName)
 
       if (referenceRegex.test(taskName))
-        throw new TypeError('Function name cannot start with &')
+        throw new TypeError('Function name cannot start with "&": ' + taskName)
     }
   }
 
