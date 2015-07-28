@@ -11,7 +11,7 @@ title: dflow
 
 *dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
 
-Table Of Contents:
+**Table Of Contents:**
 * [Installation](#installation)
 * [Examples](#examples)
 * [Editor](#editor)
@@ -27,11 +27,19 @@ With [npm](https://npmjs.org/) do
 $ npm install dflow
 ```
 
+or install globally if you want *dflow* cli in your path
+
+```bash
+$ npm install dflow -g
+```
+
 With [bower](http://bower.io/) do
 
 ```bash
 $ bower install dflow
 ```
+
+and it will install only the engine, client side.
 
 ## Examples
 
@@ -78,7 +86,9 @@ Launch *dflow* from command line, and start editing your first graph using your 
 
 If no graph is given, an empty graph named *graph.json* will be created.
 
-Double click on the canvas to open a text input where you can write the task name you want to create.
+Open your browser and go to `http://hostname-where-you-launched-dflow.example.org:3000`.
+
+Double click on the SVG canvas to open a text input where you can write the task name you want to create.
 
 Click on a task to select it: addInput, addOutput and deleteTask buttons will appear.
 
@@ -132,17 +142,16 @@ A *graph* has the following properties
   * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement).
   * `arguments`: task that returns the *arguments* of *dflowFun*.
   * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*.
+  * `this`: refers the *dflowFun* function.
+  * `this.graph`: contains the graph itself.
   * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
   * `.quz`, `.quz()`: returns a dot-operator-like function.
-  * `this`: refers the *dflowFun* function.
-  * `this.graph`: contains the graph itself.
 
 Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:
 
-  * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]` are reserved names.
-  * cannot start with a dot: name `.foo` for an additional function is not allowed.
-  * idem for the ampersand: name `&bar` for an additional function is not allowed.
+  * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]`, `this` and `this.graph` are reserved names.
+  * cannot start with a dot, ampersand or at sign: names `@foo`, `&bar`, `.quz` and `.quz()` for an additional function are not allowed.
 
 ## Support and License
 
