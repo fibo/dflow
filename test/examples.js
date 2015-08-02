@@ -18,9 +18,10 @@ describe('example', function () {
           var result = f.apply(null, test.args)
 
           // result.should.be.ok will throw if result is undefined
-          var gotExpected = (result == test.expected)
+          var gotExpected = (result === test.expected)
 
-          gotExpected.should.be.ok
+          should.deepEqual(result, test.expected)
+          //gotExpected.should.be.ok
         })
       })
     })

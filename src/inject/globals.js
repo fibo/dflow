@@ -1,4 +1,6 @@
 
+var debug = require('debug')('dflow:inject')
+
 /**
  * Inject globals.
  *
@@ -7,6 +9,8 @@
  */
 
 function injectGlobals (funcs, task) {
+  debug('globals')
+
   function inject (taskKey) {
     var taskName = task[taskKey]
 
@@ -16,7 +20,7 @@ function injectGlobals (funcs, task) {
       return
 
     // Skip also reserved keywords.
-    if (taskName === 'return')
+    if ((taskName === 'return') || (taskName === 'this.graph'))
       return
 
     var globalContext

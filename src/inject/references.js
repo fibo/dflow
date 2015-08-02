@@ -1,6 +1,8 @@
 
 var referenceRegex = require('../regex/reference')
 
+var debug = require('debug')('dflow:inject')
+
 /**
  * Inject references to functions.
  *
@@ -9,6 +11,8 @@ var referenceRegex = require('../regex/reference')
  */
 
 function injectReferences (funcs, task) {
+  debug('references')
+
   function inject (taskKey) {
     var referenceName
 

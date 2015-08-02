@@ -14,11 +14,11 @@
     "results": [
       {
         "args": [ "abcd", "b" ],
-        "expected": [ 1 ]
+        "expected": 1
       },
       {
-        "args": [ [7, 8, 9], 8 ],
-        "expected": [ 2 ]
+        "args": [ [7, 8, 9], 9 ],
+        "expected": 2
       }
     ]
   }
