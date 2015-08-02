@@ -31,13 +31,15 @@ var builtinFunctions          = require('./functions/builtin'),
     injectAdditionalFunctions = require('./inject/additionalFunctions'),
     injectArguments           = require('./inject/arguments'),
     injectAccessors           = require('./inject/accessors'),
-    injectDotOperators        = require('./inject/dotOperators'),
+// FIXME    injectDotOperators        = require('./inject/dotOperators'),
     injectGlobals             = require('./inject/globals'),
     injectReferences          = require('./inject/references'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
     validate                  = require('./validate')
+
+var debugRun = require('debug')('dflow:run')
 
 /**
  * Create a dflow function.
@@ -96,6 +98,7 @@ function fun (graph, additionalFunctions) {
     injectAdditionalFunctions(funcs, additionalFunctions)
     injectArguments(funcs, task, arguments)
     injectReferences(funcs, task)
+// FIXME    injectDotOperators(funcs, task)
     injectGlobals(funcs, task)
 
     /**
@@ -120,6 +123,8 @@ function fun (graph, additionalFunctions) {
       var args     = inputArgsOf(taskKey),
           funcName = task[taskKey],
           f        = funcs[funcName]
+
+      debugRun('task ' + taskKey + ' = ' + funcName)
 
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.

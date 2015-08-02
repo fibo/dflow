@@ -1,0 +1,19 @@
+{
+  "task": {
+    "a": "arguments[0]",
+    "b": "Date.parse",
+    "c": "return"
+  },
+  "pipe": {
+    "1": [ "a", "b", 0 ],
+    "3": [ "b", "c" ]
+  },
+  "data": {
+    "results": [
+      {
+        "args": [ "Wed, 09 Aug 1995 00:00:00" ],
+        "expected": [ 807926400000 ]
+      }
+    ]
+  }
+}

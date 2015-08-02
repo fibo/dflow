@@ -66,7 +66,12 @@ exports['typeof'] = typeofOperator
 
 // Array
 
-exports['Array.isArray']  = Array.isArray
+function emptyArray () { return [] }
+exports['[]'] = emptyArray
+
+exports.isArray  = Array.isArray
+
+exports.indexOf = function (a, b) { return a.indexOf(b) }
 
 exports['Array.prototype.filter']  = Array.prototype.filter
 exports['Array.prototype.forEach'] = Array.prototype.forEach
@@ -87,7 +92,7 @@ exports['console.log']   = console.log.bind(console)
 // Date
 
 exports['Date.now']   = Date.now
-exports['Date.parse'] = Date.parse
+//exports['Date.parse'] = Date.parse
 
 // Function
 
@@ -188,6 +193,9 @@ exports['Number.MAX_VALUE'] = max_value
 
 // Object
 
+function emptyObject () { return {} }
+exports['[]'] = emptyObject
+
 exports['Object.freeze']                   = Object.freeze
 exports['Object.getOwnPropertyDescriptor'] = Object.getOwnPropertyDescriptor
 exports['Object.getOwnPropertyNames']      = Object.getOwnPropertyNames
@@ -207,6 +215,9 @@ exports['Object.prototype.toString']             = Object.prototype.toString
 exports['Object.prototype.valueOf']              = Object.prototype.valueOf
 
 // String
+
+function emptyString () { return '' }
+exports["''"] = emptyString
 
 exports['String.prototype.charAt']            = String.prototype.charAt
 exports['String.prototype.charCodeAt']        = String.prototype.charCodeAt
