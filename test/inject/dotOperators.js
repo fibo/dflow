@@ -2,7 +2,7 @@
 var injectDotOperators = require('../../src/inject/dotOperators'),
     should             = require('should')
 
-describe('injectdotOperators', function () {
+describe('injectDotOperators', function () {
   it('modifies funcs object with dot operators attribute-like injected', function () {
     var funcs = {},
         graph = {

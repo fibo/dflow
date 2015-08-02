@@ -1,5 +1,7 @@
 .travis.yml
 .jshintrc
+bower.json
+coverage
 dist/
-npm-debug.log
 gh-pages
+npm-debug.log

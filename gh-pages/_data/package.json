@@ -1,10 +1,10 @@
 {
   "name": "dflow",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "Dataflow programming",
   "bin": "bin/dflow",
   "main": "index.js",
-  "browser": "./src/browser.js",
+  "browser": "./src/context/client-window.js",
   "scripts": {
     "start": "node bin/dflow",
     "_build": "npm test && npm run browserify && npm run jekyll; git status",
@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "body-parser": "1.x.x",
+    "debug": "^2.2.0",
     "ejs": "2.x.x",
     "express": "4.x.x",
     "nopt": "3.x.x",

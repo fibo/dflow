@@ -1,6 +1,6 @@
 
-var windowFunctions = require('./functions/window'),
-    fun             = require('./fun')
+var windowFunctions = require('../functions/window'),
+    fun             = require('../fun')
 
 function funBrowser (graph) {
   var additionalFunctions = arguments[1] || {}
