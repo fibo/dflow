@@ -1,6 +1,8 @@
 
 var accessorRegex = require('../regex/accessor')
 
+var debug = require('debug')('dflow:inject')
+
 /**
  * Inject functions to set or get context keywords.
  *
@@ -11,6 +13,8 @@ var accessorRegex = require('../regex/accessor')
  */
 
 function injectAccessors (funcs, graph) {
+  debug('accessors')
+
   if (typeof graph.data === 'undefined')
     graph.data = {}
 

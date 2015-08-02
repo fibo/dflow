@@ -16,7 +16,7 @@
     "results": [
       {
         "args": [0],
-        "expected": [1]
+        "expected": 1
       }
     ]
   }

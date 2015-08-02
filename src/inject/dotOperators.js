@@ -1,6 +1,8 @@
 
 var dotOperatorRegex = require('../regex/dotOperator')
 
+var debug = require('debug')('dflow:inject')
+
 /**
  * Inject functions that emulate dot operator.
  *
@@ -11,6 +13,7 @@ var dotOperatorRegex = require('../regex/dotOperator')
  */
 
 function injectDotOperators (funcs, graph) {
+  debug('dot operators')
 
   /**
    * Inject dot operator.

@@ -39,7 +39,8 @@ var builtinFunctions          = require('./functions/builtin'),
     level                     = require('./level'),
     validate                  = require('./validate')
 
-var debugRun = require('debug')('dflow:run')
+var debugRun   = require('debug')('dflow:run'),
+    debugCompile = require('debug')('dflow:compile')
 
 /**
  * Create a dflow function.
@@ -54,6 +55,8 @@ function fun (graph, additionalFunctions) {
   // First of all, check if graph is valid.
   try { validate(graph, additionalFunctions) }
   catch (err) { throw err }
+
+  debugCompile('valid graph with ' + Object.keys(graph.task).length + ' tasks and ' + Object.keys(graph.pipe).length + ' pipes')
 
   var func = graph.func || {},
       pipe = graph.pipe,
@@ -80,6 +83,12 @@ function fun (graph, additionalFunctions) {
   Object.keys(func)
         .forEach(compileSubgraph)
 
+  // Inject builtin tasks.
+  injectAccessors(funcs, graph)
+  injectAdditionalFunctions(funcs, additionalFunctions)
+  injectReferences(funcs, task)
+// FIXME    injectDotOperators(funcs, task)
+
   /**
    * Here we are, this is the ❤ of dflow.
    */
@@ -89,17 +98,18 @@ function fun (graph, additionalFunctions) {
         outs = {},
         returnValue
 
+    var startMessage = 'fun start'
+    if (typeof graph.info !== 'undefined') startMessage += graph.info
+
     var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
-    // Inject builtin tasks.
+    // Inject keywords and arguments.
     funcs['this'] = function () { return dflowFun }
-    funcs['this.graph'] = function () { return graph }
-    injectAccessors(funcs, graph)
-    injectAdditionalFunctions(funcs, additionalFunctions)
-    injectArguments(funcs, task, arguments)
-    injectReferences(funcs, task)
-// FIXME    injectDotOperators(funcs, task)
+    // FIXME why I cannot place it outside dflowFun? Does it make sense to inject globals
+    // everytime dflowFun is run?
     injectGlobals(funcs, task)
+    funcs['this.graph'] = function () { return graph }
+    injectArguments(funcs, task, arguments)
 
     /**
      * Sorts tasks by their level.

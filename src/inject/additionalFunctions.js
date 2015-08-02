@@ -1,10 +1,14 @@
 
+var debug = require('debug')('dflow:inject')
+
 /**
  * @params {Object} funcs
  * @params {Object} additionalFunctions
  */
 
 function injectAdditionalFunctions (funcs, additionalFunctions) {
+  debug('additional functions')
+
   // Nothing to do if no additional function is given.
   if (typeof additionalFunctions === 'undefined')
     return
