@@ -64,6 +64,26 @@ exports['.'] = dot
 function typeofOperator (operand) { return typeof operand }
 exports['typeof'] = typeofOperator
 
+function newOperator () {
+  var Obj = arguments[0],
+      arg1 = arguments[1],
+      arg2 = arguments[2],
+      arg3 = arguments[3],
+      arg4 = arguments[4],
+      arg5 = arguments[5],
+      argN = arguments.length - 1
+
+  if (argN === 0) return new Obj()
+  if (argN === 1) return new Obj(arg1)
+  if (argN === 2) return new Obj(arg1, arg2)
+  if (argN === 3) return new Obj(arg1, arg2, arg3)
+  if (argN === 4) return new Obj(arg1, arg2, arg3, arg4)
+  if (argN === 5) return new Obj(arg1, arg2, arg3, arg4, arg5)
+  // If you have a constructor with more than 5 arguments ... think about refactoring or redesign it.
+}
+
+exports['new'] = newOperator
+
 // Array
 
 function emptyArray () { return [] }
@@ -73,9 +93,20 @@ exports.isArray  = Array.isArray
 
 exports.indexOf = function (a, b) { return a.indexOf(b) }
 
-exports['Array.prototype.filter']  = Array.prototype.filter
-exports['Array.prototype.forEach'] = Array.prototype.forEach
-exports['Array.prototype.indexOf'] = Array.prototype.indexOf
+exports.filter = function (a, b, t) {
+  if (typeof t === 'undefined')
+    return a.filter(c, t)
+  else
+    return a.filter(c)
+}
+
+exports.forEach = function (a, c) {
+  if (typeof t === 'undefined')
+    return a.forEach(c, t)
+  else
+    return a.forEach(c)
+}
+
 exports['Array.prototype.join']    = Array.prototype.join
 exports['Array.prototype.map']     = Array.prototype.map
 exports['Array.prototype.pop']     = Array.prototype.pop
@@ -89,121 +120,21 @@ exports['Array.prototype.sort']    = Array.prototype.sort
 exports['console.error'] = console.error.bind(console)
 exports['console.log']   = console.log.bind(console)
 
-// Date
-
-exports['Date.now']   = Date.now
-//exports['Date.parse'] = Date.parse
-
 // Function
 
 exports['Function.prototype'] = Function.prototype
 
 // Global
 
-function infinity () { return Infinity }
-exports['Infinity'] = infinity
+exports['Infinity'] = function () { return Infinity }
 
-exports.isFinite = isFinite
+exports.NaN = function () { return NaN }
 
-exports.isNaN = isNaN
-
-function nan () { return NaN }
-exports.NaN = nan
-
-function nullValue () { return null }
-exports['null'] = nullValue
-
-// JSON
-
-exports['JSON.parse']     = JSON.parse
-exports['JSON.stringify'] = JSON.stringify
-
-// Math
-
-function MathE () { return Math.E }
-exports['Math.E'] = MathE
-
-function MathLN2 () { return Math.LN2 }
-exports['Math.LN2'] = MathLN2
-
-function MathLN10 () { return Math.LN10 }
-exports['Math.LN10'] = MathLN10
-
-function MathLOG2 () { return Math.LOG2 }
-exports['Math.LOG2'] = MathLOG2
-
-function MathLOG10 () { return Math.LOG10 }
-exports['Math.LOG10'] = MathLOG10
-
-function MathPI () { return Math.PI }
-exports['Math.PI'] = MathPI
-
-function MathSQRT1_2 () { return Math.SQRT1_2 }
-exports['Math.SQRT1_2'] = MathSQRT1_2
-
-function MathSQRT2 () { return Math.SQRT2 }
-exports['Math.SQRT2'] = MathSQRT2
-
-exports['Math.abs']    = Math.abs
-exports['Math.acos']   = Math.acos
-exports['Math.acosh']  = Math.acosh
-exports['Math.asin']   = Math.asin
-exports['Math.asinh']  = Math.asinh
-exports['Math.atan']   = Math.atan
-exports['Math.atanh']  = Math.atanh
-exports['Math.atan2']  = Math.atan2
-exports['Math.cbrt']   = Math.cbrt
-exports['Math.ceil']   = Math.ceil
-exports['Math.clz32']  = Math.clz32
-exports['Math.cos']    = Math.cos
-exports['Math.cosh']   = Math.cosh
-exports['Math.exp']    = Math.exp
-exports['Math.expm1']  = Math.expm1
-exports['Math.floor']  = Math.floor
-exports['Math.fround'] = Math.fround
-exports['Math.hypot']  = Math.hypot
-exports['Math.imul']   = Math.imul
-exports['Math.log']    = Math.log
-exports['Math.logip']  = Math.logip
-exports['Math.log10']  = Math.log10
-exports['Math.log2']   = Math.log2
-exports['Math.max']    = Math.max
-exports['Math.min']    = Math.min
-exports['Math.pow']    = Math.pow
-exports['Math.random'] = Math.random
-exports['Math.round']  = Math.round
-exports['Math.sign']   = Math.sign
-exports['Math.sin']    = Math.sin
-exports['Math.sinh']   = Math.sinh
-exports['Math.sqrt']   = Math.sqrt
-exports['Math.tan']    = Math.tan
-exports['Math.tanh']   = Math.tanh
-exports['Math.trunc']  = Math.trunc
-
-// Number
-
-function epsilon () { return Number.EPSILON }
-exports['Number.EPSILON'] = epsilon
-
-function min_value () { return Number.MIN_VALUE }
-exports['Number.MIN_VALUE'] = min_value
-
-function max_value () { return Number.MAX_VALUE }
-exports['Number.MAX_VALUE'] = max_value
+exports['null'] = function () { return null }
 
 // Object
 
-function emptyObject () { return {} }
-exports['[]'] = emptyObject
-
-exports['Object.freeze']                   = Object.freeze
-exports['Object.getOwnPropertyDescriptor'] = Object.getOwnPropertyDescriptor
-exports['Object.getOwnPropertyNames']      = Object.getOwnPropertyNames
-exports['Object.getPrototypeOf']           = Object.getPrototypeOf
-exports['Object.isFrozen']                 = Object.isFrozen
-exports['Object.isSealed']                 = Object.isSealed
-exports['Object.keys']                     = Object.keys
-exports['Object.seal']                     = Object.seal
+exports['{}'] = function () { return {} }
 
 exports['Object.prototype.defineProperties']     = Object.prototype.defineProperties
 exports['Object.prototype.defineProperty']       = Object.prototype.defineProperty
@@ -216,8 +147,7 @@ exports['Object.prototype.valueOf']              = Object.prototype.valueOf
 
 // String
 
-function emptyString () { return '' }
-exports["''"] = emptyString
+exports["''"] = function () { return '' }
 
 exports['String.prototype.charAt']            = String.prototype.charAt
 exports['String.prototype.charCodeAt']        = String.prototype.charCodeAt

@@ -20,5 +20,14 @@ describe('injectGlobals', function () {
 
     funcs['process.version']().should.be.eql(process.version)
   })
+
+  it('works with global constants', function () {
+    var funcs = {},
+        task = { '1' : 'Math.E' }
+
+    injectGlobals(funcs, task)
+
+    funcs['Math.E']().should.be.eql(Math.E)
+  })
 })
 

@@ -21,7 +21,6 @@ describe('example', function () {
           var gotExpected = (result === test.expected)
 
           should.deepEqual(result, test.expected)
-          //gotExpected.should.be.ok
         })
       })
     })
