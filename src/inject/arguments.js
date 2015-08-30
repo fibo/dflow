@@ -1,7 +1,6 @@
 
-var argumentRegex = require('../regex/argument')
-
-var debug = require('debug')('dflow:inject')
+var argumentRegex = require('../regex/argument'),
+    debug         = require('../debug').inject
 
 /**
  * Inject functions to retrieve arguments.
@@ -12,7 +11,6 @@ var debug = require('debug')('dflow:inject')
  */
 
 function injectArguments (funcs, task, args) {
-  debug('arguments')
 
   function getArgument (index) {
     return args[index]
@@ -26,13 +24,16 @@ function injectArguments (funcs, task, args) {
     var funcName = task[taskKey]
 
     if (funcName === 'arguments') {
+      debug('arguments')
       funcs[funcName] = function getArguments () { return args }
     }
     else {
       var arg = argumentRegex.exec(funcName)
 
-      if (arg)
+      if (arg) {
+        debug(funcName)
         funcs[funcName] = getArgument.bind(null, arg[1])
+      }
     }
   }
 

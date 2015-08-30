@@ -69,9 +69,9 @@ describe('fun', function () {
   it('can use dflow functions as tasks', function (){
     var graph = {
           task: {
-            'builtinFunctions': 'dflow.builtinFunctions',
-            'fun'             : 'dflow.fun',
-            'validate'        : 'dflow.validate'
+            '1': 'dflow.fun',
+            '2': 'dflow.isDflowFun',
+            '3': 'dflow.validate'
           },
           pipe: {}
         }

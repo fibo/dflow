@@ -12,7 +12,7 @@ describe('injectDotOperators', function () {
           }
         }
 
-    injectDotOperators(funcs, graph)
+    injectDotOperators(funcs, graph.task)
 
     var getVersion = funcs['.version'],
         exit       = funcs['.exit']
@@ -35,7 +35,7 @@ describe('injectDotOperators', function () {
           }
         }
 
-    injectDotOperators(funcs, graph)
+    injectDotOperators(funcs, graph.task)
 
     var foo = funcs['.foo()'],
         sum = funcs['.sum()']

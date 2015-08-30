@@ -1,5 +1,6 @@
 
-var debug = require('debug')('dflow:inject')
+var debug      = require('../debug').inject,
+    walkGlobal = require('../walkGlobal')
 
 /**
  * Inject globals.
@@ -9,7 +10,6 @@ var debug = require('debug')('dflow:inject')
  */
 
 function injectGlobals (funcs, task) {
-  debug('globals')
 
   function inject (taskKey) {
     var taskName = task[taskKey]
@@ -23,34 +23,12 @@ function injectGlobals (funcs, task) {
     if ((taskName === 'return') || (taskName === 'this.graph'))
       return
 
-    var globalContext
-
-    if (typeof window === 'object')
-      globalContext = window
-
-    if (typeof global === 'object')
-      globalContext = global
-
-    /**
-     * Walk through global context.
-     *
-     * process.version will return global[process][version]
-     *
-     * @param {String} taskName
-     * @returns {*} leaf
-     */
-
-    function walk (taskName) {
-      function toNextProp (leaf, prop) { return leaf[prop] }
-
-      return taskName.split('.')
-                     .reduce(toNextProp, globalContext)
-    }
-
-    var globalValue = walk(taskName)
+    var globalValue = walkGlobal(taskName)
 
     if (typeof globalValue === 'undefined')
       return
+
+    debug('global' + taskName)
 
     if (typeof globalValue === 'function')
       funcs[taskName] = globalValue
