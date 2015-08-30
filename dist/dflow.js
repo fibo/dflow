@@ -496,15 +496,26 @@ function plural(ms, n, name) {
 
 },{}],4:[function(require,module,exports){
 
+/**
+ * Enable debug.
+ *
+ * ```
+ * export DEBUG=dflow:*
+ * ```
+ *
+ */
+
 var debug = require('debug')
 
-exports.inject = debug('dflow:inject')
-exports.run    = debug('dflow:run')
+exports.compile = debug('dflow:compile')
+exports.inject  = debug('dflow:inject')
+exports.run     = debug('dflow:run')
 
 
 },{"debug":1}],5:[function(require,module,exports){
 
 var builtinFunctions          = require('./functions/builtin'),
+    debug                     = require('./debug'),
     injectAdditionalFunctions = require('./inject/additionalFunctions'),
     injectArguments           = require('./inject/arguments'),
     injectAccessors           = require('./inject/accessors'),
@@ -516,8 +527,8 @@ var builtinFunctions          = require('./functions/builtin'),
     level                     = require('./level'),
     validate                  = require('./validate')
 
-var debugRun   = require('debug')('dflow:run'),
-    debugCompile = require('debug')('dflow:compile')
+var debugRun     = debug.run,
+    debugCompile = debug.compile
 
 /**
  * Create a dflow function.
@@ -533,7 +544,7 @@ function fun (graph, additionalFunctions) {
   try { validate(graph, additionalFunctions) }
   catch (err) { throw err }
 
-  debugCompile('valid graph with ' + Object.keys(graph.task).length + ' tasks and ' + Object.keys(graph.pipe).length + ' pipes')
+  debugCompile('graph with ' + Object.keys(graph.task).length + ' tasks and ' + Object.keys(graph.pipe).length + ' pipes')
 
   var func = graph.func || {},
       pipe = graph.pipe,
@@ -649,7 +660,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./functions/builtin":6,"./inject/accessors":8,"./inject/additionalFunctions":9,"./inject/arguments":10,"./inject/dotOperators":11,"./inject/globals":12,"./inject/references":13,"./inputArgs":14,"./isDflowFun":16,"./level":17,"./validate":23,"debug":1}],6:[function(require,module,exports){
+},{"./debug":4,"./functions/builtin":6,"./inject/accessors":8,"./inject/additionalFunctions":9,"./inject/arguments":10,"./inject/dotOperators":11,"./inject/globals":12,"./inject/references":13,"./inputArgs":14,"./isDflowFun":16,"./level":17,"./validate":23}],6:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -825,9 +836,9 @@ exports['String.prototype.trim']              = String.prototype.trim
 
 exports.document = function _document () { return document }
 
-exports['body'] = function body () { return document.body }
+exports.body = function body () { return document.body }
 
-exports['head'] = function head () { return document.head }
+exportshead = function head () { return document.head }
 
 exports.window = function _window () { return window }
 
@@ -1084,7 +1095,7 @@ function injectGlobals (funcs, task) {
     if (typeof globalValue === 'undefined')
       return
 
-    debug('global' + taskName)
+    debug('global ' + taskName)
 
     if (typeof globalValue === 'function')
       funcs[taskName] = globalValue
