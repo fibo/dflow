@@ -496,39 +496,19 @@ function plural(ms, n, name) {
 
 },{}],4:[function(require,module,exports){
 
-//
-// Dependency graph
-//
-// fun.js
-// ├── builtinFunctions.js
-// ├── inject/accessors.js
-// │   └── regex/accessors.js
-// ├── inject/additionalFunctions.js
-// ├── inject/arguments.js
-// │   └── regex/arguments.js
-// ├── inject/dotOperator.js
-// │   └── regex/dotOperator.js
-// ├── inject/globals.js
-// ├── inject/references.js
-// │   └── regex/references.js
-// ├── inputArgs.js
-// │   └── inputPipes.js
-// ├── isDflowFun.js
-// ├── level.js
-// │   └── parents.js
-// │       └── inputPipes.js
-// └── validate.js
-//     ├── regex/accessors.js
-//     ├── regex/arguments.js
-//     ├── regex/dotOperator.js
-//     └── regex/references.js
-//
+var debug = require('debug')
+
+exports.inject = debug('dflow:inject')
+exports.run    = debug('dflow:run')
+
+
+},{"debug":1}],5:[function(require,module,exports){
 
 var builtinFunctions          = require('./functions/builtin'),
     injectAdditionalFunctions = require('./inject/additionalFunctions'),
     injectArguments           = require('./inject/arguments'),
     injectAccessors           = require('./inject/accessors'),
-// FIXME    injectDotOperators        = require('./inject/dotOperators'),
+    injectDotOperators        = require('./inject/dotOperators'),
     injectGlobals             = require('./inject/globals'),
     injectReferences          = require('./inject/references'),
     inputArgs                 = require('./inputArgs'),
@@ -536,7 +516,8 @@ var builtinFunctions          = require('./functions/builtin'),
     level                     = require('./level'),
     validate                  = require('./validate')
 
-var debugRun = require('debug')('dflow:run')
+var debugRun   = require('debug')('dflow:run'),
+    debugCompile = require('debug')('dflow:compile')
 
 /**
  * Create a dflow function.
@@ -552,6 +533,8 @@ function fun (graph, additionalFunctions) {
   try { validate(graph, additionalFunctions) }
   catch (err) { throw err }
 
+  debugCompile('valid graph with ' + Object.keys(graph.task).length + ' tasks and ' + Object.keys(graph.pipe).length + ' pipes')
+
   var func = graph.func || {},
       pipe = graph.pipe,
       task = graph.task
@@ -559,11 +542,6 @@ function fun (graph, additionalFunctions) {
   var cachedLevelOf  = {},
       computeLevelOf = level.bind(null, pipe, cachedLevelOf),
       funcs          = builtinFunctions
-
-  // Expose dflow functions.
-  funcs['dflow.fun']              = fun
-  funcs['dflow.isDflowFun']       = isDflowFun
-  funcs['dflow.validate']         = validate
 
   /**
    * Compile each sub graph.
@@ -574,6 +552,18 @@ function fun (graph, additionalFunctions) {
       funcs[key] = fun(graph.func[key], additionalFunctions)
   }
 
+  // Inject compile-time builtin tasks.
+
+  funcs['dflow.fun']        = fun
+  funcs['dflow.isDflowFun'] = isDflowFun
+  funcs['dflow.validate']   = validate
+
+  injectGlobals(funcs, task)
+  injectAccessors(funcs, graph)
+  injectAdditionalFunctions(funcs, additionalFunctions)
+  injectDotOperators(funcs, task)
+  injectReferences(funcs, task)
+
   Object.keys(func)
         .forEach(compileSubgraph)
 
@@ -582,6 +572,8 @@ function fun (graph, additionalFunctions) {
    */
 
   function dflowFun () {
+    debugRun('start')
+
     var gotReturn = false,
         outs = {},
         returnValue
@@ -591,15 +583,11 @@ function fun (graph, additionalFunctions) {
 
     var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
-    // Inject builtin tasks.
+    // Inject run-time builtin tasks.
+
     funcs['this'] = function () { return dflowFun }
     funcs['this.graph'] = function () { return graph }
-    injectAccessors(funcs, graph)
-    injectAdditionalFunctions(funcs, additionalFunctions)
     injectArguments(funcs, task, arguments)
-    injectReferences(funcs, task)
-// FIXME    injectDotOperators(funcs, task)
-    injectGlobals(funcs, task)
 
     /**
      * Sorts tasks by their level.
@@ -648,7 +636,7 @@ function fun (graph, additionalFunctions) {
           .sort(byLevel)
           .forEach(run)
 
-          console.log(returnValue)
+    debugRun('end')
     return returnValue
   }
 
@@ -661,7 +649,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./functions/builtin":5,"./inject/accessors":7,"./inject/additionalFunctions":8,"./inject/arguments":9,"./inject/globals":10,"./inject/references":11,"./inputArgs":12,"./isDflowFun":14,"./level":15,"./validate":21,"debug":1}],5:[function(require,module,exports){
+},{"./functions/builtin":6,"./inject/accessors":8,"./inject/additionalFunctions":9,"./inject/arguments":10,"./inject/dotOperators":11,"./inject/globals":12,"./inject/references":13,"./inputArgs":14,"./isDflowFun":16,"./level":17,"./validate":23,"debug":1}],6:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -719,7 +707,9 @@ exports['<='] = lessThenOrEqualTo
 
 // Other operators
 
-function applyMethod (fun, thisArg, argsArray) { return fun.apply(thisArg, argsArray) }
+function applyMethod (fun, thisArg, argsArray) {
+  return fun.apply(thisArg, argsArray)
+}
 exports.apply = applyMethod
 
 function dot (obj, prop) { return obj[prop] }
@@ -727,6 +717,26 @@ exports['.'] = dot
 
 function typeofOperator (operand) { return typeof operand }
 exports['typeof'] = typeofOperator
+
+function newOperator () {
+  var Obj = arguments[0],
+      arg1 = arguments[1],
+      arg2 = arguments[2],
+      arg3 = arguments[3],
+      arg4 = arguments[4],
+      arg5 = arguments[5],
+      argN = arguments.length - 1
+
+  if (argN === 0) return new Obj()
+  if (argN === 1) return new Obj(arg1)
+  if (argN === 2) return new Obj(arg1, arg2)
+  if (argN === 3) return new Obj(arg1, arg2, arg3)
+  if (argN === 4) return new Obj(arg1, arg2, arg3, arg4)
+  if (argN === 5) return new Obj(arg1, arg2, arg3, arg4, arg5)
+  // If you have a constructor with more than 5 arguments ... think about refactoring or redesign it.
+}
+
+exports['new'] = newOperator
 
 // Array
 
@@ -737,9 +747,20 @@ exports.isArray  = Array.isArray
 
 exports.indexOf = function (a, b) { return a.indexOf(b) }
 
-exports['Array.prototype.filter']  = Array.prototype.filter
-exports['Array.prototype.forEach'] = Array.prototype.forEach
-exports['Array.prototype.indexOf'] = Array.prototype.indexOf
+exports.filter = function (a, b, t) {
+  if (typeof t === 'undefined')
+    return a.filter(c, t)
+  else
+    return a.filter(c)
+}
+
+exports.forEach = function (a, c) {
+  if (typeof t === 'undefined')
+    return a.forEach(c, t)
+  else
+    return a.forEach(c)
+}
+
 exports['Array.prototype.join']    = Array.prototype.join
 exports['Array.prototype.map']     = Array.prototype.map
 exports['Array.prototype.pop']     = Array.prototype.pop
@@ -753,121 +774,21 @@ exports['Array.prototype.sort']    = Array.prototype.sort
 exports['console.error'] = console.error.bind(console)
 exports['console.log']   = console.log.bind(console)
 
-// Date
-
-exports['Date.now']   = Date.now
-//exports['Date.parse'] = Date.parse
-
 // Function
 
 exports['Function.prototype'] = Function.prototype
 
 // Global
 
-function infinity () { return Infinity }
-exports['Infinity'] = infinity
+exports['Infinity'] = function () { return Infinity }
 
-exports.isFinite = isFinite
+exports.NaN = function () { return NaN }
 
-exports.isNaN = isNaN
-
-function nan () { return NaN }
-exports.NaN = nan
-
-function nullValue () { return null }
-exports['null'] = nullValue
-
-// JSON
-
-exports['JSON.parse']     = JSON.parse
-exports['JSON.stringify'] = JSON.stringify
-
-// Math
-
-function MathE () { return Math.E }
-exports['Math.E'] = MathE
-
-function MathLN2 () { return Math.LN2 }
-exports['Math.LN2'] = MathLN2
-
-function MathLN10 () { return Math.LN10 }
-exports['Math.LN10'] = MathLN10
-
-function MathLOG2 () { return Math.LOG2 }
-exports['Math.LOG2'] = MathLOG2
-
-function MathLOG10 () { return Math.LOG10 }
-exports['Math.LOG10'] = MathLOG10
-
-function MathPI () { return Math.PI }
-exports['Math.PI'] = MathPI
-
-function MathSQRT1_2 () { return Math.SQRT1_2 }
-exports['Math.SQRT1_2'] = MathSQRT1_2
-
-function MathSQRT2 () { return Math.SQRT2 }
-exports['Math.SQRT2'] = MathSQRT2
-
-exports['Math.abs']    = Math.abs
-exports['Math.acos']   = Math.acos
-exports['Math.acosh']  = Math.acosh
-exports['Math.asin']   = Math.asin
-exports['Math.asinh']  = Math.asinh
-exports['Math.atan']   = Math.atan
-exports['Math.atanh']  = Math.atanh
-exports['Math.atan2']  = Math.atan2
-exports['Math.cbrt']   = Math.cbrt
-exports['Math.ceil']   = Math.ceil
-exports['Math.clz32']  = Math.clz32
-exports['Math.cos']    = Math.cos
-exports['Math.cosh']   = Math.cosh
-exports['Math.exp']    = Math.exp
-exports['Math.expm1']  = Math.expm1
-exports['Math.floor']  = Math.floor
-exports['Math.fround'] = Math.fround
-exports['Math.hypot']  = Math.hypot
-exports['Math.imul']   = Math.imul
-exports['Math.log']    = Math.log
-exports['Math.logip']  = Math.logip
-exports['Math.log10']  = Math.log10
-exports['Math.log2']   = Math.log2
-exports['Math.max']    = Math.max
-exports['Math.min']    = Math.min
-exports['Math.pow']    = Math.pow
-exports['Math.random'] = Math.random
-exports['Math.round']  = Math.round
-exports['Math.sign']   = Math.sign
-exports['Math.sin']    = Math.sin
-exports['Math.sinh']   = Math.sinh
-exports['Math.sqrt']   = Math.sqrt
-exports['Math.tan']    = Math.tan
-exports['Math.tanh']   = Math.tanh
-exports['Math.trunc']  = Math.trunc
-
-// Number
-
-function epsilon () { return Number.EPSILON }
-exports['Number.EPSILON'] = epsilon
-
-function min_value () { return Number.MIN_VALUE }
-exports['Number.MIN_VALUE'] = min_value
-
-function max_value () { return Number.MAX_VALUE }
-exports['Number.MAX_VALUE'] = max_value
+exports['null'] = function () { return null }
 
 // Object
 
-function emptyObject () { return {} }
-exports['[]'] = emptyObject
-
-exports['Object.freeze']                   = Object.freeze
-exports['Object.getOwnPropertyDescriptor'] = Object.getOwnPropertyDescriptor
-exports['Object.getOwnPropertyNames']      = Object.getOwnPropertyNames
-exports['Object.getPrototypeOf']           = Object.getPrototypeOf
-exports['Object.isFrozen']                 = Object.isFrozen
-exports['Object.isSealed']                 = Object.isSealed
-exports['Object.keys']                     = Object.keys
-exports['Object.seal']                     = Object.seal
+exports['{}'] = function () { return {} }
 
 exports['Object.prototype.defineProperties']     = Object.prototype.defineProperties
 exports['Object.prototype.defineProperty']       = Object.prototype.defineProperty
@@ -880,8 +801,7 @@ exports['Object.prototype.valueOf']              = Object.prototype.valueOf
 
 // String
 
-function emptyString () { return '' }
-exports["''"] = emptyString
+exports["''"] = function () { return '' }
 
 exports['String.prototype.charAt']            = String.prototype.charAt
 exports['String.prototype.charCodeAt']        = String.prototype.charCodeAt
@@ -901,7 +821,7 @@ exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
 
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 
 exports.document = function _document () { return document }
 
@@ -912,9 +832,10 @@ exports['head'] = function head () { return document.head }
 exports.window = function _window () { return window }
 
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 
-var accessorRegex = require('../regex/accessor')
+var accessorRegex = require('../regex/accessor'),
+    debug         = require('../debug').inject
 
 /**
  * Inject functions to set or get context keywords.
@@ -951,6 +872,8 @@ function injectAccessors (funcs, graph) {
     if (accessorRegex.test(taskName)) {
       accessorName = taskName.substring(1)
 
+      debug(taskName)
+
       funcs[taskName] = accessor
     }
   }
@@ -961,7 +884,9 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"../regex/accessor":17}],8:[function(require,module,exports){
+},{"../debug":4,"../regex/accessor":19}],9:[function(require,module,exports){
+
+var debug = require('../debug').inject
 
 /**
  * @params {Object} funcs
@@ -972,6 +897,8 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
   // Nothing to do if no additional function is given.
   if (typeof additionalFunctions === 'undefined')
     return
+
+  debug(Object.keys(additionalFunctions).length + ' additionalFunctions')
 
   /**
    * Validate and insert an additional function.
@@ -991,9 +918,10 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{}],9:[function(require,module,exports){
+},{"../debug":4}],10:[function(require,module,exports){
 
-var argumentRegex = require('../regex/argument')
+var argumentRegex = require('../regex/argument'),
+    debug         = require('../debug').inject
 
 /**
  * Inject functions to retrieve arguments.
@@ -1004,6 +932,7 @@ var argumentRegex = require('../regex/argument')
  */
 
 function injectArguments (funcs, task, args) {
+
   function getArgument (index) {
     return args[index]
   }
@@ -1016,13 +945,16 @@ function injectArguments (funcs, task, args) {
     var funcName = task[taskKey]
 
     if (funcName === 'arguments') {
+      debug('arguments')
       funcs[funcName] = function getArguments () { return args }
     }
     else {
       var arg = argumentRegex.exec(funcName)
 
-      if (arg)
+      if (arg) {
+        debug(funcName)
         funcs[funcName] = getArgument.bind(null, arg[1])
+      }
     }
   }
 
@@ -1032,8 +964,99 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"../regex/argument":18}],10:[function(require,module,exports){
-(function (global){
+},{"../debug":4,"../regex/argument":20}],11:[function(require,module,exports){
+
+var debug            = require('../debug').inject,
+    dotOperatorRegex = require('../regex/dotOperator')
+
+/**
+ * Inject functions that emulate dot operator.
+ *
+ * @api private
+ *
+ * @param {Object} funcs reference
+ * @param {Object} task
+ */
+
+function injectDotOperators (funcs, task) {
+
+  /**
+   * Inject dot operator.
+   */
+
+  function inject (taskKey) {
+    var taskName = task[taskKey]
+
+    /**
+     * Dot operator function.
+     *
+     * @param {String} attributeName
+     * @param {Object} obj
+     * @param {...} rest of arguments
+     *
+     * @returns {*} result
+     */
+
+    function dotOperatorFunc (attributeName, obj) {
+      var func
+
+      if (typeof obj === 'object')
+        func = obj[attributeName]
+
+      if (typeof func === 'function')
+        return func.apply(obj, Array.prototype.slice.call(arguments, 2))
+    }
+
+    if (dotOperatorRegex.func.test(taskName)) {
+      // .foo() -> foo
+      attributeName = taskName.substring(1, taskName.length - 2)
+
+      debug(taskName)
+
+      funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
+    }
+
+    /**
+     * Dot operator attribute.
+     *
+     * @param {String} attributeName
+     * @param {Object} obj
+     *
+     * @returns {*} attribute
+     */
+
+    function dotOperatorAttr (attributeName, obj) {
+      var attr
+
+      if (typeof obj === 'object')
+        attr = obj[attributeName]
+
+      if (typeof attr === 'function')
+        return attr.bind(obj)
+
+      return attr
+    }
+
+    if (dotOperatorRegex.attr.test(taskName)) {
+      // .foo -> foo
+      attributeName = taskName.substring(1)
+
+      debug(taskName)
+
+      funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
+    }
+  }
+
+  Object.keys(task).forEach(inject)
+}
+
+module.exports = injectDotOperators
+
+
+},{"../debug":4,"../regex/dotOperator":21}],12:[function(require,module,exports){
+
+var debug      = require('../debug').inject,
+    walkGlobal = require('../walkGlobal')
 
 /**
  * Inject globals.
@@ -1043,6 +1066,7 @@ module.exports = injectArguments
  */
 
 function injectGlobals (funcs, task) {
+
   function inject (taskKey) {
     var taskName = task[taskKey]
 
@@ -1052,37 +1076,15 @@ function injectGlobals (funcs, task) {
       return
 
     // Skip also reserved keywords.
-    if (taskName === 'return')
+    if ((taskName === 'return') || (taskName === 'this.graph'))
       return
 
-    var globalContext
-
-    if (typeof window === 'object')
-      globalContext = window
-
-    if (typeof global === 'object')
-      globalContext = global
-
-    /**
-     * Walk through global context.
-     *
-     * process.version will return global[process][version]
-     *
-     * @param {String} taskName
-     * @returns {*} leaf
-     */
-
-    function walk (taskName) {
-      function toNextProp (leaf, prop) { return leaf[prop] }
-
-      return taskName.split('.')
-                     .reduce(toNextProp, globalContext)
-    }
-
-    var globalValue = walk(taskName)
+    var globalValue = walkGlobal(taskName)
 
     if (typeof globalValue === 'undefined')
       return
+
+    debug('global' + taskName)
 
     if (typeof globalValue === 'function')
       funcs[taskName] = globalValue
@@ -1096,10 +1098,12 @@ function injectGlobals (funcs, task) {
 module.exports = injectGlobals
 
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],11:[function(require,module,exports){
+},{"../debug":4,"../walkGlobal":24}],13:[function(require,module,exports){
 
-var referenceRegex = require('../regex/reference')
+var debug          = require('../debug').inject,
+    referenceRegex = require('../regex/reference'),
+    walkGlobal     = require('../walkGlobal')
+
 
 /**
  * Inject references to functions.
@@ -1109,23 +1113,32 @@ var referenceRegex = require('../regex/reference')
  */
 
 function injectReferences (funcs, task) {
-  function inject (taskKey) {
-    var referenceName
 
-    var taskName = task[taskKey]
+  function inject (taskKey) {
+    var referenceName,
+        referencedFunction,
+        taskName = task[taskKey]
 
     /**
      * Inject reference.
      */
 
     function reference () {
-      return funcs[referenceName]
+      return referencedFunction
     }
 
     if (referenceRegex.test(taskName)) {
       referenceName = taskName.substring(1)
 
-      funcs[taskName] = reference
+      if (typeof funcs[referenceName] === 'function')
+        referencedFunction = funcs[referenceName]
+      else
+        referencedFunction = walkGlobal(referenceName)
+
+      if (typeof referencedFunction === 'function') {
+        debug('reference to ' + referenceName)
+        funcs[taskName] = reference
+      }
     }
   }
 
@@ -1135,7 +1148,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"../regex/reference":20}],12:[function(require,module,exports){
+},{"../debug":4,"../regex/reference":22,"../walkGlobal":24}],14:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -1168,7 +1181,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":13}],13:[function(require,module,exports){
+},{"./inputPipes":15}],15:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -1198,7 +1211,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -1225,7 +1238,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":21}],15:[function(require,module,exports){
+},{"./validate":23}],17:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -1261,7 +1274,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":16}],16:[function(require,module,exports){
+},{"./parents":18}],18:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -1290,29 +1303,29 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":13}],17:[function(require,module,exports){
+},{"./inputPipes":15}],19:[function(require,module,exports){
 
 module.exports = /^@(.+)$/
 
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
@@ -1447,7 +1460,38 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":17,"./regex/argument":18,"./regex/dotOperator":19,"./regex/reference":20}],"dflow":[function(require,module,exports){
+},{"./regex/accessor":19,"./regex/argument":20,"./regex/dotOperator":21,"./regex/reference":22}],24:[function(require,module,exports){
+(function (global){
+
+    var globalContext
+
+    if (typeof window === 'object')
+      globalContext = window
+
+    if (typeof global === 'object')
+      globalContext = global
+
+    /**
+     * Walk through global context.
+     *
+     * process.version will return global[process][version]
+     *
+     * @param {String} taskName
+     * @returns {*} leaf
+     */
+
+    function walkGlobal (taskName) {
+      function toNextProp (leaf, prop) { return leaf[prop] }
+
+      return taskName.split('.')
+                     .reduce(toNextProp, globalContext)
+    }
+
+module.exports = walkGlobal
+
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],"dflow":[function(require,module,exports){
 
 var windowFunctions = require('../functions/window'),
     fun             = require('../fun')
@@ -1467,4 +1511,4 @@ function funBrowser (graph) {
 exports.fun = funBrowser
 
 
-},{"../fun":4,"../functions/window":6}]},{},[]);
+},{"../fun":5,"../functions/window":7}]},{},[]);
