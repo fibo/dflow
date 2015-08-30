@@ -1,7 +1,6 @@
 
-var dotOperatorRegex = require('../regex/dotOperator')
-
-var debug = require('debug')('dflow:inject')
+var debug            = require('../debug').inject,
+    dotOperatorRegex = require('../regex/dotOperator')
 
 /**
  * Inject functions that emulate dot operator.
@@ -9,18 +8,17 @@ var debug = require('debug')('dflow:inject')
  * @api private
  *
  * @param {Object} funcs reference
- * @param {Object} graph
+ * @param {Object} task
  */
 
-function injectDotOperators (funcs, graph) {
-  debug('dot operators')
+function injectDotOperators (funcs, task) {
 
   /**
    * Inject dot operator.
    */
 
   function inject (taskKey) {
-    var taskName = graph.task[taskKey]
+    var taskName = task[taskKey]
 
     /**
      * Dot operator function.
@@ -45,6 +43,8 @@ function injectDotOperators (funcs, graph) {
     if (dotOperatorRegex.func.test(taskName)) {
       // .foo() -> foo
       attributeName = taskName.substring(1, taskName.length - 2)
+
+      debug(taskName)
 
       funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
     }
@@ -74,11 +74,13 @@ function injectDotOperators (funcs, graph) {
       // .foo -> foo
       attributeName = taskName.substring(1)
 
+      debug(taskName)
+
       funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
     }
   }
 
-  Object.keys(graph.task).forEach(inject)
+  Object.keys(task).forEach(inject)
 }
 
 module.exports = injectDotOperators

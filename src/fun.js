@@ -1,37 +1,9 @@
 
-//
-// Dependency graph
-//
-// fun.js
-// ├── builtinFunctions.js
-// ├── inject/accessors.js
-// │   └── regex/accessors.js
-// ├── inject/additionalFunctions.js
-// ├── inject/arguments.js
-// │   └── regex/arguments.js
-// ├── inject/dotOperator.js
-// │   └── regex/dotOperator.js
-// ├── inject/globals.js
-// ├── inject/references.js
-// │   └── regex/references.js
-// ├── inputArgs.js
-// │   └── inputPipes.js
-// ├── isDflowFun.js
-// ├── level.js
-// │   └── parents.js
-// │       └── inputPipes.js
-// └── validate.js
-//     ├── regex/accessors.js
-//     ├── regex/arguments.js
-//     ├── regex/dotOperator.js
-//     └── regex/references.js
-//
-
 var builtinFunctions          = require('./functions/builtin'),
     injectAdditionalFunctions = require('./inject/additionalFunctions'),
     injectArguments           = require('./inject/arguments'),
     injectAccessors           = require('./inject/accessors'),
-// FIXME    injectDotOperators        = require('./inject/dotOperators'),
+    injectDotOperators        = require('./inject/dotOperators'),
     injectGlobals             = require('./inject/globals'),
     injectReferences          = require('./inject/references'),
     inputArgs                 = require('./inputArgs'),
@@ -66,11 +38,6 @@ function fun (graph, additionalFunctions) {
       computeLevelOf = level.bind(null, pipe, cachedLevelOf),
       funcs          = builtinFunctions
 
-  // Expose dflow functions.
-  funcs['dflow.fun']              = fun
-  funcs['dflow.isDflowFun']       = isDflowFun
-  funcs['dflow.validate']         = validate
-
   /**
    * Compile each sub graph.
    */
@@ -80,20 +47,28 @@ function fun (graph, additionalFunctions) {
       funcs[key] = fun(graph.func[key], additionalFunctions)
   }
 
-  Object.keys(func)
-        .forEach(compileSubgraph)
+  // Inject compile-time builtin tasks.
 
-  // Inject builtin tasks.
+  funcs['dflow.fun']        = fun
+  funcs['dflow.isDflowFun'] = isDflowFun
+  funcs['dflow.validate']   = validate
+
+  injectGlobals(funcs, task)
   injectAccessors(funcs, graph)
   injectAdditionalFunctions(funcs, additionalFunctions)
+  injectDotOperators(funcs, task)
   injectReferences(funcs, task)
-// FIXME    injectDotOperators(funcs, task)
+
+  Object.keys(func)
+        .forEach(compileSubgraph)
 
   /**
    * Here we are, this is the ❤ of dflow.
    */
 
   function dflowFun () {
+    debugRun('start')
+
     var gotReturn = false,
         outs = {},
         returnValue
@@ -103,11 +78,9 @@ function fun (graph, additionalFunctions) {
 
     var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
-    // Inject keywords and arguments.
+    // Inject run-time builtin tasks.
+
     funcs['this'] = function () { return dflowFun }
-    // FIXME why I cannot place it outside dflowFun? Does it make sense to inject globals
-    // everytime dflowFun is run?
-    injectGlobals(funcs, task)
     funcs['this.graph'] = function () { return graph }
     injectArguments(funcs, task, arguments)
 
@@ -158,6 +131,7 @@ function fun (graph, additionalFunctions) {
           .sort(byLevel)
           .forEach(run)
 
+    debugRun('end')
     return returnValue
   }
 

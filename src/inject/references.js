@@ -1,7 +1,8 @@
 
-var referenceRegex = require('../regex/reference')
+var debug          = require('../debug').inject,
+    referenceRegex = require('../regex/reference'),
+    walkGlobal     = require('../walkGlobal')
 
-var debug = require('debug')('dflow:inject')
 
 /**
  * Inject references to functions.
@@ -11,25 +12,32 @@ var debug = require('debug')('dflow:inject')
  */
 
 function injectReferences (funcs, task) {
-  debug('references')
 
   function inject (taskKey) {
-    var referenceName
-
-    var taskName = task[taskKey]
+    var referenceName,
+        referencedFunction,
+        taskName = task[taskKey]
 
     /**
      * Inject reference.
      */
 
     function reference () {
-      return funcs[referenceName]
+      return referencedFunction
     }
 
     if (referenceRegex.test(taskName)) {
       referenceName = taskName.substring(1)
 
-      funcs[taskName] = reference
+      if (typeof funcs[referenceName] === 'function')
+        referencedFunction = funcs[referenceName]
+      else
+        referencedFunction = walkGlobal(referenceName)
+
+      if (typeof referencedFunction === 'function') {
+        debug('reference to ' + referenceName)
+        funcs[taskName] = reference
+      }
     }
   }
 

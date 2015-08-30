@@ -1,6 +1,6 @@
 {
   "task": {
-    "1": "&Math.cos",
+    "1": "&isFinite",
     "2": "null",
     "3": "arguments",
     "4": "apply",
@@ -16,7 +16,7 @@
     "results": [
       {
         "args": [0],
-        "expected": 1
+        "expected": true
       }
     ]
   }

@@ -55,7 +55,9 @@ exports['<='] = lessThenOrEqualTo
 
 // Other operators
 
-function applyMethod (fun, thisArg, argsArray) { return fun.apply(thisArg, argsArray) }
+function applyMethod (fun, thisArg, argsArray) {
+  return fun.apply(thisArg, argsArray)
+}
 exports.apply = applyMethod
 
 function dot (obj, prop) { return obj[prop] }
