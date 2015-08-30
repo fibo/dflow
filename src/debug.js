@@ -1,6 +1,16 @@
 
+/**
+ * Enable debug.
+ *
+ * ```
+ * export DEBUG=dflow:*
+ * ```
+ *
+ */
+
 var debug = require('debug')
 
-exports.inject = debug('dflow:inject')
-exports.run    = debug('dflow:run')
+exports.compile = debug('dflow:compile')
+exports.inject  = debug('dflow:inject')
+exports.run     = debug('dflow:run')
 

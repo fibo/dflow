@@ -1,3 +1,3 @@
 
-exports.process = function _process () { return process }
+exports.process = function process () { return process }
 

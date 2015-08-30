@@ -114,7 +114,6 @@ It has the following signature.
 
 Actually *dflow* exposes also the following functions, available only inside a *dflow* graph:
 
-  * [dflow.builtinFunctions][3]
   * [dflow.fun](https://github.com/fibo/dflow/blob/master/src/fun.js)
   * [dflow.isDflowFun](https://github.com/fibo/dflow/blob/master/src/isDflowFun.js)
   * [dflow.validate](https://github.com/fibo/dflow/blob/master/src/validate.js)

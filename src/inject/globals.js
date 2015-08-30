@@ -28,7 +28,7 @@ function injectGlobals (funcs, task) {
     if (typeof globalValue === 'undefined')
       return
 
-    debug('global' + taskName)
+    debug('global ' + taskName)
 
     if (typeof globalValue === 'function')
       funcs[taskName] = globalValue

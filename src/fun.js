@@ -1,5 +1,6 @@
 
 var builtinFunctions          = require('./functions/builtin'),
+    debug                     = require('./debug'),
     injectAdditionalFunctions = require('./inject/additionalFunctions'),
     injectArguments           = require('./inject/arguments'),
     injectAccessors           = require('./inject/accessors'),
@@ -11,8 +12,8 @@ var builtinFunctions          = require('./functions/builtin'),
     level                     = require('./level'),
     validate                  = require('./validate')
 
-var debugRun   = require('debug')('dflow:run'),
-    debugCompile = require('debug')('dflow:compile')
+var debugRun     = debug.run,
+    debugCompile = debug.compile
 
 /**
  * Create a dflow function.
@@ -28,7 +29,7 @@ function fun (graph, additionalFunctions) {
   try { validate(graph, additionalFunctions) }
   catch (err) { throw err }
 
-  debugCompile('valid graph with ' + Object.keys(graph.task).length + ' tasks and ' + Object.keys(graph.pipe).length + ' pipes')
+  debugCompile('graph with ' + Object.keys(graph.task).length + ' tasks and ' + Object.keys(graph.pipe).length + ' pipes')
 
   var func = graph.func || {},
       pipe = graph.pipe,
