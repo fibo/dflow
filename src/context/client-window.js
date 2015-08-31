@@ -1,3 +1,6 @@
+/**
+ * @license ciao
+ */
 
 var windowFunctions = require('../functions/window'),
     fun             = require('../fun')
