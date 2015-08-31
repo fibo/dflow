@@ -1,18 +1,18 @@
 {
   "name": "dflow",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Dataflow programming",
   "bin": "bin/dflow",
   "main": "index.js",
   "browser": "./src/context/client-window.js",
   "scripts": {
     "start": "node bin/dflow",
-    "_build": "npm test && npm run browserify && npm run jekyll; git status",
+    "_build": "npm test && npm run browserify && npm run minify && npm run jekyll; git status",
     "_push": "git push origin master && npm run gh-pages:push",
     "_pull": "git pull origin master && npm run gh-pages:pull",
     "browserify": "npm run browserify:client; npm run browserify:dist; npm run browserify:examples",
     "browserify:client": "browserify -e src/editor/client.js -o src/editor/public/dflow-editor.js",
-    "browserify:dist": "browserify -r ./index.js:${npm_package_name} -o dist/${npm_package_name}.js",
+    "browserify:dist": "browserify -r ./src/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
     "browserify:examples": "browserify -r ./src/examples/render.js:examples-render -o gh-pages/js/examples-render.js",
     "coverage": "npm run istanbul && npm run coveralls",
     "coveralls": "cat ./coverage/lcov.info | coveralls --verbose",
@@ -25,6 +25,7 @@
     "istanbul": "istanbul cover _mocha",
     "jekyll": "npm run homepage; npm run cp; cd gh-pages; jekyll build; cd ..",
     "jshint": "jshint -c .jshintrc src/**.js test/**.js",
+    "minify": "uglifyjs dist/dflow.js --output dist/dflow.min.js --compress --mangle",
     "test": "mocha --bail --require should --reporter min --recursive"
   },
   "dependencies": {
@@ -60,6 +61,7 @@
     "istanbul": "^0.3.14",
     "mocha": "*",
     "mocha-lcov-reporter": "0.0.2",
-    "should": "*"
+    "should": "*",
+    "uglify-js": "^2.4.24"
   }
 }

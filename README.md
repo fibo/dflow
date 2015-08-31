@@ -122,7 +122,7 @@ Actually *dflow* exposes also the following functions, available only inside a *
 
 A *graph* is a collection of *tasks* and *pipes* that can be stored in JSON format.
 
-Every *task* refers to a function which output can be piped as an argument to another other task.
+Every *task* refers to a function which output can be piped as an argument to another task.
 
 A *graph* has the following properties
 
@@ -143,6 +143,10 @@ A *graph* has the following properties
   * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
   * `.quz`, `.quz()`: returns a dot-operator-like function.
+  * any taskName found in global context, walking throw dot operator, is available as a task. For example
+    - `isFunction`
+    - `Math.cos` 
+    - `process.version`: will resolve to a function that returns it
 
 Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:
 
@@ -157,7 +161,7 @@ It is developed in my spare time and, as far as I know, by now *I am my only use
 
 I wrote few times a dataflow engine, the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
 
-Use cases I can think about *dflow* right now are many, but, the possibilities are I.M.H.O. outstanding: from client to server, from JavaScript to cross language, from mono-thread to graphs distributed on a network and, above all, from skilled programmer who write functions code … to artists, genetic engineers, data scientists, etc. that use those functions to create *dflow* graphs and get results nobody could even imagine.
+Use cases I can think about *dflow* right now are many, but, the possibilities are I.M.H.O. outstanding: from client to server, from JavaScript to cross language, from mono-thread to graphs distributed on a network and, above all, from skilled programmer who implement functions … to artists, genetic engineers, data scientists, etc. that use those functions to create *dflow* graphs and get results nobody could even imagine.
 
 If this is also your vision or you just want to use *dflow*, [contact me](http://g14n.info).
 
