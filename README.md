@@ -9,6 +9,7 @@
 *dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
 
 **Table Of Contents:**
+
 * [Installation](#installation)
 * [Examples](#examples)
 * [Editor](#editor)
@@ -49,6 +50,8 @@ The following simple graph is executed client side by *dflow* engine.
 ### Test page
 
 See [test/page.html](http://g14n.info/dflow/test/page.html) for another working example of *dflow* in a browser context.
+
+[![view on requirebin](http://requirebin.com/badge.png)](http://requirebin.com/?gist=45520011e093d6dfec9f)
 
 ### Stream playground
 
