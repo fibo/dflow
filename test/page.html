@@ -15,7 +15,7 @@
             funcs  = {
               createElement: document.createElement.bind(document),
               appendChild: function (parent, child) { return parent.appendChild(child) },
-              'body.appendChild': function (child) { return document.body.appendChild(child) },
+              bodyAppendChild: function (child) { return document.body.appendChild(child) },
               createTextNode: document.createTextNode.bind(document)
             },
             graph = {
@@ -25,7 +25,7 @@
                 createElement:      'createElement',
                 createTextNode:     'createTextNode',
                 appendChild:        'appendChild',
-                'body.appendChild': 'body.appendChild',
+                bodyAppendChild':   'bodyAppendChild',
                 'return':           'return'
               },
               pipe: {
@@ -37,27 +37,27 @@
                 c: ['createElement',    'appendChild'       ],
                 d: ['createTextNode',   'appendChild',     1],
                 // createElement returns a DOM node that is appended to body.
-                e: ['createElement',    'body.appendChild'  ],
+                e: ['createElement',    'bodyAppendChild'  ],
                 // body.appendChild returns a DOM node that is returned by the dflow graph.
-                f: ['body.appendChild', 'return'            ]
+                f: ['bodyAppendChild', 'return'            ]
               },
               view: {
                 node: {
-                  arg0:               { text: 'arguments[0]',     x: 10,  y: 10,                 outs: [{}] },
-                  arg1:               { text: 'arguments[1]',     x: 210, y: 10,                 outs: [{}] },
-                  createElement:      { text: 'createElement',    x: 10,  y: 100, ins: [{}],     outs: [{}] },
-                  createTextNode:     { text: 'createTextNode',   x: 210, y: 100, ins: [{}],     outs: [{}] },
-                  appendChild:        { text: 'appendChild',      x: 210, y: 190, ins: [{}, {}], outs: [{}] },
-                  'body.appendChild': { text: 'body.appendChild', x: 10,  y: 190, ins: [{}],     outs: [{}] },
-                  'return':           { text: 'return',           x: 10,  y: 280, ins: [{}]                 }
+                  arg0:              { text: 'arguments[0]',    x: 10,  y: 10,                 outs: [{}] },
+                  arg1:              { text: 'arguments[1]',    x: 210, y: 10,                 outs: [{}] },
+                  createElement:     { text: 'createElement',   x: 10,  y: 100, ins: [{}],     outs: [{}] },
+                  createTextNode:    { text: 'createTextNode',  x: 210, y: 100, ins: [{}],     outs: [{}] },
+                  appendChild:       { text: 'appendChild',     x: 210, y: 190, ins: [{}, {}], outs: [{}] },
+                  'bodyAppendChild': { text: 'bodyAppendChild', x: 10,  y: 190, ins: [{}],     outs: [{}] },
+                  'return':          { text: 'return',          x: 10,  y: 280, ins: [{}]                 }
                 },
                 link: {
-                  a: { from: ['arg0',             0], to: ['createElement',    0] },
-                  b: { from: ['arg1',             0], to: ['createTextNode',   0] },
-                  c: { from: ['createElement',    0], to: ['appendChild',      0] },
-                  d: { from: ['createTextNode',   0], to: ['appendChild',      1] },
-                  e: { from: ['createElement',    0], to: ['body.appendChild', 0] },
-                  f: { from: ['body.appendChild', 0], to: ['return',           0] }
+                  a: { from: ['arg0',            0], to: ['createElement',    0] },
+                  b: { from: ['arg1',            0], to: ['createTextNode',   0] },
+                  c: { from: ['createElement',   0], to: ['appendChild',      0] },
+                  d: { from: ['createTextNode',  0], to: ['appendChild',      1] },
+                  e: { from: ['createElement',   0], to: ['bodyAppendChild', 0] },
+                  f: { from: ['bodyAppendChild', 0], to: ['return',           0] }
                 }
               }
             }
@@ -70,7 +70,7 @@
               '   and pass them to createElement and createTextNode respectively.',
               '2. appendChild takes inputs from both createElement and createTextNode.',
               '3. createElement returns a DOM node that is appended to body.',
-              '4. body.appendChild returns a DOM node that is returned by the dflow graph.'
+              '4. bodyAppendChild returns a DOM node that is returned by the dflow graph.'
             ]
 
         graph.view.node.comment = {
