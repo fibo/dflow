@@ -19,7 +19,7 @@ function renderExample (divId, example) {
 
   var canvas = new Canvas(divId)
 
-  canvas.createView(graph.view)
+  canvas.render(graph.view)
 
   dflow.fun(graph)()
 }
