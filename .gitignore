@@ -4,6 +4,9 @@ npm-debug.log
 Gemfile*
 gh-pages/_site
 
+# Running dflow cli with no arguments will create this file
+graph.json
+
 # Test coverage
 coverage
 .coveralls.yml
