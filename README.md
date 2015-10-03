@@ -1,12 +1,14 @@
 # dflow
 
-> Dataflow programming
+> Is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
 
 [![NPM version](https://badge.fury.io/js/dflow.png)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.png?branch=master)](https://travis-ci.org/fibo/dflow?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.png)](https://gemnasium.com/fibo/dflow) [![Coverage Status](https://coveralls.io/repos/fibo/dflow/badge.svg?branch=master)](https://coveralls.io/r/fibo/dflow?branch=master)
 
+[![Whatchers](https://img.shields.io/github/watchers/fibo/dflow.svg?style=social&label=Watch)](https://github.com/fibo/dflow/watchers) [![Stargazers](https://img.shields.io/github/stars/fibo/dflow.svg?style=social&label=Star)](https://github.com/fibo/dflow/stargazers) [![Forks](https://img.shields.io/github/forks/fibo/dflow.svg?style=social&label=Forks)](https://github.com/fibo/dflow/network/members)
+
 [![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
 
-*dflow* is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
+[![Throughput Graph](https://graphs.waffle.io/fibo/dflow/throughput.svg)](https://waffle.io/fibo/dflow)
 
 **Table Of Contents:**
 
@@ -19,25 +21,28 @@
 
 ## Installation
 
-With [npm](https://npmjs.org/) do
+# Client side
 
-```bash
-$ npm install dflow
-```
-
-or install globally if you want *dflow* cli in your path
-
-```bash
-$ npm install dflow -g
-```
-
-With [bower](http://bower.io/) do
+If you have some [graphs](#specification) ready to run on client side, you can install dflow engine with [bower](http://bower.io/)
 
 ```bash
 $ bower install dflow
 ```
 
-and it will install only the engine, client side.
+### Server side
+
+If you are new to *dflow*, you probably want to try the [editor](#editor), so you need to install globally to get *dflow* cli in your path.
+With [npm](https://npmjs.org/) do
+
+```bash
+$ npm install dflow -g
+```
+
+However, if you need to require the *dflow* engine in your package, or you need to browserify it, or even you want to use the *dflow* cli in your npm scripts, or whatever, you can install *dflow* locally with
+
+```bash
+$ npm install dflow
+```
 
 ## Examples
 
