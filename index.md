@@ -5,14 +5,6 @@ title: dflow
 
 > Is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
 
-[![NPM version](https://badge.fury.io/js/dflow.png)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.png?branch=master)](https://travis-ci.org/fibo/dflow?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.png)](https://gemnasium.com/fibo/dflow) [![Coverage Status](https://coveralls.io/repos/fibo/dflow/badge.svg?branch=master)](https://coveralls.io/r/fibo/dflow?branch=master)
-
-[![Whatchers](https://img.shields.io/github/watchers/fibo/dflow.svg?style=social&label=Watch)](https://github.com/fibo/dflow/watchers) [![Stargazers](https://img.shields.io/github/stars/fibo/dflow.svg?style=social&label=Star)](https://github.com/fibo/dflow/stargazers) [![Forks](https://img.shields.io/github/forks/fibo/dflow.svg?style=social&label=Forks)](https://github.com/fibo/dflow/network/members)
-
-[![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
-
-[![Throughput Graph](https://graphs.waffle.io/fibo/dflow/throughput.svg)](https://waffle.io/fibo/dflow)
-
 **Table Of Contents:**
 
 * [Installation](#installation)
@@ -22,9 +14,17 @@ title: dflow
 * [Specification](#specification)
 * [Support and license](#support-and-license)
 
+[![NPM version](https://badge.fury.io/js/dflow.png)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.png?branch=master)](https://travis-ci.org/fibo/dflow?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.png)](https://gemnasium.com/fibo/dflow) [![Coverage Status](https://coveralls.io/repos/fibo/dflow/badge.svg?branch=master)](https://coveralls.io/r/fibo/dflow?branch=master)
+
+[![Whatchers](https://img.shields.io/github/watchers/fibo/dflow.svg?style=social&label=Watch)](https://github.com/fibo/dflow/watchers) [![Stargazers](https://img.shields.io/github/stars/fibo/dflow.svg?style=social&label=Star)](https://github.com/fibo/dflow/stargazers) [![Forks](https://img.shields.io/github/forks/fibo/dflow.svg?style=social&label=Forks)](https://github.com/fibo/dflow/network/members)
+
+[![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
+
+[![Throughput Graph](https://graphs.waffle.io/fibo/dflow/throughput.svg)](https://waffle.io/fibo/dflow)
+
 ## Installation
 
-# Client side
+### Client side
 
 If you have some [graphs](#specification) ready to run on client side, you can install dflow engine with [bower](http://bower.io/)
 
