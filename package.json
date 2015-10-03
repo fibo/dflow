@@ -1,7 +1,14 @@
 {
   "name": "dflow",
-  "version": "0.8.3",
   "description": "Dataflow programming",
+  "version": "0.8.3",
+  "engines": { "node": ">=4.0.0" },
+  "homepage": "http://g14n.info/dflow",
+  "author": {
+    "name": "Gianluca Casati",
+    "url": "http://g14n.info"
+  },
+  "license": "MIT",
   "bin": "bin/dflow",
   "main": "index.js",
   "browser": "./src/context/client-window.js",
@@ -45,12 +52,6 @@
     "dataflow",
     "visual"
   ],
-  "author": {
-    "name": "Gianluca Casati",
-    "url": "http://g14n.info"
-  },
-  "license": "MIT",
-  "homepage": "http://g14n.info/dflow",
   "devDependencies": {
     "browserify": "*",
     "coveralls": "^2.11.2",
