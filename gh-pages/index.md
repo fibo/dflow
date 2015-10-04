@@ -90,7 +90,15 @@ Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/sr
 
 Launch *dflow* from command line, and start editing your first graph using your favourite browser.
 
-> Usage: dflow [path/to/graph.json]
+```
+Usage: dflow [options] [path/to/graph.json]
+
+  -h, --help          print this message and exit
+  -p, --port          server port number, defaults to 3000
+  -V, --version       print current version and exit
+
+For more info point your browser to http://g14n.info/dflow
+```
 
 If no graph is given, an empty graph named *graph.json* will be created.
 

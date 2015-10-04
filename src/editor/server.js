@@ -21,6 +21,21 @@ function saveGraph (graphPath, graph, callback) {
 function editorServer (graphPath, opt) {
   var graph = require(graphPath)
 
+  var nextKey = 0
+
+  function getNextKey () {
+    var currentKey = ++nextKey + ''
+
+    // Make next key unique.
+    if (graph.task[currentKey])
+      return getNextKey()
+
+    if (graph.pipe[currentKey])
+      return getNextKey()
+
+    return currentKey
+  }
+
   var save = saveGraph.bind(null, graphPath)
 
   var bodyParser = require('body-parser'),
@@ -37,8 +52,6 @@ function editorServer (graphPath, opt) {
 
   app.set('views', path.join(__dirname, 'views'))
   app.set('view engine', 'ejs')
-
-// TODO  var secret = process.env.DFLOW_SECRET || 'changeme'
 
   var publicDir = express.static(path.join(__dirname, 'public'))
 
@@ -58,20 +71,20 @@ function editorServer (graphPath, opt) {
 
   io.on('connection', function (socket) {
     socket.on('addLink', function (data) {
-      Object.keys(data.link).forEach(function (key) {
-        var link = data.link[key]
+      var key  = getNextKey()
 
-        // Add link to view.
-        graph.view.link[key] = link
+      // Add link to view.
+      graph.view.link[key] = data
 
-        // Add pipe.
-        graph.pipe[key] = [link.from, link.to]
+      // Add pipe.
+      graph.pipe[key] = [data.from, data.to]
 
-        if (autosave) save(graph)
-      })
+      if (autosave) save(graph)
     })
 
     socket.on('addInput', function (data) {
+      console.log(data)
+      /*
       Object.keys(data.node).forEach(function (key) {
         Object.keys(data.node[key].ins).forEach(function (position) {
           if (typeof graph.view.node[key].ins === 'undefined')
@@ -82,6 +95,7 @@ function editorServer (graphPath, opt) {
           graph.view.node[key].ins[position] = inputData
         })
       })
+      */
 
       if (autosave) save(graph)
     })
@@ -100,18 +114,16 @@ function editorServer (graphPath, opt) {
     })
 
     socket.on('addNode', function (data) {
-      Object.keys(data.node).forEach(function (key) {
-        var node = data.node[key]
+      var key  = getNextKey()
 
-        // Add node to view.
-        graph.view.node[key] = node
+      // Add node to view.
+      graph.view.node[key] = data
 
-        // Add task.
-        graph.task[key] = node.text
+      // Add task.
+      graph.task[key] = data.text
 
-        // Associate node and task.
-        graph.view.node[key].task = key
-      })
+      // Associate node and task.
+      graph.view.node[key].task = key
 
       if (autosave) save(graph)
     })
@@ -154,7 +166,10 @@ function editorServer (graphPath, opt) {
 
   http.listen(port, function () {
     console.log('Listening on port ' + port)
-    if (autosave) console.log('Option autosave is on')
+
+    if (autosave)
+      console.log('Option autosave is on')
+
     console.log('Editing graph ' + graphPath)
   })
 }

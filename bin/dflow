@@ -15,10 +15,12 @@ var createEmptyGraph = require('../src/createEmptyGraph'),
 
 var knownOpts = {
       help: Boolean,
+      port: Number,
       version: Boolean
     },
     shortHandOpts = {
       h: '--help',
+      p: '--port',
       V: '--version'
     }
 
@@ -28,8 +30,9 @@ var opt = nopt(knownOpts, shortHandOpts, process.argv, 2)
 
 if (opt.help) {
   console.log('Usage: dflow [options] [path/to/graph.json]\n')
-  console.log('  -h, --help                print this message and exit')
-  console.log('  -v, --version             print current version and exit')
+  console.log('  -h, --help          print this message and exit')
+  console.log('  -p, --port          server port number, defaults to 3000')
+  console.log('  -V, --version       print current version and exit')
   console.log('\nFor more info point your browser to ' + pkg.homepage)
   process.exit(0)
 }

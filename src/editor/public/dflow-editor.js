@@ -6417,13 +6417,15 @@ request.onload = function() {
     var Canvas = require('flow-view').Canvas
     var canvas = new Canvas('flow')
 
-    canvas.createView(graph.view)
+    canvas.render(graph.view)
 
-    var events = ['addLink', 'addNode', 'addInput', 'addOutput',
-                  'delLink', 'delNode', 'moveNode']
+    var events = ['addLink' , 'addNode',
+                  'addInput', 'addOutput',
+                  'delLink' , 'delNode'  , 'moveNode']
 
     events.forEach(function (eventName) {
-      canvas.on(eventName, function (ev) {
+      canvas.broker.on(eventName, function (ev) {
+        console.log(eventName, ev)
         socket.emit(eventName, ev)
       })
     })
