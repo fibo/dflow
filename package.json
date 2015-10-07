@@ -2,7 +2,9 @@
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
   "version": "0.8.3",
-  "engines": { "node": ">=4.0.0" },
+  "engines": {
+    "node": ">=4.0.0"
+  },
   "homepage": "http://g14n.info/dflow",
   "author": {
     "name": "Gianluca Casati",
@@ -56,9 +58,9 @@
     "browserify": "*",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.14",
-    "mocha": "*",
+    "mocha": "^2.3.3",
     "mocha-lcov-reporter": "0.0.2",
-    "should": "*",
+    "should": "^7.1.0",
     "uglify-js": "^2.4.24"
   }
 }
