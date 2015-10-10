@@ -5,8 +5,15 @@ var pkg = require('../../package.json')
 
 var defaultOpt = {
   autosave: true,
-  port: 3000
+  port: 3000,
+  verbose: false // Silence is gold.
 }
+
+/**
+ * Save graph json file
+ *
+ * @api private
+ */
 
 function saveGraph (graphPath, graph, callback) {
   var jsonString = JSON.stringify(graph)
@@ -14,14 +21,31 @@ function saveGraph (graphPath, graph, callback) {
   fs.writeFile(graphPath, jsonString, 'utf8', function (err) {
     if (err) throw err
 
-    if (typeof callback === 'function') callback()
+    if (typeof callback === 'function')
+      callback()
   })
 }
 
-function editorServer (graphPath, opt) {
-  var graph = require(graphPath)
+/**
+ * Log event to stdout
+ *
+ * @api private
+ */
 
-  var nextKey = 0
+function logEvent (verbose, eventName, eventData) {
+  if (verbose)
+    console.dir({event: eventName, data: eventData})
+}
+
+function editorServer (graphPath, opt) {
+  var graph   = require(graphPath),
+      nextKey = 0
+
+  /**
+   * Key generator.
+   *
+   * @api private
+   */
 
   function getNextKey () {
     var currentKey = ++nextKey + ''
@@ -47,11 +71,18 @@ function editorServer (graphPath, opt) {
       http = require('http').Server(app),
       io   = require('socket.io')(http)
 
+  // Default options.
+
   var autosave = opt.autosave || defaultOpt.autosave,
-      port     = opt.port     || defaultOpt.port
+      port     = opt.port     || defaultOpt.port,
+      verbose  = opt.verbose  || defaultOpt.verbose
+
+  var log = logEvent.bind(null, verbose)
 
   app.set('views', path.join(__dirname, 'views'))
   app.set('view engine', 'ejs')
+
+  // Public dir.
 
   var publicDir = express.static(path.join(__dirname, 'public'))
 
@@ -70,7 +101,16 @@ function editorServer (graphPath, opt) {
   // Socket.IO events.
 
   io.on('connection', function (socket) {
-    socket.on('addLink', function (data) {
+
+    /**
+     * On addLink event.
+     *
+     * @api private
+     */
+
+    function addLink (data) {
+      log('addLink', data)
+
       var key  = getNextKey()
 
       // Add link to view.
@@ -80,40 +120,64 @@ function editorServer (graphPath, opt) {
       graph.pipe[key] = [data.from, data.to]
 
       if (autosave) save(graph)
-    })
+    }
 
-    socket.on('addInput', function (data) {
-      console.log(data)
-      /*
-      Object.keys(data.node).forEach(function (key) {
-        Object.keys(data.node[key].ins).forEach(function (position) {
-          if (typeof graph.view.node[key].ins === 'undefined')
-            graph.view.node[key].ins = []
+    socket.on('addLink', addLink)
 
-          var inputData = data.node[key].ins[position]
+    /**
+     * On addInput event.
+     *
+     * @api private
+     */
 
-          graph.view.node[key].ins[position] = inputData
-        })
-      })
-      */
+    function addInput (data) {
+      log('addInput', data)
+
+      var content  = data.content || {},
+          key      = data.nodeKey,
+          position = data.position
+
+      if (typeof graph.view.node[key].ins === 'undefined')
+        graph.view.node[key].ins = []
+
+      graph.view.node[key].ins.push(content)
+      if (autosave) save(graph)
+    }
+
+    socket.on('addInput', addInput)
+
+    /**
+     * On addOutput event.
+     *
+     * @api private
+     */
+
+    function addOutput (data) {
+      log('addOutput', data)
+
+      var content  = data.content || {},
+          key      = data.nodeKey,
+          position = data.position
+
+      if (typeof graph.view.node[key].outs === 'undefined')
+        graph.view.node[key].outs = []
+
+      graph.view.node[key].outs.push(content)
 
       if (autosave) save(graph)
-    })
+    }
 
-    socket.on('addOutput', function (data) {
-      Object.keys(data.node).forEach(function (key) {
-        Object.keys(data.node[key].outs).forEach(function (position) {
-          if (typeof graph.view.node[key].outs === 'undefined')
-            graph.view.node[key].outs = []
+    socket.on('addOutput', addOutput)
 
-          graph.view.node[key].outs[position] = data.node[key].outs[position]
-        })
-      })
+    /**
+     * On addNode event.
+     *
+     * @api private
+     */
 
-      if (autosave) save(graph)
-    })
+    function addNode (data) {
+      log('addNode', data)
 
-    socket.on('addNode', function (data) {
       var key  = getNextKey()
 
       // Add node to view.
@@ -126,29 +190,59 @@ function editorServer (graphPath, opt) {
       graph.view.node[key].task = key
 
       if (autosave) save(graph)
-    })
+    }
 
-    socket.on('delLink', function (data) {
-      data.forEach(function (key) {
-        delete graph.link[key]
+    socket.on('addNode', addNode)
 
-        delete graph.view.link[key]
-      })
+    /**
+     * On delLink event.
+     *
+     * @api private
+     */
+
+    function delLink (data) {
+      log('delLink', data)
+
+      var key = data
+
+      delete graph.link[key]
+
+      delete graph.view.link[key]
 
       if (autosave) save(graph)
-    })
+    }
 
-    socket.on('delNode', function (data) {
-      data.forEach(function (key) {
-        delete graph.node[key]
+    socket.on('delLink', delLink)
 
-        delete graph.view.node[key]
-      })
+    /**
+     * On delNode event.
+     *
+     * @api private
+     */
+
+    function delNode (data) {
+      log('delNode', data)
+
+      var key = data
+
+      delete graph.node[key]
+
+      delete graph.view.node[key]
 
       if (autosave) save(graph)
-    })
+    }
 
-    socket.on('moveNode', function (data) {
+    socket.on('delNode', delNode)
+
+    /**
+     * On moveNode event.
+     *
+     * @api private
+     */
+
+    function moveNode (data) {
+      log('moveNode', data)
+
       Object.keys(data.node).forEach(function (key) {
         var node = data.node[key]
 
@@ -158,19 +252,22 @@ function editorServer (graphPath, opt) {
 
         if (autosave) save(graph)
       })
-    })
+    }
 
+    socket.on('moveNode', moveNode)
   })
 
   // Start server.
 
   http.listen(port, function () {
-    console.log('Listening on port ' + port)
+    if (verbose) {
+      console.log('Listening on port ' + port)
 
-    if (autosave)
-      console.log('Option autosave is on')
+      if (autosave)
+        console.log('Option autosave is on')
 
-    console.log('Editing graph ' + graphPath)
+      console.log('Editing graph ' + graphPath)
+    }
   })
 }
 

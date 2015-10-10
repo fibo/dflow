@@ -32,6 +32,7 @@ if (opt.help) {
   console.log('Usage: dflow [options] [path/to/graph.json]\n')
   console.log('  -h, --help          print this message and exit')
   console.log('  -p, --port          server port number, defaults to 3000')
+  console.log('  -v, --verbose       print events on stdout')
   console.log('  -V, --version       print current version and exit')
   console.log('\nFor more info point your browser to ' + pkg.homepage)
   process.exit(0)
