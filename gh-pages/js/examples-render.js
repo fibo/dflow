@@ -303,512 +303,16 @@ function isUndefined(arg) {
 
 },{}],2:[function(require,module,exports){
 
-/**
- * This is the web browser implementation of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = require('./debug');
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-exports.storage = 'undefined' != typeof chrome
-               && 'undefined' != typeof chrome.storage
-                  ? chrome.storage.local
-                  : localstorage();
-
-/**
- * Colors.
- */
-
-exports.colors = [
-  'lightseagreen',
-  'forestgreen',
-  'goldenrod',
-  'dodgerblue',
-  'darkorchid',
-  'crimson'
-];
-
-/**
- * Currently only WebKit-based Web Inspectors, Firefox >= v31,
- * and the Firebug extension (any Firefox version) are known
- * to support "%c" CSS customizations.
- *
- * TODO: add a `localStorage` variable to explicitly enable/disable colors
- */
-
-function useColors() {
-  // is webkit? http://stackoverflow.com/a/16459606/376773
-  return ('WebkitAppearance' in document.documentElement.style) ||
-    // is firebug? http://stackoverflow.com/a/398120/376773
-    (window.console && (console.firebug || (console.exception && console.table))) ||
-    // is firefox >= v31?
-    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-    (navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31);
-}
-
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-exports.formatters.j = function(v) {
-  return JSON.stringify(v);
-};
-
-
-/**
- * Colorize log arguments if enabled.
- *
- * @api public
- */
-
-function formatArgs() {
-  var args = arguments;
-  var useColors = this.useColors;
-
-  args[0] = (useColors ? '%c' : '')
-    + this.namespace
-    + (useColors ? ' %c' : ' ')
-    + args[0]
-    + (useColors ? '%c ' : ' ')
-    + '+' + exports.humanize(this.diff);
-
-  if (!useColors) return args;
-
-  var c = 'color: ' + this.color;
-  args = [args[0], c, 'color: inherit'].concat(Array.prototype.slice.call(args, 1));
-
-  // the final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-  var index = 0;
-  var lastC = 0;
-  args[0].replace(/%[a-z%]/g, function(match) {
-    if ('%%' === match) return;
-    index++;
-    if ('%c' === match) {
-      // we only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-
-  args.splice(lastC, 0, c);
-  return args;
-}
-
-/**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
- *
- * @api public
- */
-
-function log() {
-  // this hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return 'object' === typeof console
-    && console.log
-    && Function.prototype.apply.call(console.log, console, arguments);
-}
-
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-
-function save(namespaces) {
-  try {
-    if (null == namespaces) {
-      exports.storage.removeItem('debug');
-    } else {
-      exports.storage.debug = namespaces;
-    }
-  } catch(e) {}
-}
-
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-function load() {
-  var r;
-  try {
-    r = exports.storage.debug;
-  } catch(e) {}
-  return r;
-}
-
-/**
- * Enable namespaces listed in `localStorage.debug` initially.
- */
-
-exports.enable(load());
-
-/**
- * Localstorage attempts to return the localstorage.
- *
- * This is necessary because safari throws
- * when a user disables cookies/localstorage
- * and you attempt to access it.
- *
- * @return {LocalStorage}
- * @api private
- */
-
-function localstorage(){
-  try {
-    return window.localStorage;
-  } catch (e) {}
-}
-
-},{"./debug":3}],3:[function(require,module,exports){
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = debug;
-exports.coerce = coerce;
-exports.disable = disable;
-exports.enable = enable;
-exports.enabled = enabled;
-exports.humanize = require('ms');
-
-/**
- * The currently active debug mode names, and names to skip.
- */
-
-exports.names = [];
-exports.skips = [];
-
-/**
- * Map of special "%n" handling functions, for the debug "format" argument.
- *
- * Valid key names are a single, lowercased letter, i.e. "n".
- */
-
-exports.formatters = {};
-
-/**
- * Previously assigned color.
- */
-
-var prevColor = 0;
-
-/**
- * Previous log timestamp.
- */
-
-var prevTime;
-
-/**
- * Select a color.
- *
- * @return {Number}
- * @api private
- */
-
-function selectColor() {
-  return exports.colors[prevColor++ % exports.colors.length];
-}
-
-/**
- * Create a debugger with the given `namespace`.
- *
- * @param {String} namespace
- * @return {Function}
- * @api public
- */
-
-function debug(namespace) {
-
-  // define the `disabled` version
-  function disabled() {
-  }
-  disabled.enabled = false;
-
-  // define the `enabled` version
-  function enabled() {
-
-    var self = enabled;
-
-    // set `diff` timestamp
-    var curr = +new Date();
-    var ms = curr - (prevTime || curr);
-    self.diff = ms;
-    self.prev = prevTime;
-    self.curr = curr;
-    prevTime = curr;
-
-    // add the `color` if not set
-    if (null == self.useColors) self.useColors = exports.useColors();
-    if (null == self.color && self.useColors) self.color = selectColor();
-
-    var args = Array.prototype.slice.call(arguments);
-
-    args[0] = exports.coerce(args[0]);
-
-    if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %o
-      args = ['%o'].concat(args);
-    }
-
-    // apply any `formatters` transformations
-    var index = 0;
-    args[0] = args[0].replace(/%([a-z%])/g, function(match, format) {
-      // if we encounter an escaped % then don't increase the array index
-      if (match === '%%') return match;
-      index++;
-      var formatter = exports.formatters[format];
-      if ('function' === typeof formatter) {
-        var val = args[index];
-        match = formatter.call(self, val);
-
-        // now we need to remove `args[index]` since it's inlined in the `format`
-        args.splice(index, 1);
-        index--;
-      }
-      return match;
-    });
-
-    if ('function' === typeof exports.formatArgs) {
-      args = exports.formatArgs.apply(self, args);
-    }
-    var logFn = enabled.log || exports.log || console.log.bind(console);
-    logFn.apply(self, args);
-  }
-  enabled.enabled = true;
-
-  var fn = exports.enabled(namespace) ? enabled : disabled;
-
-  fn.namespace = namespace;
-
-  return fn;
-}
-
-/**
- * Enables a debug mode by namespaces. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} namespaces
- * @api public
- */
-
-function enable(namespaces) {
-  exports.save(namespaces);
-
-  var split = (namespaces || '').split(/[\s,]+/);
-  var len = split.length;
-
-  for (var i = 0; i < len; i++) {
-    if (!split[i]) continue; // ignore empty strings
-    namespaces = split[i].replace(/\*/g, '.*?');
-    if (namespaces[0] === '-') {
-      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-    } else {
-      exports.names.push(new RegExp('^' + namespaces + '$'));
-    }
-  }
-}
-
-/**
- * Disable debug output.
- *
- * @api public
- */
-
-function disable() {
-  exports.enable('');
-}
-
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
-
-function enabled(name) {
-  var i, len;
-  for (i = 0, len = exports.skips.length; i < len; i++) {
-    if (exports.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (i = 0, len = exports.names.length; i < len; i++) {
-    if (exports.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Coerce `val`.
- *
- * @param {Mixed} val
- * @return {Mixed}
- * @api private
- */
-
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
-
-},{"ms":4}],4:[function(require,module,exports){
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} options
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function(val, options){
-  options = options || {};
-  if ('string' == typeof val) return parse(val);
-  return options.long
-    ? long(val)
-    : short(val);
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = '' + str;
-  if (str.length > 10000) return;
-  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
-  if (!match) return;
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function short(ms) {
-  if (ms >= d) return Math.round(ms / d) + 'd';
-  if (ms >= h) return Math.round(ms / h) + 'h';
-  if (ms >= m) return Math.round(ms / m) + 'm';
-  if (ms >= s) return Math.round(ms / s) + 's';
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function long(ms) {
-  return plural(ms, d, 'day')
-    || plural(ms, h, 'hour')
-    || plural(ms, m, 'minute')
-    || plural(ms, s, 'second')
-    || ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, n, name) {
-  if (ms < n) return;
-  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
-  return Math.ceil(ms / n) + ' ' + name + 's';
-}
-
-},{}],5:[function(require,module,exports){
-
 // Cheating npm require.
 module.exports = require('../..')
 
 
-},{"../..":31}],6:[function(require,module,exports){
+},{"../..":27}],3:[function(require,module,exports){
 
 module.exports = require('./src')
 
 
-},{"./src":29}],7:[function(require,module,exports){
+},{"./src":25}],4:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -833,7 +337,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],8:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /*! svg.draggable.js - v1.0.0 - 2015-06-12
 * https://github.com/wout/svg.draggable.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -1025,7 +529,7 @@ if (typeof Object.create === 'function') {
   })
 
 }).call(this);
-},{}],9:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*! svg.foreignobject.js - v1.0.0 - 2015-06-14
 * https://github.com/fibo/svg.foreignobject.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -1058,16 +562,16 @@ SVG.extend(SVG.Container, {
   }
 })
 
-},{}],10:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
-* @version 2.0.5
+* @version 2.1.1
 * http://www.svgjs.com
 *
 * @copyright Wout Fierens <wout@impinc.co.uk>
 * @license MIT
 *
-* BUILT: Sun Jul 05 2015 01:42:48 GMT+0200 (Mitteleuropäische Sommerzeit)
+* BUILT: Fri Oct 09 2015 14:46:55 GMT-0400 (EDT)
 */;
 
 (function(root, factory) {
@@ -1180,8 +684,8 @@ SVG.adopt = function(node) {
   // adopt with element-specific settings
   if (node.nodeName == 'svg')
     element = node.parentNode instanceof SVGElement ? new SVG.Nested : new SVG.Doc
-  else if (node.nodeName == 'lineairGradient') // lineair?
-    element = new SVG.Gradient('lineair')
+  else if (node.nodeName == 'linearGradient')
+    element = new SVG.Gradient('linear')
   else if (node.nodeName == 'radialGradient')
     element = new SVG.Gradient('radial')
   else if (SVG[capitalize(node.nodeName)])
@@ -1219,6 +723,7 @@ SVG.prepare = function(element) {
   , path: path
   }
 }
+
 // Storage for regular expressions
 SVG.regex = {
   // Parse unit value
@@ -1235,6 +740,9 @@ SVG.regex = {
   
   // Parse matrix wrapper
 , matrix:           /matrix\(|\)/g
+
+  // Elements of a matrix
+, matrixElements:   /,*\s+|,/
   
   // Whitespace
 , whitespace:       /\s/g
@@ -2930,6 +2438,14 @@ SVG.Matrix = SVG.invent({
   , skew: function(x, y, cx, cy) {
       return this.around(cx, cy, this.native().skewX(x || 0).skewY(y || 0))
     }
+    // SkewX
+  , skewX: function(x, cx, cy) {
+      return this.around(cx, cy, this.native().skewX(x || 0))
+    }
+    // SkewY
+  , skewY: function(y, cx, cy) {
+      return this.around(cx, cy, this.native().skewY(y || 0))
+    }
     // Transform around a center point
   , around: function(cx, cy, matrix) {
       return this
@@ -3166,7 +2682,7 @@ SVG.extend(SVG.Element, SVG.FX, {
       }
     }
 
-    return this.attr('transform', matrix)
+    return this.attr(this instanceof SVG.Pattern ? 'patternTransform' : this instanceof SVG.Gradient ? 'gradientTransform' : 'transform', matrix)
   }
 })
 
@@ -3182,7 +2698,7 @@ SVG.extend(SVG.Element, {
       .split(/\)\s*/).slice(0,-1).map(function(str){
         // generate key => value pairs
         var kv = str.trim().split('(')
-        return [kv[0], kv[1].split(',').map(function(str){ return parseFloat(str) })]
+        return [kv[0], kv[1].split(SVG.regex.matrixElements).map(function(str){ return parseFloat(str) })]
       })
       // calculate every transformation into one matrix
       .reduce(function(matrix, transform){
@@ -3385,9 +2901,9 @@ SVG.listeners = []
 SVG.handlerMap = []
 
 // Add event binder in the SVG namespace
-SVG.on = function(node, event, listener) {
+SVG.on = function(node, event, listener, binding) {
   // create listener, get object-index
-  var l     = listener.bind(node.instance || node)
+  var l     = listener.bind(binding || node.instance || node)
     , index = (SVG.handlerMap.indexOf(node) + 1 || SVG.handlerMap.push(node)) - 1
     , ev    = event.split('.')[0]
     , ns    = event.split('.')[1] || '*'
@@ -3463,8 +2979,8 @@ SVG.off = function(node, event, listener) {
 //
 SVG.extend(SVG.Element, {
   // Bind given event to listener
-  on: function(event, listener) {
-    SVG.on(this.node, event, listener)
+  on: function(event, listener, binding) {
+    SVG.on(this.node, event, listener, binding)
     
     return this
   }
@@ -3615,123 +3131,6 @@ SVG.extend(SVG.Element, {
     return this
   }
 
-})
-SVG.Mask = SVG.invent({
-  // Initialize node
-  create: function() {
-    this.constructor.call(this, SVG.create('mask'))
-
-    /* keep references to masked elements */
-    this.targets = []
-  }
-
-  // Inherit from
-, inherit: SVG.Container
-
-  // Add class methods
-, extend: {
-    // Unmask all masked elements and remove itself
-    remove: function() {
-      /* unmask all targets */
-      for (var i = this.targets.length - 1; i >= 0; i--)
-        if (this.targets[i])
-          this.targets[i].unmask()
-      delete this.targets
-
-      /* remove mask from parent */
-      this.parent().removeElement(this)
-      
-      return this
-    }
-  }
-  
-  // Add parent method
-, construct: {
-    // Create masking element
-    mask: function() {
-      return this.defs().put(new SVG.Mask)
-    }
-  }
-})
-
-
-SVG.extend(SVG.Element, {
-  // Distribute mask to svg element
-  maskWith: function(element) {
-    /* use given mask or create a new one */
-    this.masker = element instanceof SVG.Mask ? element : this.parent().mask().add(element)
-
-    /* store reverence on self in mask */
-    this.masker.targets.push(this)
-    
-    /* apply mask */
-    return this.attr('mask', 'url("#' + this.masker.attr('id') + '")')
-  }
-  // Unmask element
-, unmask: function() {
-    delete this.masker
-    return this.attr('mask', null)
-  }
-  
-})
-
-SVG.ClipPath = SVG.invent({
-  // Initialize node
-  create: function() {
-    this.constructor.call(this, SVG.create('clipPath'))
-
-    /* keep references to clipped elements */
-    this.targets = []
-  }
-
-  // Inherit from
-, inherit: SVG.Container
-
-  // Add class methods
-, extend: {
-    // Unclip all clipped elements and remove itself
-    remove: function() {
-      /* unclip all targets */
-      for (var i = this.targets.length - 1; i >= 0; i--)
-        if (this.targets[i])
-          this.targets[i].unclip()
-      delete this.targets
-
-      /* remove clipPath from parent */
-      this.parent().removeElement(this)
-      
-      return this
-    }
-  }
-  
-  // Add parent method
-, construct: {
-    // Create clipping element
-    clip: function() {
-      return this.defs().put(new SVG.ClipPath)
-    }
-  }
-})
-
-//
-SVG.extend(SVG.Element, {
-  // Distribute clipPath to svg element
-  clipWith: function(element) {
-    /* use given clip or create a new one */
-    this.clipper = element instanceof SVG.ClipPath ? element : this.parent().clip().add(element)
-
-    /* store reverence on self in mask */
-    this.clipper.targets.push(this)
-    
-    /* apply mask */
-    return this.attr('clip-path', 'url("#' + this.clipper.attr('id') + '")')
-  }
-  // Unclip element
-, unclip: function() {
-    delete this.clipper
-    return this.attr('clip-path', null)
-  }
-  
 })
 SVG.Gradient = SVG.invent({
   // Initialize node
@@ -3978,51 +3377,6 @@ SVG.Shape = SVG.invent({
 , inherit: SVG.Element
 
 })
-
-SVG.Bare = SVG.invent({
-  // Initialize
-  create: function(element, inherit) {
-    // construct element
-    this.constructor.call(this, SVG.create(element))
-
-    // inherit custom methods
-    if (inherit)
-      for (var method in inherit.prototype)
-        if (typeof inherit.prototype[method] === 'function')
-          this[method] = inherit.prototype[method]
-  }
-
-  // Inherit from
-, inherit: SVG.Element
-
-  // Add methods
-, extend: {
-    // Insert some plain text
-    words: function(text) {
-      // remove contents
-      while (this.node.hasChildNodes())
-        this.node.removeChild(this.node.lastChild)
-
-      // create text node
-      this.node.appendChild(document.createTextNode(text))
-
-      return this
-    }
-  }
-})
-
-
-SVG.extend(SVG.Parent, {
-  // Create an element that is not described by SVG.js
-  element: function(element, inherit) {
-    return this.put(new SVG.Bare(element, inherit))
-  }
-  // Add symbol element
-, symbol: function() {
-    return this.defs().element('symbol', SVG.Container)
-  }
-
-})
 SVG.Use = SVG.invent({
   // Initialize node
   create: 'use'
@@ -4251,31 +3605,6 @@ SVG.extend(SVG.Polyline, SVG.Polygon, {
   }
 
 })
-// unify all point to point elements
-SVG.extend(SVG.Line, SVG.Polyline, SVG.Polygon, {
-  // Define morphable array
-  morphArray:  SVG.PointArray
-  // Move by left top corner over x-axis
-, x: function(x) {
-    return x == null ? this.bbox().x : this.move(x, this.bbox().y)
-  }
-  // Move by left top corner over y-axis
-, y: function(y) {
-    return y == null ? this.bbox().y : this.move(this.bbox().x, y)
-  }
-  // Set width of element
-, width: function(width) {
-    var b = this.bbox()
-
-    return width == null ? b.width : this.size(width, b.height)
-  }
-  // Set height of element
-, height: function(height) {
-    var b = this.bbox()
-
-    return height == null ? b.height : this.size(b.width, height) 
-  }
-})
 SVG.Path = SVG.invent({
   // Initialize node
   create: 'path'
@@ -4406,8 +3735,22 @@ SVG.Text = SVG.invent({
 
   // Add class methods
 , extend: {
+    clone: function(){
+      // clone element and assign new id
+      var clone = assignNewId(this.node.cloneNode(true))
+
+      // mark first level tspans as newlines
+      clone.lines().each(function(){
+        this.newLined = true
+      })
+      
+      // insert the clone after myself
+      this.after(clone)
+
+      return clone
+    }
     // Move over x-axis
-    x: function(x) {
+  , x: function(x) {
       // act as getter
       if (x == null)
         return this.attr('x')
@@ -4687,132 +4030,6 @@ SVG.Nested = SVG.invent({
     }
   }
 })
-SVG.A = SVG.invent({
-  // Initialize node
-  create: 'a'
-
-  // Inherit from
-, inherit: SVG.Container
-
-  // Add class methods
-, extend: {
-    // Link url
-    to: function(url) {
-      return this.attr('href', url, SVG.xlink)
-    }
-    // Link show attribute
-  , show: function(target) {
-      return this.attr('show', target, SVG.xlink)
-    }
-    // Link target attribute
-  , target: function(target) {
-      return this.attr('target', target)
-    }
-  }
-  
-  // Add parent method
-, construct: {
-    // Create a hyperlink element
-    link: function(url) {
-      return this.put(new SVG.A).to(url)
-    }
-  }
-})
-
-SVG.extend(SVG.Element, {
-  // Create a hyperlink element
-  linkTo: function(url) {
-    var link = new SVG.A
-
-    if (typeof url == 'function')
-      url.call(link, link)
-    else
-      link.to(url)
-
-    return this.parent().put(link).put(this)
-  }
-  
-})
-SVG.Marker = SVG.invent({
-  // Initialize node
-  create: 'marker'
-
-  // Inherit from
-, inherit: SVG.Container
-
-  // Add class methods
-, extend: {
-    // Set width of element
-    width: function(width) {
-      return this.attr('markerWidth', width)
-    }
-    // Set height of element
-  , height: function(height) {
-      return this.attr('markerHeight', height)
-    }
-    // Set marker refX and refY
-  , ref: function(x, y) {
-      return this.attr('refX', x).attr('refY', y)
-    }
-    // Update marker
-  , update: function(block) {
-      /* remove all content */
-      this.clear()
-      
-      /* invoke passed block */
-      if (typeof block == 'function')
-        block.call(this, this)
-      
-      return this
-    }
-    // Return the fill id
-  , toString: function() {
-      return 'url(#' + this.id() + ')'
-    }
-  }
-
-  // Add parent method
-, construct: {
-    marker: function(width, height, block) {
-      // Create marker element in defs
-      return this.defs().marker(width, height, block)
-    }
-  }
-
-})
-
-SVG.extend(SVG.Defs, {
-  // Create marker
-  marker: function(width, height, block) {
-    // Set default viewbox to match the width and height, set ref to cx and cy and set orient to auto
-    return this.put(new SVG.Marker)
-      .size(width, height)
-      .ref(width / 2, height / 2)
-      .viewbox(0, 0, width, height)
-      .attr('orient', 'auto')
-      .update(block)
-  }
-  
-})
-
-SVG.extend(SVG.Line, SVG.Polyline, SVG.Polygon, SVG.Path, {
-  // Create and attach markers
-  marker: function(marker, width, height, block) {
-    var attr = ['marker']
-
-    // Build attribute name
-    if (marker != 'all') attr.push(marker)
-    attr = attr.join('-')
-
-    // Set marker attribute
-    marker = arguments[1] instanceof SVG.Marker ?
-      arguments[1] :
-      this.doc().marker(width, height, block)
-    
-    return this.attr(attr, marker)
-  }
-  
-})
 // Define list of available attributes for stroke and fill
 var sugar = {
   stroke: ['color', 'width', 'opacity', 'linecap', 'linejoin', 'miterlimit', 'dasharray', 'dashoffset']
@@ -4825,7 +4042,7 @@ var sugar = {
 /* Add sugar for fill and stroke */
 ;['fill', 'stroke'].forEach(function(m) {
   var i, extension = {}
-  
+
   extension[m] = function(o) {
     if (typeof o == 'string' || SVG.Color.isRgb(o) || (o && typeof o.fill === 'function'))
       this.attr(m, o)
@@ -4835,12 +4052,12 @@ var sugar = {
       for (i = sugar[m].length - 1; i >= 0; i--)
         if (o[sugar[m][i]] != null)
           this.attr(sugar.prefix(m, sugar[m][i]), o[sugar[m][i]])
-    
+
     return this
   }
-  
+
   SVG.extend(SVG.Element, SVG.FX, extension)
-  
+
 })
 
 SVG.extend(SVG.Element, SVG.FX, {
@@ -4891,8 +4108,9 @@ SVG.extend(SVG.Element, SVG.FX, {
 SVG.extend(SVG.Rect, SVG.Ellipse, SVG.Circle, SVG.Gradient, SVG.FX, {
   // Add x and y radius
   radius: function(x, y) {
-    return (this.target || this).type == 'radial' ?
-      this.attr({ r: new SVG.Number(x) }) :
+    var type = (this.target || this).type;
+    return type == 'radial' || type == 'circle' ?
+      this.attr({ 'r': new SVG.Number(x) }) :
       this.rx(x).ry(y == null ? x : y)
   }
 })
@@ -4909,7 +4127,7 @@ SVG.extend(SVG.Path, {
 })
 
 SVG.extend(SVG.Parent, SVG.Text, SVG.FX, {
-  // Set font 
+  // Set font
   font: function(o) {
     for (var k in o)
       k == 'leading' ?
@@ -4919,7 +4137,7 @@ SVG.extend(SVG.Parent, SVG.Text, SVG.FX, {
       k == 'size' || k == 'family' || k == 'weight' || k == 'stretch' || k == 'variant' || k == 'style' ?
         this.attr('font-'+ k, o[k]) :
         this.attr(k, o[k])
-    
+
     return this
   }
 })
@@ -5144,28 +4362,6 @@ SVG.extend(SVG.Element, {
   }
 
 })
-// Method for getting an element by id
-SVG.get = function(id) {
-  var node = document.getElementById(idFromReference(id) || id)
-  if (node) return SVG.adopt(node)
-}
-
-// Select elements by query string
-SVG.select = function(query, parent) {
-  return new SVG.Set(
-    SVG.utils.map((parent || document).querySelectorAll(query), function(node) {
-      return SVG.adopt(node)
-    })
-  )
-}
-
-SVG.extend(SVG.Parent, {
-  // Scoped select method
-  select: function(query) {
-    return SVG.select(query, this.node)
-  }
-
-})
 // Convert dash-separated-string to camelCase
 function camelCase(s) { 
   return s.toLowerCase().replace(/-(.)/g, function(m, g) {
@@ -5240,7 +4436,7 @@ function stringToMatrix(source) {
   source = source
     .replace(SVG.regex.whitespace, '')
     .replace(SVG.regex.matrix, '')
-    .split(',')
+    .split(SVG.regex.matrixElements)
 
   // convert string values to floats and convert to a matrix-formatted object
   return arrayToMatrix(
@@ -5338,57 +4534,11 @@ function idFromReference(url) {
 
 // Create matrix array for looping
 var abcdef = 'abcdef'.split('')
-// Add CustomEvent to IE9 and IE10 
-if (typeof CustomEvent !== 'function') {
-  // Code from: https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent
-  var CustomEvent = function(event, options) {
-    options = options || { bubbles: false, cancelable: false, detail: undefined }
-    var e = document.createEvent('CustomEvent')
-    e.initCustomEvent(event, options.bubbles, options.cancelable, options.detail)
-    return e
-  }
-
-  CustomEvent.prototype = window.Event.prototype
-
-  window.CustomEvent = CustomEvent
-}
-
-// requestAnimationFrame / cancelAnimationFrame Polyfill with fallback based on Paul Irish
-(function(w) {
-  var lastTime = 0
-  var vendors = ['moz', 'webkit']
-  
-  for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-    w.requestAnimationFrame = w[vendors[x] + 'RequestAnimationFrame']
-    w.cancelAnimationFrame  = w[vendors[x] + 'CancelAnimationFrame'] ||
-                              w[vendors[x] + 'CancelRequestAnimationFrame']
-  }
- 
-  w.requestAnimationFrame = w.requestAnimationFrame || 
-    function(callback) {
-      var currTime = new Date().getTime()
-      var timeToCall = Math.max(0, 16 - (currTime - lastTime))
-      
-      var id = w.setTimeout(function() {
-        callback(currTime + timeToCall)
-      }, timeToCall)
-      
-      lastTime = currTime + timeToCall
-      return id
-    }
- 
-  w.cancelAnimationFrame = w.cancelAnimationFrame || w.clearTimeout;
-
-}(window))
 return SVG;
 
 }));
 
-},{}],11:[function(require,module,exports){
-
-// TODO create closures to generate hooks
-// every hook can accept only one parameter, since addNode and addLink triggered
-// by user input does not need to pass a key.
+},{}],8:[function(require,module,exports){
 
 var EventEmitter = require('events').EventEmitter,
     inherits     = require('inherits')
@@ -5424,29 +4574,46 @@ function init (eventHook) {
 
   this.on('addLink', addLink)
 
-  function addInput (eventData) {
-    var beforeAdd = eventHook.beforeAddInput
+  /**
+   * Generate addInput or addOutput event callback
+   *
+   * @api private
+   *
+   * @param {String} type can be In or Out
+   *
+   * @returns {Function} anonymous
+   */
 
-    var key      = eventData.node,
-        position = eventData.position
+  function addPin (type) {
+    return function (eventData) {
+      // Can be addInput or addOutput.
+      var action = 'add' + type + 'put'
 
-    var node = canvas.node[key]
+      // Can be beforeAddInput or beforeAddOutput hook.
+      var beforeAdd = eventHook['beforeAdd' + type + 'put']
 
-    if (typeof beforeAdd === 'function') {
-      try {
-        beforeAdd(eventData)
-        node.addInput(position)
+      var key      = eventData.node,
+          position = eventData.position
+
+      var node = canvas.node[key]
+
+      if (typeof beforeAdd === 'function') {
+        try {
+          beforeAdd(eventData)
+          node[action](position)
+        }
+        catch (err) {
+          console.error(err)
+        }
       }
-      catch (err) {
-        console.error(err)
+      else {
+        node[action](position)
       }
-    }
-    else {
-      node.addInput(position)
     }
   }
 
-  this.on('addInput', addInput)
+  this.on('addInput', addPin('In'))
+  this.on('addOutput', addPin('Out'))
 
   function addNode (view, key) {
     if (typeof key === 'undefined')
@@ -5470,43 +4637,41 @@ function init (eventHook) {
 
   this.on('addNode', addNode)
 
-  function delLink (key) {
-    var beforeDel = eventHook.beforeDelLink
+  /**
+   * Generate delLink or delNode event callback
+   *
+   * @api private
+   *
+   * @param {String} type can be Link or Node
+   *
+   * @returns {Function} anonymous
+   */
 
-    if (typeof beforeDel === 'function') {
-      try {
-        beforeDel(key)
-        canvas.delLink(key)
-      }
-      catch (err) {
-        console.error(err)
-      }
-    }
-    else {
-      canvas.delLink(key)
-    }
-  }
+  function del (type) {
+    return function (key) {
+      // Can be delLink or delNode.
+      var action = 'del' + type
 
-  this.on('delLink', delLink)
+      // Can be beforeAddInput or beforeAddOutput hook.
+      var beforeDel = eventHook['beforeDel' + type]
 
-  function delNode (key) {
-    var beforeDel = eventHook.beforeDelNode
-
-    if (typeof beforeDel === 'function') {
-      try {
-        beforeDel(key)
-        canvas.delNode(key)
+      if (typeof beforeDel === 'function') {
+        try {
+          beforeDel(key)
+          canvas[action](key)
+        }
+        catch (err) {
+          console.error(err)
+        }
       }
-      catch (err) {
-        console.error(err)
+      else {
+        canvas[action](key)
       }
-    }
-    else {
-      canvas.delNode(key)
     }
   }
 
-  this.on('delNode', delNode)
+  this.on('delLink', del('Link'))
+  this.on('delNode', del('Node'))
 
   function moveNode (eventData) {
     var afterMove = eventHook.afterMoveNode
@@ -5523,7 +4688,7 @@ Broker.prototype.init = init
 module.exports = Broker
 
 
-},{"events":1,"inherits":7}],12:[function(require,module,exports){
+},{"events":1,"inherits":4}],9:[function(require,module,exports){
 
 var SVG = require('./SVG')
 
@@ -5532,7 +4697,6 @@ var Broker        = require('./Broker'),
     Node          = require('./Node'),
     NodeControls  = require('./NodeControls'),
     NodeCreator   = require('./NodeCreator'),
-    NodeInspector = require('./NodeInspector')
     validate      = require('./validate')
 
 var defaultTheme = require('./default/theme.json'),
@@ -5610,9 +4774,6 @@ function Canvas (id, arg) {
 
   var nodeCreator  = new NodeCreator(this)
   this.nodeCreator = nodeCreator
-
-  var nodeInspector  = new NodeInspector(this)
-  this.NodeInspector = NodeInspector
 
   var nodeControls = new NodeControls(this)
   this.nodeControls = nodeControls
@@ -5730,7 +4891,7 @@ Canvas.prototype.delLink = delLink
 module.exports = Canvas
 
 
-},{"./Broker":11,"./Link":14,"./Node":15,"./NodeControls":20,"./NodeCreator":21,"./NodeInspector":22,"./SVG":26,"./default/theme.json":27,"./default/view.json":28,"./validate":30}],13:[function(require,module,exports){
+},{"./Broker":8,"./Link":11,"./Node":12,"./NodeControls":17,"./NodeCreator":18,"./SVG":22,"./default/theme.json":23,"./default/view.json":24,"./validate":26}],10:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin')
@@ -5765,7 +4926,14 @@ Input.prototype.render = render
 module.exports = Input
 
 
-},{"./Pin":24,"inherits":7}],14:[function(require,module,exports){
+},{"./Pin":20,"inherits":4}],11:[function(require,module,exports){
+
+/**
+ * Connect an output to an input
+ *
+ * @param {Object} canvas
+ * @param {String} key
+ */
 
 function Link (canvas, key) {
   this.canvas = canvas
@@ -5773,8 +4941,6 @@ function Link (canvas, key) {
 }
 
 function render (view) {
-  var self = this
-
   var canvas = this.canvas,
       key    = this.key
 
@@ -5882,7 +5048,7 @@ Link.prototype.linePlot = linePlot
 module.exports = Link
 
 
-},{}],15:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 
 var Input   = require('./Input'),
     Output  = require('./Output')
@@ -6071,10 +5237,9 @@ function xCoordinateOf (pin) {
   if (position === 0)
     return 0
 
-  var size     = pin.size,
-      type     = pin.type,
-      w        = this.w,
-      x        = 0
+  var size = pin.size,
+      type = pin.type,
+      w    = this.w
 
   var numPins = this[type].length
 
@@ -6144,30 +5309,12 @@ function addPin (type, position) {
 
 function addInput (position) {
   addPin.bind(this)('ins', position)
-
-  var canvas = this.canvas,
-      key    = this.key
-
-  var eventData = { node: {} }
-  eventData.node[key] = {
-    ins: [{position: position}]
-  }
 }
 
 Node.prototype.addInput = addInput
 
 function addOutput (position) {
   addPin.bind(this)('outs', position)
-
-  var canvas = this.canvas,
-      key    = this.key
-
-  var eventData = { node: {} }
-  eventData.node[key] = {
-    outs: [{position: position}]
-  }
-
-  canvas.broker.emit('addOutput', eventData)
 }
 
 Node.prototype.addOutput = addOutput
@@ -6175,7 +5322,7 @@ Node.prototype.addOutput = addOutput
 module.exports = Node
 
 
-},{"./Input":13,"./Output":23}],16:[function(require,module,exports){
+},{"./Input":10,"./Output":19}],13:[function(require,module,exports){
 
 function NodeButton (canvas, relativeCoordinate) {
   this.relativeCoordinate = relativeCoordinate
@@ -6203,7 +5350,7 @@ NodeButton.prototype.detach = detachNodeButton
 module.exports = NodeButton
 
 
-},{}],17:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -6276,7 +5423,7 @@ AddInput.prototype.attachTo = attachTo
 module.exports = AddInput
 
 
-},{"../NodeButton":16,"inherits":7}],18:[function(require,module,exports){
+},{"../NodeButton":13,"inherits":4}],15:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -6349,7 +5496,7 @@ module.exports = AddOutput
 
 
 
-},{"../NodeButton":16,"inherits":7}],19:[function(require,module,exports){
+},{"../NodeButton":13,"inherits":4}],16:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -6428,7 +5575,7 @@ DeleteNode.prototype.attachTo = attachTo
 module.exports = DeleteNode
 
 
-},{"../NodeButton":16,"inherits":7}],20:[function(require,module,exports){
+},{"../NodeButton":13,"inherits":4}],17:[function(require,module,exports){
 
 var AddInputButton   = require('./NodeButton/AddInput'),
     AddOutputButton  = require('./NodeButton/AddOutput'),
@@ -6467,7 +5614,7 @@ NodeControls.prototype.detach = nodeControlsDetach
 module.exports = NodeControls
 
 
-},{"./NodeButton/AddInput":17,"./NodeButton/AddOutput":18,"./NodeButton/DeleteNode":19}],21:[function(require,module,exports){
+},{"./NodeButton/AddInput":14,"./NodeButton/AddOutput":15,"./NodeButton/DeleteNode":16}],18:[function(require,module,exports){
 
 // TODO autocompletion from json
 // http://blog.teamtreehouse.com/creating-autocomplete-dropdowns-datalist-element
@@ -6547,16 +5694,7 @@ NodeCreator.prototype.show = showNodeCreator
 module.exports = NodeCreator
 
 
-},{}],22:[function(require,module,exports){
-
-function NodeInspector (canvas) {
-
-}
-
-module.exports = NodeInspector
-
-
-},{}],23:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin'),
@@ -6603,7 +5741,7 @@ Output.prototype.render = render
 module.exports = Output
 
 
-},{"./Pin":24,"./PreLink":25,"inherits":7}],24:[function(require,module,exports){
+},{"./Pin":20,"./PreLink":21,"inherits":4}],20:[function(require,module,exports){
 
 function Pin (type, node, position) {
   var self = this
@@ -6709,9 +5847,14 @@ Pin.prototype.toJSON = toJSON
 module.exports = Pin
 
 
-},{}],25:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 
-var Link = require('./Link')
+/**
+ * A link that is not already attached
+ *
+ * @param {Object} canvas
+ * @param {Object} output
+ */
 
 function PreLink (canvas, output) {
   var svg   = canvas.svg,
@@ -6831,7 +5974,7 @@ function PreLink (canvas, output) {
 module.exports = PreLink
 
 
-},{"./Link":14}],26:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 
 // Consider this module will be browserified.
 
@@ -6852,7 +5995,7 @@ require('svg.foreignobject.js')
 module.exports = SVG
 
 
-},{"svg.draggable.js":8,"svg.foreignobject.js":9,"svg.js":10}],27:[function(require,module,exports){
+},{"svg.draggable.js":5,"svg.foreignobject.js":6,"svg.js":7}],23:[function(require,module,exports){
 module.exports={
   "fillCircle": "#fff",
   "fillLabel": "#333",
@@ -6878,18 +6021,18 @@ module.exports={
   "unitWidth": 10
 }
 
-},{}],28:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports={
   "node": {},
   "link": {}
 }
 
-},{}],29:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 
 exports.Canvas = require('./Canvas')
 
 
-},{"./Canvas":12}],30:[function(require,module,exports){
+},{"./Canvas":9}],26:[function(require,module,exports){
 
 function validate (view) {
   if (typeof view !== 'object')
@@ -6905,7 +6048,7 @@ function validate (view) {
 module.exports = validate
 
 
-},{}],31:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /**
  * @license ciao
  */
@@ -6928,25 +6071,7 @@ function funBrowser (graph) {
 exports.fun = funBrowser
 
 
-},{"../fun":40,"../functions/window":42}],32:[function(require,module,exports){
-
-/**
- * Enable debug.
- *
- * ```
- * export DEBUG=dflow:*
- * ```
- *
- */
-
-var debug = require('debug')
-
-exports.compile = debug('dflow:compile')
-exports.inject  = debug('dflow:inject')
-exports.run     = debug('dflow:run')
-
-
-},{"debug":2}],33:[function(require,module,exports){
+},{"../fun":35,"../functions/window":37}],28:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "&isFinite",
@@ -6971,7 +6096,7 @@ module.exports={
   }
 }
 
-},{}],34:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -6992,7 +6117,7 @@ module.exports={
   }
 }
 
-},{}],35:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -7040,7 +6165,7 @@ module.exports={
   }
 }
 
-},{}],36:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7067,7 +6192,7 @@ module.exports={
   }
 }
 
-},{}],37:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7090,7 +6215,7 @@ module.exports={
   }
 }
 
-},{}],38:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7113,7 +6238,7 @@ module.exports={
   }
 }
 
-},{}],39:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 
 exports.apply          = require('./graph/apply.json')
 exports.dateParse      = require('./graph/dateParse.json')
@@ -7123,10 +6248,9 @@ exports.or             = require('./graph/or.json')
 exports.sum            = require('./graph/sum.json')
 
 
-},{"./graph/apply.json":33,"./graph/dateParse.json":34,"./graph/hello-world.json":35,"./graph/indexOf.json":36,"./graph/or.json":37,"./graph/sum.json":38}],40:[function(require,module,exports){
+},{"./graph/apply.json":28,"./graph/dateParse.json":29,"./graph/hello-world.json":30,"./graph/indexOf.json":31,"./graph/or.json":32,"./graph/sum.json":33}],35:[function(require,module,exports){
 
 var builtinFunctions          = require('./functions/builtin'),
-    debug                     = require('./debug'),
     injectAdditionalFunctions = require('./inject/additionalFunctions'),
     injectArguments           = require('./inject/arguments'),
     injectAccessors           = require('./inject/accessors'),
@@ -7137,9 +6261,6 @@ var builtinFunctions          = require('./functions/builtin'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
     validate                  = require('./validate')
-
-var debugRun     = debug.run,
-    debugCompile = debug.compile
 
 /**
  * Create a dflow function.
@@ -7154,8 +6275,6 @@ function fun (graph, additionalFunctions) {
   // First of all, check if graph is valid.
   try { validate(graph, additionalFunctions) }
   catch (err) { throw err }
-
-  debugCompile('graph with ' + Object.keys(graph.task).length + ' tasks and ' + Object.keys(graph.pipe).length + ' pipes')
 
   var func = graph.func || {},
       pipe = graph.pipe,
@@ -7194,8 +6313,6 @@ function fun (graph, additionalFunctions) {
    */
 
   function dflowFun () {
-    debugRun('start')
-
     var gotReturn = false,
         outs = {},
         returnValue
@@ -7234,8 +6351,6 @@ function fun (graph, additionalFunctions) {
           funcName = task[taskKey],
           f        = funcs[funcName]
 
-      debugRun('task ' + taskKey + ' = ' + funcName)
-
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.
       if (gotReturn)
@@ -7258,7 +6373,6 @@ function fun (graph, additionalFunctions) {
           .sort(byLevel)
           .forEach(run)
 
-    debugRun('end')
     return returnValue
   }
 
@@ -7271,7 +6385,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./debug":32,"./functions/builtin":41,"./inject/accessors":43,"./inject/additionalFunctions":44,"./inject/arguments":45,"./inject/dotOperators":46,"./inject/globals":47,"./inject/references":48,"./inputArgs":49,"./isDflowFun":51,"./level":52,"./validate":58}],41:[function(require,module,exports){
+},{"./functions/builtin":36,"./inject/accessors":38,"./inject/additionalFunctions":39,"./inject/arguments":40,"./inject/dotOperators":41,"./inject/globals":42,"./inject/references":43,"./inputArgs":44,"./isDflowFun":46,"./level":47,"./validate":53}],36:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -7443,7 +6557,7 @@ exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
 
 
-},{}],42:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 
 exports.document = function _document () { return document }
 
@@ -7454,10 +6568,9 @@ exportshead = function head () { return document.head }
 exports.window = function _window () { return window }
 
 
-},{}],43:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 
-var accessorRegex = require('../regex/accessor'),
-    debug         = require('../debug').inject
+var accessorRegex = require('../regex/accessor')
 
 /**
  * Inject functions to set or get context keywords.
@@ -7474,6 +6587,8 @@ function injectAccessors (funcs, graph) {
 
   /**
    * Inject accessor.
+   *
+   * @api private
    */
 
   function inject (taskKey) {
@@ -7482,6 +6597,8 @@ function injectAccessors (funcs, graph) {
 
     /**
      * Accessor-like function.
+     *
+     * @api private
      */
 
     function accessor () {
@@ -7494,8 +6611,6 @@ function injectAccessors (funcs, graph) {
     if (accessorRegex.test(taskName)) {
       accessorName = taskName.substring(1)
 
-      debug(taskName)
-
       funcs[taskName] = accessor
     }
   }
@@ -7506,11 +6621,13 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"../debug":32,"../regex/accessor":54}],44:[function(require,module,exports){
-
-var debug = require('../debug').inject
+},{"../regex/accessor":49}],39:[function(require,module,exports){
 
 /**
+ * Optionally add custom functions.
+ *
+ * @api private
+ *
  * @params {Object} funcs
  * @params {Object} additionalFunctions
  */
@@ -7520,10 +6637,10 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
   if (typeof additionalFunctions === 'undefined')
     return
 
-  debug(Object.keys(additionalFunctions).length + ' additionalFunctions')
-
   /**
    * Validate and insert an additional function.
+   *
+   * @api private
    */
 
   function injectAdditionalFunction (key) {
@@ -7540,13 +6657,14 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{"../debug":32}],45:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 
-var argumentRegex = require('../regex/argument'),
-    debug         = require('../debug').inject
+var argumentRegex = require('../regex/argument')
 
 /**
  * Inject functions to retrieve arguments.
+ *
+ * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
@@ -7561,35 +6679,34 @@ function injectArguments (funcs, task, args) {
 
   /**
    * Inject arguments.
+   *
+   * @api private
    */
 
   function inject (taskKey) {
     var funcName = task[taskKey]
 
     if (funcName === 'arguments') {
-      debug('arguments')
       funcs[funcName] = function getArguments () { return args }
     }
     else {
       var arg = argumentRegex.exec(funcName)
 
-      if (arg) {
-        debug(funcName)
+      if (arg)
         funcs[funcName] = getArgument.bind(null, arg[1])
-      }
     }
   }
 
-  Object.keys(task).forEach(inject)
+  Object.keys(task)
+        .forEach(inject)
 }
 
 module.exports = injectArguments
 
 
-},{"../debug":32,"../regex/argument":55}],46:[function(require,module,exports){
+},{"../regex/argument":50}],41:[function(require,module,exports){
 
-var debug            = require('../debug').inject,
-    dotOperatorRegex = require('../regex/dotOperator')
+var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
  * Inject functions that emulate dot operator.
@@ -7604,6 +6721,8 @@ function injectDotOperators (funcs, task) {
 
   /**
    * Inject dot operator.
+   *
+   * @api private
    */
 
   function inject (taskKey) {
@@ -7611,6 +6730,8 @@ function injectDotOperators (funcs, task) {
 
     /**
      * Dot operator function.
+     *
+     * @api private
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -7633,13 +6754,13 @@ function injectDotOperators (funcs, task) {
       // .foo() -> foo
       attributeName = taskName.substring(1, taskName.length - 2)
 
-      debug(taskName)
-
       funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
     }
 
     /**
      * Dot operator attribute.
+     *
+     * @api private
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -7663,8 +6784,6 @@ function injectDotOperators (funcs, task) {
       // .foo -> foo
       attributeName = taskName.substring(1)
 
-      debug(taskName)
-
       funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
     }
   }
@@ -7675,19 +6794,26 @@ function injectDotOperators (funcs, task) {
 module.exports = injectDotOperators
 
 
-},{"../debug":32,"../regex/dotOperator":56}],47:[function(require,module,exports){
+},{"../regex/dotOperator":51}],42:[function(require,module,exports){
 
-var debug      = require('../debug').inject,
-    walkGlobal = require('../walkGlobal')
+var walkGlobal = require('../walkGlobal')
 
 /**
  * Inject globals.
+ *
+ * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
  */
 
 function injectGlobals (funcs, task) {
+
+  /**
+   * Inject task
+   *
+   * @api private
+   */
 
   function inject (taskKey) {
     var taskName = task[taskKey]
@@ -7706,29 +6832,29 @@ function injectGlobals (funcs, task) {
     if (typeof globalValue === 'undefined')
       return
 
-    debug('global ' + taskName)
-
     if (typeof globalValue === 'function')
       funcs[taskName] = globalValue
     else
       funcs[taskName] = function () { return globalValue }
   }
 
-  Object.keys(task).forEach(inject)
+  Object.keys(task)
+        .forEach(inject)
 }
 
 module.exports = injectGlobals
 
 
-},{"../debug":32,"../walkGlobal":59}],48:[function(require,module,exports){
+},{"../walkGlobal":54}],43:[function(require,module,exports){
 
-var debug          = require('../debug').inject,
-    referenceRegex = require('../regex/reference'),
+var referenceRegex = require('../regex/reference'),
     walkGlobal     = require('../walkGlobal')
 
 
 /**
  * Inject references to functions.
+ *
+ * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
@@ -7743,6 +6869,8 @@ function injectReferences (funcs, task) {
 
     /**
      * Inject reference.
+     *
+     * @api private
      */
 
     function reference () {
@@ -7757,10 +6885,8 @@ function injectReferences (funcs, task) {
       else
         referencedFunction = walkGlobal(referenceName)
 
-      if (typeof referencedFunction === 'function') {
-        debug('reference to ' + referenceName)
+      if (typeof referencedFunction === 'function')
         funcs[taskName] = reference
-      }
     }
   }
 
@@ -7770,7 +6896,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"../debug":32,"../regex/reference":57,"../walkGlobal":59}],49:[function(require,module,exports){
+},{"../regex/reference":52,"../walkGlobal":54}],44:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -7803,7 +6929,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":50}],50:[function(require,module,exports){
+},{"./inputPipes":45}],45:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -7833,7 +6959,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],51:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -7860,7 +6986,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":58}],52:[function(require,module,exports){
+},{"./validate":53}],47:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -7896,7 +7022,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":53}],53:[function(require,module,exports){
+},{"./parents":48}],48:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -7925,29 +7051,29 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":50}],54:[function(require,module,exports){
+},{"./inputPipes":45}],49:[function(require,module,exports){
 
 module.exports = /^@(.+)$/
 
 
-},{}],55:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],56:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
 
-},{}],57:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],58:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
@@ -8082,7 +7208,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":54,"./regex/argument":55,"./regex/dotOperator":56,"./regex/reference":57}],59:[function(require,module,exports){
+},{"./regex/accessor":49,"./regex/argument":50,"./regex/dotOperator":51,"./regex/reference":52}],54:[function(require,module,exports){
 (function (global){
 
     var globalContext
@@ -8143,4 +7269,4 @@ function renderExample (divId, example) {
 module.exports = renderExample
 
 
-},{"./index":39,"dflow":5,"flow-view":6}]},{},[]);
+},{"./index":34,"dflow":2,"flow-view":3}]},{},[]);

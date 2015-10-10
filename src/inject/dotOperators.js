@@ -1,6 +1,5 @@
 
-var debug            = require('../debug').inject,
-    dotOperatorRegex = require('../regex/dotOperator')
+var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
  * Inject functions that emulate dot operator.
@@ -15,6 +14,8 @@ function injectDotOperators (funcs, task) {
 
   /**
    * Inject dot operator.
+   *
+   * @api private
    */
 
   function inject (taskKey) {
@@ -22,6 +23,8 @@ function injectDotOperators (funcs, task) {
 
     /**
      * Dot operator function.
+     *
+     * @api private
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -44,13 +47,13 @@ function injectDotOperators (funcs, task) {
       // .foo() -> foo
       attributeName = taskName.substring(1, taskName.length - 2)
 
-      debug(taskName)
-
       funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
     }
 
     /**
      * Dot operator attribute.
+     *
+     * @api private
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -73,8 +76,6 @@ function injectDotOperators (funcs, task) {
     if (dotOperatorRegex.attr.test(taskName)) {
       // .foo -> foo
       attributeName = taskName.substring(1)
-
-      debug(taskName)
 
       funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
     }

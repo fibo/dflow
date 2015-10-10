@@ -1,15 +1,22 @@
 
-var debug      = require('../debug').inject,
-    walkGlobal = require('../walkGlobal')
+var walkGlobal = require('../walkGlobal')
 
 /**
  * Inject globals.
+ *
+ * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
  */
 
 function injectGlobals (funcs, task) {
+
+  /**
+   * Inject task
+   *
+   * @api private
+   */
 
   function inject (taskKey) {
     var taskName = task[taskKey]
@@ -28,15 +35,14 @@ function injectGlobals (funcs, task) {
     if (typeof globalValue === 'undefined')
       return
 
-    debug('global ' + taskName)
-
     if (typeof globalValue === 'function')
       funcs[taskName] = globalValue
     else
       funcs[taskName] = function () { return globalValue }
   }
 
-  Object.keys(task).forEach(inject)
+  Object.keys(task)
+        .forEach(inject)
 }
 
 module.exports = injectGlobals

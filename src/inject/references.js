@@ -1,11 +1,12 @@
 
-var debug          = require('../debug').inject,
-    referenceRegex = require('../regex/reference'),
+var referenceRegex = require('../regex/reference'),
     walkGlobal     = require('../walkGlobal')
 
 
 /**
  * Inject references to functions.
+ *
+ * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
@@ -20,6 +21,8 @@ function injectReferences (funcs, task) {
 
     /**
      * Inject reference.
+     *
+     * @api private
      */
 
     function reference () {
@@ -34,10 +37,8 @@ function injectReferences (funcs, task) {
       else
         referencedFunction = walkGlobal(referenceName)
 
-      if (typeof referencedFunction === 'function') {
-        debug('reference to ' + referenceName)
+      if (typeof referencedFunction === 'function')
         funcs[taskName] = reference
-      }
     }
   }
 

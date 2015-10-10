@@ -1,7 +1,9 @@
 
-var debug = require('../debug').inject
-
 /**
+ * Optionally add custom functions.
+ *
+ * @api private
+ *
  * @params {Object} funcs
  * @params {Object} additionalFunctions
  */
@@ -11,10 +13,10 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
   if (typeof additionalFunctions === 'undefined')
     return
 
-  debug(Object.keys(additionalFunctions).length + ' additionalFunctions')
-
   /**
    * Validate and insert an additional function.
+   *
+   * @api private
    */
 
   function injectAdditionalFunction (key) {
