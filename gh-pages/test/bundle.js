@@ -48,20 +48,22 @@ var rootParent = {}
  */
 Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== undefined
   ? global.TYPED_ARRAY_SUPPORT
-  : (function () {
-      function Bar () {}
-      try {
-        var arr = new Uint8Array(1)
-        arr.foo = function () { return 42 }
-        arr.constructor = Bar
-        return arr.foo() === 42 && // typed array instances can be augmented
-            arr.constructor === Bar && // constructor can be set
-            typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
-            arr.subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
-      } catch (e) {
-        return false
-      }
-    })()
+  : typedArraySupport()
+
+function typedArraySupport () {
+  function Bar () {}
+  try {
+    var arr = new Uint8Array(1)
+    arr.foo = function () { return 42 }
+    arr.constructor = Bar
+    return arr.foo() === 42 && // typed array instances can be augmented
+        arr.constructor === Bar && // constructor can be set
+        typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
+        arr.subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
+  } catch (e) {
+    return false
+  }
+}
 
 function kMaxLength () {
   return Buffer.TYPED_ARRAY_SUPPORT
@@ -1015,7 +1017,7 @@ Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
   offset = offset | 0
   if (!noAssert) checkInt(this, value, offset, 1, 0xff, 0)
   if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
-  this[offset] = value
+  this[offset] = (value & 0xff)
   return offset + 1
 }
 
@@ -1032,7 +1034,7 @@ Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert
   offset = offset | 0
   if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
+    this[offset] = (value & 0xff)
     this[offset + 1] = (value >>> 8)
   } else {
     objectWriteUInt16(this, value, offset, true)
@@ -1046,7 +1048,7 @@ Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert
   if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     this[offset] = (value >>> 8)
-    this[offset + 1] = value
+    this[offset + 1] = (value & 0xff)
   } else {
     objectWriteUInt16(this, value, offset, false)
   }
@@ -1068,7 +1070,7 @@ Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert
     this[offset + 3] = (value >>> 24)
     this[offset + 2] = (value >>> 16)
     this[offset + 1] = (value >>> 8)
-    this[offset] = value
+    this[offset] = (value & 0xff)
   } else {
     objectWriteUInt32(this, value, offset, true)
   }
@@ -1083,7 +1085,7 @@ Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert
     this[offset] = (value >>> 24)
     this[offset + 1] = (value >>> 16)
     this[offset + 2] = (value >>> 8)
-    this[offset + 3] = value
+    this[offset + 3] = (value & 0xff)
   } else {
     objectWriteUInt32(this, value, offset, false)
   }
@@ -1136,7 +1138,7 @@ Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
   if (!noAssert) checkInt(this, value, offset, 1, 0x7f, -0x80)
   if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
   if (value < 0) value = 0xff + value + 1
-  this[offset] = value
+  this[offset] = (value & 0xff)
   return offset + 1
 }
 
@@ -1145,7 +1147,7 @@ Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) 
   offset = offset | 0
   if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
+    this[offset] = (value & 0xff)
     this[offset + 1] = (value >>> 8)
   } else {
     objectWriteUInt16(this, value, offset, true)
@@ -1159,7 +1161,7 @@ Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) 
   if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     this[offset] = (value >>> 8)
-    this[offset + 1] = value
+    this[offset + 1] = (value & 0xff)
   } else {
     objectWriteUInt16(this, value, offset, false)
   }
@@ -1171,7 +1173,7 @@ Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) 
   offset = offset | 0
   if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
-    this[offset] = value
+    this[offset] = (value & 0xff)
     this[offset + 1] = (value >>> 8)
     this[offset + 2] = (value >>> 16)
     this[offset + 3] = (value >>> 24)
@@ -1190,7 +1192,7 @@ Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) 
     this[offset] = (value >>> 24)
     this[offset + 1] = (value >>> 16)
     this[offset + 2] = (value >>> 8)
-    this[offset + 3] = value
+    this[offset + 3] = (value & 0xff)
   } else {
     objectWriteUInt32(this, value, offset, false)
   }
@@ -1792,502 +1794,6 @@ module.exports = isArray || function (val) {
 };
 
 },{}],5:[function(require,module,exports){
-
-/**
- * This is the web browser implementation of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = require('./debug');
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-exports.storage = 'undefined' != typeof chrome
-               && 'undefined' != typeof chrome.storage
-                  ? chrome.storage.local
-                  : localstorage();
-
-/**
- * Colors.
- */
-
-exports.colors = [
-  'lightseagreen',
-  'forestgreen',
-  'goldenrod',
-  'dodgerblue',
-  'darkorchid',
-  'crimson'
-];
-
-/**
- * Currently only WebKit-based Web Inspectors, Firefox >= v31,
- * and the Firebug extension (any Firefox version) are known
- * to support "%c" CSS customizations.
- *
- * TODO: add a `localStorage` variable to explicitly enable/disable colors
- */
-
-function useColors() {
-  // is webkit? http://stackoverflow.com/a/16459606/376773
-  return ('WebkitAppearance' in document.documentElement.style) ||
-    // is firebug? http://stackoverflow.com/a/398120/376773
-    (window.console && (console.firebug || (console.exception && console.table))) ||
-    // is firefox >= v31?
-    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-    (navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31);
-}
-
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-exports.formatters.j = function(v) {
-  return JSON.stringify(v);
-};
-
-
-/**
- * Colorize log arguments if enabled.
- *
- * @api public
- */
-
-function formatArgs() {
-  var args = arguments;
-  var useColors = this.useColors;
-
-  args[0] = (useColors ? '%c' : '')
-    + this.namespace
-    + (useColors ? ' %c' : ' ')
-    + args[0]
-    + (useColors ? '%c ' : ' ')
-    + '+' + exports.humanize(this.diff);
-
-  if (!useColors) return args;
-
-  var c = 'color: ' + this.color;
-  args = [args[0], c, 'color: inherit'].concat(Array.prototype.slice.call(args, 1));
-
-  // the final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-  var index = 0;
-  var lastC = 0;
-  args[0].replace(/%[a-z%]/g, function(match) {
-    if ('%%' === match) return;
-    index++;
-    if ('%c' === match) {
-      // we only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-
-  args.splice(lastC, 0, c);
-  return args;
-}
-
-/**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
- *
- * @api public
- */
-
-function log() {
-  // this hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return 'object' === typeof console
-    && console.log
-    && Function.prototype.apply.call(console.log, console, arguments);
-}
-
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-
-function save(namespaces) {
-  try {
-    if (null == namespaces) {
-      exports.storage.removeItem('debug');
-    } else {
-      exports.storage.debug = namespaces;
-    }
-  } catch(e) {}
-}
-
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-function load() {
-  var r;
-  try {
-    r = exports.storage.debug;
-  } catch(e) {}
-  return r;
-}
-
-/**
- * Enable namespaces listed in `localStorage.debug` initially.
- */
-
-exports.enable(load());
-
-/**
- * Localstorage attempts to return the localstorage.
- *
- * This is necessary because safari throws
- * when a user disables cookies/localstorage
- * and you attempt to access it.
- *
- * @return {LocalStorage}
- * @api private
- */
-
-function localstorage(){
-  try {
-    return window.localStorage;
-  } catch (e) {}
-}
-
-},{"./debug":6}],6:[function(require,module,exports){
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = debug;
-exports.coerce = coerce;
-exports.disable = disable;
-exports.enable = enable;
-exports.enabled = enabled;
-exports.humanize = require('ms');
-
-/**
- * The currently active debug mode names, and names to skip.
- */
-
-exports.names = [];
-exports.skips = [];
-
-/**
- * Map of special "%n" handling functions, for the debug "format" argument.
- *
- * Valid key names are a single, lowercased letter, i.e. "n".
- */
-
-exports.formatters = {};
-
-/**
- * Previously assigned color.
- */
-
-var prevColor = 0;
-
-/**
- * Previous log timestamp.
- */
-
-var prevTime;
-
-/**
- * Select a color.
- *
- * @return {Number}
- * @api private
- */
-
-function selectColor() {
-  return exports.colors[prevColor++ % exports.colors.length];
-}
-
-/**
- * Create a debugger with the given `namespace`.
- *
- * @param {String} namespace
- * @return {Function}
- * @api public
- */
-
-function debug(namespace) {
-
-  // define the `disabled` version
-  function disabled() {
-  }
-  disabled.enabled = false;
-
-  // define the `enabled` version
-  function enabled() {
-
-    var self = enabled;
-
-    // set `diff` timestamp
-    var curr = +new Date();
-    var ms = curr - (prevTime || curr);
-    self.diff = ms;
-    self.prev = prevTime;
-    self.curr = curr;
-    prevTime = curr;
-
-    // add the `color` if not set
-    if (null == self.useColors) self.useColors = exports.useColors();
-    if (null == self.color && self.useColors) self.color = selectColor();
-
-    var args = Array.prototype.slice.call(arguments);
-
-    args[0] = exports.coerce(args[0]);
-
-    if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %o
-      args = ['%o'].concat(args);
-    }
-
-    // apply any `formatters` transformations
-    var index = 0;
-    args[0] = args[0].replace(/%([a-z%])/g, function(match, format) {
-      // if we encounter an escaped % then don't increase the array index
-      if (match === '%%') return match;
-      index++;
-      var formatter = exports.formatters[format];
-      if ('function' === typeof formatter) {
-        var val = args[index];
-        match = formatter.call(self, val);
-
-        // now we need to remove `args[index]` since it's inlined in the `format`
-        args.splice(index, 1);
-        index--;
-      }
-      return match;
-    });
-
-    if ('function' === typeof exports.formatArgs) {
-      args = exports.formatArgs.apply(self, args);
-    }
-    var logFn = enabled.log || exports.log || console.log.bind(console);
-    logFn.apply(self, args);
-  }
-  enabled.enabled = true;
-
-  var fn = exports.enabled(namespace) ? enabled : disabled;
-
-  fn.namespace = namespace;
-
-  return fn;
-}
-
-/**
- * Enables a debug mode by namespaces. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} namespaces
- * @api public
- */
-
-function enable(namespaces) {
-  exports.save(namespaces);
-
-  var split = (namespaces || '').split(/[\s,]+/);
-  var len = split.length;
-
-  for (var i = 0; i < len; i++) {
-    if (!split[i]) continue; // ignore empty strings
-    namespaces = split[i].replace(/\*/g, '.*?');
-    if (namespaces[0] === '-') {
-      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-    } else {
-      exports.names.push(new RegExp('^' + namespaces + '$'));
-    }
-  }
-}
-
-/**
- * Disable debug output.
- *
- * @api public
- */
-
-function disable() {
-  exports.enable('');
-}
-
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
-
-function enabled(name) {
-  var i, len;
-  for (i = 0, len = exports.skips.length; i < len; i++) {
-    if (exports.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (i = 0, len = exports.names.length; i < len; i++) {
-    if (exports.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Coerce `val`.
- *
- * @param {Mixed} val
- * @return {Mixed}
- * @api private
- */
-
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
-
-},{"ms":7}],7:[function(require,module,exports){
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} options
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function(val, options){
-  options = options || {};
-  if ('string' == typeof val) return parse(val);
-  return options.long
-    ? long(val)
-    : short(val);
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = '' + str;
-  if (str.length > 10000) return;
-  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
-  if (!match) return;
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function short(ms) {
-  if (ms >= d) return Math.round(ms / d) + 'd';
-  if (ms >= h) return Math.round(ms / h) + 'h';
-  if (ms >= m) return Math.round(ms / m) + 'm';
-  if (ms >= s) return Math.round(ms / s) + 's';
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function long(ms) {
-  return plural(ms, d, 'day')
-    || plural(ms, h, 'hour')
-    || plural(ms, m, 'minute')
-    || plural(ms, s, 'second')
-    || ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, n, name) {
-  if (ms < n) return;
-  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
-  return Math.ceil(ms / n) + ' ' + name + 's';
-}
-
-},{}],8:[function(require,module,exports){
 var should = require('./lib/should');
 
 var defaultProto = Object.prototype;
@@ -2303,7 +1809,7 @@ try {
 
 module.exports = should;
 
-},{"./lib/should":24}],9:[function(require,module,exports){
+},{"./lib/should":21}],6:[function(require,module,exports){
 var util = require('./util');
 
 /**
@@ -2391,7 +1897,7 @@ AssertionError.prototype = Object.create(Error.prototype, {
 
 module.exports = AssertionError;
 
-},{"./util":25}],10:[function(require,module,exports){
+},{"./util":22}],7:[function(require,module,exports){
 var AssertionError = require('./assertion-error');
 var util = require('./util');
 
@@ -2599,7 +2105,7 @@ Assertion.prototype = {
 
 module.exports = Assertion;
 
-},{"./assertion-error":9,"./util":25}],11:[function(require,module,exports){
+},{"./assertion-error":6,"./util":22}],8:[function(require,module,exports){
 var Formatter = require('should-format').Formatter;
 
 var config = {
@@ -2612,7 +2118,7 @@ var config = {
 
 module.exports = config;
 
-},{"should-format":28}],12:[function(require,module,exports){
+},{"should-format":25}],9:[function(require,module,exports){
 // implement assert interface using already written peaces of should.js
 
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
@@ -2893,7 +2399,7 @@ assert.ifError = function(err) {
   }
 };
 
-},{"./../assertion":10,"should-equal":27}],13:[function(require,module,exports){
+},{"./../assertion":7,"should-equal":24}],10:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -2964,7 +2470,7 @@ module.exports = function(should) {
     }
   };
 };
-},{"../assertion-error":9,"../util":25,"./_assert":12}],14:[function(require,module,exports){
+},{"../assertion-error":6,"../util":22,"./_assert":9}],11:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -3033,7 +2539,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],15:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 module.exports = function(should, Assertion) {
   /**
    * Simple chaining. It actually do nothing.
@@ -3059,7 +2565,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],16:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -3219,7 +2725,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{"../util":25,"should-equal":27}],17:[function(require,module,exports){
+},{"../util":22,"should-equal":24}],14:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -3357,7 +2863,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{"../util":25,"should-equal":27,"should-type":30}],18:[function(require,module,exports){
+},{"../util":22,"should-equal":24,"should-type":27}],15:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -3468,7 +2974,7 @@ module.exports = function(should, Assertion) {
   Assertion.alias('throw', 'throwError');
 };
 
-},{"../util":25}],19:[function(require,module,exports){
+},{"../util":22}],16:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -3661,7 +3167,7 @@ module.exports = function(should, Assertion) {
   Assertion.alias('matchEach', 'matchEvery');
 };
 
-},{"../util":25,"should-equal":27}],20:[function(require,module,exports){
+},{"../util":22,"should-equal":24}],17:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -3829,7 +3335,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{}],21:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -4201,7 +3707,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{"../util":25,"should-equal":27}],22:[function(require,module,exports){
+},{"../util":22,"should-equal":24}],19:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -4244,7 +3750,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],23:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -4470,7 +3976,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{"../util":25}],24:[function(require,module,exports){
+},{"../util":22}],21:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -4630,7 +4136,7 @@ should
   .use(require('./ext/match'))
   .use(require('./ext/contain'));
 
-},{"./assertion":10,"./assertion-error":9,"./config":11,"./ext/assert":13,"./ext/bool":14,"./ext/chain":15,"./ext/contain":16,"./ext/eql":17,"./ext/error":18,"./ext/match":19,"./ext/number":20,"./ext/property":21,"./ext/string":22,"./ext/type":23,"./util":25,"should-type":30}],25:[function(require,module,exports){
+},{"./assertion":7,"./assertion-error":6,"./config":8,"./ext/assert":10,"./ext/bool":11,"./ext/chain":12,"./ext/contain":13,"./ext/eql":14,"./ext/error":15,"./ext/match":16,"./ext/number":17,"./ext/property":18,"./ext/string":19,"./ext/type":20,"./util":22,"should-type":27}],22:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2014 TJ Holowaychuk <tj@vision-media.ca>
@@ -4767,7 +4273,7 @@ exports.formatProp = function(value) {
   return config.getFormatter().formatPropertyName(String(value));
 };
 
-},{"./config":11,"should-format":28,"should-type":30}],26:[function(require,module,exports){
+},{"./config":8,"should-format":25,"should-type":27}],23:[function(require,module,exports){
 module.exports = function format(msg) {
   var args = arguments;
   for(var i = 1, l = args.length; i < l; i++) {
@@ -4776,7 +4282,7 @@ module.exports = function format(msg) {
   return msg;
 }
 
-},{}],27:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var getType = require('should-type');
 var format = require('./format');
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -5118,7 +4624,7 @@ module.exports = eq;
 
 eq.r = REASON;
 
-},{"./format":26,"should-type":30}],28:[function(require,module,exports){
+},{"./format":23,"should-type":27}],25:[function(require,module,exports){
 var getType = require('should-type');
 var util = require('./util');
 
@@ -5575,7 +5081,7 @@ function defaultFormat(value, opts) {
 defaultFormat.Formatter = Formatter;
 module.exports = defaultFormat;
 
-},{"./util":29,"should-type":30}],29:[function(require,module,exports){
+},{"./util":26,"should-type":27}],26:[function(require,module,exports){
 function addSpaces(v) {
   return v.split('\n').map(function(vv) { return '  ' + vv; }).join('\n');
 }
@@ -5605,7 +5111,7 @@ module.exports = {
   }
 };
 
-},{}],30:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function (Buffer){
 var toString = Object.prototype.toString;
 
@@ -5768,7 +5274,7 @@ Object.keys(types).forEach(function(typeName) {
 module.exports = getGlobalType;
 
 }).call(this,require("buffer").Buffer)
-},{"./types":31,"buffer":1}],31:[function(require,module,exports){
+},{"./types":28,"buffer":1}],28:[function(require,module,exports){
 var types = {
   NUMBER: 'number',
   UNDEFINED: 'undefined',
@@ -5811,7 +5317,7 @@ var types = {
 
 module.exports = types;
 
-},{}],32:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /**
  * @license ciao
  */
@@ -5834,25 +5340,7 @@ function funBrowser (graph) {
 exports.fun = funBrowser
 
 
-},{"../fun":43,"../functions/window":45}],33:[function(require,module,exports){
-
-/**
- * Enable debug.
- *
- * ```
- * export DEBUG=dflow:*
- * ```
- *
- */
-
-var debug = require('debug')
-
-exports.compile = debug('dflow:compile')
-exports.inject  = debug('dflow:inject')
-exports.run     = debug('dflow:run')
-
-
-},{"debug":5}],34:[function(require,module,exports){
+},{"../fun":39,"../functions/window":41}],30:[function(require,module,exports){
 module.exports={
   "data": {},
   "pipe": {},
@@ -5863,7 +5351,7 @@ module.exports={
   }
 }
 
-},{}],35:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "&isFinite",
@@ -5888,7 +5376,7 @@ module.exports={
   }
 }
 
-},{}],36:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -5909,7 +5397,7 @@ module.exports={
   }
 }
 
-},{}],37:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -5957,7 +5445,7 @@ module.exports={
   }
 }
 
-},{}],38:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -5984,7 +5472,7 @@ module.exports={
   }
 }
 
-},{}],39:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6007,7 +5495,7 @@ module.exports={
   }
 }
 
-},{}],40:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6030,7 +5518,7 @@ module.exports={
   }
 }
 
-},{}],41:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 
 exports.apply          = require('./graph/apply.json')
 exports.dateParse      = require('./graph/dateParse.json')
@@ -6040,7 +5528,7 @@ exports.or             = require('./graph/or.json')
 exports.sum            = require('./graph/sum.json')
 
 
-},{"./graph/apply.json":35,"./graph/dateParse.json":36,"./graph/hello-world.json":37,"./graph/indexOf.json":38,"./graph/or.json":39,"./graph/sum.json":40}],42:[function(require,module,exports){
+},{"./graph/apply.json":31,"./graph/dateParse.json":32,"./graph/hello-world.json":33,"./graph/indexOf.json":34,"./graph/or.json":35,"./graph/sum.json":36}],38:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6059,10 +5547,9 @@ module.exports={
   "view": {}
 }
 
-},{}],43:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 
 var builtinFunctions          = require('./functions/builtin'),
-    debug                     = require('./debug'),
     injectAdditionalFunctions = require('./inject/additionalFunctions'),
     injectArguments           = require('./inject/arguments'),
     injectAccessors           = require('./inject/accessors'),
@@ -6073,9 +5560,6 @@ var builtinFunctions          = require('./functions/builtin'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
     validate                  = require('./validate')
-
-var debugRun     = debug.run,
-    debugCompile = debug.compile
 
 /**
  * Create a dflow function.
@@ -6090,8 +5574,6 @@ function fun (graph, additionalFunctions) {
   // First of all, check if graph is valid.
   try { validate(graph, additionalFunctions) }
   catch (err) { throw err }
-
-  debugCompile('graph with ' + Object.keys(graph.task).length + ' tasks and ' + Object.keys(graph.pipe).length + ' pipes')
 
   var func = graph.func || {},
       pipe = graph.pipe,
@@ -6130,8 +5612,6 @@ function fun (graph, additionalFunctions) {
    */
 
   function dflowFun () {
-    debugRun('start')
-
     var gotReturn = false,
         outs = {},
         returnValue
@@ -6170,8 +5650,6 @@ function fun (graph, additionalFunctions) {
           funcName = task[taskKey],
           f        = funcs[funcName]
 
-      debugRun('task ' + taskKey + ' = ' + funcName)
-
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.
       if (gotReturn)
@@ -6194,7 +5672,6 @@ function fun (graph, additionalFunctions) {
           .sort(byLevel)
           .forEach(run)
 
-    debugRun('end')
     return returnValue
   }
 
@@ -6207,7 +5684,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./debug":33,"./functions/builtin":44,"./inject/accessors":46,"./inject/additionalFunctions":47,"./inject/arguments":48,"./inject/dotOperators":49,"./inject/globals":50,"./inject/references":51,"./inputArgs":52,"./isDflowFun":54,"./level":55,"./validate":61}],44:[function(require,module,exports){
+},{"./functions/builtin":40,"./inject/accessors":42,"./inject/additionalFunctions":43,"./inject/arguments":44,"./inject/dotOperators":45,"./inject/globals":46,"./inject/references":47,"./inputArgs":48,"./isDflowFun":50,"./level":51,"./validate":57}],40:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -6379,7 +5856,7 @@ exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
 
 
-},{}],45:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 
 exports.document = function _document () { return document }
 
@@ -6390,10 +5867,9 @@ exportshead = function head () { return document.head }
 exports.window = function _window () { return window }
 
 
-},{}],46:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 
-var accessorRegex = require('../regex/accessor'),
-    debug         = require('../debug').inject
+var accessorRegex = require('../regex/accessor')
 
 /**
  * Inject functions to set or get context keywords.
@@ -6410,6 +5886,8 @@ function injectAccessors (funcs, graph) {
 
   /**
    * Inject accessor.
+   *
+   * @api private
    */
 
   function inject (taskKey) {
@@ -6418,6 +5896,8 @@ function injectAccessors (funcs, graph) {
 
     /**
      * Accessor-like function.
+     *
+     * @api private
      */
 
     function accessor () {
@@ -6430,8 +5910,6 @@ function injectAccessors (funcs, graph) {
     if (accessorRegex.test(taskName)) {
       accessorName = taskName.substring(1)
 
-      debug(taskName)
-
       funcs[taskName] = accessor
     }
   }
@@ -6442,11 +5920,13 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"../debug":33,"../regex/accessor":57}],47:[function(require,module,exports){
-
-var debug = require('../debug').inject
+},{"../regex/accessor":53}],43:[function(require,module,exports){
 
 /**
+ * Optionally add custom functions.
+ *
+ * @api private
+ *
  * @params {Object} funcs
  * @params {Object} additionalFunctions
  */
@@ -6456,10 +5936,10 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
   if (typeof additionalFunctions === 'undefined')
     return
 
-  debug(Object.keys(additionalFunctions).length + ' additionalFunctions')
-
   /**
    * Validate and insert an additional function.
+   *
+   * @api private
    */
 
   function injectAdditionalFunction (key) {
@@ -6476,13 +5956,14 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{"../debug":33}],48:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 
-var argumentRegex = require('../regex/argument'),
-    debug         = require('../debug').inject
+var argumentRegex = require('../regex/argument')
 
 /**
  * Inject functions to retrieve arguments.
+ *
+ * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
@@ -6497,35 +5978,34 @@ function injectArguments (funcs, task, args) {
 
   /**
    * Inject arguments.
+   *
+   * @api private
    */
 
   function inject (taskKey) {
     var funcName = task[taskKey]
 
     if (funcName === 'arguments') {
-      debug('arguments')
       funcs[funcName] = function getArguments () { return args }
     }
     else {
       var arg = argumentRegex.exec(funcName)
 
-      if (arg) {
-        debug(funcName)
+      if (arg)
         funcs[funcName] = getArgument.bind(null, arg[1])
-      }
     }
   }
 
-  Object.keys(task).forEach(inject)
+  Object.keys(task)
+        .forEach(inject)
 }
 
 module.exports = injectArguments
 
 
-},{"../debug":33,"../regex/argument":58}],49:[function(require,module,exports){
+},{"../regex/argument":54}],45:[function(require,module,exports){
 
-var debug            = require('../debug').inject,
-    dotOperatorRegex = require('../regex/dotOperator')
+var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
  * Inject functions that emulate dot operator.
@@ -6540,6 +6020,8 @@ function injectDotOperators (funcs, task) {
 
   /**
    * Inject dot operator.
+   *
+   * @api private
    */
 
   function inject (taskKey) {
@@ -6547,6 +6029,8 @@ function injectDotOperators (funcs, task) {
 
     /**
      * Dot operator function.
+     *
+     * @api private
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -6569,13 +6053,13 @@ function injectDotOperators (funcs, task) {
       // .foo() -> foo
       attributeName = taskName.substring(1, taskName.length - 2)
 
-      debug(taskName)
-
       funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
     }
 
     /**
      * Dot operator attribute.
+     *
+     * @api private
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -6599,8 +6083,6 @@ function injectDotOperators (funcs, task) {
       // .foo -> foo
       attributeName = taskName.substring(1)
 
-      debug(taskName)
-
       funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
     }
   }
@@ -6611,19 +6093,26 @@ function injectDotOperators (funcs, task) {
 module.exports = injectDotOperators
 
 
-},{"../debug":33,"../regex/dotOperator":59}],50:[function(require,module,exports){
+},{"../regex/dotOperator":55}],46:[function(require,module,exports){
 
-var debug      = require('../debug').inject,
-    walkGlobal = require('../walkGlobal')
+var walkGlobal = require('../walkGlobal')
 
 /**
  * Inject globals.
+ *
+ * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
  */
 
 function injectGlobals (funcs, task) {
+
+  /**
+   * Inject task
+   *
+   * @api private
+   */
 
   function inject (taskKey) {
     var taskName = task[taskKey]
@@ -6642,29 +6131,29 @@ function injectGlobals (funcs, task) {
     if (typeof globalValue === 'undefined')
       return
 
-    debug('global ' + taskName)
-
     if (typeof globalValue === 'function')
       funcs[taskName] = globalValue
     else
       funcs[taskName] = function () { return globalValue }
   }
 
-  Object.keys(task).forEach(inject)
+  Object.keys(task)
+        .forEach(inject)
 }
 
 module.exports = injectGlobals
 
 
-},{"../debug":33,"../walkGlobal":62}],51:[function(require,module,exports){
+},{"../walkGlobal":58}],47:[function(require,module,exports){
 
-var debug          = require('../debug').inject,
-    referenceRegex = require('../regex/reference'),
+var referenceRegex = require('../regex/reference'),
     walkGlobal     = require('../walkGlobal')
 
 
 /**
  * Inject references to functions.
+ *
+ * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
@@ -6679,6 +6168,8 @@ function injectReferences (funcs, task) {
 
     /**
      * Inject reference.
+     *
+     * @api private
      */
 
     function reference () {
@@ -6693,10 +6184,8 @@ function injectReferences (funcs, task) {
       else
         referencedFunction = walkGlobal(referenceName)
 
-      if (typeof referencedFunction === 'function') {
-        debug('reference to ' + referenceName)
+      if (typeof referencedFunction === 'function')
         funcs[taskName] = reference
-      }
     }
   }
 
@@ -6706,7 +6195,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"../debug":33,"../regex/reference":60,"../walkGlobal":62}],52:[function(require,module,exports){
+},{"../regex/reference":56,"../walkGlobal":58}],48:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6739,7 +6228,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":53}],53:[function(require,module,exports){
+},{"./inputPipes":49}],49:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -6769,7 +6258,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],54:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -6796,7 +6285,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":61}],55:[function(require,module,exports){
+},{"./validate":57}],51:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -6832,7 +6321,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":56}],56:[function(require,module,exports){
+},{"./parents":52}],52:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6861,29 +6350,29 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":53}],57:[function(require,module,exports){
+},{"./inputPipes":49}],53:[function(require,module,exports){
 
 module.exports = /^@(.+)$/
 
 
-},{}],58:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],59:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
 
-},{}],60:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],61:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
@@ -7018,7 +6507,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":57,"./regex/argument":58,"./regex/dotOperator":59,"./regex/reference":60}],62:[function(require,module,exports){
+},{"./regex/accessor":53,"./regex/argument":54,"./regex/dotOperator":55,"./regex/reference":56}],58:[function(require,module,exports){
 (function (global){
 
     var globalContext
@@ -7049,7 +6538,7 @@ module.exports = walkGlobal
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],63:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 
 var emptyGraph = require('../src/emptyGraph.json'),
     should     = require('should'),
@@ -7062,7 +6551,7 @@ describe('emptyGraph', function () {
 })
 
 
-},{"../src/emptyGraph.json":34,"../src/validate":61,"should":8}],64:[function(require,module,exports){
+},{"../src/emptyGraph.json":30,"../src/validate":57,"should":5}],60:[function(require,module,exports){
 
 var dflow  = require('dflow'),
     should = require('should')
@@ -7108,7 +6597,7 @@ describe('example', function () {
 })
 
 
-},{"../src/examples":41,"../src/examples/packagedGraph":42,"dflow":70,"should":8}],65:[function(require,module,exports){
+},{"../src/examples":37,"../src/examples/packagedGraph":38,"dflow":66,"should":5}],61:[function(require,module,exports){
 
 var should = require('should'),
     fun    = require('../src/fun')
@@ -7193,7 +6682,7 @@ describe('fun', function () {
 })
 
 
-},{"../src/fun":43,"should":8}],66:[function(require,module,exports){
+},{"../src/fun":39,"should":5}],62:[function(require,module,exports){
 
 var inputArgs = require('../src/inputArgs'),
     should    = require('should')
@@ -7225,7 +6714,7 @@ describe('inputArgs', function () {
 })
 
 
-},{"../src/inputArgs":52,"should":8}],67:[function(require,module,exports){
+},{"../src/inputArgs":48,"should":5}],63:[function(require,module,exports){
 
 var should = require('should')
 var inputPipes = require('../src/inputPipes')
@@ -7252,7 +6741,7 @@ describe('inputPipes', function () {
 })
 
 
-},{"../src/inputPipes":53,"should":8}],68:[function(require,module,exports){
+},{"../src/inputPipes":49,"should":5}],64:[function(require,module,exports){
 
 var examples   = require('../src/examples'),
     fun        = require('../src/fun'),
@@ -7310,7 +6799,7 @@ describe('isDflowFun', function () {
 })
 
 
-},{"../src/examples":41,"../src/fun":43,"../src/isDflowFun":54,"should":8}],69:[function(require,module,exports){
+},{"../src/examples":37,"../src/fun":39,"../src/isDflowFun":50,"should":5}],65:[function(require,module,exports){
 
 var level  = require('../src/level'),
     should = require('should')
@@ -7338,13 +6827,13 @@ describe('level', function () {
 })
 
 
-},{"../src/level":55,"should":8}],70:[function(require,module,exports){
+},{"../src/level":51,"should":5}],66:[function(require,module,exports){
 
 // Cheating NPM.
 module.exports = require('../../..')
 
 
-},{"../../..":32}],71:[function(require,module,exports){
+},{"../../..":29}],67:[function(require,module,exports){
 
 var parents = require('../src/parents'),
     should  = require('should')
@@ -7380,7 +6869,7 @@ describe('parentsOf', function () {
 })
 
 
-},{"../src/parents":56,"should":8}],72:[function(require,module,exports){
+},{"../src/parents":52,"should":5}],68:[function(require,module,exports){
 
 var dotOperator = require('../src/regex/dotOperator'),
     should    = require('should')
@@ -7402,7 +6891,7 @@ describe('regex', function () {
 })
 
 
-},{"../src/regex/dotOperator":59,"should":8}],73:[function(require,module,exports){
+},{"../src/regex/dotOperator":55,"should":5}],69:[function(require,module,exports){
 
 var should = require('should'),
     fun    = require('../src/fun')
@@ -7447,7 +6936,7 @@ describe('this.graph', function () {
   })
 })
 
-},{"../src/fun":43,"should":8}],74:[function(require,module,exports){
+},{"../src/fun":39,"should":5}],70:[function(require,module,exports){
 
 var should   = require('should'),
     validate = require('../src/validate')
@@ -7621,4 +7110,4 @@ describe('validate', function () {
 })
 
 
-},{"../src/validate":61,"should":8}]},{},[63,64,65,66,67,68,69,71,72,73,74]);
+},{"../src/validate":57,"should":5}]},{},[59,60,61,62,63,64,65,67,68,69,70]);

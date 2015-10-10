@@ -1,6 +1,5 @@
 
-var accessorRegex = require('../regex/accessor'),
-    debug         = require('../debug').inject
+var accessorRegex = require('../regex/accessor')
 
 /**
  * Inject functions to set or get context keywords.
@@ -17,6 +16,8 @@ function injectAccessors (funcs, graph) {
 
   /**
    * Inject accessor.
+   *
+   * @api private
    */
 
   function inject (taskKey) {
@@ -25,6 +26,8 @@ function injectAccessors (funcs, graph) {
 
     /**
      * Accessor-like function.
+     *
+     * @api private
      */
 
     function accessor () {
@@ -36,8 +39,6 @@ function injectAccessors (funcs, graph) {
 
     if (accessorRegex.test(taskName)) {
       accessorName = taskName.substring(1)
-
-      debug(taskName)
 
       funcs[taskName] = accessor
     }
