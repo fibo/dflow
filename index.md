@@ -47,6 +47,18 @@ However, if you need to require the *dflow* engine in your package, or you need 
 $ npm install dflow
 ```
 
+If you want start hacking on dflow run
+
+```bash
+$ git clone https://github.com/fibo/dflow.git
+$ cd dflow
+$ npm install
+$ npm start
+```
+
+which will clone repo, install deps, and start the *dflow* cli. Then point your browser to *http://localhost:3000* and edit your *graph.json*.
+Note that opening another browser window on *http://localhost:3000* you can try the **collaborative editing** feature, powered by [Socket.IO](http://socket.io/)!
+
 ## Examples
 
 ### Hello world
@@ -55,9 +67,9 @@ The following simple graph is executed client side by *dflow* engine.
 
 [![HelloWorld](http://g14n.info/dflow/examples/hello-world.png)][2]
 
-### Test page
+### Client side
 
-See [test/page.html](http://g14n.info/dflow/test/page.html) for another working example of *dflow* in a browser context.
+See [example/client-side.html](http://g14n.info/dflow/examples/client-side.html) for another working example of *dflow* in a browser context.
 
 [![view on requirebin](http://requirebin.com/badge.png)](http://requirebin.com/?gist=45520011e093d6dfec9f)
 
@@ -95,6 +107,7 @@ Usage: dflow [options] [path/to/graph.json]
 
   -h, --help          print this message and exit
   -p, --port          server port number, defaults to 3000
+  -v, --verbose       print events on stdout
   -V, --version       print current version and exit
 
 For more info point your browser to http://g14n.info/dflow
@@ -177,6 +190,7 @@ Note that optional collection of *additionalFunctions*, in order to avoid confli
 *dflow* is [MIT](http://g14n.info/mit-license) licensed.
 
 It is developed in my spare time and, as far as I know, by now *I am my only user*.
+By the way, I got a stimulating feedback by [Stamplay](https://stamplay.com/) founder, who it is pretty much interested in using *dflow* maybe in the future. **Grazie** [Giuliano](http://www.giulianoiacobelli.com/), I hope you all the best.
 
 I wrote few times a dataflow engine, the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
 
