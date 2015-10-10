@@ -312,7 +312,7 @@ module.exports = require('../..')
 module.exports = require('./src')
 
 
-},{"./src":25}],4:[function(require,module,exports){
+},{"./src":24}],4:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -4592,7 +4592,7 @@ function init (eventHook) {
       // Can be beforeAddInput or beforeAddOutput hook.
       var beforeAdd = eventHook['beforeAdd' + type + 'put']
 
-      var key      = eventData.node,
+      var key      = eventData.nodeKey,
           position = eventData.position
 
       var node = canvas.node[key]
@@ -4806,6 +4806,7 @@ function render (view) {
 Canvas.prototype.render = render
 
 /**
+ * Get model.
  *
  * @returns {Object} json
  */
@@ -4829,6 +4830,10 @@ function toJSON () {
 
 Canvas.prototype.toJSON = toJSON
 
+/**
+ * Add a link.
+ */
+
 function addLink (view, key) {
   if (typeof key === 'undefined')
      key = this.nextKey
@@ -4844,6 +4849,10 @@ function addLink (view, key) {
 }
 
 Canvas.prototype.addLink = addLink
+
+/**
+ * Add a node.
+ */
 
 function addNode (view, key) {
   if (typeof key === 'undefined')
@@ -4861,6 +4870,10 @@ function addNode (view, key) {
 
 Canvas.prototype.addNode = addNode
 
+/**
+ * Delete a node.
+ */
+
 function delNode (key) {
   var link = this.link,
       node = this.node[key]
@@ -4871,7 +4884,7 @@ function delNode (key) {
         nodeIsTarget = link[i].to.key   === key
 
     if (nodeIsSource || nodeIsTarget)
-      this.delLink(i)
+      this.broker.emit('delLink', i)
   }
 
   // Then remove node.
@@ -4879,6 +4892,10 @@ function delNode (key) {
 }
 
 Canvas.prototype.delNode = delNode
+
+/**
+ * Delete a link.
+ */
 
 function delLink (key) {
   var link = this.link[key]
@@ -4891,7 +4908,7 @@ Canvas.prototype.delLink = delLink
 module.exports = Canvas
 
 
-},{"./Broker":8,"./Link":11,"./Node":12,"./NodeControls":17,"./NodeCreator":18,"./SVG":22,"./default/theme.json":23,"./default/view.json":24,"./validate":26}],10:[function(require,module,exports){
+},{"./Broker":8,"./Link":11,"./Node":12,"./NodeControls":17,"./NodeCreator":18,"./SVG":26,"./default/theme.json":22,"./default/view.json":23,"./validate":25}],10:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin')
@@ -5104,12 +5121,6 @@ function render (view) {
   group.add(rect)
        .add(text)
 
-  // Add url, if any.
-  if (typeof view.url === 'string') {
-    group.linkTo(view.url)
-    this.url = view.url
-  }
-
   Object.defineProperties(self, {
     'x': { get: function () { return group.x()     } },
     'y': { get: function () { return group.y()     } },
@@ -5130,7 +5141,7 @@ function render (view) {
   outs.forEach(createOutput)
 
   function dynamicConstraint (x, y) {
-    var horyzontalContraint = (x > 0) && (x < canvas.width - self.w),
+    var horyzontalContraint = (x > 0) && (x < canvas.width  - self.w),
         verticalContraint   = (y > 0) && (y < canvas.height - self.h)
 
     return { x: horyzontalContraint, y: verticalContraint }
@@ -5202,9 +5213,6 @@ function toJSON () {
       outs = this.outs
 
   view.text = this.text
-
-  if (typeof this.url === 'string')
-    view.url = this.url
 
   ins.forEach(function (position) {
     view.ins[position] = ins[position].toJSON()
@@ -5384,7 +5392,13 @@ function AddInput (canvas) {
 
   function addInput (ev) {
     var node = this.node
-    canvas.broker.emit('addInput', { node: node.key })
+
+    var eventData = {
+      nodeKey: node.key,
+      position: node.ins.length
+    }
+
+    canvas.broker.emit('addInput', eventData)
   }
 
   function deselectButton () {
@@ -5456,7 +5470,14 @@ function AddOutput (canvas) {
   this.group = group
 
   function addOutput (ev) {
-    this.node.addOutput()
+    var node = this.node
+
+    var eventData = {
+      nodeKey: node.key,
+      position: node.outs.length
+    }
+
+    canvas.broker.emit('addOutput', eventData)
   }
 
   function deselectButton () {
@@ -5975,27 +5996,6 @@ module.exports = PreLink
 
 
 },{}],22:[function(require,module,exports){
-
-// Consider this module will be browserified.
-
-// Load svg.js first ...
-var SVG = require('svg.js')
-
-// ... then load plugins: since plugins do not use *module.exports*, they are
-// loaded as plain text, and when browserified they will be included in the bundle.
-require('svg.draggable.js')
-require('svg.foreignobject.js')
-
-// Note that, in order to be included as expected by browserify, dynamic imports
-// do not work: for instance a code like the following won't work client-side
-//
-//    ['svg.draggable.js', 'svg.foreignobject.js'].forEach(require)
-//
-
-module.exports = SVG
-
-
-},{"svg.draggable.js":5,"svg.foreignobject.js":6,"svg.js":7}],23:[function(require,module,exports){
 module.exports={
   "fillCircle": "#fff",
   "fillLabel": "#333",
@@ -6021,18 +6021,18 @@ module.exports={
   "unitWidth": 10
 }
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports={
   "node": {},
   "link": {}
 }
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 
 exports.Canvas = require('./Canvas')
 
 
-},{"./Canvas":9}],26:[function(require,module,exports){
+},{"./Canvas":9}],25:[function(require,module,exports){
 
 function validate (view) {
   if (typeof view !== 'object')
@@ -6048,7 +6048,28 @@ function validate (view) {
 module.exports = validate
 
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
+
+// Consider this module will be browserified.
+
+// Load svg.js first ...
+var SVG = require('svg.js')
+
+// ... then load plugins: since plugins do not use *module.exports*, they are
+// loaded as plain text, and when browserified they will be included in the bundle.
+require('svg.draggable.js')
+require('svg.foreignobject.js')
+
+// Note that, in order to be included as expected by browserify, dynamic imports
+// do not work: for instance a code like the following won't work client-side
+//
+//    ['svg.draggable.js', 'svg.foreignobject.js'].forEach(require)
+//
+
+module.exports = SVG
+
+
+},{"svg.draggable.js":5,"svg.foreignobject.js":6,"svg.js":7}],27:[function(require,module,exports){
 /**
  * @license ciao
  */
