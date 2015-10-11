@@ -4546,27 +4546,27 @@ inherits(Broker, EventEmitter)
 function init (eventHook) {
   var canvas = this.canvas
 
-  function addLink (view, key) {
-    if (typeof key === 'undefined')
-      key = canvas.nextKey
-
+  function addLink (eventData) {
+    /*
     var beforeAdd = eventHook.beforeAddLink
 
     if (typeof beforeAdd === 'function') {
       try {
-        beforeAdd(view, key)
-        canvas.addLink(view, key)
+        var stop = beforeAdd(eventData)
+
+        if (! stop) canvas.addLink(eventData)
       }
       catch (err) {
         console.error(err)
       }
     }
     else {
-      canvas.addLink(view, key)
-    }
+    */
+      canvas.addLink(eventData)
+    //}
   }
 
-  this.on('addLink', addLink)
+  this.on('addLink', canvas.addLink)
 
   /**
    * Generate addInput or addOutput event callback
@@ -4583,53 +4583,33 @@ function init (eventHook) {
       // Can be addInput or addOutput.
       var action = 'add' + type + 'put'
 
-      // Can be beforeAddInput or beforeAddOutput hook.
-      var beforeAdd = eventHook['beforeAdd' + type + 'put']
-
       var key      = eventData.nodeKey,
           position = eventData.position
 
+        /*
+      // Can be beforeAddInput or beforeAddOutput hook.
+      var beforeAdd = eventHook['beforeAdd' + type + 'put']
       var node = canvas.node[key]
 
       if (typeof beforeAdd === 'function') {
         try {
           beforeAdd(eventData)
-          node[action](position)
         }
         catch (err) {
           console.error(err)
         }
       }
       else {
+      */
         node[action](position)
-      }
+      //}
     }
   }
 
   this.on('addInput', addPin('In'))
   this.on('addOutput', addPin('Out'))
 
-  function addNode (view, key) {
-    if (typeof key === 'undefined')
-      key = canvas.nextKey
-
-    var beforeAdd = eventHook.beforeAddNode
-
-    if (typeof beforeAdd === 'function') {
-      try {
-        beforeAdd(view, key)
-        canvas.addNode(view, key)
-      }
-      catch (err) {
-        console.error(err)
-      }
-    }
-    else {
-      canvas.addNode(view, key)
-    }
-  }
-
-  this.on('addNode', addNode)
+  this.on('addNode', canvas.addNode)
 
   /**
    * Generate delLink or delNode event callback
@@ -4642,7 +4622,7 @@ function init (eventHook) {
    */
 
   function del (type) {
-    return function (key) {
+    return function (eventData) {
       // Can be delLink or delNode.
       var action = 'del' + type
 
@@ -4651,15 +4631,14 @@ function init (eventHook) {
 
       if (typeof beforeDel === 'function') {
         try {
-          beforeDel(key)
-          canvas[action](key)
+          beforeDel(eventData, canvas[action])
         }
         catch (err) {
           console.error(err)
         }
       }
       else {
-        canvas[action](key)
+        canvas[action](eventData)
       }
     }
   }
@@ -4683,6 +4662,8 @@ module.exports = Broker
 
 
 },{"events":1,"inherits":3}],8:[function(require,module,exports){
+
+// TODO rename key to id, specially linkKey in linkId.
 
 var SVG = require('./SVG')
 
@@ -4785,13 +4766,19 @@ function render (view) {
   var self = this
 
   function createNode (key) {
-    self.addNode(view.node[key], key)
+    var data = view.node[key]
+    data.nodeKey = key
+
+    self.addNode(data)
   }
 
   Object.keys(view.node).forEach(createNode)
 
   function createLink (key) {
-    self.addLink(view.link[key], key)
+    var data = view.link[key]
+    data.linkKey = key
+
+    self.addLink(data)
   }
 
   Object.keys(view.link).forEach(createLink)
@@ -4828,18 +4815,17 @@ Canvas.prototype.toJSON = toJSON
  * Add a link.
  */
 
-function addLink (view, key) {
+function addLink (data) {
+  var key = data.linkKey
+
   if (typeof key === 'undefined')
      key = this.nextKey
 
   var link = new Link(this, key)
 
-  link.render(view)
+  link.render(data)
 
   this.link[key] = link
-
-  var eventData = { link: {} }
-  eventData.link[key] = view
 }
 
 Canvas.prototype.addLink = addLink
@@ -4848,18 +4834,17 @@ Canvas.prototype.addLink = addLink
  * Add a node.
  */
 
-function addNode (view, key) {
+function addNode (data) {
+  var key = data.nodeKey
+
   if (typeof key === 'undefined')
      key = this.nextKey
 
   var node = new Node(this, key)
 
-  node.render(view)
+  node.render(data)
 
   this.node[key] = node
-
-  var eventData = { node: {} }
-  eventData.node[key] = view
 }
 
 Canvas.prototype.addNode = addNode
@@ -4868,7 +4853,9 @@ Canvas.prototype.addNode = addNode
  * Delete a node.
  */
 
-function delNode (key) {
+function delNode (data) {
+  var key = data.nodeKey
+
   var link = this.link,
       node = this.node[key]
 
@@ -4878,7 +4865,7 @@ function delNode (key) {
         nodeIsTarget = link[i].to.key   === key
 
     if (nodeIsSource || nodeIsTarget)
-      this.broker.emit('delLink', i)
+      this.broker.emit('delLink', { key: i })
   }
 
   // Then remove node.
@@ -4891,7 +4878,9 @@ Canvas.prototype.delNode = delNode
  * Delete a link.
  */
 
-function delLink (key) {
+function delLink (data) {
+  var key = data.linkKey
+
   var link = this.link[key]
 
   link.deleteView()
@@ -4956,7 +4945,7 @@ function render (view) {
       key    = this.key
 
   var broker = canvas.broker,
-      node  = canvas.node,
+      node   = canvas.node,
       svg    = canvas.svg,
       theme  = canvas.theme
 
@@ -4992,7 +4981,7 @@ function render (view) {
   start.link[key] = this
 
   function remove () {
-    broker.emit('delLink', key)
+    broker.emit('delLink', { linkKey: key })
   }
 
   function deselectLine () {
@@ -5150,8 +5139,11 @@ function render (view) {
   var dragMoves = -1
 
   function dragend () {
-    var eventData = { node: {} }
-    eventData.node[key] = {x: self.x, y: self.y}
+    var eventData = {
+      nodeKey: key,
+      x: self.x,
+      y: self.y
+    }
 
     if (dragMoves > 0)
       canvas.broker.emit('moveNode', eventData)
@@ -5551,7 +5543,7 @@ function DeleteNode (canvas) {
 
     canvas.nodeControls.detach()
 
-    canvas.broker.emit('delNode', key)
+    canvas.broker.emit('delNode', { nodeKey: key })
   }
 
   function deselectButton () {
@@ -6068,41 +6060,50 @@ module.exports = SVG
 var request = new XMLHttpRequest(),
     socket = io()
 
-request.open('GET', '/graph.json', true)
+var Canvas = require('flow-view').Canvas
+var canvas = new Canvas('flow')
 
-request.onload = function() {
-  if (request.status >= 200 && request.status < 400) {
-    // Success!
-    var graph = JSON.parse(request.responseText)
-    var Canvas = require('flow-view').Canvas
-    var canvas = new Canvas('flow')
+var events = ['addLink' , 'addNode',
+              'addInput', 'addOutput',
+              'delLink' , 'delNode'  , 'moveNode']
 
-    canvas.render(graph.view)
+events.forEach(function (eventName) {
+  canvas.broker.removeAllListeners(eventName)
 
-    var events = ['addLink' , 'addNode',
-                  'addInput', 'addOutput',
-                  'delLink' , 'delNode'  , 'moveNode']
+  canvas.broker.on(eventName, function (ev) {
+    console.log(eventName, ev)
+    socket.emit(eventName, ev)
+  })
 
-    events.forEach(function (eventName) {
-      canvas.broker.on(eventName, function (ev) {
-        console.log(eventName, ev)
-        socket.emit(eventName, ev)
-      })
-    })
+socket.on(eventName, function (data) {
+  console.log(eventName, data)
+  canvas[eventName](data)
+})
 
-    // TODO run graph depending on dflow-cli arguments
-    //require('dflow').fun(graph)()
-  }
-  else {
-    // We reached our target server, but it returned an error
-  }
-}
+})
 
-request.onerror = function() {
-  // There was a connection error of some sort
-}
+socket.on('loadGraph', function (graph) {
+  console.log('loadGraph', graph)
+  canvas.render(graph.view)
+})
 
-request.send()
+/*
+socket.on('addNode', function (data) {
+  console.log(data)
+  canvas.addNode(data)
+})
 
+socket.on('addLink', function (data) {
+  console.log(data)
+  canvas.addLink(data)
+})
+
+socket.on('addInput', function (data) {
+
+  console.log(data)
+  canvas.addInput(data)
+})
+
+*/
 
 },{"flow-view":2}]},{},[26]);

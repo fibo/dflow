@@ -2,39 +2,48 @@
 var request = new XMLHttpRequest(),
     socket = io()
 
-request.open('GET', '/graph.json', true)
+var Canvas = require('flow-view').Canvas
+var canvas = new Canvas('flow')
 
-request.onload = function() {
-  if (request.status >= 200 && request.status < 400) {
-    // Success!
-    var graph = JSON.parse(request.responseText)
-    var Canvas = require('flow-view').Canvas
-    var canvas = new Canvas('flow')
+var events = ['addLink' , 'addNode',
+              'addInput', 'addOutput',
+              'delLink' , 'delNode'  , 'moveNode']
 
-    canvas.render(graph.view)
+events.forEach(function (eventName) {
+  canvas.broker.removeAllListeners(eventName)
 
-    var events = ['addLink' , 'addNode',
-                  'addInput', 'addOutput',
-                  'delLink' , 'delNode'  , 'moveNode']
+  canvas.broker.on(eventName, function (ev) {
+    console.log(eventName, ev)
+    socket.emit(eventName, ev)
+  })
 
-    events.forEach(function (eventName) {
-      canvas.broker.on(eventName, function (ev) {
-        console.log(eventName, ev)
-        socket.emit(eventName, ev)
-      })
-    })
+socket.on(eventName, function (data) {
+  console.log(eventName, data)
+  canvas[eventName](data)
+})
 
-    // TODO run graph depending on dflow-cli arguments
-    //require('dflow').fun(graph)()
-  }
-  else {
-    // We reached our target server, but it returned an error
-  }
-}
+})
 
-request.onerror = function() {
-  // There was a connection error of some sort
-}
+socket.on('loadGraph', function (graph) {
+  console.log('loadGraph', graph)
+  canvas.render(graph.view)
+})
 
-request.send()
+/*
+socket.on('addNode', function (data) {
+  console.log(data)
+  canvas.addNode(data)
+})
 
+socket.on('addLink', function (data) {
+  console.log(data)
+  canvas.addLink(data)
+})
+
+socket.on('addInput', function (data) {
+
+  console.log(data)
+  canvas.addInput(data)
+})
+
+*/
