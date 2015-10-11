@@ -94,13 +94,19 @@ function editorServer (graphPath, opt) {
     res.render('index', {graphPath: graphPath, version: pkg.version})
   })
 
+  /*
   app.get('/graph.json', function (req, res) {
       res.json(graph)
   })
+  */
 
   // Socket.IO events.
 
   io.on('connection', function (socket) {
+
+     console.log('a user connected')
+
+     socket.emit('loadGraph', graph)
 
     /**
      * On addLink event.
@@ -118,6 +124,8 @@ function editorServer (graphPath, opt) {
 
       // Add pipe.
       graph.pipe[key] = [data.from, data.to]
+
+      socket.emit('addLink', data)
 
       if (autosave) save(graph)
     }
@@ -141,6 +149,7 @@ function editorServer (graphPath, opt) {
         graph.view.node[key].ins = []
 
       graph.view.node[key].ins.push(content)
+
       if (autosave) save(graph)
     }
 
@@ -189,6 +198,8 @@ function editorServer (graphPath, opt) {
       // Associate node and task.
       graph.view.node[key].task = key
 
+      io.emit('addNode', data)
+
       if (autosave) save(graph)
     }
 
@@ -203,11 +214,13 @@ function editorServer (graphPath, opt) {
     function delLink (data) {
       log('delLink', data)
 
-      var key = data
+      var key = data.linkKey
 
       delete graph.link[key]
 
       delete graph.view.link[key]
+
+      socket.broadcast.emit('delLink', data)
 
       if (autosave) save(graph)
     }
@@ -223,11 +236,13 @@ function editorServer (graphPath, opt) {
     function delNode (data) {
       log('delNode', data)
 
-      var key = data
+      var key = data.nodeKey
 
       delete graph.node[key]
 
       delete graph.view.node[key]
+
+      socket.broadcast.emit('delNode', data)
 
       if (autosave) save(graph)
     }
@@ -243,15 +258,17 @@ function editorServer (graphPath, opt) {
     function moveNode (data) {
       log('moveNode', data)
 
-      Object.keys(data.node).forEach(function (key) {
-        var node = data.node[key]
+      var key = data.nodeKey
 
-        // Update view.
-        graph.view.node[key].x = node.x
-        graph.view.node[key].y = node.y
+      var node = data
 
-        if (autosave) save(graph)
-      })
+      // Update view.
+      graph.view.node[key].x = node.x
+      graph.view.node[key].y = node.y
+
+      socket.broadcast.emit('moveNode', data)
+
+      if (autosave) save(graph)
     }
 
     socket.on('moveNode', moveNode)
