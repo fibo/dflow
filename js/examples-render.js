@@ -6061,7 +6061,7 @@ module.exports = SVG
 
 },{"svg.draggable.js":5,"svg.foreignobject.js":6,"svg.js":7}],27:[function(require,module,exports){
 /**
- * @license ciao
+ * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
 
 var windowFunctions = require('../functions/window'),
@@ -6574,7 +6574,7 @@ exports.document = function _document () { return document }
 
 exports.body = function body () { return document.body }
 
-exportshead = function head () { return document.head }
+exports.head = function head () { return document.head }
 
 exports.window = function _window () { return window }
 
