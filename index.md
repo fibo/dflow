@@ -22,6 +22,11 @@ title: dflow
 
 [![Throughput Graph](https://graphs.waffle.io/fibo/dflow/throughput.svg)](https://waffle.io/fibo/dflow)
 
+## Status
+
+*dflow* is beta software: the engine is pretty much stable, the editor is usable but with an ugly webpage and collaborative editing feature is  buggy (: but I am proud and they will be fixed in version **1.0** :).
+Next step: start using *dflow*, improve editor look&feel, add more examples using the editor and go for a stable version.
+
 ## Installation
 
 ### Client side
@@ -178,7 +183,7 @@ A *graph* has the following properties
   * `.quz`, `.quz()`: returns a dot-operator-like function.
   * any taskName found in global context, walking throw dot operator, is available as a task. For example
     - `isFunction`
-    - `Math.cos` 
+    - `Math.cos`
     - `process.version`: will resolve to a function that returns it
 
 Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:
