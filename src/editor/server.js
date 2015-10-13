@@ -39,25 +39,25 @@ function logEvent (verbose, eventName, eventData) {
 
 function editorServer (graphPath, opt) {
   var graph   = require(graphPath),
-      nextKey = 0
+      nextId = 0
 
   /**
-   * Key generator.
+   * Id generator.
    *
    * @api private
    */
 
-  function getNextKey () {
-    var currentKey = ++nextKey + ''
+  function getNextId () {
+    var currentId = ++nextId + ''
 
-    // Make next key unique.
-    if (graph.task[currentKey])
-      return getNextKey()
+    // Make next id unique.
+    if (graph.task[currentId])
+      return getNextId()
 
-    if (graph.pipe[currentKey])
-      return getNextKey()
+    if (graph.pipe[currentId])
+      return getNextId()
 
-    return currentKey
+    return currentId
   }
 
   var save = saveGraph.bind(null, graphPath)
@@ -104,6 +104,7 @@ function editorServer (graphPath, opt) {
 
   io.on('connection', function (socket) {
 
+    if (verbose)
      console.log('a user connected')
 
      socket.emit('loadGraph', graph)
@@ -117,15 +118,16 @@ function editorServer (graphPath, opt) {
     function addLink (data) {
       log('addLink', data)
 
-      var key  = getNextKey()
+      var id = getNextId()
 
       // Add link to view.
-      graph.view.link[key] = data
+      graph.view.link[id] = data
 
       // Add pipe.
-      graph.pipe[key] = [data.from, data.to]
+      graph.pipe[id] = [data.from, data.to]
 
-      socket.emit('addLink', data)
+      data.id = id
+      io.emit('addLink', data)
 
       if (autosave) save(graph)
     }
@@ -141,14 +143,16 @@ function editorServer (graphPath, opt) {
     function addInput (data) {
       log('addInput', data)
 
-      var content  = data.content || {},
-          key      = data.nodeKey,
+      var content = data.content || {},
+          id      = data.nodeid,
           position = data.position
 
-      if (typeof graph.view.node[key].ins === 'undefined')
-        graph.view.node[key].ins = []
+      if (typeof graph.view.node[id].ins === 'undefined')
+        graph.view.node[id].ins = []
 
-      graph.view.node[key].ins.push(content)
+      graph.view.node[id].ins.push(content)
+
+      io.emit('addInput', data)
 
       if (autosave) save(graph)
     }
@@ -165,13 +169,15 @@ function editorServer (graphPath, opt) {
       log('addOutput', data)
 
       var content  = data.content || {},
-          key      = data.nodeKey,
+          id       = data.nodeid,
           position = data.position
 
-      if (typeof graph.view.node[key].outs === 'undefined')
-        graph.view.node[key].outs = []
+      if (typeof graph.view.node[id].outs === 'undefined')
+        graph.view.node[id].outs = []
 
-      graph.view.node[key].outs.push(content)
+      graph.view.node[id].outs.push(content)
+
+      io.emit('addOutput', data)
 
       if (autosave) save(graph)
     }
@@ -187,16 +193,16 @@ function editorServer (graphPath, opt) {
     function addNode (data) {
       log('addNode', data)
 
-      var key  = getNextKey()
+      var id  = getNextId()
 
       // Add node to view.
-      graph.view.node[key] = data
+      graph.view.node[id] = data
 
       // Add task.
-      graph.task[key] = data.text
+      graph.task[id] = data.text
 
       // Associate node and task.
-      graph.view.node[key].task = key
+      graph.view.node[id].task = id
 
       io.emit('addNode', data)
 
@@ -214,13 +220,13 @@ function editorServer (graphPath, opt) {
     function delLink (data) {
       log('delLink', data)
 
-      var key = data.linkKey
+      var id = data.linkid
 
-      delete graph.link[key]
+      delete graph.pipe[id]
 
-      delete graph.view.link[key]
+      delete graph.view.link[id]
 
-      socket.broadcast.emit('delLink', data)
+      io.emit('delLink', data)
 
       if (autosave) save(graph)
     }
@@ -236,13 +242,13 @@ function editorServer (graphPath, opt) {
     function delNode (data) {
       log('delNode', data)
 
-      var key = data.nodeKey
+      var id = data.nodeid
 
-      delete graph.node[key]
+      delete graph.task[id]
 
-      delete graph.view.node[key]
+      delete graph.view.node[id]
 
-      socket.broadcast.emit('delNode', data)
+      io.emit('delNode', data)
 
       if (autosave) save(graph)
     }
@@ -258,14 +264,16 @@ function editorServer (graphPath, opt) {
     function moveNode (data) {
       log('moveNode', data)
 
-      var key = data.nodeKey
+      var id = data.nodeid
 
       var node = data
 
       // Update view.
-      graph.view.node[key].x = node.x
-      graph.view.node[key].y = node.y
+      graph.view.node[id].x = node.x
+      graph.view.node[id].y = node.y
 
+      // The moveNode event is fired after that node is actually moved client side,
+      // so it should be sent back to all clients except the one that emitted it.
       socket.broadcast.emit('moveNode', data)
 
       if (autosave) save(graph)

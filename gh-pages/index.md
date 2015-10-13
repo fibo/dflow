@@ -3,7 +3,7 @@ title: dflow
 ---
 # dflow
 
-> Is a minimal [Dataflow programming](http://en.wikipedia.org/wiki/Dataflow_programming) engine.
+> Is a minimal [Dataflow programming][4] engine.
 
 **Table Of Contents:**
 
@@ -56,7 +56,8 @@ $ npm install
 $ npm start
 ```
 
-which will clone repo, install deps, and start the *dflow* cli. Then point your browser to *http://localhost:3000* and edit your *graph.json*.
+which will clone repo, install deps, and start the *dflow* cli.
+Then point your browser to *http://localhost:3000* and edit your *graph.json*.
 Note that opening another browser window on *http://localhost:3000* you can try the **collaborative editing** feature, powered by [Socket.IO](http://socket.io/)!
 
 ## Examples
@@ -108,7 +109,7 @@ Usage: dflow [options] [path/to/graph.json]
   -h, --help          print this message and exit
   -p, --port          server port number, defaults to 3000
   -v, --verbose       print events on stdout
-  -V, --version       print current version and exit
+  --version           print current version and exit
 
 For more info point your browser to http://g14n.info/dflow
 ```
@@ -190,9 +191,9 @@ Note that optional collection of *additionalFunctions*, in order to avoid confli
 *dflow* is [MIT](http://g14n.info/mit-license) licensed.
 
 It is developed in my spare time and, as far as I know, by now *I am my only user*.
-By the way, I got a stimulating feedback by [Stamplay](https://stamplay.com/) founder, who it is pretty much interested in using *dflow* maybe in the future. **Grazie** [Giuliano](http://www.giulianoiacobelli.com/), I hope you all the best.
+By the way, I got a stimulating feedback by [Stamplay](https://stamplay.com/)'s founder, who it is pretty much interested in using *dflow* maybe in the future. **Grazie** Giuliano, I hope you all the best.
 
-I wrote few times a dataflow engine, the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
+I wrote few times a [Dataflow engine][4], the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
 
 Use cases I can think about *dflow* right now are many, but, the possibilities are I.M.H.O. outstanding: from client to server, from JavaScript to cross language, from mono-thread to graphs distributed on a network and, above all, from skilled programmer who implement functions … to artists, genetic engineers, data scientists, etc. that use those functions to create *dflow* graphs and get results nobody could even imagine.
 
@@ -205,4 +206,5 @@ My goal is to say to a *dflow* user:
  [1]: http://g14n.info/flow-view "flow-view"
  [2]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
  [3]: https://github.com/fibo/dflow/blob/master/src/functions/builtin.js "builtin functions"
+ [4]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
 
