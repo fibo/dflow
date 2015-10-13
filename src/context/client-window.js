@@ -1,5 +1,5 @@
 /**
- * @license ciao
+ * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
 
 var windowFunctions = require('../functions/window'),
