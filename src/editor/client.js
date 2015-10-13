@@ -5,45 +5,70 @@ var request = new XMLHttpRequest(),
 var Canvas = require('flow-view').Canvas
 var canvas = new Canvas('flow')
 
-var events = ['addLink' , 'addNode',
-              'addInput', 'addOutput',
-              'delLink' , 'delNode'  , 'moveNode']
+var canvasMethods = ['addLink' , 'addNode',
+                     'delLink' , 'delNode']
 
-events.forEach(function (eventName) {
-  canvas.broker.removeAllListeners(eventName)
+canvasMethods.forEach(function (methodName) {
+  canvas.broker.removeAllListeners(methodName)
 
-  canvas.broker.on(eventName, function (ev) {
-    console.log(eventName, ev)
-    socket.emit(eventName, ev)
+  canvas.broker.on(methodName, function (ev) {
+    socket.emit(methodName, ev)
   })
 
-socket.on(eventName, function (data) {
-  console.log(eventName, data)
-  canvas[eventName](data)
+  socket.on(methodName, function (data) {
+    canvas[methodName](data)
+  })
 })
 
+var nodeMethods = ['addInput', 'addOutput']
+
+nodeMethods.forEach(function (methodName) {
+  canvas.broker.removeAllListeners(methodName)
+
+  canvas.broker.on(methodName, function (ev) {
+    socket.emit(methodName, ev)
+  })
+
+  socket.on(methodName, function (data) {
+    var id       = data.nodeid,
+        position = data.position
+
+    var node = canvas.node[id]
+
+    node[methodName](position)
+  })
+})
+
+canvas.broker.on('moveNode', function (ev) {
+  socket.emit('moveNode', ev)
+})
+
+socket.on('moveNode', function (data) {
+  var x  = data.x
+      y  = data.y
+
+  var node = canvas.node[data.nodeid]
+
+  node.group.move(x, y)
+
+  node.outs.forEach(function (output) {
+    Object.keys(output.link).forEach(function (id) {
+      var link = output.link[id]
+
+      if (link)
+        link.linePlot()
+    })
+  })
+
+  node.ins.forEach(function (input) {
+    var link = input.link
+
+    if (link)
+      link.linePlot()
+  })
 })
 
 socket.on('loadGraph', function (graph) {
-  console.log('loadGraph', graph)
   canvas.render(graph.view)
 })
 
-/*
-socket.on('addNode', function (data) {
-  console.log(data)
-  canvas.addNode(data)
-})
-
-socket.on('addLink', function (data) {
-  console.log(data)
-  canvas.addLink(data)
-})
-
-socket.on('addInput', function (data) {
-
-  console.log(data)
-  canvas.addInput(data)
-})
-
-*/
