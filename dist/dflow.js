@@ -313,7 +313,7 @@ exports.document = function _document () { return document }
 
 exports.body = function body () { return document.body }
 
-exportshead = function head () { return document.head }
+exports.head = function head () { return document.head }
 
 exports.window = function _window () { return window }
 
@@ -991,7 +991,7 @@ module.exports = walkGlobal
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],"dflow":[function(require,module,exports){
 /**
- * @license ciao
+ * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
 
 var windowFunctions = require('../functions/window'),

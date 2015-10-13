@@ -5319,7 +5319,7 @@ module.exports = types;
 
 },{}],29:[function(require,module,exports){
 /**
- * @license ciao
+ * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
 
 var windowFunctions = require('../functions/window'),
@@ -5862,7 +5862,7 @@ exports.document = function _document () { return document }
 
 exports.body = function body () { return document.body }
 
-exportshead = function head () { return document.head }
+exports.head = function head () { return document.head }
 
 exports.window = function _window () { return window }
 
