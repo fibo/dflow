@@ -152,9 +152,9 @@ It has the following signature.
 
 Actually *dflow* exposes also the following functions, available only inside a *dflow* graph:
 
-  * [dflow.fun](https://github.com/fibo/dflow/blob/master/src/fun.js)
-  * [dflow.isDflowFun](https://github.com/fibo/dflow/blob/master/src/isDflowFun.js)
-  * [dflow.validate](https://github.com/fibo/dflow/blob/master/src/validate.js)
+  * [dflow.fun](https://github.com/fibo/dflow/blob/master/src/engine/fun.js)
+  * [dflow.isDflowFun](https://github.com/fibo/dflow/blob/master/src/engine/isDflowFun.js)
+  * [dflow.validate](https://github.com/fibo/dflow/blob/master/src/engine/validate.js)
 
 ## Specification
 
@@ -210,6 +210,6 @@ My goal is to say to a *dflow* user:
 
  [1]: http://g14n.info/flow-view "flow-view"
  [2]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
- [3]: https://github.com/fibo/dflow/blob/master/src/functions/builtin.js "builtin functions"
+ [3]: https://github.com/fibo/dflow/blob/master/src/engine/functions/builtin.js "builtin functions"
  [4]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
 
