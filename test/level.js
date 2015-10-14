@@ -1,5 +1,5 @@
 
-var level  = require('../src/level'),
+var level  = require('../src/engine/level'),
     should = require('should')
 
 var pipe = {

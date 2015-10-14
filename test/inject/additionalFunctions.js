@@ -1,5 +1,5 @@
 
-var injectAdditionalFunctions = require('../../src/inject/additionalFunctions'),
+var injectAdditionalFunctions = require('../../src/engine/inject/additionalFunctions'),
     should                    = require('should')
 
 describe('injectAdditionalFunctions', function () {

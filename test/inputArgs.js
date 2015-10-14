@@ -1,5 +1,5 @@
 
-var inputArgs = require('../src/inputArgs'),
+var inputArgs = require('../src/engine/inputArgs'),
     should    = require('should')
 
 var pipe = {

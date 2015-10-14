@@ -1,7 +1,7 @@
 
 var examples   = require('../src/examples'),
-    fun        = require('../src/fun'),
-    isDflowFun = require('../src/isDflowFun'),
+    fun        = require('../src/engine/fun'),
+    isDflowFun = require('../src/engine/isDflowFun'),
     should     = require('should')
 
 describe('isDflowFun', function () {

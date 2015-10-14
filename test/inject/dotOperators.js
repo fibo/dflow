@@ -1,5 +1,5 @@
 
-var injectDotOperators = require('../../src/inject/dotOperators'),
+var injectDotOperators = require('../../src/engine/inject/dotOperators'),
     should             = require('should')
 
 describe('injectDotOperators', function () {
