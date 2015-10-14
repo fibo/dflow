@@ -1,5 +1,5 @@
 
-var injectGlobals = require('../../src/inject/globals'),
+var injectGlobals = require('../../src/engine/inject/globals'),
     should        = require('should')
 
 describe('injectGlobals', function () {

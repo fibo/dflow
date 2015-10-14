@@ -1,7 +1,7 @@
 
 var fs = require('fs')
 
-var emptyGraph = require('../src/emptyGraph.json')
+var emptyGraph = require('./emptyGraph.json')
 
   /**
   *

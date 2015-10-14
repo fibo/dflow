@@ -1,5 +1,5 @@
 
-var injectAccessors = require('../../src/inject/accessors'),
+var injectAccessors = require('../../src/engine/inject/accessors'),
     should          = require('should')
 
 describe('injectAccessors', function () {

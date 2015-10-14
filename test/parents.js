@@ -1,5 +1,5 @@
 
-var parents = require('../src/parents'),
+var parents = require('../src/engine/parents'),
     should  = require('should')
 
 var pipe = {
@@ -27,7 +27,7 @@ describe('parentsOf', function () {
       'a': [ '0', '1', 0 ],
       'b': [ '0', '1', 1 ]
     }
-    
+
     parentsOf('1').should.eql(['0']) // not ['0', '0']
   })
 })

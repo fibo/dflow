@@ -1,6 +1,6 @@
 
-var should = require('should')
-var inputPipes = require('../src/inputPipes')
+var should     = require('should'),
+    inputPipes = require('../src/engine/inputPipes')
 
 var pipe = {
       'a': [ '0', '1' ],

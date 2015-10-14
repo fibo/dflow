@@ -1,6 +1,6 @@
 
 var should = require('should'),
-    fun    = require('../src/fun')
+    fun    = require('../src/engine/fun')
 
 var graph = {
   task: {
