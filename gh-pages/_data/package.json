@@ -20,7 +20,7 @@
     "browserify:client": "browserify -e src/editor/client.js -o src/editor/public/dflow-editor.js",
     "browserify:dist": "browserify -r ./src/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
     "browserify:test": "browserify test/*js -o gh-pages/test/bundle.js",
-    "browserify:examples": "browserify -r ./src/examples/render.js:examples-render -o gh-pages/js/examples-render.js",
+    "browserify:examples": "browserify -r ./src/examples/renderer.js:examples-renderer -o gh-pages/js/examples-renderer.js",
     "coverage": "npm run istanbul && npm run coveralls",
     "coveralls": "cat ./coverage/lcov.info | coveralls --verbose",
     "cp": "npm run cp:dist; npm run cp:package.json",
