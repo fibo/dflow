@@ -8,7 +8,7 @@ var fs   = require('fs'),
 
 var pkg = require('../package.json')
 
-var createEmptyGraph = require('../src/createEmptyGraph'),
+var createEmptyGraph = require('../src/engine/createEmptyGraph'),
     editorServer     = require('../src/editor/server')
 
 // Process arguments.

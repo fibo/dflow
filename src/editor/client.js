@@ -1,74 +1,83 @@
 
-var request = new XMLHttpRequest(),
-    socket = io()
+var fs = require('fs')
+var insertCss = require('insert-css')
+var socket = io()
 
-var Canvas = require('flow-view').Canvas
-var canvas = new Canvas('flow')
+var normalize = fs.readFileSync(__dirname + '/../../node_modules/normalize.css/normalize.css')
+insertCss(normalize)
 
-var canvasMethods = ['addLink' , 'addNode',
-                     'delLink' , 'delNode']
+var style = fs.readFileSync(__dirname + '/style.css')
+insertCss(style)
 
-canvasMethods.forEach(function (methodName) {
-  canvas.broker.removeAllListeners(methodName)
+window.onload = function () {
+  var Canvas = require('flow-view').Canvas
+  var canvas = new Canvas('flow')
 
-  canvas.broker.on(methodName, function (ev) {
-    socket.emit(methodName, ev)
+  var canvasMethods = ['addLink' , 'addNode',
+                       'delLink' , 'delNode']
+
+  canvasMethods.forEach(function (methodName) {
+    canvas.broker.removeAllListeners(methodName)
+
+    canvas.broker.on(methodName, function (ev) {
+      socket.emit(methodName, ev)
+    })
+
+    socket.on(methodName, function (data) {
+      canvas[methodName](data)
+    })
   })
 
-  socket.on(methodName, function (data) {
-    canvas[methodName](data)
+  var nodeMethods = ['addInput', 'addOutput']
+
+  nodeMethods.forEach(function (methodName) {
+    canvas.broker.removeAllListeners(methodName)
+
+    canvas.broker.on(methodName, function (ev) {
+      socket.emit(methodName, ev)
+    })
+
+    socket.on(methodName, function (data) {
+      var id       = data.nodeid,
+          position = data.position
+
+      var node = canvas.node[id]
+
+      node[methodName](position)
+    })
   })
-})
 
-var nodeMethods = ['addInput', 'addOutput']
-
-nodeMethods.forEach(function (methodName) {
-  canvas.broker.removeAllListeners(methodName)
-
-  canvas.broker.on(methodName, function (ev) {
-    socket.emit(methodName, ev)
+  canvas.broker.on('moveNode', function (ev) {
+    socket.emit('moveNode', ev)
   })
 
-  socket.on(methodName, function (data) {
-    var id       = data.nodeid,
-        position = data.position
+  socket.on('moveNode', function (data) {
+    var x  = data.x
+        y  = data.y
 
-    var node = canvas.node[id]
+    var node = canvas.node[data.nodeid]
 
-    node[methodName](position)
-  })
-})
+    node.group.move(x, y)
 
-canvas.broker.on('moveNode', function (ev) {
-  socket.emit('moveNode', ev)
-})
+    node.outs.forEach(function (output) {
+      Object.keys(output.link).forEach(function (id) {
+        var link = output.link[id]
 
-socket.on('moveNode', function (data) {
-  var x  = data.x
-      y  = data.y
+        if (link)
+          link.linePlot()
+      })
+    })
 
-  var node = canvas.node[data.nodeid]
-
-  node.group.move(x, y)
-
-  node.outs.forEach(function (output) {
-    Object.keys(output.link).forEach(function (id) {
-      var link = output.link[id]
+    node.ins.forEach(function (input) {
+      var link = input.link
 
       if (link)
         link.linePlot()
     })
   })
 
-  node.ins.forEach(function (input) {
-    var link = input.link
-
-    if (link)
-      link.linePlot()
+  socket.on('loadGraph', function (graph) {
+    canvas.render(graph.view)
   })
-})
-
-socket.on('loadGraph', function (graph) {
-  canvas.render(graph.view)
-})
+}
 
