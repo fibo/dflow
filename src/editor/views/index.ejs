@@ -1,15 +1,17 @@
 <!DOCTYPE>
-<html>
-  <head>
+<html lang="en">
+   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="dflow editor v<%= version %>">
+
+    <title>dflow editor</title>
+
     <script src="/socket.io/socket.io.js"></script>
+
+    <script src="/bundle.js"></script>
   </head>
-
   <body>
-    <h1>dflow editor v<%= version %></h1>
-    <h2>Editing graph <%= graphPath %></h2>
-
     <div id="flow"></div>
-
-    <script type="text/javascript" src="/dflow-editor.js"></script>
   </body>
 </html>
