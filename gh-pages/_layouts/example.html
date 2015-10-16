@@ -7,16 +7,21 @@
 {% include navbar.html %}
 
   <div class="container">
-
+    <h1>{{ page.title }}</h1>
+    <blockquote>{{ page.description }}</blockquote>
     {{ content }}
-
   </div>
 
-  <div id="example-graph"></div>
+  <div class="container">
+    <div id="example-graph"
+         class="dflow-graph"
+         style="height: {{ page.graph.height }}px;"
+    ></div>
+  </div>
 
   <script type="text/javascript" src="../js/examples-renderer.js"></script>
   <script type="text/javascript">
-    require('examples-renderer')('example-graph', '{{ page.graph }}')
+    require('examples-renderer')('example-graph', '{{ page.graph.name }}')
   </script>
 
 {% include footer.html %}

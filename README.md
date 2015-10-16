@@ -21,8 +21,16 @@
 
 ## Status
 
-*dflow* is beta software: the engine is pretty much stable, the editor is usable but with an ugly webpage and collaborative editing feature is  buggy (: but I am proud and they will be fixed in version **1.0** :).
-Next step: start using *dflow*, improve editor look&feel, add more examples using the editor and go for a stable version.
+*dflow* is beta software.
+The editor is usable but with no css (help me!) and collaborative editing feature is working but buggy (I am proud of my bugs and they will be fixed in version **1.0** :).
+The engine is almost stable.
+
+Next steps:
+
+* start using *dflow*,
+* improve editor look&feel,
+* add more examples using the editor
+* and go for a stable version!
 
 ## Installation
 
@@ -60,7 +68,7 @@ $ npm start
 
 which will clone repo, install deps, and start the *dflow* cli.
 Then point your browser to *http://localhost:3000* and edit your *graph.json*.
-Note that opening another browser window on *http://localhost:3000* you can try the **collaborative editing** feature, powered by [Socket.IO](http://socket.io/)!
+Note that by opening another browser window you can try the **collaborative editing** feature, powered by [Socket.IO](http://socket.io/)!
 
 ## Examples
 
@@ -68,11 +76,13 @@ Note that opening another browser window on *http://localhost:3000* you can try 
 
 The following simple graph is executed client side by *dflow* engine.
 
-[![HelloWorld](http://g14n.info/dflow/examples/hello-world.png)][2]
+<style>.example-preview { border-style: groove; width: 300px;}</style>
 
-### Client side
+[<div id="hello-world" class="example-preview"><svg id="SvgjsSvg1000" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="220" style="left: 0px; top: 0px;"><defs id="SvgjsDefs1001"></defs><foreignObject id="flow-view-selector" width="200" height="100" x="0" y="0" style="display: none;"><form id="flow-view-selector-form" name="nodecreator"><input id="flow-view-selector-input" name="selectnode" type="text"></form></foreignObject><g id="SvgjsG1008"></g><g id="SvgjsG1009" transform="matrix(1,0,0,1,270,10)" style="display: none;"><line id="SvgjsLine1010" x1="0" y1="5" x2="10" y2="5" stroke="#333333" stroke-width="3"></line><line id="SvgjsLine1011" x1="5" y1="0" x2="5" y2="10" stroke="#333333" stroke-width="3"></line></g><g id="SvgjsG1012"></g><g id="SvgjsG1013" transform="matrix(1,0,0,1,270,160)" style="display: none;"><line id="SvgjsLine1014" x1="0" y1="5" x2="10" y2="5" stroke="#333333" stroke-width="3"></line><line id="SvgjsLine1015" x1="5" y1="0" x2="5" y2="10" stroke="#333333" stroke-width="3"></line></g><g id="SvgjsG1016"></g><g id="SvgjsG1017" transform="matrix(1,0,0,1,730,0)" style="display: none;"><line id="SvgjsLine1018" x1="0" y1="0" x2="10" y2="10" stroke="#333333" stroke-width="3"></line><line id="SvgjsLine1019" x1="0" y1="10" x2="10" y2="0" stroke="#333333" stroke-width="3"></line></g><g id="SvgjsG1020" transform="matrix(1,0,0,1,80,20)"><rect id="SvgjsRect1021" width="150" height="40" fill="#cccccc"></rect><text id="SvgjsText1022" font-family="Helvetica, Arial, sans-serif" fill="#333333" x="10" y="2.203125"><tspan id="SvgjsTspan1023" dy="20.8" x="10">@message</tspan></text><rect id="SvgjsRect1024" width="10" height="10" x="0" y="30" fill="#333333"></rect></g><g id="SvgjsG1025" transform="matrix(1,0,0,1,80,150)"><rect id="SvgjsRect1026" width="150" height="40" fill="#cccccc"></rect><text id="SvgjsText1027" font-family="Helvetica, Arial, sans-serif" fill="#333333" x="10" y="2.203125"><tspan id="SvgjsTspan1028" dy="20.8" x="10">console.log</tspan></text><rect id="SvgjsRect1029" width="10" height="10" x="0" y="0" fill="#333333"></rect></g><line id="SvgjsLine1040" x1="85" y1="55" x2="85" y2="155" stroke="#333333" stroke-width="3"></line></svg></div>][2]
 
-See [example/client-side.html](http://g14n.info/dflow/examples/client-side.html) for another working example of *dflow* in a browser context.
+### RequireBin
+
+An example of *dflow* in a browser context, testing DOM manipulation.
 
 [![view on requirebin](http://requirebin.com/badge.png)](http://requirebin.com/?gist=45520011e093d6dfec9f)
 

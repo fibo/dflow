@@ -1,5 +1,6 @@
 
-body {
-	    background-color: snow;
+.dflow-graph {
+	background-color: snow;
+	border-style: groove;
 }
 
