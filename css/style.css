@@ -1,16 +1,6 @@
 
-#example-graph {
-	height: 500px;
-}
-
-/* fix mocha stats style */
-
-#mocha-stats {
-	top: 55px !important;
-}
-
-#mocha-stats li.progress {
-	height: 40px;
-	width: 40px;
+.dflow-graph {
+	background-color: snow;
+	border-style: groove;
 }
 
