@@ -23,9 +23,10 @@
     "browserify:examples": "browserify -r ./src/examples/renderer.js:examples-renderer -o gh-pages/js/examples-renderer.js",
     "coverage": "npm run istanbul && npm run coveralls",
     "coveralls": "cat ./coverage/lcov.info | coveralls --verbose",
-    "cp": "npm run cp:dist; npm run cp:package.json",
+    "cp": "npm run cp:dist; npm run cp:package.json; npm run cp:style.css",
     "cp:dist": "cp -r dist/ gh-pages/",
     "cp:package.json": "cp package.json gh-pages/_data/",
+    "cp:style.css": "cp src/editor/style.css gh-pages/css/",
     "gh-pages:push": "git subtree --prefix gh-pages push origin gh-pages",
     "gh-pages:pull": "git subtree --prefix gh-pages pull origin gh-pages",
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
@@ -60,6 +61,7 @@
     "istanbul": "^0.3.14",
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "0.0.2",
+    "normalize.css": "^3.0.3",
     "should": "^7.1.0",
     "uglify-js": "^2.4.24"
   }

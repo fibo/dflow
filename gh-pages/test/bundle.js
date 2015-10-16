@@ -6415,7 +6415,7 @@ module.exports={
         "w": 15,
         "task": "1",
         "text": "@message",
-        "outs": [{"name": "out0", "data": 1}]
+        "outs": [{"name": "out0"}]
       },
       "2": {
         "x": 80,
@@ -6423,20 +6423,13 @@ module.exports={
         "w": 15,
         "task": "2",
         "text": "console.log",
-        "ins": [{"name": "in0", "data": 2}]
-      },
-      "comment": {
-        "x": 280,
-        "y": 10,
-        "w": 45,
-        "h": 4,
-        "text": "This is a comment ...\n  * you can drag a node,\n  * delete it by pressing the x button,\n * add inputs and outputs by pressing a + button\n * connect them by dragging an output to an input to create a link.\n Double click on the canvas,\n to open an input text and create a new node."
+        "ins": [{"name": "in0"}]
       }
-   },
-   "link": {
-     "3": {
-       "from": ["1", 0],
-       "to": ["2", 0]
+    },
+    "link": {
+      "3": {
+        "from": ["1", 0],
+        "to": ["2", 0]
       }
     }
   }
