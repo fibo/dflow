@@ -24,8 +24,16 @@ title: dflow
 
 ## Status
 
-*dflow* is beta software: the engine is pretty much stable, the editor is usable but with an ugly webpage and collaborative editing feature is  buggy (: but I am proud and they will be fixed in version **1.0** :).
-Next step: start using *dflow*, improve editor look&feel, add more examples using the editor and go for a stable version.
+*dflow* is beta software.
+The editor is usable but with no css (help me!) and collaborative editing feature is working but buggy (I am proud of my bugs and they will be fixed in version **1.0** :).
+The engine is almost stable.
+
+Next steps:
+
+* start using *dflow*,
+* improve editor look&feel,
+* add more examples using the editor
+* and go for a stable version!
 
 ## Installation
 
@@ -63,7 +71,7 @@ $ npm start
 
 which will clone repo, install deps, and start the *dflow* cli.
 Then point your browser to *http://localhost:3000* and edit your *graph.json*.
-Note that opening another browser window on *http://localhost:3000* you can try the **collaborative editing** feature, powered by [Socket.IO](http://socket.io/)!
+Note that by opening another browser window you can try the **collaborative editing** feature, powered by [Socket.IO](http://socket.io/)!
 
 ## Examples
 
@@ -114,6 +122,7 @@ Launch *dflow* from command line, and start editing your first graph using your 
 Usage: dflow [options] [path/to/graph.json]
 
   -h, --help          print this message and exit
+  --indentJSON        indent saved JSON graph
   -p, --port          server port number, defaults to 3000
   -v, --verbose       print events on stdout
   --version           print current version and exit

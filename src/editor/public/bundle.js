@@ -7887,7 +7887,7 @@ insertCss(style)
 
 window.onload = function () {
   var Canvas = require('flow-view').Canvas
-  var canvas = new Canvas('flow')
+  var canvas = new Canvas('dflow-graph')
 
   var canvasMethods = ['addLink' , 'addNode',
                        'delLink' , 'delNode']
