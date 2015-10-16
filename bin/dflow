@@ -15,6 +15,7 @@ var createEmptyGraph = require('../src/engine/createEmptyGraph'),
 
 var knownOpts = {
       help: Boolean,
+      indentJSON: Boolean,
       port: Number,
       version: Boolean
     },
@@ -31,6 +32,7 @@ var opt = nopt(knownOpts, shortHandOpts, process.argv, 2)
 if (opt.help) {
   console.log('Usage: dflow [options] [path/to/graph.json]\n')
   console.log('  -h, --help          print this message and exit')
+  console.log('  --indentJSON        indent saved JSON graph')
   console.log('  -p, --port          server port number, defaults to 3000')
   console.log('  -v, --verbose       print events on stdout')
   console.log('  --version           print current version and exit')

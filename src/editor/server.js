@@ -6,7 +6,8 @@ var pkg = require('../../package.json')
 var defaultOpt = {
   autosave: true,
   port: 3000,
-  verbose: false // Silence is gold.
+  verbose: false, // Silence is gold.
+  indentJSON: false
 }
 
 /**
@@ -15,8 +16,12 @@ var defaultOpt = {
  * @api private
  */
 
-function saveGraph (graphPath, graph, callback) {
-  var jsonString = JSON.stringify(graph)
+function saveGraph (graphPath, indentJSON, graph, callback) {
+  var indentLevel = 0
+
+  if (indentJSON) indentLevel = 2
+
+  var jsonString = JSON.stringify(graph, null, indentLevel)
 
   fs.writeFile(graphPath, jsonString, 'utf8', function (err) {
     if (err) throw err
@@ -38,8 +43,15 @@ function logEvent (verbose, eventName, eventData) {
 }
 
 function editorServer (graphPath, opt) {
-  var graph   = require(graphPath),
+  var graph  = require(graphPath),
       nextId = 0
+
+  // Default options.
+
+  var autosave   = opt.autosave   || defaultOpt.autosave,
+      indentJSON = opt.indentJSON || defaultOpt.indentJSON,
+      port       = opt.port       || defaultOpt.port,
+      verbose    = opt.verbose    || defaultOpt.verbose
 
   /**
    * Id generator.
@@ -60,8 +72,6 @@ function editorServer (graphPath, opt) {
     return currentId
   }
 
-  var save = saveGraph.bind(null, graphPath)
-
   var bodyParser = require('body-parser'),
       express    = require('express'),
       ejs        = require('ejs'),
@@ -71,11 +81,7 @@ function editorServer (graphPath, opt) {
       http = require('http').Server(app),
       io   = require('socket.io')(http)
 
-  // Default options.
-
-  var autosave = opt.autosave || defaultOpt.autosave,
-      port     = opt.port     || defaultOpt.port,
-      verbose  = opt.verbose  || defaultOpt.verbose
+  var save = saveGraph.bind(null, graphPath, indentJSON)
 
   var log = logEvent.bind(null, verbose)
 
@@ -290,6 +296,13 @@ function editorServer (graphPath, opt) {
 
       if (autosave)
         console.log('Option autosave is on')
+      else
+        console.log('Option autosave is off')
+
+      if (indentJSON)
+        console.log('Option indentJSON is on')
+      else
+        console.log('Option indentJSON is off')
 
       console.log('Editing graph ' + graphPath)
     }

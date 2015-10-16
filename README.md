@@ -119,6 +119,7 @@ Launch *dflow* from command line, and start editing your first graph using your 
 Usage: dflow [options] [path/to/graph.json]
 
   -h, --help          print this message and exit
+  --indentJSON        indent saved JSON graph
   -p, --port          server port number, defaults to 3000
   -v, --verbose       print events on stdout
   --version           print current version and exit
