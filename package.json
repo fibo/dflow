@@ -12,7 +12,7 @@
   "main": "index.js",
   "browser": "./src/engine/context/client-window.js",
   "scripts": {
-    "start": "node bin/dflow",
+    "start": "node bin/dflow --verbose",
     "_build": "npm test && npm run browserify && npm run minify && npm run jekyll; git status",
     "_push": "git push origin master && npm run gh-pages:push",
     "_pull": "git pull origin master && npm run gh-pages:pull",
@@ -56,7 +56,7 @@
     "brfs": "^1.4.1",
     "browserify": "*",
     "coveralls": "^2.11.2",
-    "flow-view": "^0.6.1",
+    "flow-view": "^0.6.2",
     "insert-css": "^0.2.0",
     "istanbul": "^0.3.14",
     "mocha": "^2.3.3",

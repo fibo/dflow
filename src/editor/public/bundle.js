@@ -6559,6 +6559,17 @@ function render (view) {
 
 Canvas.prototype.render = render
 
+function deleteView () {
+
+  var link = this.link,
+      node = this.node
+
+  Object.keys(node).forEach(function (id) { node[id].deleteView() })
+  Object.keys(link).forEach(function (id) { link[id].deleteView() })
+}
+
+Canvas.prototype.deleteView = deleteView
+
 /**
  * Get model.
  *
@@ -6954,7 +6965,7 @@ function render (view) {
   group.on('dragend', dragend)
 
   function dragmove () {
-    // First time node is clicked, dragMoves will be eqal to zero.
+    // First time node is clicked, dragMoves will be equal to zero.
     dragMoves++
 
     self.outs.forEach(function (output) {
@@ -7953,6 +7964,7 @@ window.onload = function () {
   })
 
   socket.on('loadGraph', function (graph) {
+    canvas.deleteView()
     canvas.render(graph.view)
   })
 }
