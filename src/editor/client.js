@@ -77,6 +77,7 @@ window.onload = function () {
   })
 
   socket.on('loadGraph', function (graph) {
+    canvas.deleteView()
     canvas.render(graph.view)
   })
 }
