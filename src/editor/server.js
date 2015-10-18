@@ -4,7 +4,6 @@ var fs = require('fs')
 var pkg = require('../../package.json')
 
 var defaultOpt = {
-  autosave: true,
   port: 3000,
   verbose: false, // Silence is gold.
   indentJSON: false
@@ -48,8 +47,7 @@ function editorServer (graphPath, opt) {
 
   // Default options.
 
-  var autosave   = opt.autosave   || defaultOpt.autosave,
-      indentJSON = opt.indentJSON || defaultOpt.indentJSON,
+  var indentJSON = opt.indentJSON || defaultOpt.indentJSON,
       port       = opt.port       || defaultOpt.port,
       verbose    = opt.verbose    || defaultOpt.verbose
 
@@ -100,12 +98,6 @@ function editorServer (graphPath, opt) {
     res.render('index', {graphPath: graphPath, version: pkg.version})
   })
 
-  /*
-  app.get('/graph.json', function (req, res) {
-      res.json(graph)
-  })
-  */
-
   // Socket.IO events.
 
   io.on('connection', function (socket) {
@@ -135,7 +127,7 @@ function editorServer (graphPath, opt) {
       data.id = id
       io.emit('addLink', data)
 
-      if (autosave) save(graph)
+      save(graph)
     }
 
     socket.on('addLink', addLink)
@@ -160,7 +152,7 @@ function editorServer (graphPath, opt) {
 
       io.emit('addInput', data)
 
-      if (autosave) save(graph)
+      save(graph)
     }
 
     socket.on('addInput', addInput)
@@ -185,7 +177,7 @@ function editorServer (graphPath, opt) {
 
       io.emit('addOutput', data)
 
-      if (autosave) save(graph)
+      save(graph)
     }
 
     socket.on('addOutput', addOutput)
@@ -212,7 +204,7 @@ function editorServer (graphPath, opt) {
 
       io.emit('addNode', data)
 
-      if (autosave) save(graph)
+      save(graph)
     }
 
     socket.on('addNode', addNode)
@@ -234,7 +226,7 @@ function editorServer (graphPath, opt) {
 
       io.emit('delLink', data)
 
-      if (autosave) save(graph)
+      save(graph)
     }
 
     socket.on('delLink', delLink)
@@ -256,7 +248,7 @@ function editorServer (graphPath, opt) {
 
       io.emit('delNode', data)
 
-      if (autosave) save(graph)
+      save(graph)
     }
 
     socket.on('delNode', delNode)
@@ -282,7 +274,7 @@ function editorServer (graphPath, opt) {
       // so it should be sent back to all clients except the one that emitted it.
       socket.broadcast.emit('moveNode', data)
 
-      if (autosave) save(graph)
+      save(graph)
     }
 
     socket.on('moveNode', moveNode)
@@ -293,11 +285,6 @@ function editorServer (graphPath, opt) {
   http.listen(port, function () {
     if (verbose) {
       console.log('Listening on port ' + port)
-
-      if (autosave)
-        console.log('Option autosave is on')
-      else
-        console.log('Option autosave is off')
 
       if (indentJSON)
         console.log('Option indentJSON is on')
