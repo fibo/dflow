@@ -67,9 +67,6 @@ function fun (graph, additionalFunctions) {
         outs = {},
         returnValue
 
-    var startMessage = 'fun start'
-    if (typeof graph.info !== 'undefined') startMessage += graph.info
-
     var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
     // Inject run-time builtin tasks.
