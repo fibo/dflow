@@ -19,6 +19,7 @@
     "browserify": "npm run browserify:client; npm run browserify:dist; npm run browserify:examples; npm run browserify:test",
     "browserify:client": "npm run browserify:client:edit",
     "browserify:client:edit": "browserify -e src/editor/client/edit.js -t brfs -o src/editor/public/edit.js",
+    "browserify:client:run": "browserify -e src/editor/client/run.js -t brfs -o src/editor/public/run.js",
     "browserify:dist": "browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
     "browserify:test": "browserify test/*.js -o gh-pages/test/bundle.js",
     "browserify:examples": "browserify -r ./src/examples/renderer.js:examples-renderer -o gh-pages/js/examples-renderer.js",
