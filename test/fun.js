@@ -77,7 +77,6 @@ describe('fun', function () {
         }
 
     var f = fun(graph)
-
   })
 })
 

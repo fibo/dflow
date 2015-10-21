@@ -6105,6 +6105,7 @@ var builtinFunctions          = require('./functions/builtin'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
+    subgraph                  = require('./regex/subgraph'),
     validate                  = require('./validate')
 
 /**
@@ -6129,15 +6130,6 @@ function fun (graph, additionalFunctions) {
       computeLevelOf = level.bind(null, pipe, cachedLevelOf),
       funcs          = builtinFunctions
 
-  /**
-   * Compile each sub graph.
-   */
-
-  function compileSubgraph (key) {
-    if (typeof funcs[key] === 'undefined')
-      funcs[key] = fun(graph.func[key], additionalFunctions)
-  }
-
   // Inject compile-time builtin tasks.
 
   funcs['dflow.fun']        = fun
@@ -6149,6 +6141,18 @@ function fun (graph, additionalFunctions) {
   injectAdditionalFunctions(funcs, additionalFunctions)
   injectDotOperators(funcs, task)
   injectReferences(funcs, task)
+
+  /**
+   * Compile each sub graph.
+   */
+
+  function compileSubgraph (key) {
+    var subGraph = graph.func[key]
+
+    var funcName = '/' + key
+
+    funcs[funcName] = fun(subGraph, additionalFunctions)
+  }
 
   Object.keys(func)
         .forEach(compileSubgraph)
@@ -6227,7 +6231,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./functions/builtin":29,"./inject/accessors":31,"./inject/additionalFunctions":32,"./inject/arguments":33,"./inject/dotOperators":34,"./inject/globals":35,"./inject/references":36,"./inputArgs":37,"./isDflowFun":39,"./level":40,"./validate":46}],29:[function(require,module,exports){
+},{"./functions/builtin":29,"./inject/accessors":31,"./inject/additionalFunctions":32,"./inject/arguments":33,"./inject/dotOperators":34,"./inject/globals":35,"./inject/references":36,"./inputArgs":37,"./isDflowFun":39,"./level":40,"./regex/subgraph":46,"./validate":47}],29:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -6687,7 +6691,7 @@ function injectGlobals (funcs, task) {
 module.exports = injectGlobals
 
 
-},{"../walkGlobal":47}],36:[function(require,module,exports){
+},{"../walkGlobal":48}],36:[function(require,module,exports){
 
 var referenceRegex = require('../regex/reference'),
     walkGlobal     = require('../walkGlobal')
@@ -6738,7 +6742,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"../regex/reference":45,"../walkGlobal":47}],37:[function(require,module,exports){
+},{"../regex/reference":45,"../walkGlobal":48}],37:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6828,7 +6832,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":46}],40:[function(require,module,exports){
+},{"./validate":47}],40:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -6917,10 +6921,16 @@ module.exports = /^\&(.+)$/
 
 },{}],46:[function(require,module,exports){
 
+module.exports = /^\/(.+)$/
+
+
+},{}],47:[function(require,module,exports){
+
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
     dotOperatorRegex = require('./regex/dotOperator'),
     referenceRegex   = require('./regex/reference')
+    subgraphRegex    = require('./regex/subgraph')
 
 /**
  * Check graph consistency.
@@ -7033,7 +7043,29 @@ function validate (graph, additionalFunctions) {
       throw new Error('Duplicated pipe:', pipe[key])
   }
 
-  Object.keys(pipe).forEach(checkPipe)
+  Object.keys(pipe)
+        .forEach(checkPipe)
+
+  // Check that every subgraph referenced are defined.
+
+  function onlySubgraphs (key) {
+    var taskName = task[key]
+
+    return subgraphRegex.test(taskName)
+  }
+
+  function checkSubgraph (key) {
+    var taskName = task[key]
+
+    var funcName = taskName.substring(1)
+
+    if (typeof func[funcName] === 'undefined')
+      throw new Error('Undefined subgraph:', funcName)
+  }
+
+  Object.keys(task)
+        .filter(onlySubgraphs)
+        .forEach(checkSubgraph)
 
   // Recursively check subgraphs in func property.
 
@@ -7042,7 +7074,8 @@ function validate (graph, additionalFunctions) {
   }
 
   if (typeof func === 'object')
-    Object.keys(func).forEach(checkFunc)
+    Object.keys(func)
+          .forEach(checkFunc)
 
   return true
 }
@@ -7050,38 +7083,38 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":42,"./regex/argument":43,"./regex/dotOperator":44,"./regex/reference":45}],47:[function(require,module,exports){
+},{"./regex/accessor":42,"./regex/argument":43,"./regex/dotOperator":44,"./regex/reference":45,"./regex/subgraph":46}],48:[function(require,module,exports){
 (function (global){
 
-    var globalContext
+var globalContext
 
-    if (typeof window === 'object')
-      globalContext = window
+if (typeof window === 'object')
+  globalContext = window
 
-    if (typeof global === 'object')
-      globalContext = global
+if (typeof global === 'object')
+  globalContext = global
 
-    /**
-     * Walk through global context.
-     *
-     * process.version will return global[process][version]
-     *
-     * @param {String} taskName
-     * @returns {*} leaf
-     */
+/**
+ * Walk through global context.
+ *
+ * process.version will return global[process][version]
+ *
+ * @param {String} taskName
+ * @returns {*} leaf
+ */
 
-    function walkGlobal (taskName) {
-      function toNextProp (leaf, prop) { return leaf[prop] }
+function walkGlobal (taskName) {
+   function toNextProp (next, prop) { return next[prop] }
 
-      return taskName.split('.')
-                     .reduce(toNextProp, globalContext)
-    }
+  return taskName.split('.')
+                 .reduce(toNextProp, globalContext)
+}
 
 module.exports = walkGlobal
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "&isFinite",
@@ -7106,7 +7139,7 @@ module.exports={
   }
 }
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7127,7 +7160,7 @@ module.exports={
   }
 }
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -7168,7 +7201,7 @@ module.exports={
   }
 }
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7195,7 +7228,7 @@ module.exports={
   }
 }
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7218,7 +7251,7 @@ module.exports={
   }
 }
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7241,7 +7274,7 @@ module.exports={
   }
 }
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 
 exports.apply          = require('./graph/apply.json')
 exports.dateParse      = require('./graph/dateParse.json')
@@ -7251,7 +7284,7 @@ exports.or             = require('./graph/or.json')
 exports.sum            = require('./graph/sum.json')
 
 
-},{"./graph/apply.json":48,"./graph/dateParse.json":49,"./graph/hello-world.json":50,"./graph/indexOf.json":51,"./graph/or.json":52,"./graph/sum.json":53}],"examples-renderer":[function(require,module,exports){
+},{"./graph/apply.json":49,"./graph/dateParse.json":50,"./graph/hello-world.json":51,"./graph/indexOf.json":52,"./graph/or.json":53,"./graph/sum.json":54}],"examples-renderer":[function(require,module,exports){
 
 var Canvas   = require('flow-view').Canvas,
     dflow    = require('dflow'),
@@ -7281,4 +7314,4 @@ function renderExample (divId, example) {
 module.exports = renderExample
 
 
-},{"./index":54,"dflow":2,"flow-view":3}]},{},[]);
+},{"./index":55,"dflow":2,"flow-view":3}]},{},[]);
