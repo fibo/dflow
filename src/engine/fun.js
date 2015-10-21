@@ -9,6 +9,7 @@ var builtinFunctions          = require('./functions/builtin'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
+    subgraph                  = require('./regex/subgraph'),
     validate                  = require('./validate')
 
 /**
@@ -33,15 +34,6 @@ function fun (graph, additionalFunctions) {
       computeLevelOf = level.bind(null, pipe, cachedLevelOf),
       funcs          = builtinFunctions
 
-  /**
-   * Compile each sub graph.
-   */
-
-  function compileSubgraph (key) {
-    if (typeof funcs[key] === 'undefined')
-      funcs[key] = fun(graph.func[key], additionalFunctions)
-  }
-
   // Inject compile-time builtin tasks.
 
   funcs['dflow.fun']        = fun
@@ -53,6 +45,18 @@ function fun (graph, additionalFunctions) {
   injectAdditionalFunctions(funcs, additionalFunctions)
   injectDotOperators(funcs, task)
   injectReferences(funcs, task)
+
+  /**
+   * Compile each sub graph.
+   */
+
+  function compileSubgraph (key) {
+    var subGraph = graph.func[key]
+
+    var funcName = '/' + key
+
+    funcs[funcName] = fun(subGraph, additionalFunctions)
+  }
 
   Object.keys(func)
         .forEach(compileSubgraph)

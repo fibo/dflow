@@ -6,7 +6,7 @@ var graph = {
   task: {
     '0': 'arguments[0]',
     '1': 'arguments[1]',
-    '2': 'sum',
+    '2': '/sum',
     '3': '@three',
     '4': '*',
     '5': '@result',
