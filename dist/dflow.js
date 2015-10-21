@@ -10,6 +10,7 @@ var builtinFunctions          = require('./functions/builtin'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
+    subgraph                  = require('./regex/subgraph'),
     validate                  = require('./validate')
 
 /**
@@ -34,15 +35,6 @@ function fun (graph, additionalFunctions) {
       computeLevelOf = level.bind(null, pipe, cachedLevelOf),
       funcs          = builtinFunctions
 
-  /**
-   * Compile each sub graph.
-   */
-
-  function compileSubgraph (key) {
-    if (typeof funcs[key] === 'undefined')
-      funcs[key] = fun(graph.func[key], additionalFunctions)
-  }
-
   // Inject compile-time builtin tasks.
 
   funcs['dflow.fun']        = fun
@@ -54,6 +46,18 @@ function fun (graph, additionalFunctions) {
   injectAdditionalFunctions(funcs, additionalFunctions)
   injectDotOperators(funcs, task)
   injectReferences(funcs, task)
+
+  /**
+   * Compile each sub graph.
+   */
+
+  function compileSubgraph (key) {
+    var subGraph = graph.func[key]
+
+    var funcName = '/' + key
+
+    funcs[funcName] = fun(subGraph, additionalFunctions)
+  }
 
   Object.keys(func)
         .forEach(compileSubgraph)
@@ -132,7 +136,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./functions/builtin":2,"./inject/accessors":4,"./inject/additionalFunctions":5,"./inject/arguments":6,"./inject/dotOperators":7,"./inject/globals":8,"./inject/references":9,"./inputArgs":10,"./isDflowFun":12,"./level":13,"./validate":19}],2:[function(require,module,exports){
+},{"./functions/builtin":2,"./inject/accessors":4,"./inject/additionalFunctions":5,"./inject/arguments":6,"./inject/dotOperators":7,"./inject/globals":8,"./inject/references":9,"./inputArgs":10,"./isDflowFun":12,"./level":13,"./regex/subgraph":19,"./validate":20}],2:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -592,7 +596,7 @@ function injectGlobals (funcs, task) {
 module.exports = injectGlobals
 
 
-},{"../walkGlobal":20}],9:[function(require,module,exports){
+},{"../walkGlobal":21}],9:[function(require,module,exports){
 
 var referenceRegex = require('../regex/reference'),
     walkGlobal     = require('../walkGlobal')
@@ -643,7 +647,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"../regex/reference":18,"../walkGlobal":20}],10:[function(require,module,exports){
+},{"../regex/reference":18,"../walkGlobal":21}],10:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -733,7 +737,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":19}],13:[function(require,module,exports){
+},{"./validate":20}],13:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -822,10 +826,16 @@ module.exports = /^\&(.+)$/
 
 },{}],19:[function(require,module,exports){
 
+module.exports = /^\/(.+)$/
+
+
+},{}],20:[function(require,module,exports){
+
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
     dotOperatorRegex = require('./regex/dotOperator'),
     referenceRegex   = require('./regex/reference')
+    subgraphRegex    = require('./regex/subgraph')
 
 /**
  * Check graph consistency.
@@ -938,7 +948,29 @@ function validate (graph, additionalFunctions) {
       throw new Error('Duplicated pipe:', pipe[key])
   }
 
-  Object.keys(pipe).forEach(checkPipe)
+  Object.keys(pipe)
+        .forEach(checkPipe)
+
+  // Check that every subgraph referenced are defined.
+
+  function onlySubgraphs (key) {
+    var taskName = task[key]
+
+    return subgraphRegex.test(taskName)
+  }
+
+  function checkSubgraph (key) {
+    var taskName = task[key]
+
+    var funcName = taskName.substring(1)
+
+    if (typeof func[funcName] === 'undefined')
+      throw new Error('Undefined subgraph:', funcName)
+  }
+
+  Object.keys(task)
+        .filter(onlySubgraphs)
+        .forEach(checkSubgraph)
 
   // Recursively check subgraphs in func property.
 
@@ -947,7 +979,8 @@ function validate (graph, additionalFunctions) {
   }
 
   if (typeof func === 'object')
-    Object.keys(func).forEach(checkFunc)
+    Object.keys(func)
+          .forEach(checkFunc)
 
   return true
 }
@@ -955,32 +988,32 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":15,"./regex/argument":16,"./regex/dotOperator":17,"./regex/reference":18}],20:[function(require,module,exports){
+},{"./regex/accessor":15,"./regex/argument":16,"./regex/dotOperator":17,"./regex/reference":18,"./regex/subgraph":19}],21:[function(require,module,exports){
 (function (global){
 
-    var globalContext
+var globalContext
 
-    if (typeof window === 'object')
-      globalContext = window
+if (typeof window === 'object')
+  globalContext = window
 
-    if (typeof global === 'object')
-      globalContext = global
+if (typeof global === 'object')
+  globalContext = global
 
-    /**
-     * Walk through global context.
-     *
-     * process.version will return global[process][version]
-     *
-     * @param {String} taskName
-     * @returns {*} leaf
-     */
+/**
+ * Walk through global context.
+ *
+ * process.version will return global[process][version]
+ *
+ * @param {String} taskName
+ * @returns {*} leaf
+ */
 
-    function walkGlobal (taskName) {
-      function toNextProp (leaf, prop) { return leaf[prop] }
+function walkGlobal (taskName) {
+   function toNextProp (next, prop) { return next[prop] }
 
-      return taskName.split('.')
-                     .reduce(toNextProp, globalContext)
-    }
+  return taskName.split('.')
+                 .reduce(toNextProp, globalContext)
+}
 
 module.exports = walkGlobal
 

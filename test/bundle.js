@@ -3001,8 +3001,12 @@ module.exports = function(should, Assertion) {
    * If `other` is a regexp and given object is an object check values on matching regexp
    * If `other` is a function check if this function throws AssertionError on given object or return false - it will be assumed as not matched
    * If `other` is an object check if the same keys matched with above rules
-   * All other cases failed
-   *
+   * All other cases failed.
+   * 
+   * Usually it is right idea to add pre type assertions, like `.String()` or `.Object()` to be sure assertions will do what you are expecting.
+   * Object iteration happen by keys (properties with enumerable: true), thus some objects can cause small pain. Typical example is js 
+   * Error - it by default has 2 properties `name` and `message`, but they both non-enumerable. In this case make sure you specify checking props (see examples).
+   * 
    * @name match
    * @memberOf Assertion
    * @category assertion matching
@@ -3031,6 +3035,19 @@ module.exports = function(should, Assertion) {
    * .match({ '0': 10, '1': /c$/, '2': function(it) {
    *    return it.should.have.property('d', 10);
    * }});
+   * 
+   * var myString = 'abc';
+   * 
+   * myString.should.be.a.String().and.match(/abc/);
+   * 
+   * myString = {};
+   * 
+   * myString.should.match(/abc/); //yes this will pass
+   * //better to do
+   * myString.should.be.an.Object().and.not.empty().and.match(/abc/);//fixed
+   * 
+   * (new Error('boom')).should.match(/abc/);//passed because no keys
+   * (new Error('boom')).should.not.match({ message: /abc/ });//check specified property
    */
   Assertion.add('match', function(other, description) {
     this.params = {operator: 'to match ' + i(other), message: description};
@@ -4859,9 +4876,10 @@ Formatter.generateFunctionForIndexedArray = function generateFunctionForIndexedA
   };
 };
 
-['undefined', 'boolean', 'null', 'symbol'].forEach(function(name) {
-  Formatter.add(name, String);
-});
+Formatter.add('undefined', function() { return 'undefined' });
+Formatter.add('null', function() { return 'null' });
+Formatter.add('boolean', function(value) { return value ? 'true': 'false' });
+Formatter.add('symbol', function(value) { return value.toString() });
 
 ['number', 'boolean'].forEach(function(name) {
   Formatter.add('object', name, function(value) {
@@ -5369,6 +5387,7 @@ var builtinFunctions          = require('./functions/builtin'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
+    subgraph                  = require('./regex/subgraph'),
     validate                  = require('./validate')
 
 /**
@@ -5393,15 +5412,6 @@ function fun (graph, additionalFunctions) {
       computeLevelOf = level.bind(null, pipe, cachedLevelOf),
       funcs          = builtinFunctions
 
-  /**
-   * Compile each sub graph.
-   */
-
-  function compileSubgraph (key) {
-    if (typeof funcs[key] === 'undefined')
-      funcs[key] = fun(graph.func[key], additionalFunctions)
-  }
-
   // Inject compile-time builtin tasks.
 
   funcs['dflow.fun']        = fun
@@ -5413,6 +5423,18 @@ function fun (graph, additionalFunctions) {
   injectAdditionalFunctions(funcs, additionalFunctions)
   injectDotOperators(funcs, task)
   injectReferences(funcs, task)
+
+  /**
+   * Compile each sub graph.
+   */
+
+  function compileSubgraph (key) {
+    var subGraph = graph.func[key]
+
+    var funcName = '/' + key
+
+    funcs[funcName] = fun(subGraph, additionalFunctions)
+  }
 
   Object.keys(func)
         .forEach(compileSubgraph)
@@ -5491,7 +5513,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./functions/builtin":33,"./inject/accessors":35,"./inject/additionalFunctions":36,"./inject/arguments":37,"./inject/dotOperators":38,"./inject/globals":39,"./inject/references":40,"./inputArgs":41,"./isDflowFun":43,"./level":44,"./validate":50}],33:[function(require,module,exports){
+},{"./functions/builtin":33,"./inject/accessors":35,"./inject/additionalFunctions":36,"./inject/arguments":37,"./inject/dotOperators":38,"./inject/globals":39,"./inject/references":40,"./inputArgs":41,"./isDflowFun":43,"./level":44,"./regex/subgraph":50,"./validate":51}],33:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -5951,7 +5973,7 @@ function injectGlobals (funcs, task) {
 module.exports = injectGlobals
 
 
-},{"../walkGlobal":51}],40:[function(require,module,exports){
+},{"../walkGlobal":52}],40:[function(require,module,exports){
 
 var referenceRegex = require('../regex/reference'),
     walkGlobal     = require('../walkGlobal')
@@ -6002,7 +6024,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"../regex/reference":49,"../walkGlobal":51}],41:[function(require,module,exports){
+},{"../regex/reference":49,"../walkGlobal":52}],41:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -6092,7 +6114,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":50}],44:[function(require,module,exports){
+},{"./validate":51}],44:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -6181,10 +6203,16 @@ module.exports = /^\&(.+)$/
 
 },{}],50:[function(require,module,exports){
 
+module.exports = /^\/(.+)$/
+
+
+},{}],51:[function(require,module,exports){
+
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
     dotOperatorRegex = require('./regex/dotOperator'),
     referenceRegex   = require('./regex/reference')
+    subgraphRegex    = require('./regex/subgraph')
 
 /**
  * Check graph consistency.
@@ -6297,7 +6325,29 @@ function validate (graph, additionalFunctions) {
       throw new Error('Duplicated pipe:', pipe[key])
   }
 
-  Object.keys(pipe).forEach(checkPipe)
+  Object.keys(pipe)
+        .forEach(checkPipe)
+
+  // Check that every subgraph referenced are defined.
+
+  function onlySubgraphs (key) {
+    var taskName = task[key]
+
+    return subgraphRegex.test(taskName)
+  }
+
+  function checkSubgraph (key) {
+    var taskName = task[key]
+
+    var funcName = taskName.substring(1)
+
+    if (typeof func[funcName] === 'undefined')
+      throw new Error('Undefined subgraph:', funcName)
+  }
+
+  Object.keys(task)
+        .filter(onlySubgraphs)
+        .forEach(checkSubgraph)
 
   // Recursively check subgraphs in func property.
 
@@ -6306,7 +6356,8 @@ function validate (graph, additionalFunctions) {
   }
 
   if (typeof func === 'object')
-    Object.keys(func).forEach(checkFunc)
+    Object.keys(func)
+          .forEach(checkFunc)
 
   return true
 }
@@ -6314,38 +6365,38 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":46,"./regex/argument":47,"./regex/dotOperator":48,"./regex/reference":49}],51:[function(require,module,exports){
+},{"./regex/accessor":46,"./regex/argument":47,"./regex/dotOperator":48,"./regex/reference":49,"./regex/subgraph":50}],52:[function(require,module,exports){
 (function (global){
 
-    var globalContext
+var globalContext
 
-    if (typeof window === 'object')
-      globalContext = window
+if (typeof window === 'object')
+  globalContext = window
 
-    if (typeof global === 'object')
-      globalContext = global
+if (typeof global === 'object')
+  globalContext = global
 
-    /**
-     * Walk through global context.
-     *
-     * process.version will return global[process][version]
-     *
-     * @param {String} taskName
-     * @returns {*} leaf
-     */
+/**
+ * Walk through global context.
+ *
+ * process.version will return global[process][version]
+ *
+ * @param {String} taskName
+ * @returns {*} leaf
+ */
 
-    function walkGlobal (taskName) {
-      function toNextProp (leaf, prop) { return leaf[prop] }
+function walkGlobal (taskName) {
+   function toNextProp (next, prop) { return next[prop] }
 
-      return taskName.split('.')
-                     .reduce(toNextProp, globalContext)
-    }
+  return taskName.split('.')
+                 .reduce(toNextProp, globalContext)
+}
 
 module.exports = walkGlobal
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "&isFinite",
@@ -6370,7 +6421,7 @@ module.exports={
   }
 }
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -6391,7 +6442,7 @@ module.exports={
   }
 }
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -6432,7 +6483,7 @@ module.exports={
   }
 }
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -6459,7 +6510,7 @@ module.exports={
   }
 }
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6482,7 +6533,7 @@ module.exports={
   }
 }
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6505,7 +6556,7 @@ module.exports={
   }
 }
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 
 exports.apply          = require('./graph/apply.json')
 exports.dateParse      = require('./graph/dateParse.json')
@@ -6515,7 +6566,7 @@ exports.or             = require('./graph/or.json')
 exports.sum            = require('./graph/sum.json')
 
 
-},{"./graph/apply.json":52,"./graph/dateParse.json":53,"./graph/hello-world.json":54,"./graph/indexOf.json":55,"./graph/or.json":56,"./graph/sum.json":57}],59:[function(require,module,exports){
+},{"./graph/apply.json":53,"./graph/dateParse.json":54,"./graph/hello-world.json":55,"./graph/indexOf.json":56,"./graph/or.json":57,"./graph/sum.json":58}],60:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6534,7 +6585,7 @@ module.exports={
   "view": {}
 }
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 
 var emptyGraph = require('../src/engine/emptyGraph.json'),
     should     = require('should'),
@@ -6547,7 +6598,7 @@ describe('emptyGraph', function () {
 })
 
 
-},{"../src/engine/emptyGraph.json":31,"../src/engine/validate":50,"should":6}],61:[function(require,module,exports){
+},{"../src/engine/emptyGraph.json":31,"../src/engine/validate":51,"should":6}],62:[function(require,module,exports){
 
 var dflow  = require('dflow'),
     should = require('should')
@@ -6593,58 +6644,58 @@ describe('example', function () {
 })
 
 
-},{"../src/examples":58,"../src/examples/packagedGraph":59,"dflow":5,"should":6}],62:[function(require,module,exports){
+},{"../src/examples":59,"../src/examples/packagedGraph":60,"dflow":5,"should":6}],63:[function(require,module,exports){
 
 var should = require('should'),
     fun    = require('../src/engine/fun')
 
-var graph = {
-  task: {
-    '0': 'arguments[0]',
-    '1': 'arguments[1]',
-    '2': 'sum',
-    '3': '@three',
-    '4': '*',
-    '5': '@result',
-    '6': 'return'
-  },
-  pipe: {
-    'a': [ '0', '2', 0 ],
-    'b': [ '1', '2', 1 ],
-    'c': [ '2', '4', 0 ],
-    'd': [ '3', '4', 1 ],
-    'e': [ '4', '5' ],
-    'f': [ '5', '6' ]
-  },
-  func: {
-    sum: {
-      pipe: {
-        'a': [ '0', '2', 0 ],
-        'b': [ '1', '2', 1 ],
-        'c': [ '2', '3' ]
-      },
+describe('fun', function () {
+  it('returns a function', function () {
+    var graph = {
       task: {
         '0': 'arguments[0]',
         '1': 'arguments[1]',
-        '2': 'custom + operator',
-        '3': 'return'
-      }
+        '2': '/sum',
+        '3': '@three',
+        '4': '*',
+        '5': '@result',
+        '6': 'return'
+      },
+      pipe: {
+        'a': [ '0', '2', 0 ],
+        'b': [ '1', '2', 1 ],
+        'c': [ '2', '4', 0 ],
+        'd': [ '3', '4', 1 ],
+        'e': [ '4', '5' ],
+        'f': [ '5', '6' ]
+      },
+      func: {
+        sum: {
+          pipe: {
+            'a': [ '0', '2', 0 ],
+            'b': [ '1', '2', 1 ],
+            'c': [ '2', '3' ]
+          },
+          task: {
+            '0': 'arguments[0]',
+            '1': 'arguments[1]',
+            '2': 'custom + operator',
+            '3': 'return'
+          }
+        }
+      },
+      data: {
+        three: 3
+      },
+      view: {}
     }
-  },
-  data: {
-    three: 3
-  },
-  view: {}
-}
 
-var funcs = {
-  'custom + operator': function (a, b) { return a + b }
-}
+    var funcs = {
+      'custom + operator': function (a, b) { return a + b }
+    }
 
-var f = fun(graph, funcs)
+    var f = fun(graph, funcs)
 
-describe('fun', function () {
-  it('returns a function', function () {
     f.should.be.instanceOf(Function)
     f(1, 2).should.eql(9)
     f.graph.should.eql(graph)
@@ -6673,12 +6724,11 @@ describe('fun', function () {
         }
 
     var f = fun(graph)
-
   })
 })
 
 
-},{"../src/engine/fun":32,"should":6}],63:[function(require,module,exports){
+},{"../src/engine/fun":32,"should":6}],64:[function(require,module,exports){
 
 var inputArgs = require('../src/engine/inputArgs'),
     should    = require('should')
@@ -6710,7 +6760,7 @@ describe('inputArgs', function () {
 })
 
 
-},{"../src/engine/inputArgs":41,"should":6}],64:[function(require,module,exports){
+},{"../src/engine/inputArgs":41,"should":6}],65:[function(require,module,exports){
 
 var should     = require('should'),
     inputPipes = require('../src/engine/inputPipes')
@@ -6737,7 +6787,7 @@ describe('inputPipes', function () {
 })
 
 
-},{"../src/engine/inputPipes":42,"should":6}],65:[function(require,module,exports){
+},{"../src/engine/inputPipes":42,"should":6}],66:[function(require,module,exports){
 
 var examples   = require('../src/examples'),
     fun        = require('../src/engine/fun'),
@@ -6795,7 +6845,7 @@ describe('isDflowFun', function () {
 })
 
 
-},{"../src/engine/fun":32,"../src/engine/isDflowFun":43,"../src/examples":58,"should":6}],66:[function(require,module,exports){
+},{"../src/engine/fun":32,"../src/engine/isDflowFun":43,"../src/examples":59,"should":6}],67:[function(require,module,exports){
 
 var level  = require('../src/engine/level'),
     should = require('should')
@@ -6823,7 +6873,7 @@ describe('level', function () {
 })
 
 
-},{"../src/engine/level":44,"should":6}],67:[function(require,module,exports){
+},{"../src/engine/level":44,"should":6}],68:[function(require,module,exports){
 
 var parents = require('../src/engine/parents'),
     should  = require('should')
@@ -6859,12 +6909,31 @@ describe('parentsOf', function () {
 })
 
 
-},{"../src/engine/parents":45,"should":6}],68:[function(require,module,exports){
+},{"../src/engine/parents":45,"should":6}],69:[function(require,module,exports){
 
-var dotOperator = require('../src/engine/regex/dotOperator'),
+var accessor    = require('../src/engine/regex/accessor'),
+    argument    = require('../src/engine/regex/argument'),
+    dotOperator = require('../src/engine/regex/dotOperator'),
+    reference   = require('../src/engine/regex/reference'),
+    subgraph    = require('../src/engine/regex/subgraph'),
     should      = require('should')
 
 describe('regex', function () {
+  describe('accessor', function () {
+    it('matches @attributeName', function () {
+      accessor.test('@foo').should.be.true
+    })
+  })
+
+  describe('argument', function () {
+    it('matches arguments[N]', function () {
+      argument.test('arguments[0]').should.be.true
+      argument.test('arguments[1]').should.be.true
+      argument.test('arguments[2]').should.be.true
+      argument.test('arguments[3]').should.be.true
+    })
+  })
+
   describe('dotOperator.attr', function () {
     it('matches .validJavaScriptVariableName', function () {
       dotOperator.func.test('.foo').should.be.true
@@ -6878,10 +6947,23 @@ describe('regex', function () {
       dotOperator.func.test('.1foo()').should.be.false
     })
   })
+
+  describe('reference', function () {
+    it('matches &functionName', function () {
+      reference.test('&foo').should.be.true
+    })
+  })
+
+  describe('subgraph', function () {
+    it('matches /functionName', function () {
+      subgraph.test('/foo').should.be.true
+      subgraph.test('notStartingWithSlash').should.be.false
+    })
+  })
 })
 
 
-},{"../src/engine/regex/dotOperator":48,"should":6}],69:[function(require,module,exports){
+},{"../src/engine/regex/accessor":46,"../src/engine/regex/argument":47,"../src/engine/regex/dotOperator":48,"../src/engine/regex/reference":49,"../src/engine/regex/subgraph":50,"should":6}],70:[function(require,module,exports){
 
 var should = require('should'),
     fun    = require('../src/engine/fun')
@@ -6926,7 +7008,7 @@ describe('this.graph', function () {
   })
 })
 
-},{"../src/engine/fun":32,"should":6}],70:[function(require,module,exports){
+},{"../src/engine/fun":32,"should":6}],71:[function(require,module,exports){
 
 var should   = require('should'),
     validate = require('../src/engine/validate')
@@ -7097,7 +7179,17 @@ describe('validate', function () {
           })
       }).should.throwError(/Orphan pipe:/)
   })
+
+  it('throws if subgraph is not defined', function () {
+    ;(function () {
+      validate(
+        { task: { '1': '/foo' },
+          pipe: {},
+          func: {}
+        })
+      }).should.throwError(/Undefined subgraph:/)
+  })
 })
 
 
-},{"../src/engine/validate":50,"should":6}]},{},[60,61,62,63,64,65,66,67,68,69,70]);
+},{"../src/engine/validate":51,"should":6}]},{},[61,62,63,64,65,66,67,68,69,70,71]);
