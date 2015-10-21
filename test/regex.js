@@ -3,6 +3,7 @@ var accessor    = require('../src/engine/regex/accessor'),
     argument    = require('../src/engine/regex/argument'),
     dotOperator = require('../src/engine/regex/dotOperator'),
     reference   = require('../src/engine/regex/reference'),
+    subgraph    = require('../src/engine/regex/subgraph'),
     should      = require('should')
 
 describe('regex', function () {
@@ -38,6 +39,12 @@ describe('regex', function () {
   describe('reference', function () {
     it('matches &functionName', function () {
       reference.test('&foo').should.be.true
+    })
+  })
+
+  describe('subgraph', function () {
+    it('matches /functionName', function () {
+      subgraph.test('/foo').should.be.true
     })
   })
 })
