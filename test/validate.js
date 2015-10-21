@@ -168,5 +168,15 @@ describe('validate', function () {
           })
       }).should.throwError(/Orphan pipe:/)
   })
+
+  it('throws if subgraph is not defined', function () {
+    ;(function () {
+      validate(
+        { task: { '1': '/foo' },
+          pipe: {},
+          func: {}
+        })
+      }).should.throwError(/Undefined subgraph:/)
+  })
 })
 
