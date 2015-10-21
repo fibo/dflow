@@ -45,6 +45,7 @@ describe('regex', function () {
   describe('subgraph', function () {
     it('matches /functionName', function () {
       subgraph.test('/foo').should.be.true
+      subgraph.test('notStartingWithSlash').should.be.false
     })
   })
 })

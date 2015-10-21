@@ -3,7 +3,7 @@ var fs = require('fs')
 var insertCss = require('insert-css')
 var socket = io()
 
-var normalize = fs.readFileSync(__dirname + '/../../node_modules/normalize.css/normalize.css')
+var normalize = fs.readFileSync(__dirname + '/../../../node_modules/normalize.css/normalize.css')
 insertCss(normalize)
 
 var style = fs.readFileSync(__dirname + '/style.css')

@@ -3,6 +3,11 @@ var fs = require('fs')
 
 var pkg = require('../../package.json')
 
+var accessorRegex = require('../engine/regex/accessor'),
+    subgraphRegex = require('../engine/regex/subgraph')
+
+var emptyGraph = require('../engine/emptyGraph.json')
+
 var defaultOpt = {
   port: 3000,
   verbose: false, // Silence is gold.
@@ -11,14 +16,13 @@ var defaultOpt = {
 
 /**
  * Save graph json file
- *
- * @api private
  */
 
 function saveGraph (graphPath, indentJSON, graph, callback) {
   var indentLevel = 0
 
-  if (indentJSON) indentLevel = 2
+  if (indentJSON)
+    indentLevel = 2
 
   var jsonString = JSON.stringify(graph, null, indentLevel)
 
@@ -32,8 +36,6 @@ function saveGraph (graphPath, indentJSON, graph, callback) {
 
 /**
  * Log event to stdout
- *
- * @api private
  */
 
 function logEvent (verbose, eventName, eventData) {
@@ -53,8 +55,6 @@ function editorServer (graphPath, opt) {
 
   /**
    * Id generator.
-   *
-   * @api private
    */
 
   function getNextId () {
@@ -95,7 +95,17 @@ function editorServer (graphPath, opt) {
   // Routes.
 
   app.get('/', function (req, res) {
-    res.render('index', {graphPath: graphPath, version: pkg.version})
+    res.redirect('/edit')
+  })
+
+  app.get('/edit', function (req, res) {
+    res.render('edit', {graphPath: graphPath, version: pkg.version})
+  })
+
+  app.get('/:subgraph', function (req, res) {
+    // TODO render subgraph
+    // TODO every subgraph should be a separated room, included /
+    res.send(req.params.subgraph)
   })
 
   // Socket.IO events.
@@ -109,8 +119,6 @@ function editorServer (graphPath, opt) {
 
     /**
      * On addLink event.
-     *
-     * @api private
      */
 
     function addLink (data) {
@@ -134,8 +142,6 @@ function editorServer (graphPath, opt) {
 
     /**
      * On addInput event.
-     *
-     * @api private
      */
 
     function addInput (data) {
@@ -159,8 +165,6 @@ function editorServer (graphPath, opt) {
 
     /**
      * On addOutput event.
-     *
-     * @api private
      */
 
     function addOutput (data) {
@@ -184,23 +188,45 @@ function editorServer (graphPath, opt) {
 
     /**
      * On addNode event.
-     *
-     * @api private
      */
 
     function addNode (data) {
       log('addNode', data)
 
-      var id  = getNextId()
+      var id       = getNextId(),
+          key      = null,
+          taskName = data.text
 
       // Add node to view.
       graph.view.node[id] = data
 
       // Add task.
-      graph.task[id] = data.text
+      graph.task[id] = taskName
 
       // Associate node and task.
       graph.view.node[id].task = id
+
+      // If node is an accessor, create its data entry if it does not exists.
+      if (accessorRegex.test(taskName)) {
+        key = taskName.substring(1)
+
+        if (typeof graph.data === 'undefined')
+          graph.data = {}
+
+        if (typeof graph.data[key] === 'undefined')
+          graph.data[key] = null
+      }
+
+      // If node is a subgraph, create its func entry if it does not exists.
+      if (subgraphRegex.test(taskName)) {
+        key = taskName.substring(1)
+
+        if (typeof graph.func === 'undefined')
+          graph.func = {}
+
+        if (typeof graph.func[key] === 'undefined')
+          graph.func[key] = emptyGraph
+      }
 
       io.emit('addNode', data)
 
@@ -211,8 +237,6 @@ function editorServer (graphPath, opt) {
 
     /**
      * On delLink event.
-     *
-     * @api private
      */
 
     function delLink (data) {
@@ -233,8 +257,6 @@ function editorServer (graphPath, opt) {
 
     /**
      * On delNode event.
-     *
-     * @api private
      */
 
     function delNode (data) {
@@ -255,8 +277,6 @@ function editorServer (graphPath, opt) {
 
     /**
      * On moveNode event.
-     *
-     * @api private
      */
 
     function moveNode (data) {
