@@ -102,10 +102,8 @@ function editorServer (graphPath, opt) {
     res.render('edit', {graphPath: graphPath, version: pkg.version})
   })
 
-  app.get('/:subgraph', function (req, res) {
-    // TODO render subgraph
-    // TODO every subgraph should be a separated room, included /
-    res.send(req.params.subgraph)
+  app.get('/run', function (req, res) {
+    res.render('run')
   })
 
   // Socket.IO events.
