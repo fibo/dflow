@@ -3,6 +3,7 @@ var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
     dotOperatorRegex = require('./regex/dotOperator'),
     referenceRegex   = require('./regex/reference')
+    subgraphRegex    = require('./regex/subgraph')
 
 /**
  * Check graph consistency.
@@ -115,7 +116,29 @@ function validate (graph, additionalFunctions) {
       throw new Error('Duplicated pipe:', pipe[key])
   }
 
-  Object.keys(pipe).forEach(checkPipe)
+  Object.keys(pipe)
+        .forEach(checkPipe)
+
+  // Check that every subgraph referenced are defined.
+
+  function onlySubgraphs (key) {
+    var taskName = task[key]
+
+    return subgraphRegex.test(taskName)
+  }
+
+  function checkSubgraph (key) {
+    var taskName = task[key]
+
+    var funcName = taskName.substring(1)
+
+    if (typeof func[funcName] === 'undefined')
+      throw new Error('Undefined subgraph:', funcName)
+  }
+
+  Object.keys(task)
+        .filter(onlySubgraphs)
+        .forEach(checkSubgraph)
 
   // Recursively check subgraphs in func property.
 
@@ -124,7 +147,8 @@ function validate (graph, additionalFunctions) {
   }
 
   if (typeof func === 'object')
-    Object.keys(func).forEach(checkFunc)
+    Object.keys(func)
+          .forEach(checkFunc)
 
   return true
 }
