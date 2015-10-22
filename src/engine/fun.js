@@ -1,5 +1,6 @@
 
 var builtinFunctions          = require('./functions/builtin'),
+    commentRegex              = require('./regex/comment'),
     injectAdditionalFunctions = require('./inject/additionalFunctions'),
     injectArguments           = require('./inject/arguments'),
     injectAccessors           = require('./inject/accessors'),
@@ -9,7 +10,6 @@ var builtinFunctions          = require('./functions/builtin'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
-    subgraph                  = require('./regex/subgraph'),
     validate                  = require('./validate')
 
 /**
@@ -118,8 +118,17 @@ function fun (graph, additionalFunctions) {
       outs[taskKey] = f.apply(null, args)
     }
 
+    /**
+     * Ignore comments.
+     */
+
+    function comments (key) {
+      return ! commentRegex.test(task[key])
+    }
+
     // Run every graph task, sorted by level.
     Object.keys(task)
+          .filter(comments)
           .sort(byLevel)
           .forEach(run)
 

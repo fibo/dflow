@@ -12,7 +12,8 @@ describe('fun', function () {
         '3': '@three',
         '4': '*',
         '5': '@result',
-        '6': 'return'
+        '6': 'return',
+        '7': '// this is a comment',
       },
       pipe: {
         'a': [ '0', '2', 0 ],

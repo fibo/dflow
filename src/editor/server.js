@@ -4,6 +4,7 @@ var fs = require('fs')
 var pkg = require('../../package.json')
 
 var accessorRegex = require('../engine/regex/accessor'),
+    commentRegex  = require('../engine/regex/comment'),
     subgraphRegex = require('../engine/regex/subgraph')
 
 var emptyGraph = require('../engine/emptyGraph.json')
@@ -198,11 +199,17 @@ function editorServer (graphPath, opt) {
       // Add node to view.
       graph.view.node[id] = data
 
-      // Add task.
-      graph.task[id] = taskName
+      if (commentRegex.test(taskName)) {
+        // Do not add a task if node is a comment.
+        log('comment', taskName)
+      }
+      else {
+        // Add task.
+        graph.task[id] = taskName
 
-      // Associate node and task.
-      graph.view.node[id].task = id
+        // Associate node and task.
+        graph.view.node[id].task = id
+      }
 
       // If node is an accessor, create its data entry if it does not exists.
       if (accessorRegex.test(taskName)) {
