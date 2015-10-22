@@ -13,9 +13,14 @@
   </head>
   <body>
     <div id="toolbar">
-      <em>dflow v<%= version %>,<em>
+      <em>dflow v<%= version %>,</em>
       <strong>editing graph:</strong><%= graphPath %>
     </div>
-    <div id="dflow-graph"></div>
+    <div id="container">
+      <div id="inspector" class="dflow-inspector">
+      <p id="task-name">None selected</p>
+      </div>
+      <div id="graph" class="dflow-graph"></div>
+      </div>
   </body>
 </html>

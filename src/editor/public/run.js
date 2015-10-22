@@ -1,4 +1,52 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+
+// Cheating npm require.
+module.exports = require('../..')
+
+
+},{"../..":3}],2:[function(require,module,exports){
+
+var dflow = require('dflow')
+
+var xmlhttp = new XMLHttpRequest()
+
+function runGraph () {
+  if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+    var graph = JSON.parse(xmlhttp.responseText)
+    var f = dflow.fun(graph)
+    f()
+  }
+}
+
+xmlhttp.onreadystatechange = runGraph
+xmlhttp.open("GET", '/graph', true)
+xmlhttp.send()
+
+
+},{"dflow":1}],3:[function(require,module,exports){
+/**
+ * @license MIT <Gianluca Casati> http://g14n.info/flow-view
+ */
+
+var windowFunctions = require('../functions/window'),
+    fun             = require('../fun')
+
+function funBrowser (graph) {
+  var additionalFunctions = arguments[1] || {}
+
+  function inject (key) {
+    additionalFunctions[key] = windowFunctions[key]
+  }
+
+  Object.keys(windowFunctions).forEach(inject)
+
+  return fun(graph, additionalFunctions)
+}
+
+exports.fun = funBrowser
+
+
+},{"../fun":4,"../functions/window":6}],4:[function(require,module,exports){
 
 var builtinFunctions          = require('./functions/builtin'),
     commentRegex              = require('./regex/comment'),
@@ -145,7 +193,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./functions/builtin":2,"./inject/accessors":4,"./inject/additionalFunctions":5,"./inject/arguments":6,"./inject/dotOperators":7,"./inject/globals":8,"./inject/references":9,"./inputArgs":10,"./isDflowFun":12,"./level":13,"./regex/comment":17,"./validate":21}],2:[function(require,module,exports){
+},{"./functions/builtin":5,"./inject/accessors":7,"./inject/additionalFunctions":8,"./inject/arguments":9,"./inject/dotOperators":10,"./inject/globals":11,"./inject/references":12,"./inputArgs":13,"./isDflowFun":15,"./level":16,"./regex/comment":20,"./validate":24}],5:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -317,7 +365,7 @@ exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
 exports['String.prototype.trim']              = String.prototype.trim
 
 
-},{}],3:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 
 exports.document = function _document () { return document }
 
@@ -328,7 +376,7 @@ exports.head = function head () { return document.head }
 exports.window = function _window () { return window }
 
 
-},{}],4:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 
 var accessorRegex = require('../regex/accessor')
 
@@ -381,7 +429,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"../regex/accessor":15}],5:[function(require,module,exports){
+},{"../regex/accessor":18}],8:[function(require,module,exports){
 
 /**
  * Optionally add custom functions.
@@ -417,7 +465,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 var argumentRegex = require('../regex/argument')
 
@@ -464,7 +512,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"../regex/argument":16}],7:[function(require,module,exports){
+},{"../regex/argument":19}],10:[function(require,module,exports){
 
 var dotOperatorRegex = require('../regex/dotOperator')
 
@@ -554,7 +602,7 @@ function injectDotOperators (funcs, task) {
 module.exports = injectDotOperators
 
 
-},{"../regex/dotOperator":18}],8:[function(require,module,exports){
+},{"../regex/dotOperator":21}],11:[function(require,module,exports){
 
 var walkGlobal = require('../walkGlobal')
 
@@ -605,7 +653,7 @@ function injectGlobals (funcs, task) {
 module.exports = injectGlobals
 
 
-},{"../walkGlobal":22}],9:[function(require,module,exports){
+},{"../walkGlobal":25}],12:[function(require,module,exports){
 
 var referenceRegex = require('../regex/reference'),
     walkGlobal     = require('../walkGlobal')
@@ -656,7 +704,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"../regex/reference":19,"../walkGlobal":22}],10:[function(require,module,exports){
+},{"../regex/reference":22,"../walkGlobal":25}],13:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -689,7 +737,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":11}],11:[function(require,module,exports){
+},{"./inputPipes":14}],14:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -719,7 +767,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],12:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -746,7 +794,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":21}],13:[function(require,module,exports){
+},{"./validate":24}],16:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -782,7 +830,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":14}],14:[function(require,module,exports){
+},{"./parents":17}],17:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -811,39 +859,39 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":11}],15:[function(require,module,exports){
+},{"./inputPipes":14}],18:[function(require,module,exports){
 
 module.exports = /^@[\w][\w\d]+$/
 
 
-},{}],16:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 
 module.exports = /^\/\/.+$/
 
 
-},{}],18:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
 
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 
 module.exports = /^\/[\w][\w\d]+$/
 
 
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
@@ -1002,7 +1050,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":15,"./regex/argument":16,"./regex/dotOperator":18,"./regex/reference":19,"./regex/subgraph":20}],22:[function(require,module,exports){
+},{"./regex/accessor":18,"./regex/argument":19,"./regex/dotOperator":21,"./regex/reference":22,"./regex/subgraph":23}],25:[function(require,module,exports){
 (function (global){
 
 var globalContext
@@ -1033,27 +1081,4 @@ module.exports = walkGlobal
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"dflow":[function(require,module,exports){
-/**
- * @license MIT <Gianluca Casati> http://g14n.info/flow-view
- */
-
-var windowFunctions = require('../functions/window'),
-    fun             = require('../fun')
-
-function funBrowser (graph) {
-  var additionalFunctions = arguments[1] || {}
-
-  function inject (key) {
-    additionalFunctions[key] = windowFunctions[key]
-  }
-
-  Object.keys(windowFunctions).forEach(inject)
-
-  return fun(graph, additionalFunctions)
-}
-
-exports.fun = funBrowser
-
-
-},{"../fun":1,"../functions/window":3}]},{},[]);
+},{}]},{},[2]);
