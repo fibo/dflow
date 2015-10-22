@@ -1,6 +1,7 @@
 
 var accessor    = require('../src/engine/regex/accessor'),
     argument    = require('../src/engine/regex/argument'),
+    comment     = require('../src/engine/regex/comment'),
     dotOperator = require('../src/engine/regex/dotOperator'),
     reference   = require('../src/engine/regex/reference'),
     subgraph    = require('../src/engine/regex/subgraph'),
@@ -45,7 +46,14 @@ describe('regex', function () {
   describe('subgraph', function () {
     it('matches /functionName', function () {
       subgraph.test('/foo').should.be.true
+      subgraph.test('//comment').should.be.false
       subgraph.test('notStartingWithSlash').should.be.false
+    })
+  })
+
+  describe('comment', function () {
+    it('matches //comment', function () {
+      comment.test('//foo').should.be.true
     })
   })
 })
