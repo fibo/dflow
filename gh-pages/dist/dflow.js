@@ -907,21 +907,21 @@ function validate (graph, additionalFunctions) {
   // Check pipe and task are objects.
 
   if (typeof pipe !== 'object')
-    throw new TypeError('Not an object: pipe', pipe)
+    throw new TypeError('Not an object: pipe ' + pipe)
 
   if (typeof task !== 'object')
-    throw new TypeError('Not an object: task', task)
+    throw new TypeError('Not an object: task ' + task)
 
   // Check optional data, func, info and view are objects.
 
   if (typeof data !== 'object')
-    throw new TypeError('Not an object: data', data)
+    throw new TypeError('Not an object: data ' + data)
 
   if (typeof func !== 'object')
-    throw new TypeError('Not an object: func', func)
+    throw new TypeError('Not an object: func ' + func)
 
   if (typeof info !== 'object')
-    throw new TypeError('Not an object: info', info)
+    throw new TypeError('Not an object: info ' + info)
 
 
   function checkPipe (key) {
@@ -932,21 +932,21 @@ function validate (graph, additionalFunctions) {
     // Check types.
 
     if (typeof arg !== 'number')
-      throw new TypeError('Invalid pipe:', pipe[key])
+      throw new TypeError('Invalid pipe: ' + pipe[key])
 
     if (typeof from !== 'string')
-      throw new TypeError('Invalid pipe:', pipe[key])
+      throw new TypeError('Invalid pipe: ' + pipe[key])
 
     if (typeof to !== 'string')
-      throw new TypeError('Invalid pipe:', pipe[key])
+      throw new TypeError('Invalid pipe: ' + pipe[key])
 
     // Check for orphan pipes.
 
     if (typeof task[from] === 'undefined')
-      throw new Error('Orphan pipe:', pipe[key])
+      throw new Error('Orphan pipe: ' + pipe[key])
 
     if (typeof task[to] === 'undefined')
-      throw new Error('Orphan pipe:', pipe[key])
+      throw new Error('Orphan pipe: ' + pipe[key])
 
     // Remember pipes, avoid duplicates.
 
@@ -959,7 +959,7 @@ function validate (graph, additionalFunctions) {
     if (typeof seenPipe[from][to][arg] === 'undefined')
       seenPipe[from][to][arg] = true
     else
-      throw new Error('Duplicated pipe:', pipe[key])
+      throw new Error('Duplicated pipe: ' + pipe[key])
   }
 
   Object.keys(pipe)
@@ -979,7 +979,7 @@ function validate (graph, additionalFunctions) {
     var funcName = taskName.substring(1)
 
     if (typeof func[funcName] === 'undefined')
-      throw new Error('Undefined subgraph:', funcName)
+      throw new Error('Undefined subgraph: ' + funcName)
   }
 
   Object.keys(task)

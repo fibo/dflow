@@ -103,8 +103,12 @@ function editorServer (graphPath, opt) {
     res.render('edit', {graphPath: graphPath, version: pkg.version})
   })
 
+  app.get('/graph', function (req, res) {
+    res.json(graph)
+  })
+
   app.get('/run', function (req, res) {
-    res.render('run')
+    res.render('run', {graph: JSON.stringify(graph)})
   })
 
   // Socket.IO events.

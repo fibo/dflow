@@ -1,6 +1,35 @@
 
+.dflow-inspector {
+  background-color: whitesmoke;
+  border-style: none;
+}
+
+#inspector {
+  position: absolute;
+  float: left;
+  width: 200px;
+  height: 100%;
+}
+
 .dflow-graph {
-	background-color: snow;
-	border-style: groove;
+  background-color: snow;
+  border-style: groove;
+}
+
+#graph {
+  overflow-x: hidden;
+  margin-left: 200px;
+}
+
+#toolbar {}
+
+#container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+#task-name::before {
+  content: "task: "
 }
 
