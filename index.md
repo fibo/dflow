@@ -195,6 +195,7 @@ A *graph* has the following properties
     - `Math.cos`
     - `process.version`: will resolve to a function that returns it
   * `/subgraph`: returns a function compiled from *subgraph* that is an entry in *func* collection.
+  * `// comment`: every task starting with `//` is ignored.
 
 Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:
 
