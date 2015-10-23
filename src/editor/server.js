@@ -133,9 +133,17 @@ function editorServer (graphPath, opt) {
       graph.view.link[id] = data
 
       // Add pipe.
-      graph.pipe[id] = [data.from, data.to]
+      var inputPosition = data.to[1],
+          sourceId      = data.from[0],
+          targetId      = data.to[0]
+
+      graph.pipe[id] = [sourceId, targetId]
+
+      if (inputPosition > 0)
+        graph.pipe[id].push(inputPosition)
 
       data.id = id
+
       io.emit('addLink', data)
 
       save(graph)
