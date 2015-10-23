@@ -139,7 +139,7 @@ Click on a pipe to delete it.
 
 ## Api
 
-> dflow exports a [fun](https://github.com/fibo/dflow/blob/master/src/fun.js) function ☺
+> dflow exports a [fun](https://github.com/fibo/dflow/blob/master/src/engine/fun.js) function ☺
 
 It has the following signature.
 
