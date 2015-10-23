@@ -4933,7 +4933,7 @@ function selectNode (data) {
 
   var node = this.node[id]
 
-  canvas.nodeControls.attachTo(node)
+  this.nodeControls.attachTo(node)
 }
 
 Canvas.prototype.selectNode = selectNode
