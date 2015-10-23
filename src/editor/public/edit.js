@@ -6722,7 +6722,7 @@ function selectNode (data) {
 
   var node = this.node[id]
 
-  canvas.nodeControls.attachTo(node)
+  this.nodeControls.attachTo(node)
 }
 
 Canvas.prototype.selectNode = selectNode
@@ -7966,6 +7966,21 @@ window.onload = function () {
 
   canvas.broker.on('moveNode', function (ev) {
     socket.emit('moveNode', ev)
+  })
+
+  canvas.broker.on('selectNode', function (ev) {
+    var id = ev.nodeid
+
+    var node = canvas.node[id]
+
+    var nodeJSON = node.toJSON()
+    console.log(nodeJSON)
+
+    var taskName = nodeJSON.text
+
+    var taskNameElement = document.getElementById('task-name')
+
+    taskNameElement.innerHTML = taskName
   })
 
   socket.on('moveNode', function (data) {

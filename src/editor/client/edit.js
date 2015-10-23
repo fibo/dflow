@@ -51,6 +51,21 @@ window.onload = function () {
     socket.emit('moveNode', ev)
   })
 
+  canvas.broker.on('selectNode', function (ev) {
+    var id = ev.nodeid
+
+    var node = canvas.node[id]
+
+    var nodeJSON = node.toJSON()
+    console.log(nodeJSON)
+
+    var taskName = nodeJSON.text
+
+    var taskNameElement = document.getElementById('task-name')
+
+    taskNameElement.innerHTML = taskName
+  })
+
   socket.on('moveNode', function (data) {
     var x  = data.x
         y  = data.y
