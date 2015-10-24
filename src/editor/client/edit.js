@@ -9,6 +9,8 @@ insertCss(normalize)
 var style = fs.readFileSync(__dirname + '/style.css')
 insertCss(style)
 
+var regexAccessor = require('../../engine/regex/accessor')
+
 window.onload = function () {
   var Canvas = require('flow-view').Canvas
   var canvas = new Canvas('graph')
@@ -57,13 +59,20 @@ window.onload = function () {
     var node = canvas.node[id]
 
     var nodeJSON = node.toJSON()
-    console.log(nodeJSON)
 
     var taskName = nodeJSON.text
 
     var taskNameElement = document.getElementById('task-name')
+    var taskIdElement = document.getElementById('task-id')
+    var taskDataElement = document.getElementById('task-data')
 
     taskNameElement.innerHTML = taskName
+    taskIdElement.innerHTML = id
+
+    if (regexAccessor.test(taskName))
+      taskDataElement.style.display = 'block'
+    else
+      taskDataElement.style.display = 'none'
   })
 
   socket.on('moveNode', function (data) {
