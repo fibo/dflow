@@ -2098,10 +2098,506 @@ function isUndefined(arg) {
 
 },{}],6:[function(require,module,exports){
 
+/**
+ * This is the web browser implementation of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = require('./debug');
+exports.log = log;
+exports.formatArgs = formatArgs;
+exports.save = save;
+exports.load = load;
+exports.useColors = useColors;
+exports.storage = 'undefined' != typeof chrome
+               && 'undefined' != typeof chrome.storage
+                  ? chrome.storage.local
+                  : localstorage();
+
+/**
+ * Colors.
+ */
+
+exports.colors = [
+  'lightseagreen',
+  'forestgreen',
+  'goldenrod',
+  'dodgerblue',
+  'darkorchid',
+  'crimson'
+];
+
+/**
+ * Currently only WebKit-based Web Inspectors, Firefox >= v31,
+ * and the Firebug extension (any Firefox version) are known
+ * to support "%c" CSS customizations.
+ *
+ * TODO: add a `localStorage` variable to explicitly enable/disable colors
+ */
+
+function useColors() {
+  // is webkit? http://stackoverflow.com/a/16459606/376773
+  return ('WebkitAppearance' in document.documentElement.style) ||
+    // is firebug? http://stackoverflow.com/a/398120/376773
+    (window.console && (console.firebug || (console.exception && console.table))) ||
+    // is firefox >= v31?
+    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+    (navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31);
+}
+
+/**
+ * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
+ */
+
+exports.formatters.j = function(v) {
+  return JSON.stringify(v);
+};
+
+
+/**
+ * Colorize log arguments if enabled.
+ *
+ * @api public
+ */
+
+function formatArgs() {
+  var args = arguments;
+  var useColors = this.useColors;
+
+  args[0] = (useColors ? '%c' : '')
+    + this.namespace
+    + (useColors ? ' %c' : ' ')
+    + args[0]
+    + (useColors ? '%c ' : ' ')
+    + '+' + exports.humanize(this.diff);
+
+  if (!useColors) return args;
+
+  var c = 'color: ' + this.color;
+  args = [args[0], c, 'color: inherit'].concat(Array.prototype.slice.call(args, 1));
+
+  // the final "%c" is somewhat tricky, because there could be other
+  // arguments passed either before or after the %c, so we need to
+  // figure out the correct index to insert the CSS into
+  var index = 0;
+  var lastC = 0;
+  args[0].replace(/%[a-z%]/g, function(match) {
+    if ('%%' === match) return;
+    index++;
+    if ('%c' === match) {
+      // we only are interested in the *last* %c
+      // (the user may have provided their own)
+      lastC = index;
+    }
+  });
+
+  args.splice(lastC, 0, c);
+  return args;
+}
+
+/**
+ * Invokes `console.log()` when available.
+ * No-op when `console.log` is not a "function".
+ *
+ * @api public
+ */
+
+function log() {
+  // this hackery is required for IE8/9, where
+  // the `console.log` function doesn't have 'apply'
+  return 'object' === typeof console
+    && console.log
+    && Function.prototype.apply.call(console.log, console, arguments);
+}
+
+/**
+ * Save `namespaces`.
+ *
+ * @param {String} namespaces
+ * @api private
+ */
+
+function save(namespaces) {
+  try {
+    if (null == namespaces) {
+      exports.storage.removeItem('debug');
+    } else {
+      exports.storage.debug = namespaces;
+    }
+  } catch(e) {}
+}
+
+/**
+ * Load `namespaces`.
+ *
+ * @return {String} returns the previously persisted debug modes
+ * @api private
+ */
+
+function load() {
+  var r;
+  try {
+    r = exports.storage.debug;
+  } catch(e) {}
+  return r;
+}
+
+/**
+ * Enable namespaces listed in `localStorage.debug` initially.
+ */
+
+exports.enable(load());
+
+/**
+ * Localstorage attempts to return the localstorage.
+ *
+ * This is necessary because safari throws
+ * when a user disables cookies/localstorage
+ * and you attempt to access it.
+ *
+ * @return {LocalStorage}
+ * @api private
+ */
+
+function localstorage(){
+  try {
+    return window.localStorage;
+  } catch (e) {}
+}
+
+},{"./debug":7}],7:[function(require,module,exports){
+
+/**
+ * This is the common logic for both the Node.js and web browser
+ * implementations of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = debug;
+exports.coerce = coerce;
+exports.disable = disable;
+exports.enable = enable;
+exports.enabled = enabled;
+exports.humanize = require('ms');
+
+/**
+ * The currently active debug mode names, and names to skip.
+ */
+
+exports.names = [];
+exports.skips = [];
+
+/**
+ * Map of special "%n" handling functions, for the debug "format" argument.
+ *
+ * Valid key names are a single, lowercased letter, i.e. "n".
+ */
+
+exports.formatters = {};
+
+/**
+ * Previously assigned color.
+ */
+
+var prevColor = 0;
+
+/**
+ * Previous log timestamp.
+ */
+
+var prevTime;
+
+/**
+ * Select a color.
+ *
+ * @return {Number}
+ * @api private
+ */
+
+function selectColor() {
+  return exports.colors[prevColor++ % exports.colors.length];
+}
+
+/**
+ * Create a debugger with the given `namespace`.
+ *
+ * @param {String} namespace
+ * @return {Function}
+ * @api public
+ */
+
+function debug(namespace) {
+
+  // define the `disabled` version
+  function disabled() {
+  }
+  disabled.enabled = false;
+
+  // define the `enabled` version
+  function enabled() {
+
+    var self = enabled;
+
+    // set `diff` timestamp
+    var curr = +new Date();
+    var ms = curr - (prevTime || curr);
+    self.diff = ms;
+    self.prev = prevTime;
+    self.curr = curr;
+    prevTime = curr;
+
+    // add the `color` if not set
+    if (null == self.useColors) self.useColors = exports.useColors();
+    if (null == self.color && self.useColors) self.color = selectColor();
+
+    var args = Array.prototype.slice.call(arguments);
+
+    args[0] = exports.coerce(args[0]);
+
+    if ('string' !== typeof args[0]) {
+      // anything else let's inspect with %o
+      args = ['%o'].concat(args);
+    }
+
+    // apply any `formatters` transformations
+    var index = 0;
+    args[0] = args[0].replace(/%([a-z%])/g, function(match, format) {
+      // if we encounter an escaped % then don't increase the array index
+      if (match === '%%') return match;
+      index++;
+      var formatter = exports.formatters[format];
+      if ('function' === typeof formatter) {
+        var val = args[index];
+        match = formatter.call(self, val);
+
+        // now we need to remove `args[index]` since it's inlined in the `format`
+        args.splice(index, 1);
+        index--;
+      }
+      return match;
+    });
+
+    if ('function' === typeof exports.formatArgs) {
+      args = exports.formatArgs.apply(self, args);
+    }
+    var logFn = enabled.log || exports.log || console.log.bind(console);
+    logFn.apply(self, args);
+  }
+  enabled.enabled = true;
+
+  var fn = exports.enabled(namespace) ? enabled : disabled;
+
+  fn.namespace = namespace;
+
+  return fn;
+}
+
+/**
+ * Enables a debug mode by namespaces. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} namespaces
+ * @api public
+ */
+
+function enable(namespaces) {
+  exports.save(namespaces);
+
+  var split = (namespaces || '').split(/[\s,]+/);
+  var len = split.length;
+
+  for (var i = 0; i < len; i++) {
+    if (!split[i]) continue; // ignore empty strings
+    namespaces = split[i].replace(/\*/g, '.*?');
+    if (namespaces[0] === '-') {
+      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+    } else {
+      exports.names.push(new RegExp('^' + namespaces + '$'));
+    }
+  }
+}
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+function disable() {
+  exports.enable('');
+}
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+function enabled(name) {
+  var i, len;
+  for (i = 0, len = exports.skips.length; i < len; i++) {
+    if (exports.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (i = 0, len = exports.names.length; i < len; i++) {
+    if (exports.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Coerce `val`.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
+
+},{"ms":8}],8:[function(require,module,exports){
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} options
+ * @return {String|Number}
+ * @api public
+ */
+
+module.exports = function(val, options){
+  options = options || {};
+  if ('string' == typeof val) return parse(val);
+  return options.long
+    ? long(val)
+    : short(val);
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  str = '' + str;
+  if (str.length > 10000) return;
+  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
+  if (!match) return;
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function short(ms) {
+  if (ms >= d) return Math.round(ms / d) + 'd';
+  if (ms >= h) return Math.round(ms / h) + 'h';
+  if (ms >= m) return Math.round(ms / m) + 'm';
+  if (ms >= s) return Math.round(ms / s) + 's';
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function long(ms) {
+  return plural(ms, d, 'day')
+    || plural(ms, h, 'hour')
+    || plural(ms, m, 'minute')
+    || plural(ms, s, 'second')
+    || ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, n, name) {
+  if (ms < n) return;
+  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
+  return Math.ceil(ms / n) + ' ' + name + 's';
+}
+
+},{}],9:[function(require,module,exports){
+
 module.exports = require('./src')
 
 
-},{"./src":27}],7:[function(require,module,exports){
+},{"./src":30}],10:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -2126,7 +2622,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],8:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /*! svg.draggable.js - v1.0.0 - 2015-06-12
 * https://github.com/wout/svg.draggable.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -2318,7 +2814,7 @@ if (typeof Object.create === 'function') {
   })
 
 }).call(this);
-},{}],9:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*! svg.foreignobject.js - v1.0.0 - 2015-06-14
 * https://github.com/fibo/svg.foreignobject.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -2351,7 +2847,7 @@ SVG.extend(SVG.Container, {
   }
 })
 
-},{}],10:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
 * @version 2.1.1
@@ -6327,7 +6823,7 @@ return SVG;
 
 }));
 
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 
 var EventEmitter = require('events').EventEmitter,
     inherits     = require('inherits')
@@ -6446,7 +6942,7 @@ Broker.prototype.init = init
 module.exports = Broker
 
 
-},{"events":5,"inherits":7}],12:[function(require,module,exports){
+},{"events":5,"inherits":10}],15:[function(require,module,exports){
 
 var SVG = require('./SVG')
 
@@ -6730,7 +7226,7 @@ Canvas.prototype.selectNode = selectNode
 module.exports = Canvas
 
 
-},{"./Broker":11,"./Link":14,"./Node":15,"./NodeControls":20,"./NodeCreator":21,"./SVG":29,"./default/theme.json":25,"./default/view.json":26,"./validate":28}],13:[function(require,module,exports){
+},{"./Broker":14,"./Link":17,"./Node":18,"./NodeControls":23,"./NodeCreator":24,"./SVG":32,"./default/theme.json":28,"./default/view.json":29,"./validate":31}],16:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin')
@@ -6765,7 +7261,7 @@ Input.prototype.render = render
 module.exports = Input
 
 
-},{"./Pin":23,"inherits":7}],14:[function(require,module,exports){
+},{"./Pin":26,"inherits":10}],17:[function(require,module,exports){
 
 /**
  * Connect an output to an input
@@ -6887,7 +7383,7 @@ Link.prototype.linePlot = linePlot
 module.exports = Link
 
 
-},{}],15:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 
 var Input   = require('./Input'),
     Output  = require('./Output')
@@ -7163,7 +7659,7 @@ Node.prototype.addOutput = addOutput
 module.exports = Node
 
 
-},{"./Input":13,"./Output":22}],16:[function(require,module,exports){
+},{"./Input":16,"./Output":25}],19:[function(require,module,exports){
 
 function NodeButton (canvas, relativeCoordinate) {
   this.relativeCoordinate = relativeCoordinate
@@ -7191,7 +7687,7 @@ NodeButton.prototype.detach = detachNodeButton
 module.exports = NodeButton
 
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -7270,7 +7766,7 @@ AddInput.prototype.attachTo = attachTo
 module.exports = AddInput
 
 
-},{"../NodeButton":16,"inherits":7}],18:[function(require,module,exports){
+},{"../NodeButton":19,"inherits":10}],21:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -7350,7 +7846,7 @@ module.exports = AddOutput
 
 
 
-},{"../NodeButton":16,"inherits":7}],19:[function(require,module,exports){
+},{"../NodeButton":19,"inherits":10}],22:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -7428,7 +7924,7 @@ DeleteNode.prototype.attachTo = attachTo
 module.exports = DeleteNode
 
 
-},{"../NodeButton":16,"inherits":7}],20:[function(require,module,exports){
+},{"../NodeButton":19,"inherits":10}],23:[function(require,module,exports){
 
 var AddInputButton   = require('./NodeButton/AddInput'),
     AddOutputButton  = require('./NodeButton/AddOutput'),
@@ -7467,7 +7963,7 @@ NodeControls.prototype.detach = nodeControlsDetach
 module.exports = NodeControls
 
 
-},{"./NodeButton/AddInput":17,"./NodeButton/AddOutput":18,"./NodeButton/DeleteNode":19}],21:[function(require,module,exports){
+},{"./NodeButton/AddInput":20,"./NodeButton/AddOutput":21,"./NodeButton/DeleteNode":22}],24:[function(require,module,exports){
 
 // TODO autocompletion from json
 // http://blog.teamtreehouse.com/creating-autocomplete-dropdowns-datalist-element
@@ -7547,7 +8043,7 @@ NodeCreator.prototype.show = showNodeCreator
 module.exports = NodeCreator
 
 
-},{}],22:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin'),
@@ -7594,7 +8090,7 @@ Output.prototype.render = render
 module.exports = Output
 
 
-},{"./Pin":23,"./PreLink":24,"inherits":7}],23:[function(require,module,exports){
+},{"./Pin":26,"./PreLink":27,"inherits":10}],26:[function(require,module,exports){
 
 function Pin (type, node, position) {
   var self = this
@@ -7689,7 +8185,7 @@ Pin.prototype.toJSON = toJSON
 module.exports = Pin
 
 
-},{}],24:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 
 /**
  * A link that is not already attached
@@ -7816,7 +8312,7 @@ function PreLink (canvas, output) {
 module.exports = PreLink
 
 
-},{}],25:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports={
   "fillCircle": "#fff",
   "fillLabel": "#333",
@@ -7842,18 +8338,18 @@ module.exports={
   "unitWidth": 10
 }
 
-},{}],26:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 module.exports={
   "node": {},
   "link": {}
 }
 
-},{}],27:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 
 exports.Canvas = require('./Canvas')
 
 
-},{"./Canvas":12}],28:[function(require,module,exports){
+},{"./Canvas":15}],31:[function(require,module,exports){
 
 function validate (view) {
   if (typeof view !== 'object')
@@ -7869,7 +8365,7 @@ function validate (view) {
 module.exports = validate
 
 
-},{}],29:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 
 // Consider this module will be browserified.
 
@@ -7890,7 +8386,7 @@ require('svg.foreignobject.js')
 module.exports = SVG
 
 
-},{"svg.draggable.js":8,"svg.foreignobject.js":9,"svg.js":10}],30:[function(require,module,exports){
+},{"svg.draggable.js":11,"svg.foreignobject.js":12,"svg.js":13}],33:[function(require,module,exports){
 var inserted = {};
 
 module.exports = function (css, options) {
@@ -7914,24 +8410,42 @@ module.exports = function (css, options) {
     }
 };
 
-},{}],31:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function (Buffer){
 
+window.myDebug = require('debug')
 
-var insertCss = require('insert-css')
+
+var insertCss=require('insert-css')
+
 var socket = io()
 
 var normalize = Buffer("LyohIG5vcm1hbGl6ZS5jc3MgdjMuMC4zIHwgTUlUIExpY2Vuc2UgfCBnaXRodWIuY29tL25lY29sYXMvbm9ybWFsaXplLmNzcyAqLwoKLyoqCiAqIDEuIFNldCBkZWZhdWx0IGZvbnQgZmFtaWx5IHRvIHNhbnMtc2VyaWYuCiAqIDIuIFByZXZlbnQgaU9TIGFuZCBJRSB0ZXh0IHNpemUgYWRqdXN0IGFmdGVyIGRldmljZSBvcmllbnRhdGlvbiBjaGFuZ2UsCiAqICAgIHdpdGhvdXQgZGlzYWJsaW5nIHVzZXIgem9vbS4KICovCgpodG1sIHsKICBmb250LWZhbWlseTogc2Fucy1zZXJpZjsgLyogMSAqLwogIC1tcy10ZXh0LXNpemUtYWRqdXN0OiAxMDAlOyAvKiAyICovCiAgLXdlYmtpdC10ZXh0LXNpemUtYWRqdXN0OiAxMDAlOyAvKiAyICovCn0KCi8qKgogKiBSZW1vdmUgZGVmYXVsdCBtYXJnaW4uCiAqLwoKYm9keSB7CiAgbWFyZ2luOiAwOwp9CgovKiBIVE1MNSBkaXNwbGF5IGRlZmluaXRpb25zCiAgID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ICovCgovKioKICogQ29ycmVjdCBgYmxvY2tgIGRpc3BsYXkgbm90IGRlZmluZWQgZm9yIGFueSBIVE1MNSBlbGVtZW50IGluIElFIDgvOS4KICogQ29ycmVjdCBgYmxvY2tgIGRpc3BsYXkgbm90IGRlZmluZWQgZm9yIGBkZXRhaWxzYCBvciBgc3VtbWFyeWAgaW4gSUUgMTAvMTEKICogYW5kIEZpcmVmb3guCiAqIENvcnJlY3QgYGJsb2NrYCBkaXNwbGF5IG5vdCBkZWZpbmVkIGZvciBgbWFpbmAgaW4gSUUgMTEuCiAqLwoKYXJ0aWNsZSwKYXNpZGUsCmRldGFpbHMsCmZpZ2NhcHRpb24sCmZpZ3VyZSwKZm9vdGVyLApoZWFkZXIsCmhncm91cCwKbWFpbiwKbWVudSwKbmF2LApzZWN0aW9uLApzdW1tYXJ5IHsKICBkaXNwbGF5OiBibG9jazsKfQoKLyoqCiAqIDEuIENvcnJlY3QgYGlubGluZS1ibG9ja2AgZGlzcGxheSBub3QgZGVmaW5lZCBpbiBJRSA4LzkuCiAqIDIuIE5vcm1hbGl6ZSB2ZXJ0aWNhbCBhbGlnbm1lbnQgb2YgYHByb2dyZXNzYCBpbiBDaHJvbWUsIEZpcmVmb3gsIGFuZCBPcGVyYS4KICovCgphdWRpbywKY2FudmFzLApwcm9ncmVzcywKdmlkZW8gewogIGRpc3BsYXk6IGlubGluZS1ibG9jazsgLyogMSAqLwogIHZlcnRpY2FsLWFsaWduOiBiYXNlbGluZTsgLyogMiAqLwp9CgovKioKICogUHJldmVudCBtb2Rlcm4gYnJvd3NlcnMgZnJvbSBkaXNwbGF5aW5nIGBhdWRpb2Agd2l0aG91dCBjb250cm9scy4KICogUmVtb3ZlIGV4Y2VzcyBoZWlnaHQgaW4gaU9TIDUgZGV2aWNlcy4KICovCgphdWRpbzpub3QoW2NvbnRyb2xzXSkgewogIGRpc3BsYXk6IG5vbmU7CiAgaGVpZ2h0OiAwOwp9CgovKioKICogQWRkcmVzcyBgW2hpZGRlbl1gIHN0eWxpbmcgbm90IHByZXNlbnQgaW4gSUUgOC85LzEwLgogKiBIaWRlIHRoZSBgdGVtcGxhdGVgIGVsZW1lbnQgaW4gSUUgOC85LzEwLzExLCBTYWZhcmksIGFuZCBGaXJlZm94IDwgMjIuCiAqLwoKW2hpZGRlbl0sCnRlbXBsYXRlIHsKICBkaXNwbGF5OiBub25lOwp9CgovKiBMaW5rcwogICA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSAqLwoKLyoqCiAqIFJlbW92ZSB0aGUgZ3JheSBiYWNrZ3JvdW5kIGNvbG9yIGZyb20gYWN0aXZlIGxpbmtzIGluIElFIDEwLgogKi8KCmEgewogIGJhY2tncm91bmQtY29sb3I6IHRyYW5zcGFyZW50Owp9CgovKioKICogSW1wcm92ZSByZWFkYWJpbGl0eSBvZiBmb2N1c2VkIGVsZW1lbnRzIHdoZW4gdGhleSBhcmUgYWxzbyBpbiBhbgogKiBhY3RpdmUvaG92ZXIgc3RhdGUuCiAqLwoKYTphY3RpdmUsCmE6aG92ZXIgewogIG91dGxpbmU6IDA7Cn0KCi8qIFRleHQtbGV2ZWwgc2VtYW50aWNzCiAgID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ICovCgovKioKICogQWRkcmVzcyBzdHlsaW5nIG5vdCBwcmVzZW50IGluIElFIDgvOS8xMC8xMSwgU2FmYXJpLCBhbmQgQ2hyb21lLgogKi8KCmFiYnJbdGl0bGVdIHsKICBib3JkZXItYm90dG9tOiAxcHggZG90dGVkOwp9CgovKioKICogQWRkcmVzcyBzdHlsZSBzZXQgdG8gYGJvbGRlcmAgaW4gRmlyZWZveCA0KywgU2FmYXJpLCBhbmQgQ2hyb21lLgogKi8KCmIsCnN0cm9uZyB7CiAgZm9udC13ZWlnaHQ6IGJvbGQ7Cn0KCi8qKgogKiBBZGRyZXNzIHN0eWxpbmcgbm90IHByZXNlbnQgaW4gU2FmYXJpIGFuZCBDaHJvbWUuCiAqLwoKZGZuIHsKICBmb250LXN0eWxlOiBpdGFsaWM7Cn0KCi8qKgogKiBBZGRyZXNzIHZhcmlhYmxlIGBoMWAgZm9udC1zaXplIGFuZCBtYXJnaW4gd2l0aGluIGBzZWN0aW9uYCBhbmQgYGFydGljbGVgCiAqIGNvbnRleHRzIGluIEZpcmVmb3ggNCssIFNhZmFyaSwgYW5kIENocm9tZS4KICovCgpoMSB7CiAgZm9udC1zaXplOiAyZW07CiAgbWFyZ2luOiAwLjY3ZW0gMDsKfQoKLyoqCiAqIEFkZHJlc3Mgc3R5bGluZyBub3QgcHJlc2VudCBpbiBJRSA4LzkuCiAqLwoKbWFyayB7CiAgYmFja2dyb3VuZDogI2ZmMDsKICBjb2xvcjogIzAwMDsKfQoKLyoqCiAqIEFkZHJlc3MgaW5jb25zaXN0ZW50IGFuZCB2YXJpYWJsZSBmb250IHNpemUgaW4gYWxsIGJyb3dzZXJzLgogKi8KCnNtYWxsIHsKICBmb250LXNpemU6IDgwJTsKfQoKLyoqCiAqIFByZXZlbnQgYHN1YmAgYW5kIGBzdXBgIGFmZmVjdGluZyBgbGluZS1oZWlnaHRgIGluIGFsbCBicm93c2Vycy4KICovCgpzdWIsCnN1cCB7CiAgZm9udC1zaXplOiA3NSU7CiAgbGluZS1oZWlnaHQ6IDA7CiAgcG9zaXRpb246IHJlbGF0aXZlOwogIHZlcnRpY2FsLWFsaWduOiBiYXNlbGluZTsKfQoKc3VwIHsKICB0b3A6IC0wLjVlbTsKfQoKc3ViIHsKICBib3R0b206IC0wLjI1ZW07Cn0KCi8qIEVtYmVkZGVkIGNvbnRlbnQKICAgPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gKi8KCi8qKgogKiBSZW1vdmUgYm9yZGVyIHdoZW4gaW5zaWRlIGBhYCBlbGVtZW50IGluIElFIDgvOS8xMC4KICovCgppbWcgewogIGJvcmRlcjogMDsKfQoKLyoqCiAqIENvcnJlY3Qgb3ZlcmZsb3cgbm90IGhpZGRlbiBpbiBJRSA5LzEwLzExLgogKi8KCnN2Zzpub3QoOnJvb3QpIHsKICBvdmVyZmxvdzogaGlkZGVuOwp9CgovKiBHcm91cGluZyBjb250ZW50CiAgID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ICovCgovKioKICogQWRkcmVzcyBtYXJnaW4gbm90IHByZXNlbnQgaW4gSUUgOC85IGFuZCBTYWZhcmkuCiAqLwoKZmlndXJlIHsKICBtYXJnaW46IDFlbSA0MHB4Owp9CgovKioKICogQWRkcmVzcyBkaWZmZXJlbmNlcyBiZXR3ZWVuIEZpcmVmb3ggYW5kIG90aGVyIGJyb3dzZXJzLgogKi8KCmhyIHsKICBib3gtc2l6aW5nOiBjb250ZW50LWJveDsKICBoZWlnaHQ6IDA7Cn0KCi8qKgogKiBDb250YWluIG92ZXJmbG93IGluIGFsbCBicm93c2Vycy4KICovCgpwcmUgewogIG92ZXJmbG93OiBhdXRvOwp9CgovKioKICogQWRkcmVzcyBvZGQgYGVtYC11bml0IGZvbnQgc2l6ZSByZW5kZXJpbmcgaW4gYWxsIGJyb3dzZXJzLgogKi8KCmNvZGUsCmtiZCwKcHJlLApzYW1wIHsKICBmb250LWZhbWlseTogbW9ub3NwYWNlLCBtb25vc3BhY2U7CiAgZm9udC1zaXplOiAxZW07Cn0KCi8qIEZvcm1zCiAgID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ICovCgovKioKICogS25vd24gbGltaXRhdGlvbjogYnkgZGVmYXVsdCwgQ2hyb21lIGFuZCBTYWZhcmkgb24gT1MgWCBhbGxvdyB2ZXJ5IGxpbWl0ZWQKICogc3R5bGluZyBvZiBgc2VsZWN0YCwgdW5sZXNzIGEgYGJvcmRlcmAgcHJvcGVydHkgaXMgc2V0LgogKi8KCi8qKgogKiAxLiBDb3JyZWN0IGNvbG9yIG5vdCBiZWluZyBpbmhlcml0ZWQuCiAqICAgIEtub3duIGlzc3VlOiBhZmZlY3RzIGNvbG9yIG9mIGRpc2FibGVkIGVsZW1lbnRzLgogKiAyLiBDb3JyZWN0IGZvbnQgcHJvcGVydGllcyBub3QgYmVpbmcgaW5oZXJpdGVkLgogKiAzLiBBZGRyZXNzIG1hcmdpbnMgc2V0IGRpZmZlcmVudGx5IGluIEZpcmVmb3ggNCssIFNhZmFyaSwgYW5kIENocm9tZS4KICovCgpidXR0b24sCmlucHV0LApvcHRncm91cCwKc2VsZWN0LAp0ZXh0YXJlYSB7CiAgY29sb3I6IGluaGVyaXQ7IC8qIDEgKi8KICBmb250OiBpbmhlcml0OyAvKiAyICovCiAgbWFyZ2luOiAwOyAvKiAzICovCn0KCi8qKgogKiBBZGRyZXNzIGBvdmVyZmxvd2Agc2V0IHRvIGBoaWRkZW5gIGluIElFIDgvOS8xMC8xMS4KICovCgpidXR0b24gewogIG92ZXJmbG93OiB2aXNpYmxlOwp9CgovKioKICogQWRkcmVzcyBpbmNvbnNpc3RlbnQgYHRleHQtdHJhbnNmb3JtYCBpbmhlcml0YW5jZSBmb3IgYGJ1dHRvbmAgYW5kIGBzZWxlY3RgLgogKiBBbGwgb3RoZXIgZm9ybSBjb250cm9sIGVsZW1lbnRzIGRvIG5vdCBpbmhlcml0IGB0ZXh0LXRyYW5zZm9ybWAgdmFsdWVzLgogKiBDb3JyZWN0IGBidXR0b25gIHN0eWxlIGluaGVyaXRhbmNlIGluIEZpcmVmb3gsIElFIDgvOS8xMC8xMSwgYW5kIE9wZXJhLgogKiBDb3JyZWN0IGBzZWxlY3RgIHN0eWxlIGluaGVyaXRhbmNlIGluIEZpcmVmb3guCiAqLwoKYnV0dG9uLApzZWxlY3QgewogIHRleHQtdHJhbnNmb3JtOiBub25lOwp9CgovKioKICogMS4gQXZvaWQgdGhlIFdlYktpdCBidWcgaW4gQW5kcm9pZCA0LjAuKiB3aGVyZSAoMikgZGVzdHJveXMgbmF0aXZlIGBhdWRpb2AKICogICAgYW5kIGB2aWRlb2AgY29udHJvbHMuCiAqIDIuIENvcnJlY3QgaW5hYmlsaXR5IHRvIHN0eWxlIGNsaWNrYWJsZSBgaW5wdXRgIHR5cGVzIGluIGlPUy4KICogMy4gSW1wcm92ZSB1c2FiaWxpdHkgYW5kIGNvbnNpc3RlbmN5IG9mIGN1cnNvciBzdHlsZSBiZXR3ZWVuIGltYWdlLXR5cGUKICogICAgYGlucHV0YCBhbmQgb3RoZXJzLgogKi8KCmJ1dHRvbiwKaHRtbCBpbnB1dFt0eXBlPSJidXR0b24iXSwgLyogMSAqLwppbnB1dFt0eXBlPSJyZXNldCJdLAppbnB1dFt0eXBlPSJzdWJtaXQiXSB7CiAgLXdlYmtpdC1hcHBlYXJhbmNlOiBidXR0b247IC8qIDIgKi8KICBjdXJzb3I6IHBvaW50ZXI7IC8qIDMgKi8KfQoKLyoqCiAqIFJlLXNldCBkZWZhdWx0IGN1cnNvciBmb3IgZGlzYWJsZWQgZWxlbWVudHMuCiAqLwoKYnV0dG9uW2Rpc2FibGVkXSwKaHRtbCBpbnB1dFtkaXNhYmxlZF0gewogIGN1cnNvcjogZGVmYXVsdDsKfQoKLyoqCiAqIFJlbW92ZSBpbm5lciBwYWRkaW5nIGFuZCBib3JkZXIgaW4gRmlyZWZveCA0Ky4KICovCgpidXR0b246Oi1tb3otZm9jdXMtaW5uZXIsCmlucHV0OjotbW96LWZvY3VzLWlubmVyIHsKICBib3JkZXI6IDA7CiAgcGFkZGluZzogMDsKfQoKLyoqCiAqIEFkZHJlc3MgRmlyZWZveCA0KyBzZXR0aW5nIGBsaW5lLWhlaWdodGAgb24gYGlucHV0YCB1c2luZyBgIWltcG9ydGFudGAgaW4KICogdGhlIFVBIHN0eWxlc2hlZXQuCiAqLwoKaW5wdXQgewogIGxpbmUtaGVpZ2h0OiBub3JtYWw7Cn0KCi8qKgogKiBJdCdzIHJlY29tbWVuZGVkIHRoYXQgeW91IGRvbid0IGF0dGVtcHQgdG8gc3R5bGUgdGhlc2UgZWxlbWVudHMuCiAqIEZpcmVmb3gncyBpbXBsZW1lbnRhdGlvbiBkb2Vzbid0IHJlc3BlY3QgYm94LXNpemluZywgcGFkZGluZywgb3Igd2lkdGguCiAqCiAqIDEuIEFkZHJlc3MgYm94IHNpemluZyBzZXQgdG8gYGNvbnRlbnQtYm94YCBpbiBJRSA4LzkvMTAuCiAqIDIuIFJlbW92ZSBleGNlc3MgcGFkZGluZyBpbiBJRSA4LzkvMTAuCiAqLwoKaW5wdXRbdHlwZT0iY2hlY2tib3giXSwKaW5wdXRbdHlwZT0icmFkaW8iXSB7CiAgYm94LXNpemluZzogYm9yZGVyLWJveDsgLyogMSAqLwogIHBhZGRpbmc6IDA7IC8qIDIgKi8KfQoKLyoqCiAqIEZpeCB0aGUgY3Vyc29yIHN0eWxlIGZvciBDaHJvbWUncyBpbmNyZW1lbnQvZGVjcmVtZW50IGJ1dHRvbnMuIEZvciBjZXJ0YWluCiAqIGBmb250LXNpemVgIHZhbHVlcyBvZiB0aGUgYGlucHV0YCwgaXQgY2F1c2VzIHRoZSBjdXJzb3Igc3R5bGUgb2YgdGhlCiAqIGRlY3JlbWVudCBidXR0b24gdG8gY2hhbmdlIGZyb20gYGRlZmF1bHRgIHRvIGB0ZXh0YC4KICovCgppbnB1dFt0eXBlPSJudW1iZXIiXTo6LXdlYmtpdC1pbm5lci1zcGluLWJ1dHRvbiwKaW5wdXRbdHlwZT0ibnVtYmVyIl06Oi13ZWJraXQtb3V0ZXItc3Bpbi1idXR0b24gewogIGhlaWdodDogYXV0bzsKfQoKLyoqCiAqIDEuIEFkZHJlc3MgYGFwcGVhcmFuY2VgIHNldCB0byBgc2VhcmNoZmllbGRgIGluIFNhZmFyaSBhbmQgQ2hyb21lLgogKiAyLiBBZGRyZXNzIGBib3gtc2l6aW5nYCBzZXQgdG8gYGJvcmRlci1ib3hgIGluIFNhZmFyaSBhbmQgQ2hyb21lLgogKi8KCmlucHV0W3R5cGU9InNlYXJjaCJdIHsKICAtd2Via2l0LWFwcGVhcmFuY2U6IHRleHRmaWVsZDsgLyogMSAqLwogIGJveC1zaXppbmc6IGNvbnRlbnQtYm94OyAvKiAyICovCn0KCi8qKgogKiBSZW1vdmUgaW5uZXIgcGFkZGluZyBhbmQgc2VhcmNoIGNhbmNlbCBidXR0b24gaW4gU2FmYXJpIGFuZCBDaHJvbWUgb24gT1MgWC4KICogU2FmYXJpIChidXQgbm90IENocm9tZSkgY2xpcHMgdGhlIGNhbmNlbCBidXR0b24gd2hlbiB0aGUgc2VhcmNoIGlucHV0IGhhcwogKiBwYWRkaW5nIChhbmQgYHRleHRmaWVsZGAgYXBwZWFyYW5jZSkuCiAqLwoKaW5wdXRbdHlwZT0ic2VhcmNoIl06Oi13ZWJraXQtc2VhcmNoLWNhbmNlbC1idXR0b24sCmlucHV0W3R5cGU9InNlYXJjaCJdOjotd2Via2l0LXNlYXJjaC1kZWNvcmF0aW9uIHsKICAtd2Via2l0LWFwcGVhcmFuY2U6IG5vbmU7Cn0KCi8qKgogKiBEZWZpbmUgY29uc2lzdGVudCBib3JkZXIsIG1hcmdpbiwgYW5kIHBhZGRpbmcuCiAqLwoKZmllbGRzZXQgewogIGJvcmRlcjogMXB4IHNvbGlkICNjMGMwYzA7CiAgbWFyZ2luOiAwIDJweDsKICBwYWRkaW5nOiAwLjM1ZW0gMC42MjVlbSAwLjc1ZW07Cn0KCi8qKgogKiAxLiBDb3JyZWN0IGBjb2xvcmAgbm90IGJlaW5nIGluaGVyaXRlZCBpbiBJRSA4LzkvMTAvMTEuCiAqIDIuIFJlbW92ZSBwYWRkaW5nIHNvIHBlb3BsZSBhcmVuJ3QgY2F1Z2h0IG91dCBpZiB0aGV5IHplcm8gb3V0IGZpZWxkc2V0cy4KICovCgpsZWdlbmQgewogIGJvcmRlcjogMDsgLyogMSAqLwogIHBhZGRpbmc6IDA7IC8qIDIgKi8KfQoKLyoqCiAqIFJlbW92ZSBkZWZhdWx0IHZlcnRpY2FsIHNjcm9sbGJhciBpbiBJRSA4LzkvMTAvMTEuCiAqLwoKdGV4dGFyZWEgewogIG92ZXJmbG93OiBhdXRvOwp9CgovKioKICogRG9uJ3QgaW5oZXJpdCB0aGUgYGZvbnQtd2VpZ2h0YCAoYXBwbGllZCBieSBhIHJ1bGUgYWJvdmUpLgogKiBOT1RFOiB0aGUgZGVmYXVsdCBjYW5ub3Qgc2FmZWx5IGJlIGNoYW5nZWQgaW4gQ2hyb21lIGFuZCBTYWZhcmkgb24gT1MgWC4KICovCgpvcHRncm91cCB7CiAgZm9udC13ZWlnaHQ6IGJvbGQ7Cn0KCi8qIFRhYmxlcwogICA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSAqLwoKLyoqCiAqIFJlbW92ZSBtb3N0IHNwYWNpbmcgYmV0d2VlbiB0YWJsZSBjZWxscy4KICovCgp0YWJsZSB7CiAgYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsKICBib3JkZXItc3BhY2luZzogMDsKfQoKdGQsCnRoIHsKICBwYWRkaW5nOiAwOwp9Cg==","base64")
 insertCss(normalize)
 
-var style = Buffer("Ci5kZmxvdy1pbnNwZWN0b3IgewogIGJhY2tncm91bmQtY29sb3I6IHdoaXRlc21va2U7CiAgYm9yZGVyLXN0eWxlOiBub25lOwp9CgojaW5zcGVjdG9yIHsKICBwb3NpdGlvbjogYWJzb2x1dGU7CiAgZmxvYXQ6IGxlZnQ7CiAgd2lkdGg6IDIwMHB4OwogIGhlaWdodDogMTAwJTsKfQoKLmRmbG93LWdyYXBoIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiBzbm93OwogIGJvcmRlci1zdHlsZTogZ3Jvb3ZlOwp9CgojZ3JhcGggewogIG92ZXJmbG93LXg6IGhpZGRlbjsKICBtYXJnaW4tbGVmdDogMjAwcHg7Cn0KCiN0b29sYmFyIHt9CgojY29udGFpbmVyIHsKICBvdmVyZmxvdzogaGlkZGVuOwogIHBvc2l0aW9uOiByZWxhdGl2ZTsKICB3aWR0aDogMTAwJTsKfQoKI3Rhc2stbmFtZTo6YmVmb3JlIHsKICBjb250ZW50OiAidGFzazogIgp9CgojdGFzay1pZDo6YmVmb3JlIHsKICBjb250ZW50OiAiaWQ6ICIKfQoKI3Rhc2stZGF0YSB7CiAgZGlzcGxheTogbm9uZTsKfQoKI3Rhc2stZGF0YTo6YmVmb3JlIHsKICBjb250ZW50OiAiZGF0YTogIgp9Cgo=","base64")
+var style = Buffer("Ci5kZmxvdy1pbnNwZWN0b3IgewogIGJhY2tncm91bmQtY29sb3I6IHdoaXRlc21va2U7CiAgYm9yZGVyLXN0eWxlOiBub25lOwp9CgojaW5zcGVjdG9yIHsKICBwb3NpdGlvbjogYWJzb2x1dGU7CiAgZmxvYXQ6IGxlZnQ7CiAgd2lkdGg6IDIwMHB4OwogIGhlaWdodDogMTAwJTsKfQoKLmRmbG93LWdyYXBoIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiBzbm93OwogIGJvcmRlci1zdHlsZTogZ3Jvb3ZlOwp9CgojZ3JhcGggewogIG92ZXJmbG93LXg6IGhpZGRlbjsKICBtYXJnaW4tbGVmdDogMjAwcHg7Cn0KCiN0b29sYmFyIHt9CgojY29udGFpbmVyIHsKICBvdmVyZmxvdzogaGlkZGVuOwogIHBvc2l0aW9uOiByZWxhdGl2ZTsKICB3aWR0aDogMTAwJTsKfQoKI3Rhc2stbmFtZTo6YmVmb3JlIHsKICBjb250ZW50OiAidGFzazogIgp9CgojdGFzay1pZDo6YmVmb3JlIHsKICBjb250ZW50OiAiaWQ6ICIKfQoKI3Rhc2stZGF0YSB7CiAgZGlzcGxheTogbm9uZTsKfQoKI3Rhc2stZGF0YTo6YmVmb3JlIHsKICBjb250ZW50OiAiZGF0YTogIgp9CgojdGFzay1kYXRhLWluaXRpYWxpemUgewogIGRpc3BsYXk6IG5vbmU7Cn0KCiN0YXNrLWRhdGEtcmVzZXQgewogIGRpc3BsYXk6IG5vbmU7Cn0KCiN0YXNrLWRhdGEtdHlwZSB7CiAgZGlzcGxheTogbm9uZTsKfQoK","base64")
 insertCss(style)
 
 var regexAccessor = require('../../engine/regex/accessor')
 
+var graph = null
+
 window.onload = function () {
+  // Debug setup.
+  window.myDebug.enable('dflow')
+  var debug = window.myDebug('dflow')
+  // TODO add Debug toogle button
+
+  // Initialize canvas and other elements.
   var Canvas = require('flow-view').Canvas
   var canvas = new Canvas('graph')
+
+  var taskDataInitButton  = document.getElementById('task-data-initialize'),
+      taskDataElement     = document.getElementById('task-data'),
+      taskDataResetButton = document.getElementById('task-data-reset'),
+      taskDataTypeSelect  = document.getElementById('task-data-type'),
+      taskIdElement       = document.getElementById('task-id'),
+      taskNameElement     = document.getElementById('task-name')
 
   var canvasMethods = ['addLink' , 'addNode',
                        'delLink' , 'delNode']
@@ -7939,8 +8453,9 @@ window.onload = function () {
   canvasMethods.forEach(function (methodName) {
     canvas.broker.removeAllListeners(methodName)
 
-    canvas.broker.on(methodName, function (ev) {
-      socket.emit(methodName, ev)
+    canvas.broker.on(methodName, function (data) {
+      debug(methodName, data)
+      socket.emit(methodName, data)
     })
 
     socket.on(methodName, function (data) {
@@ -7953,8 +8468,9 @@ window.onload = function () {
   nodeMethods.forEach(function (methodName) {
     canvas.broker.removeAllListeners(methodName)
 
-    canvas.broker.on(methodName, function (ev) {
-      socket.emit(methodName, ev)
+    canvas.broker.on(methodName, function (data) {
+      debug(methodName, data)
+      socket.emit(methodName, data)
     })
 
     socket.on(methodName, function (data) {
@@ -7967,12 +8483,15 @@ window.onload = function () {
     })
   })
 
-  canvas.broker.on('moveNode', function (ev) {
-    socket.emit('moveNode', ev)
+  canvas.broker.on('moveNode', function (data) {
+    debug('moveNode', data)
+    socket.emit('moveNode', data)
   })
 
-  canvas.broker.on('selectNode', function (ev) {
-    var id = ev.nodeid
+  canvas.broker.on('selectNode', function (data) {
+    debug('selectNode', data)
+
+    var id = data.nodeid
 
     var node = canvas.node[id]
 
@@ -7980,20 +8499,52 @@ window.onload = function () {
 
     var taskName = nodeJSON.text
 
-    var taskNameElement = document.getElementById('task-name')
-    var taskIdElement = document.getElementById('task-id')
-    var taskDataElement = document.getElementById('task-data')
-
     taskNameElement.innerHTML = taskName
-    taskIdElement.innerHTML = id
+    taskIdElement.innerHTML   = id
 
-    if (regexAccessor.test(taskName))
+    var taskIsAccessor  = regexAccessor.test(taskName),
+        taskDataContent = null,
+        taskDataProp    = null,
+        taskDataType    = null
+
+    // Show task-data element if task is an accessor.
+    if (taskIsAccessor)
       taskDataElement.style.display = 'block'
     else
       taskDataElement.style.display = 'none'
+
+    function resetData () {
+      console.log('reset '+taskDataProp)
+      graph.data[taskDataProp] = null
+      // TODO emit dataChange event
+    }
+
+    if (taskIsAccessor) {
+      taskDataProp    = taskName.substr(1)
+      taskDataContent = graph.data[taskDataProp]
+
+      if (taskDataContent) {
+        taskDataType = typeof taskDataContent
+
+        // Show reset button if task data has content.
+        taskDataInitButton.style.display  = 'none'
+        taskDataTypeSelect.style.display  = 'none'
+        taskDataResetButton.style.display = 'block'
+
+        taskDataResetButton.onclick = resetData
+      }
+      else {
+        // Show initialization form if task data is empty.
+        taskDataInitButton.style.display  = 'block'
+        taskDataTypeSelect.style.display  = 'block'
+        taskDataResetButton.style.display = 'none'
+      }
+    }
   })
 
   socket.on('moveNode', function (data) {
+    debug('moveNode', data)
+
     var x  = data.x
         y  = data.y
 
@@ -8018,7 +8569,10 @@ window.onload = function () {
     })
   })
 
-  socket.on('loadGraph', function (graph) {
+  socket.on('loadGraph', function (data) {
+    debug('loadGraph', data)
+
+    graph = data
     canvas.deleteView()
     canvas.render(graph.view)
   })
@@ -8026,9 +8580,9 @@ window.onload = function () {
 
 
 }).call(this,require("buffer").Buffer)
-},{"../../engine/regex/accessor":32,"buffer":1,"flow-view":6,"insert-css":30}],32:[function(require,module,exports){
+},{"../../engine/regex/accessor":35,"buffer":1,"debug":6,"flow-view":9,"insert-css":33}],35:[function(require,module,exports){
 
 module.exports = /^@[\w][\w\d]+$/
 
 
-},{}]},{},[31]);
+},{}]},{},[34]);

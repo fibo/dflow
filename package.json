@@ -10,9 +10,12 @@
   "license": "MIT",
   "bin": "bin/dflow",
   "main": "index.js",
+  "engines": {
+    "node": "4.1.1"
+  },
   "browser": "./src/engine/context/client-window.js",
   "scripts": {
-    "start": "node bin/dflow --verbose",
+    "start": "node bin/dflow",
     "_build": "npm test && npm run browserify && npm run minify && npm run jekyll; git status",
     "_push": "git push origin master && npm run gh-pages:push",
     "_pull": "git pull origin master && npm run gh-pages:pull",
@@ -41,6 +44,7 @@
   },
   "dependencies": {
     "body-parser": "^1.14.1",
+    "debug": "^2.2.0",
     "ejs": "^2.3.4",
     "express": "^4.13.3",
     "flow-view": "^0.7.2",

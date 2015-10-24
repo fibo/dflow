@@ -22,7 +22,17 @@
       <div id="inspector" class="dflow-inspector">
       <p id="task-name">None selected</p>
       <p id="task-id">null</p>
-      <p id="task-data">null</p>
+      <p id="task-data">
+        <select id="task-data-type">
+          <option value="string">string<option>
+          <option value="number">number<option>
+          <option value="object">object<option>
+          <option value="array">array<option>
+          <option value="boolean">boolean<option>
+        </select>
+        <button id="task-data-initialize">Initialize</button>
+        <button id="task-data-reset">Reset</button>
+      </p>
       </div>
       <div id="graph" class="dflow-graph"></div>
       </div>

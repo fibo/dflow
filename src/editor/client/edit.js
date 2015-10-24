@@ -1,6 +1,9 @@
 
+window.myDebug = require('debug')
+
 var fs = require('fs')
-var insertCss = require('insert-css')
+var insertCss=require('insert-css')
+
 var socket = io()
 
 var normalize = fs.readFileSync(__dirname + '/../../../node_modules/normalize.css/normalize.css')
@@ -11,9 +14,24 @@ insertCss(style)
 
 var regexAccessor = require('../../engine/regex/accessor')
 
+var graph = null
+
 window.onload = function () {
+  // Debug setup.
+  window.myDebug.enable('dflow')
+  var debug = window.myDebug('dflow')
+  // TODO add Debug toogle button
+
+  // Initialize canvas and other elements.
   var Canvas = require('flow-view').Canvas
   var canvas = new Canvas('graph')
+
+  var taskDataInitButton  = document.getElementById('task-data-initialize'),
+      taskDataElement     = document.getElementById('task-data'),
+      taskDataResetButton = document.getElementById('task-data-reset'),
+      taskDataTypeSelect  = document.getElementById('task-data-type'),
+      taskIdElement       = document.getElementById('task-id'),
+      taskNameElement     = document.getElementById('task-name')
 
   var canvasMethods = ['addLink' , 'addNode',
                        'delLink' , 'delNode']
@@ -21,8 +39,9 @@ window.onload = function () {
   canvasMethods.forEach(function (methodName) {
     canvas.broker.removeAllListeners(methodName)
 
-    canvas.broker.on(methodName, function (ev) {
-      socket.emit(methodName, ev)
+    canvas.broker.on(methodName, function (data) {
+      debug(methodName, data)
+      socket.emit(methodName, data)
     })
 
     socket.on(methodName, function (data) {
@@ -35,8 +54,9 @@ window.onload = function () {
   nodeMethods.forEach(function (methodName) {
     canvas.broker.removeAllListeners(methodName)
 
-    canvas.broker.on(methodName, function (ev) {
-      socket.emit(methodName, ev)
+    canvas.broker.on(methodName, function (data) {
+      debug(methodName, data)
+      socket.emit(methodName, data)
     })
 
     socket.on(methodName, function (data) {
@@ -49,12 +69,15 @@ window.onload = function () {
     })
   })
 
-  canvas.broker.on('moveNode', function (ev) {
-    socket.emit('moveNode', ev)
+  canvas.broker.on('moveNode', function (data) {
+    debug('moveNode', data)
+    socket.emit('moveNode', data)
   })
 
-  canvas.broker.on('selectNode', function (ev) {
-    var id = ev.nodeid
+  canvas.broker.on('selectNode', function (data) {
+    debug('selectNode', data)
+
+    var id = data.nodeid
 
     var node = canvas.node[id]
 
@@ -62,20 +85,52 @@ window.onload = function () {
 
     var taskName = nodeJSON.text
 
-    var taskNameElement = document.getElementById('task-name')
-    var taskIdElement = document.getElementById('task-id')
-    var taskDataElement = document.getElementById('task-data')
-
     taskNameElement.innerHTML = taskName
-    taskIdElement.innerHTML = id
+    taskIdElement.innerHTML   = id
 
-    if (regexAccessor.test(taskName))
+    var taskIsAccessor  = regexAccessor.test(taskName),
+        taskDataContent = null,
+        taskDataProp    = null,
+        taskDataType    = null
+
+    // Show task-data element if task is an accessor.
+    if (taskIsAccessor)
       taskDataElement.style.display = 'block'
     else
       taskDataElement.style.display = 'none'
+
+    function resetData () {
+      console.log('reset '+taskDataProp)
+      graph.data[taskDataProp] = null
+      // TODO emit dataChange event
+    }
+
+    if (taskIsAccessor) {
+      taskDataProp    = taskName.substr(1)
+      taskDataContent = graph.data[taskDataProp]
+
+      if (taskDataContent) {
+        taskDataType = typeof taskDataContent
+
+        // Show reset button if task data has content.
+        taskDataInitButton.style.display  = 'none'
+        taskDataTypeSelect.style.display  = 'none'
+        taskDataResetButton.style.display = 'block'
+
+        taskDataResetButton.onclick = resetData
+      }
+      else {
+        // Show initialization form if task data is empty.
+        taskDataInitButton.style.display  = 'block'
+        taskDataTypeSelect.style.display  = 'block'
+        taskDataResetButton.style.display = 'none'
+      }
+    }
   })
 
   socket.on('moveNode', function (data) {
+    debug('moveNode', data)
+
     var x  = data.x
         y  = data.y
 
@@ -100,7 +155,10 @@ window.onload = function () {
     })
   })
 
-  socket.on('loadGraph', function (graph) {
+  socket.on('loadGraph', function (data) {
+    debug('loadGraph', data)
+
+    graph = data
     canvas.deleteView()
     canvas.render(graph.view)
   })
