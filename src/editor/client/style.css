@@ -33,3 +33,15 @@
   content: "task: "
 }
 
+#task-id::before {
+  content: "id: "
+}
+
+#task-data {
+  display: none;
+}
+
+#task-data::before {
+  content: "data: "
+}
+
