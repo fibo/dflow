@@ -60,7 +60,7 @@ However, if you need to require the *dflow* engine in your package, or you need 
 $ npm install dflow
 ```
 
-If you want start hacking on dflow run
+If you want start hacking on *dflow* run
 
 ```bash
 $ git clone https://github.com/fibo/dflow.git
@@ -114,6 +114,8 @@ Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/sr
 
 ## Editor
 
+### Usage
+
 Launch *dflow* from command line, and start editing your first graph using your favourite browser.
 
 ```
@@ -122,7 +124,6 @@ Usage: dflow [options] [path/to/graph.json]
   -h, --help          print this message and exit
   --indentJSON        indent saved JSON graph
   -p, --port          server port number, defaults to 3000
-  -v, --verbose       print events on stdout
   --version           print current version and exit
 
 For more info point your browser to http://g14n.info/dflow
@@ -139,6 +140,10 @@ Click on a task to select it: addInput, addOutput and deleteTask buttons will ap
 Drag an output into an input to create a pipe.
 
 Click on a pipe to delete it.
+
+### Debug
+
+Set `DEBUG=dflow` environment variable to enable [debug](https://www.npmjs.com/package/debug) messages.
 
 ## Api
 

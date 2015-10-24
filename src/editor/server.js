@@ -1,5 +1,6 @@
 
-var fs = require('fs')
+var debug = require('debug')('dflow'),
+    fs    = require('fs')
 
 var pkg = require('../../package.json')
 
@@ -11,7 +12,6 @@ var emptyGraph = require('../engine/emptyGraph.json')
 
 var defaultOpt = {
   port: 3000,
-  verbose: false, // Silence is gold.
   indentJSON: false
 }
 
@@ -35,15 +35,6 @@ function saveGraph (graphPath, indentJSON, graph, callback) {
   })
 }
 
-/**
- * Log event to stdout
- */
-
-function logEvent (verbose, eventName, eventData) {
-  if (verbose)
-    console.dir({event: eventName, data: eventData})
-}
-
 function editorServer (graphPath, opt) {
   var graph  = require(graphPath),
       nextId = 0
@@ -51,8 +42,7 @@ function editorServer (graphPath, opt) {
   // Default options.
 
   var indentJSON = opt.indentJSON || defaultOpt.indentJSON,
-      port       = opt.port       || defaultOpt.port,
-      verbose    = opt.verbose    || defaultOpt.verbose
+      port       = opt.port       || defaultOpt.port
 
   /**
    * Id generator.
@@ -81,8 +71,6 @@ function editorServer (graphPath, opt) {
       io   = require('socket.io')(http)
 
   var save = saveGraph.bind(null, graphPath, indentJSON)
-
-  var log = logEvent.bind(null, verbose)
 
   app.set('views', path.join(__dirname, 'views'))
   app.set('view engine', 'ejs')
@@ -114,18 +102,16 @@ function editorServer (graphPath, opt) {
   // Socket.IO events.
 
   io.on('connection', function (socket) {
+    debug('a user connected')
 
-    if (verbose)
-     console.log('a user connected')
-
-     socket.emit('loadGraph', graph)
+    socket.emit('loadGraph', graph)
 
     /**
      * On addLink event.
      */
 
     function addLink (data) {
-      log('addLink', data)
+      debug('addLink', data)
 
       var id = getNextId()
 
@@ -156,7 +142,7 @@ function editorServer (graphPath, opt) {
      */
 
     function addInput (data) {
-      log('addInput', data)
+      debug('addInput', data)
 
       var content = data.content || {},
           id      = data.nodeid,
@@ -179,7 +165,7 @@ function editorServer (graphPath, opt) {
      */
 
     function addOutput (data) {
-      log('addOutput', data)
+      debug('addOutput', data)
 
       var content  = data.content || {},
           id       = data.nodeid,
@@ -202,7 +188,7 @@ function editorServer (graphPath, opt) {
      */
 
     function addNode (data) {
-      log('addNode', data)
+      debug('addNode', data)
 
       var id       = getNextId(),
           key      = null,
@@ -213,7 +199,7 @@ function editorServer (graphPath, opt) {
 
       if (commentRegex.test(taskName)) {
         // Do not add a task if node is a comment.
-        log('comment', taskName)
+        debug('comment', taskName)
       }
       else {
         // Add task.
@@ -257,7 +243,7 @@ function editorServer (graphPath, opt) {
      */
 
     function delLink (data) {
-      log('delLink', data)
+      debug('delLink', data)
 
       var id = data.linkid
 
@@ -277,13 +263,31 @@ function editorServer (graphPath, opt) {
      */
 
     function delNode (data) {
-      log('delNode', data)
+      debug('delNode', data)
 
       var id = data.nodeid
 
+      var taskName = graph.task[id]
       delete graph.task[id]
 
       delete graph.view.node[id]
+
+      // If node is an accessor, delete its data entry
+      // if there are is view node referencing it.
+
+      function byTaskName (key) {
+        return graph.view.node[key].text === taskName
+      }
+
+      if (accessorRegex.test(taskName)) {
+        var numOfAccessorsReferenced = Object.keys(graph.view.node)
+                                             .filter(byTaskName)
+                                             .length
+
+        if (numOfAccessorsReferenced === 0)
+          delete graph.data[taskName.substr(1)]
+          // TODO emit delData, document editor events, no event in engine
+      }
 
       io.emit('delNode', data)
 
@@ -297,7 +301,7 @@ function editorServer (graphPath, opt) {
      */
 
     function moveNode (data) {
-      log('moveNode', data)
+      debug('moveNode', data)
 
       var id = data.nodeid
 
@@ -319,18 +323,18 @@ function editorServer (graphPath, opt) {
 
   // Start server.
 
-  http.listen(port, function () {
-    if (verbose) {
-      console.log('Listening on port ' + port)
+  function onListening () {
+    debug('Listening on port %d', port)
 
-      if (indentJSON)
-        console.log('Option indentJSON is on')
-      else
-        console.log('Option indentJSON is off')
+    if (indentJSON)
+      debug('Option indentJSON is on')
+    else
+      debug('Option indentJSON is off')
 
-      console.log('Editing graph ' + graphPath)
-    }
-  })
+    debug('Editing graph %s', graphPath)
+  }
+
+  http.listen(port, onListening)
 }
 
 module.exports = editorServer
