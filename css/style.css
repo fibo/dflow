@@ -45,3 +45,15 @@
   content: "data: "
 }
 
+#task-data-initialize {
+  display: none;
+}
+
+#task-data-reset {
+  display: none;
+}
+
+#task-data-type {
+  display: none;
+}
+
