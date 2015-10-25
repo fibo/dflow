@@ -1,6 +1,6 @@
 
 /**
- *
+ * Inject functions that return numbers.
  *
  * @api private
  *
@@ -11,7 +11,7 @@
 function injectNumbers (funcs, task) {
 
   /**
-   * Inject a function that return a number.
+   * Inject a function that returns a number.
    *
    * @api private
    */

@@ -8,6 +8,7 @@ var builtinFunctions          = require('./functions/builtin'),
     injectGlobals             = require('./inject/globals'),
     injectNumbers             = require('./inject/numbers'),
     injectReferences          = require('./inject/references'),
+    injectStrings             = require('./inject/strings'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
     level                     = require('./level'),
@@ -47,6 +48,7 @@ function fun (graph, additionalFunctions) {
   injectDotOperators(funcs, task)
   injectReferences(funcs, task)
   injectNumbers(funcs, task)
+  injectStrings(funcs, task)
 
   /**
    * Compile each sub graph.
