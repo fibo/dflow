@@ -7,6 +7,7 @@ var builtinFunctions          = require('./functions/builtin'),
     injectAccessors           = require('./inject/accessors'),
     injectDotOperators        = require('./inject/dotOperators'),
     injectGlobals             = require('./inject/globals'),
+    injectNumbers             = require('./inject/numbers'),
     injectReferences          = require('./inject/references'),
     inputArgs                 = require('./inputArgs'),
     isDflowFun                = require('./isDflowFun'),
@@ -46,6 +47,7 @@ function fun (graph, additionalFunctions) {
   injectAdditionalFunctions(funcs, additionalFunctions)
   injectDotOperators(funcs, task)
   injectReferences(funcs, task)
+  injectNumbers(funcs, task)
 
   /**
    * Compile each sub graph.
@@ -145,7 +147,7 @@ function fun (graph, additionalFunctions) {
 module.exports = fun
 
 
-},{"./functions/builtin":2,"./inject/accessors":4,"./inject/additionalFunctions":5,"./inject/arguments":6,"./inject/dotOperators":7,"./inject/globals":8,"./inject/references":9,"./inputArgs":10,"./isDflowFun":12,"./level":13,"./regex/comment":17,"./validate":21}],2:[function(require,module,exports){
+},{"./functions/builtin":2,"./inject/accessors":4,"./inject/additionalFunctions":5,"./inject/arguments":6,"./inject/dotOperators":7,"./inject/globals":8,"./inject/numbers":9,"./inject/references":10,"./inputArgs":11,"./isDflowFun":13,"./level":14,"./regex/comment":18,"./validate":22}],2:[function(require,module,exports){
 
 // Arithmetic operators
 
@@ -355,7 +357,7 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 
-},{"../regex/accessor":15}],5:[function(require,module,exports){
+},{"../regex/accessor":16}],5:[function(require,module,exports){
 
 /**
  * Optionally add custom functions.
@@ -438,7 +440,7 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 
-},{"../regex/argument":16}],7:[function(require,module,exports){
+},{"../regex/argument":17}],7:[function(require,module,exports){
 
 var dotOperatorRegex = require('../regex/dotOperator')
 
@@ -528,7 +530,7 @@ function injectDotOperators (funcs, task) {
 module.exports = injectDotOperators
 
 
-},{"../regex/dotOperator":18}],8:[function(require,module,exports){
+},{"../regex/dotOperator":19}],8:[function(require,module,exports){
 
 var walkGlobal = require('../walkGlobal')
 
@@ -579,7 +581,44 @@ function injectGlobals (funcs, task) {
 module.exports = injectGlobals
 
 
-},{"../walkGlobal":22}],9:[function(require,module,exports){
+},{"../walkGlobal":23}],9:[function(require,module,exports){
+
+/**
+ *
+ *
+ * @api private
+ *
+ * @param {Object} funcs reference
+ * @param {Object} task collection
+ */
+
+function injectNumbers (funcs, task) {
+
+  /**
+   * Inject a function that return a number.
+   *
+   * @api private
+   */
+
+  function inject (taskKey) {
+    var taskName = task[taskKey]
+
+    var num = parseFloat(taskName)
+
+    if (isNaN(num))
+      return
+    else
+      funcs[taskName] = function () { return num }
+  }
+
+  Object.keys(task)
+        .forEach(inject)
+}
+
+module.exports = injectNumbers
+
+
+},{}],10:[function(require,module,exports){
 
 var referenceRegex = require('../regex/reference'),
     walkGlobal     = require('../walkGlobal')
@@ -630,7 +669,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 
-},{"../regex/reference":19,"../walkGlobal":22}],10:[function(require,module,exports){
+},{"../regex/reference":20,"../walkGlobal":23}],11:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -663,7 +702,7 @@ function inputArgs (outs, pipe, taskKey) {
 module.exports = inputArgs
 
 
-},{"./inputPipes":11}],11:[function(require,module,exports){
+},{"./inputPipes":12}],12:[function(require,module,exports){
 
 /**
  * Compute pipes that feed a task.
@@ -693,7 +732,7 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 
 var validate = require('./validate')
 
@@ -720,7 +759,7 @@ function isDflowFun (f) {
 module.exports = isDflowFun
 
 
-},{"./validate":21}],13:[function(require,module,exports){
+},{"./validate":22}],14:[function(require,module,exports){
 
 var parents = require('./parents')
 
@@ -756,7 +795,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 module.exports = level
 
 
-},{"./parents":14}],14:[function(require,module,exports){
+},{"./parents":15}],15:[function(require,module,exports){
 
 var inputPipes = require('./inputPipes')
 
@@ -785,39 +824,39 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 
-},{"./inputPipes":11}],15:[function(require,module,exports){
+},{"./inputPipes":12}],16:[function(require,module,exports){
 
 module.exports = /^@[\w][\w\d]+$/
 
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 
 module.exports = /^arguments\[(\d+)\]$/
 
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 
 module.exports = /^\/\/.+$/
 
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 
 module.exports = /^\&(.+)$/
 
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 
 module.exports = /^\/[\w][\w\d]+$/
 
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 
 var accessorRegex    = require('./regex/accessor'),
     argumentRegex    = require('./regex/argument'),
@@ -976,7 +1015,7 @@ function validate (graph, additionalFunctions) {
 module.exports = validate
 
 
-},{"./regex/accessor":15,"./regex/argument":16,"./regex/dotOperator":18,"./regex/reference":19,"./regex/subgraph":20}],22:[function(require,module,exports){
+},{"./regex/accessor":16,"./regex/argument":17,"./regex/dotOperator":19,"./regex/reference":20,"./regex/subgraph":21}],23:[function(require,module,exports){
 (function (global){
 
 var globalContext
