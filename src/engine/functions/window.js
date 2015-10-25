@@ -1,9 +1,21 @@
 
-exports.document = function _document () { return document }
+exports.document = function () {
+  return document
+}
 
-exports.body = function body () { return document.body }
+exports.body = function () {
+  return document.body
+}
 
-exports.head = function head () { return document.head }
+exports.head = function () {
+  return document.head
+}
 
-exports.window = function _window () { return window }
+exports.window = function () {
+  return window
+}
+
+exports.AudioContext = function () {
+  return window.AudioContext || window.webkitAudioContext
+}
 

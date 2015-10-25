@@ -8,6 +8,9 @@ var accessorRegex = require('../engine/regex/accessor'),
     commentRegex  = require('../engine/regex/comment'),
     subgraphRegex = require('../engine/regex/subgraph')
 
+var builtinFunctions = require('../engine/functions/builtin'),
+    windowFunctions  = require('../engine/functions/window')
+
 var emptyGraph = require('../engine/emptyGraph.json')
 
 var defaultOpt = {
@@ -97,6 +100,22 @@ function editorServer (graphPath, opt) {
 
   app.get('/run', function (req, res) {
     res.render('run', {graph: JSON.stringify(graph)})
+  })
+
+  app.get('/tasklist', function (req, res) {
+    var taskList = []
+
+    function addToTaskList (item) {
+      taskList.push(item)
+    }
+
+    Object.keys(builtinFunctions)
+          .forEach(addToTaskList)
+
+    Object.keys(windowFunctions)
+          .forEach(addToTaskList)
+
+    res.json(taskList)
   })
 
   // Socket.IO events.
@@ -202,6 +221,38 @@ function editorServer (graphPath, opt) {
         debug('comment', taskName)
       }
       else {
+        var i      = null,
+            numIns = null
+
+        var isBuiltinFunction = typeof builtinFunctions[taskName] === 'function',
+            isWindowFunction = typeof windowFunctions[taskName] === 'function'
+
+        // Add ins if taskName has arguments.
+        if (isBuiltinFunction) {
+          numIns = builtinFunctions[taskName].length
+
+          if (numIns > 0)
+            data.ins = []
+
+          for (i = 0; i < numIns; i++)
+            data.ins.push({ name: 'in' + i })
+        }
+
+        if (isWindowFunction) {
+          numIns = windowFunctions[taskName].length
+
+          if (numIns > 0)
+            data.ins = []
+
+          for (i = 0; i < numIns; i++)
+            data.ins.push({ name: 'in' + i })
+        }
+        // TODO Manage also global, and process functions
+
+        // Every node in dflow is a function hence it has an out,
+        // i.e. the return value of the function.
+        data.outs = [{ name: 'out' }]
+
         // Add task.
         graph.task[id] = taskName
 

@@ -305,22 +305,10 @@ exports.forEach = function (a, c) {
     return a.forEach(c)
 }
 
-exports['Array.prototype.join']    = Array.prototype.join
-exports['Array.prototype.map']     = Array.prototype.map
-exports['Array.prototype.pop']     = Array.prototype.pop
-exports['Array.prototype.push']    = Array.prototype.push
-exports['Array.prototype.reduce']  = Array.prototype.reduce
-exports['Array.prototype.slice']   = Array.prototype.slice
-exports['Array.prototype.sort']    = Array.prototype.sort
-
 // console
 
 exports['console.error'] = console.error.bind(console)
 exports['console.log']   = console.log.bind(console)
-
-// Function
-
-exports['Function.prototype'] = Function.prototype
 
 // Global
 
@@ -334,46 +322,32 @@ exports['null'] = function () { return null }
 
 exports['{}'] = function () { return {} }
 
-exports['Object.prototype.defineProperties']     = Object.prototype.defineProperties
-exports['Object.prototype.defineProperty']       = Object.prototype.defineProperty
-exports['Object.prototype.hasOwnProperty']       = Object.prototype.hasOwnProperty
-exports['Object.prototype.isPrototypeOf']        = Object.prototype.isPrototypeOf
-exports['Object.prototype.propertyIsEnumerable'] = Object.prototype.propertyIsEnumerable
-exports['Object.prototype.toLocaleString']       = Object.prototype.toLocaleString
-exports['Object.prototype.toString']             = Object.prototype.toString
-exports['Object.prototype.valueOf']              = Object.prototype.valueOf
-
 // String
 
 exports["''"] = function () { return '' }
 
-exports['String.prototype.charAt']            = String.prototype.charAt
-exports['String.prototype.charCodeAt']        = String.prototype.charCodeAt
-exports['String.prototype.concat']            = String.prototype.concat
-exports['String.prototype.indexOf']           = String.prototype.indexOf
-exports['String.prototype.lastIndexOf']       = String.prototype.lastIndexOf
-exports['String.prototype.repeat']            = String.prototype.repeat
-exports['String.prototype.search']            = String.prototype.search
-exports['String.prototype.slice']             = String.prototype.slice
-exports['String.prototype.split']             = String.prototype.split
-exports['String.prototype.substr']            = String.prototype.substr
-exports['String.prototype.substring']         = String.prototype.substring
-exports['String.prototype.toLocaleLowerCase'] = String.prototype.toLocaleLowerCase
-exports['String.prototype.toLocaleUpperCase'] = String.prototype.toLocaleUpperCase
-exports['String.prototype.toLowerCase']       = String.prototype.toLowerCase
-exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
-exports['String.prototype.trim']              = String.prototype.trim
-
 
 },{}],6:[function(require,module,exports){
 
-exports.document = function _document () { return document }
+exports.document = function () {
+  return document
+}
 
-exports.body = function body () { return document.body }
+exports.body = function () {
+  return document.body
+}
 
-exports.head = function head () { return document.head }
+exports.head = function () {
+  return document.head
+}
 
-exports.window = function _window () { return window }
+exports.window = function () {
+  return window
+}
+
+exports.AudioContext = function () {
+  return window.AudioContext || window.webkitAudioContext
+}
 
 
 },{}],7:[function(require,module,exports){
