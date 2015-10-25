@@ -24,7 +24,14 @@ window.onload = function () {
 
   // Initialize canvas and other elements.
   var Canvas = require('flow-view').Canvas
-  var canvas = new Canvas('graph')
+
+  var canvas = new Canvas('graph', {
+    nodeSelector: {
+      dataList: {
+        URL: '/tasklist'
+      }
+    }
+  })
 
   var taskDataInitButton  = document.getElementById('task-data-initialize'),
       taskDataElement     = document.getElementById('task-data'),

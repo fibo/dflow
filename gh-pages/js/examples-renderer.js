@@ -574,6 +574,18 @@ SVG.extend(SVG.Container, {
 * BUILT: Fri Oct 09 2015 14:46:55 GMT-0400 (EDT)
 */;
 
+
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(factory);
+  } else if (typeof exports === 'object') {
+    module.exports = root.document ? factory(root, root.document) : function(w){ return factory(w, w.document) };
+  } else {
+    root.SVG = factory(root, root.document);
+  }
+}(typeof window !== "undefined" ? window : this, function(window, document) {
+
+/*
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     define(factory);
@@ -583,6 +595,7 @@ SVG.extend(SVG.Container, {
     root.SVG = factory();
   }
 }(this, function(require, exports, module) {
+*/
 
 // The main wrapping element
 var SVG = this.SVG = function(element) {
@@ -4665,7 +4678,7 @@ var Broker        = require('./Broker'),
     Link          = require('./Link'),
     Node          = require('./Node'),
     NodeControls  = require('./NodeControls'),
-    NodeCreator   = require('./NodeCreator'),
+    NodeSelector  = require('./NodeSelector'),
     validate      = require('./validate')
 
 var defaultTheme = require('./default/theme.json'),
@@ -4676,7 +4689,11 @@ var defaultTheme = require('./default/theme.json'),
  *
  * @constructor
  * @param {String} id of div
- * @param {Object} arg can contain width, height, eventHooks
+ * @param {Object} arg
+ * @param {Number} arg.height
+ * @param {Number} arg.width
+ * @param {Object} arg.eventHooks
+ * @param {Object} arg.nodeSelector
  */
 
 function Canvas (id, arg) {
@@ -4741,17 +4758,17 @@ function Canvas (id, arg) {
 
   Object.defineProperty(this, 'nextId', { get: getNextId })
 
-  var nodeCreator  = new NodeCreator(this)
-  this.nodeCreator = nodeCreator
+  var nodeSelector  = new NodeSelector(this, arg.nodeSelector)
+  this.nodeSelector = nodeSelector
 
   var nodeControls = new NodeControls(this)
   this.nodeControls = nodeControls
 
-  var hideNodeCreator = nodeCreator.hide.bind(nodeCreator),
-      showNodeCreator = nodeCreator.show.bind(nodeCreator)
+  var hideNodeSelector = nodeSelector.hide.bind(nodeSelector),
+      showNodeSelector = nodeSelector.show.bind(nodeSelector)
 
-  SVG.on(element, 'click',    hideNodeCreator)
-  SVG.on(element, 'dblclick', showNodeCreator)
+  SVG.on(element, 'click',    hideNodeSelector)
+  SVG.on(element, 'dblclick', showNodeSelector)
 }
 
 function render (view) {
@@ -4941,7 +4958,7 @@ Canvas.prototype.selectNode = selectNode
 module.exports = Canvas
 
 
-},{"./Broker":8,"./Link":11,"./Node":12,"./NodeControls":17,"./NodeCreator":18,"./SVG":26,"./default/theme.json":22,"./default/view.json":23,"./validate":25}],10:[function(require,module,exports){
+},{"./Broker":8,"./Link":11,"./Node":12,"./NodeControls":17,"./NodeSelector":18,"./SVG":26,"./default/theme.json":22,"./default/view.json":23,"./validate":25}],10:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin')
@@ -5243,6 +5260,10 @@ function render (view) {
   }
 
   group.on('click', selectNode)
+
+  group.on('dblclick', function (ev) {
+    ev.stopPropagation()
+  })
 }
 
 Node.prototype.render = render
@@ -5680,24 +5701,89 @@ module.exports = NodeControls
 
 },{"./NodeButton/AddInput":14,"./NodeButton/AddOutput":15,"./NodeButton/DeleteNode":16}],18:[function(require,module,exports){
 
-// TODO autocompletion from json
-// http://blog.teamtreehouse.com/creating-autocomplete-dropdowns-datalist-element
+/**
+ * Create new nodes.
+ *
+ * Datalist feature stolen from article: http://blog.teamtreehouse.com/creating-autocomplete-dropdowns-datalist-element
+ * and this codepen: http://codepen.io/matt-west/pen/jKnzG
+ *
+ * @param {Object} canvas
+ * @param {Object} arg
+ * @param {String} dataListUrl containing datalist entries
+ */
 
-function NodeCreator (canvas) {
-  var x = 0
-  this.x = x
+function NodeSelector (canvas, arg) {
+  var x = this.x = 0,
+      y = this.y = 0
 
-  var y = 0
-  this.y = y
+  if (typeof arg === 'undefined')
+    arg = {}
 
   var foreignObject = canvas.svg.foreignObject(100, 100)
                             .attr({id: 'flow-view-selector'})
 
-  foreignObject.appendChild('form', {id: 'flow-view-selector-form', name: 'nodecreator'})
+  foreignObject.appendChild('form', {
+    id: 'flow-view-selector-form',
+    name: 'nodeselector'
+  })
 
   var form = foreignObject.getChild(0)
 
-  form.innerHTML = '<input id="flow-view-selector-input" name="selectnode" type="text" />'
+  var selectorInput = document.createElement('input')
+
+  selectorInput.id = 'flow-view-selector-input'
+  selectorInput.name = 'selectnode'
+  selectorInput.type = 'text'
+
+  var dataList      = null,
+      dataListItems = null,
+      dataListURL   = null
+
+  if (typeof arg.dataList === 'object') {
+    dataListItems = arg.dataList.items
+    dataListURL     = arg.dataList.URL
+    dataList = document.createElement('datalist')
+
+    dataList.id = 'flow-view-selector-list'
+
+    selectorInput.setAttribute('list', dataList.id)
+    selectorInput.appendChild(dataList)
+  }
+
+  function addToDataList (item) {
+    var option = document.createElement('option')
+
+    option.value = item
+
+    dataList.appendChild(option)
+  }
+
+  if (typeof dataListURL === 'string') {
+    var request = new XMLHttpRequest()
+
+    selectorInput.placeholder = 'Loading ...'
+
+    request.onreadystatechange = function () {
+      if (request.readyState === 4) {
+        if (request.status === 200) {
+          var jsonOptions = JSON.parse(request.responseText)
+
+            jsonOptions.forEach(addToDataList)
+
+          selectorInput.placeholder = ''
+        }
+        else {
+          // On error, notify in placeholder.
+          input.placeholder = 'Could not load datalist :(';
+        }
+      }
+    }
+
+    request.open('GET', dataListURL, true)
+    request.send()
+  }
+
+  form.appendChild(selectorInput)
 
   function createNode () {
     foreignObject.hide()
@@ -5728,16 +5814,20 @@ function NodeCreator (canvas) {
                .move(x, y)
                .hide()
 
+  foreignObject.on('click', function (ev) {
+    ev.stopPropagation()
+  })
+
   this.foreignObject = foreignObject
 }
 
-function hideNodeCreator (ev) {
+function hide (ev) {
   this.foreignObject.hide()
 }
 
-NodeCreator.prototype.hide = hideNodeCreator
+NodeSelector.prototype.hide = hide
 
-function showNodeCreator (ev) {
+function show (ev) {
   var x = ev.offsetX,
       y = ev.offsetY
 
@@ -5753,9 +5843,9 @@ function showNodeCreator (ev) {
   form.selectnode.focus()
 }
 
-NodeCreator.prototype.show = showNodeCreator
+NodeSelector.prototype.show = show
 
-module.exports = NodeCreator
+module.exports = NodeSelector
 
 
 },{}],19:[function(require,module,exports){
@@ -6383,22 +6473,10 @@ exports.forEach = function (a, c) {
     return a.forEach(c)
 }
 
-exports['Array.prototype.join']    = Array.prototype.join
-exports['Array.prototype.map']     = Array.prototype.map
-exports['Array.prototype.pop']     = Array.prototype.pop
-exports['Array.prototype.push']    = Array.prototype.push
-exports['Array.prototype.reduce']  = Array.prototype.reduce
-exports['Array.prototype.slice']   = Array.prototype.slice
-exports['Array.prototype.sort']    = Array.prototype.sort
-
 // console
 
 exports['console.error'] = console.error.bind(console)
 exports['console.log']   = console.log.bind(console)
-
-// Function
-
-exports['Function.prototype'] = Function.prototype
 
 // Global
 
@@ -6412,46 +6490,32 @@ exports['null'] = function () { return null }
 
 exports['{}'] = function () { return {} }
 
-exports['Object.prototype.defineProperties']     = Object.prototype.defineProperties
-exports['Object.prototype.defineProperty']       = Object.prototype.defineProperty
-exports['Object.prototype.hasOwnProperty']       = Object.prototype.hasOwnProperty
-exports['Object.prototype.isPrototypeOf']        = Object.prototype.isPrototypeOf
-exports['Object.prototype.propertyIsEnumerable'] = Object.prototype.propertyIsEnumerable
-exports['Object.prototype.toLocaleString']       = Object.prototype.toLocaleString
-exports['Object.prototype.toString']             = Object.prototype.toString
-exports['Object.prototype.valueOf']              = Object.prototype.valueOf
-
 // String
 
 exports["''"] = function () { return '' }
 
-exports['String.prototype.charAt']            = String.prototype.charAt
-exports['String.prototype.charCodeAt']        = String.prototype.charCodeAt
-exports['String.prototype.concat']            = String.prototype.concat
-exports['String.prototype.indexOf']           = String.prototype.indexOf
-exports['String.prototype.lastIndexOf']       = String.prototype.lastIndexOf
-exports['String.prototype.repeat']            = String.prototype.repeat
-exports['String.prototype.search']            = String.prototype.search
-exports['String.prototype.slice']             = String.prototype.slice
-exports['String.prototype.split']             = String.prototype.split
-exports['String.prototype.substr']            = String.prototype.substr
-exports['String.prototype.substring']         = String.prototype.substring
-exports['String.prototype.toLocaleLowerCase'] = String.prototype.toLocaleLowerCase
-exports['String.prototype.toLocaleUpperCase'] = String.prototype.toLocaleUpperCase
-exports['String.prototype.toLowerCase']       = String.prototype.toLowerCase
-exports['String.prototype.toUpperCase']       = String.prototype.toUpperCase
-exports['String.prototype.trim']              = String.prototype.trim
-
 
 },{}],30:[function(require,module,exports){
 
-exports.document = function _document () { return document }
+exports.document = function () {
+  return document
+}
 
-exports.body = function body () { return document.body }
+exports.body = function () {
+  return document.body
+}
 
-exports.head = function head () { return document.head }
+exports.head = function () {
+  return document.head
+}
 
-exports.window = function _window () { return window }
+exports.window = function () {
+  return window
+}
+
+exports.AudioContext = function () {
+  return window.AudioContext || window.webkitAudioContext
+}
 
 
 },{}],31:[function(require,module,exports){
