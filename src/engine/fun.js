@@ -42,10 +42,10 @@ function fun (graph, additionalFunctions) {
   funcs['dflow.isDflowFun'] = isDflowFun
   funcs['dflow.validate']   = validate
 
-  injectGlobals(funcs, task)
   injectAccessors(funcs, graph)
   injectAdditionalFunctions(funcs, additionalFunctions)
   injectDotOperators(funcs, task)
+  injectGlobals(funcs, task)
   injectReferences(funcs, task)
   injectNumbers(funcs, task)
   injectStrings(funcs, task)
