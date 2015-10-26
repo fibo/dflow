@@ -6259,10 +6259,10 @@ function fun (graph, additionalFunctions) {
   funcs['dflow.isDflowFun'] = isDflowFun
   funcs['dflow.validate']   = validate
 
-  injectGlobals(funcs, task)
   injectAccessors(funcs, graph)
   injectAdditionalFunctions(funcs, additionalFunctions)
   injectDotOperators(funcs, task)
+  injectGlobals(funcs, task)
   injectReferences(funcs, task)
   injectNumbers(funcs, task)
   injectStrings(funcs, task)
@@ -6494,9 +6494,18 @@ exports['null'] = function () { return null }
 
 exports['{}'] = function () { return {} }
 
-// String
+// Boolean
 
-exports["''"] = function () { return '' }
+exports.false = function () { return false }
+
+exports.true = function () { return true }
+
+// Assignment
+
+exports['='] = function (a, b) {
+  a = b
+  return b
+}
 
 
 },{}],30:[function(require,module,exports){
