@@ -23,6 +23,9 @@ var defaultOpt = {
  */
 
 function saveGraph (graphPath, indentJSON, graph, callback) {
+  if (typeof graphPath === 'undefined')
+    return
+
   var indentLevel = 0
 
   if (indentJSON)
@@ -39,8 +42,13 @@ function saveGraph (graphPath, indentJSON, graph, callback) {
 }
 
 function editorServer (graphPath, opt) {
-  var graph  = require(graphPath),
+  var graph,
       nextId = 0
+
+  if (typeof graphPath === 'undefined')
+    graph = Object.assign({}, emptyGraph)
+  else
+    graph = require(graphPath)
 
   // Default options.
 
@@ -91,7 +99,10 @@ function editorServer (graphPath, opt) {
   })
 
   app.get('/edit', function (req, res) {
-    res.render('edit', {graphPath: graphPath, version: pkg.version})
+    if (typeof graphPath === 'undefined')
+      res.render('edit', {graphPath: '(in memory)', version: pkg.version})
+    else
+      res.render('edit', {graphPath: graphPath, version: pkg.version})
   })
 
   app.get('/graph', function (req, res) {
@@ -279,7 +290,7 @@ function editorServer (graphPath, opt) {
           graph.func = {}
 
         if (typeof graph.func[key] === 'undefined')
-          graph.func[key] = emptyGraph
+          graph.func[key] = Object.assign({}, emptyGraph)
       }
 
       io.emit('addNode', data)
@@ -382,7 +393,10 @@ function editorServer (graphPath, opt) {
     else
       debug('Option indentJSON is off')
 
-    debug('Editing graph %s', graphPath)
+    if (typeof graph === 'undefined')
+      debug('Editing graph in memory')
+    else
+      debug('Editing graph %s', graphPath)
   }
 
   http.listen(port, onListening)

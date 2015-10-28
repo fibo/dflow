@@ -215,8 +215,7 @@ exports.apply = applyMethod
 function dot (obj, prop) { return obj[prop] }
 exports['.'] = dot
 
-function typeofOperator (operand) { return typeof operand }
-exports['typeof'] = typeofOperator
+exports['typeof'] = function (a) { return typeof a }
 
 function newOperator () {
   var Obj = arguments[0],
@@ -240,26 +239,13 @@ exports['new'] = newOperator
 
 // Array
 
-function emptyArray () { return [] }
-exports['[]'] = emptyArray
-
-exports.isArray  = Array.isArray
+exports['[]'] = function () { return [] }
 
 exports.indexOf = function (a, b) { return a.indexOf(b) }
 
-exports.filter = function (a, b, t) {
-  if (typeof t === 'undefined')
-    return a.filter(c, t)
-  else
-    return a.filter(c)
-}
+exports.push = function (a, b) { return a.push(b) }
 
-exports.forEach = function (a, c) {
-  if (typeof t === 'undefined')
-    return a.forEach(c, t)
-  else
-    return a.forEach(c)
-}
+exports.pop = function (a, b) { return a.pop(b) }
 
 // console
 
@@ -283,13 +269,6 @@ exports['{}'] = function () { return {} }
 exports.false = function () { return false }
 
 exports.true = function () { return true }
-
-// Assignment
-
-exports['='] = function (a, b) {
-  a = b
-  return b
-}
 
 
 },{}],3:[function(require,module,exports){
