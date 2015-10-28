@@ -67,8 +67,14 @@ $ npm start
 ```
 
 which will clone repo, install deps, and start the *dflow* cli.
-Then point your browser to *http://localhost:3000* and edit your *graph.json*.
+Then point your browser to *http://localhost:3000* and edit your graph.
 Note that by opening another browser window you can try the **collaborative editing** feature, powered by [Socket.IO](http://socket.io/)!
+
+Note that `npm start` will edit a graph **in memory**, if you want to edit your graph and save it to a file, for instance *graph.json*, launch
+
+```
+$ npm start -- graph.json
+```
 
 ## Examples
 

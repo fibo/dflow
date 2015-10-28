@@ -46,11 +46,9 @@ function appendCurrentWorkingDir (givenPath) {
   return path.join(process.cwd(), givenPath)
 }
 
-var graphPath = opt.argv.remain.map(appendCurrentWorkingDir).shift()
-
-if (typeof graphPath === 'undefined') {
-  graphPath = appendCurrentWorkingDir('graph.json')
-}
+var graphPath = opt.argv.remain
+                        .map(appendCurrentWorkingDir)
+                        .shift()
 
 function checkGraphPath (err, stats) {
   if (err && err.code === 'ENOENT') {
@@ -63,5 +61,8 @@ function checkGraphPath (err, stats) {
   }
 }
 
-fs.stat(graphPath, checkGraphPath)
+if (typeof graphPath === 'undefined')
+  editorServer(graphPath, opt)
+else
+  fs.stat(graphPath, checkGraphPath)
 
