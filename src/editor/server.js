@@ -50,6 +50,13 @@ function editorServer (graphPath, opt) {
   else
     graph = require(graphPath)
 
+  // Environment overrides defaults.
+
+  var envPORT = process.env.PORT
+
+  if (typeof envPORT !== 'undefined')
+    defaultOpt.port = envPORT
+
   // Default options.
 
   var indentJSON = opt.indentJSON || defaultOpt.indentJSON,

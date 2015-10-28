@@ -126,7 +126,7 @@ Usage: dflow [options] [path/to/graph.json]
 
   -h, --help          print this message and exit
   --indentJSON        indent saved JSON graph
-  -p, --port          server port number, defaults to 3000
+  -p, --port          server port number, defaults to 3000 or PORT env var
   --version           print current version and exit
 
 For more info point your browser to http://g14n.info/dflow
