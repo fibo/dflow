@@ -2,6 +2,8 @@
 
 > Is a minimal [Dataflow programming][4] engine.
 
+[Try dflow now!](https://dflow.herokuapp.com/) (on Heroku).
+
 **Table Of Contents:**
 
 * [Installation](#installation)
