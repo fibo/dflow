@@ -200,7 +200,7 @@ A *graph* has the following properties
   * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
   * `.quz`, `.quz()`: returns a dot-operator-like function.
-  * any taskName found in global context, walking throw dot operator, is available as a task. For example
+  * any task found in global context, for example
     - `isFunction`
     - `Math.cos`
     - `process.version`: will resolve to a function that returns it
