@@ -1,4 +1,3 @@
-
 /**
  * Compute pipes that feed a task.
  *
@@ -16,7 +15,7 @@ function inputPipes (pipe, taskKey) {
   }
 
   function ifIsInputPipe (key) {
-    return pipe[key][1] === taskKey 
+    return pipe[key][1] === taskKey
   }
 
   Object.keys(pipe).filter(ifIsInputPipe).forEach(pushPipe)
@@ -25,4 +24,3 @@ function inputPipes (pipe, taskKey) {
 }
 
 module.exports = inputPipes
-

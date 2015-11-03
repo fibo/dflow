@@ -1,4 +1,3 @@
-
 var parents = require('./parents')
 
 /**
@@ -32,4 +31,3 @@ function level (pipe, cachedLevelOf, taskKey) {
 }
 
 module.exports = level
-
