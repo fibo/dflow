@@ -6,6 +6,8 @@
 "    endif
 """""""""""""""""""""""""""""""""""""""""""""""
 
+" Highly recommended to install plugin https://github.com/elzr/vim-json
+
 " JavaScript Standard Style (standardjs.com)
 let b:syntastic_checkers = ['standard']
 
