@@ -22,45 +22,48 @@ var defaultOpt = {
  * Save graph json file
  */
 
-function saveGraph (graphPath, indentJSON, graph, callback) {
-  if (typeof graphPath === 'undefined')
+function saveGraph (graphPath, indentJSON, graph) {
+  if (typeof graphPath === 'undefined') {
     return
+  }
 
   var indentLevel = 0
 
-  if (indentJSON)
+  if (indentJSON) {
     indentLevel = 2
+  }
 
   var jsonString = JSON.stringify(graph, null, indentLevel)
 
   fs.writeFile(graphPath, jsonString, 'utf8', function (err) {
-    if (err) throw err
-
-    if (typeof callback === 'function')
-      callback()
+    if (err) {
+      throw err
+    }
   })
 }
 
 function editorServer (graphPath, opt) {
-  var graph,
-      nextId = 0
+  var graph = null
+  var nextId = 0
 
-  if (typeof graphPath === 'undefined')
+  if (typeof graphPath === 'undefined') {
     graph = Object.assign({}, emptyGraph)
-  else
+  } else {
     graph = require(graphPath)
+  }
 
   // Environment overrides defaults.
 
   var envPORT = process.env.PORT
 
-  if (typeof envPORT !== 'undefined')
+  if (typeof envPORT !== 'undefined') {
     defaultOpt.port = envPORT
+  }
 
   // Default options.
 
-  var indentJSON = opt.indentJSON || defaultOpt.indentJSON,
-      port       = opt.port       || defaultOpt.port
+  var indentJSON = opt.indentJSON || defaultOpt.indentJSON
+  var port = opt.port || defaultOpt.port
 
   /**
    * Id generator.
@@ -70,23 +73,23 @@ function editorServer (graphPath, opt) {
     var currentId = ++nextId + ''
 
     // Make next id unique.
-    if (graph.task[currentId])
+    if (graph.task[currentId]) {
       return getNextId()
+    }
 
-    if (graph.pipe[currentId])
+    if (graph.pipe[currentId]) {
       return getNextId()
+    }
 
     return currentId
   }
 
-  var bodyParser = require('body-parser'),
-      express    = require('express'),
-      ejs        = require('ejs'),
-      path       = require('path')
+  var express = require('express')
+  var path = require('path')
 
-  var app  = express(),
-      http = require('http').Server(app),
-      io   = require('socket.io')(http)
+  var app = express()
+  var http = require('http').Server(app)
+  var io = require('socket.io')(http)
 
   var save = saveGraph.bind(null, graphPath, indentJSON)
 
@@ -106,10 +109,11 @@ function editorServer (graphPath, opt) {
   })
 
   app.get('/edit', function (req, res) {
-    if (typeof graphPath === 'undefined')
+    if (typeof graphPath === 'undefined') {
       res.render('edit', {graphPath: '(in memory)', version: pkg.version})
-    else
+    } else {
       res.render('edit', {graphPath: graphPath, version: pkg.version})
+    }
   })
 
   app.get('/graph', function (req, res) {
@@ -156,14 +160,15 @@ function editorServer (graphPath, opt) {
       graph.view.link[id] = data
 
       // Add pipe.
-      var inputPosition = data.to[1],
-          sourceId      = data.from[0],
-          targetId      = data.to[0]
+      var inputPosition = data.to[1]
+      var sourceId = data.from[0]
+      var targetId = data.to[0]
 
       graph.pipe[id] = [sourceId, targetId]
 
-      if (inputPosition > 0)
+      if (inputPosition > 0) {
         graph.pipe[id].push(inputPosition)
+      }
 
       data.id = id
 
@@ -181,12 +186,12 @@ function editorServer (graphPath, opt) {
     function addInput (data) {
       debug('addInput', data)
 
-      var content = data.content || {},
-          id      = data.nodeid,
-          position = data.position
+      var content = data.content || {}
+      var id = data.nodeid
 
-      if (typeof graph.view.node[id].ins === 'undefined')
+      if (typeof graph.view.node[id].ins === 'undefined') {
         graph.view.node[id].ins = []
+      }
 
       graph.view.node[id].ins.push(content)
 
@@ -204,12 +209,12 @@ function editorServer (graphPath, opt) {
     function addOutput (data) {
       debug('addOutput', data)
 
-      var content  = data.content || {},
-          id       = data.nodeid,
-          position = data.position
+      var content = data.content || {}
+      var id = data.nodeid
 
-      if (typeof graph.view.node[id].outs === 'undefined')
+      if (typeof graph.view.node[id].outs === 'undefined') {
         graph.view.node[id].outs = []
+      }
 
       graph.view.node[id].outs.push(content)
 
@@ -227,9 +232,9 @@ function editorServer (graphPath, opt) {
     function addNode (data) {
       debug('addNode', data)
 
-      var id       = getNextId(),
-          key      = null,
-          taskName = data.text
+      var id = getNextId()
+      var key = null
+      var taskName = data.text
 
       // Add node to view.
       graph.view.node[id] = data
@@ -237,33 +242,36 @@ function editorServer (graphPath, opt) {
       if (commentRegex.test(taskName)) {
         // Do not add a task if node is a comment.
         debug('comment', taskName)
-      }
-      else {
-        var i      = null,
-            numIns = null
+      } else {
+        var i = null
+        var numIns = null
 
-        var isBuiltinFunction = typeof builtinFunctions[taskName] === 'function',
-            isWindowFunction = typeof windowFunctions[taskName] === 'function'
+        var isBuiltinFunction = typeof builtinFunctions[taskName] === 'function'
+        var isWindowFunction = typeof windowFunctions[taskName] === 'function'
 
         // Add ins if taskName has arguments.
         if (isBuiltinFunction) {
           numIns = builtinFunctions[taskName].length
 
-          if (numIns > 0)
+          if (numIns > 0) {
             data.ins = []
+          }
 
-          for (i = 0; i < numIns; i++)
+          for (i = 0; i < numIns; i++) {
             data.ins.push({ name: 'in' + i })
+          }
         }
 
         if (isWindowFunction) {
           numIns = windowFunctions[taskName].length
 
-          if (numIns > 0)
+          if (numIns > 0) {
             data.ins = []
+          }
 
-          for (i = 0; i < numIns; i++)
+          for (i = 0; i < numIns; i++) {
             data.ins.push({ name: 'in' + i })
+          }
         }
         // TODO Manage also global, and process functions
 
@@ -282,22 +290,26 @@ function editorServer (graphPath, opt) {
       if (accessorRegex.test(taskName)) {
         key = taskName.substring(1)
 
-        if (typeof graph.data === 'undefined')
+        if (typeof graph.data === 'undefined') {
           graph.data = {}
+        }
 
-        if (typeof graph.data[key] === 'undefined')
+        if (typeof graph.data[key] === 'undefined') {
           graph.data[key] = null
+        }
       }
 
       // If node is a subgraph, create its func entry if it does not exists.
       if (subgraphRegex.test(taskName)) {
         key = taskName.substring(1)
 
-        if (typeof graph.func === 'undefined')
+        if (typeof graph.func === 'undefined') {
           graph.func = {}
+        }
 
-        if (typeof graph.func[key] === 'undefined')
+        if (typeof graph.func[key] === 'undefined') {
           graph.func[key] = Object.assign({}, emptyGraph)
+        }
       }
 
       io.emit('addNode', data)
@@ -353,9 +365,10 @@ function editorServer (graphPath, opt) {
                                              .filter(byTaskName)
                                              .length
 
-        if (numOfAccessorsReferenced === 0)
+        if (numOfAccessorsReferenced === 0) {
           delete graph.data[taskName.substr(1)]
           // TODO emit delData, document editor events, no event in engine
+        }
       }
 
       io.emit('delNode', data)
@@ -395,15 +408,17 @@ function editorServer (graphPath, opt) {
   function onListening () {
     debug('Listening on port %d', port)
 
-    if (indentJSON)
+    if (indentJSON) {
       debug('Option indentJSON is on')
-    else
+    } else {
       debug('Option indentJSON is off')
+    }
 
-    if (typeof graph === 'undefined')
+    if (typeof graph === 'undefined') {
       debug('Editing graph in memory')
-    else
+    } else {
       debug('Editing graph %s', graphPath)
+    }
   }
 
   http.listen(port, onListening)
