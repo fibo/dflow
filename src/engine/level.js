@@ -13,10 +13,11 @@ var parents = require('./parents')
 
 function level (pipe, cachedLevelOf, taskKey) {
   var taskLevel = 0
-    , parentsOf = parents.bind(null, pipe)
+  var parentsOf = parents.bind(null, pipe)
 
-  if (typeof cachedLevelOf[taskKey] === 'number')
+  if (typeof cachedLevelOf[taskKey] === 'number') {
     return cachedLevelOf[taskKey]
+  }
 
   function computeLevel (parentTaskKey) {
                                  // ↓ Recursion here: the level of a task is the max level of its parents + 1.
