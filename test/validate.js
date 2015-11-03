@@ -1,6 +1,5 @@
 
-var should   = require('should'),
-    validate = require('../src/engine/validate')
+var validate = require('../src/engine/validate')
 
 describe('validate', function () {
   it('is aware that undefined argIndex means 0', function () {
