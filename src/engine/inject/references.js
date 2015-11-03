@@ -1,7 +1,5 @@
-
-var referenceRegex = require('../regex/reference'),
-    walkGlobal     = require('../walkGlobal')
-
+var referenceRegex = require('../regex/reference')
+var walkGlobal = require('../walkGlobal')
 
 /**
  * Inject references to functions.
@@ -13,11 +11,16 @@ var referenceRegex = require('../regex/reference'),
  */
 
 function injectReferences (funcs, task) {
+  /**
+   * Inject task.
+   *
+   * @api private
+   */
 
   function inject (taskKey) {
-    var referenceName,
-        referencedFunction,
-        taskName = task[taskKey]
+    var referenceName = null
+    var referencedFunction = null
+    var taskName = task[taskKey]
 
     /**
      * Inject reference.
@@ -32,13 +35,15 @@ function injectReferences (funcs, task) {
     if (referenceRegex.test(taskName)) {
       referenceName = taskName.substring(1)
 
-      if (typeof funcs[referenceName] === 'function')
+      if (typeof funcs[referenceName] === 'function') {
         referencedFunction = funcs[referenceName]
-      else
+      } else {
         referencedFunction = walkGlobal(referenceName)
+      }
 
-      if (typeof referencedFunction === 'function')
+      if (typeof referencedFunction === 'function') {
         funcs[taskName] = reference
+      }
     }
   }
 
@@ -46,4 +51,3 @@ function injectReferences (funcs, task) {
 }
 
 module.exports = injectReferences
-
