@@ -1,4 +1,3 @@
-
 var walkGlobal = require('../walkGlobal')
 
 /**
@@ -11,7 +10,6 @@ var walkGlobal = require('../walkGlobal')
  */
 
 function injectGlobals (funcs, task) {
-
   /**
    * Inject task
    *
@@ -23,22 +21,28 @@ function injectGlobals (funcs, task) {
 
     // Do not overwrite a function if already defined.
     // For example, console.log cannot be used as is, it must binded to console.
-    if (typeof funcs[taskName] === 'function')
+    if (typeof funcs[taskName] === 'function') {
       return
+    }
 
     // Skip also reserved keywords.
-    if ((taskName === 'return') || (taskName === 'this.graph'))
+    if ((taskName === 'return') || (taskName === 'this.graph')) {
       return
+    }
 
     var globalValue = walkGlobal(taskName)
 
-    if (typeof globalValue === 'undefined')
+    if (typeof globalValue === 'undefined') {
       return
+    }
 
-    if (typeof globalValue === 'function')
+    if (typeof globalValue === 'function') {
       funcs[taskName] = globalValue
-    else
-      funcs[taskName] = function () { return globalValue }
+    } else {
+      funcs[taskName] = function () {
+        return globalValue
+      }
+    }
   }
 
   Object.keys(task)
@@ -46,4 +50,3 @@ function injectGlobals (funcs, task) {
 }
 
 module.exports = injectGlobals
-

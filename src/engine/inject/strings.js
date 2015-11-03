@@ -1,4 +1,3 @@
-
 var quotedRegex = require('../regex/quoted')
 
 /**
@@ -11,7 +10,6 @@ var quotedRegex = require('../regex/quoted')
  */
 
 function injectStrings (funcs, task) {
-
   /**
    * Inject a function that returns a string.
    *
@@ -21,8 +19,11 @@ function injectStrings (funcs, task) {
   function inject (taskKey) {
     var taskName = task[taskKey]
 
-    if (quotedRegex.test(taskName))
-      funcs[taskName] = function () { return taskName.substr(1, taskName.length - 2) }
+    if (quotedRegex.test(taskName)) {
+      funcs[taskName] = function () {
+        return taskName.substr(1, taskName.length - 2)
+      }
+    }
   }
 
   Object.keys(task)
@@ -30,4 +31,3 @@ function injectStrings (funcs, task) {
 }
 
 module.exports = injectStrings
-
