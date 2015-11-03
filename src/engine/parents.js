@@ -1,4 +1,3 @@
-
 var inputPipes = require('./inputPipes')
 
 /**
@@ -12,7 +11,7 @@ var inputPipes = require('./inputPipes')
 
 function parents (pipe, taskKey) {
   var inputPipesOf = inputPipes.bind(null, pipe)
-    , parentTaskIds = []
+  var parentTaskIds = []
 
   function pushParentTaskId (pipe) {
     parentTaskIds.push(pipe[0])
@@ -24,4 +23,3 @@ function parents (pipe, taskKey) {
 }
 
 module.exports = parents
-

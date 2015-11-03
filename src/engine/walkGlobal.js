@@ -1,11 +1,12 @@
-
 var globalContext
 
-if (typeof window === 'object')
+if (typeof window === 'object') {
   globalContext = window
+}
 
-if (typeof global === 'object')
+if (typeof global === 'object') {
   globalContext = global
+}
 
 /**
  * Walk through global context.
@@ -17,11 +18,12 @@ if (typeof global === 'object')
  */
 
 function walkGlobal (taskName) {
-   function toNextProp (next, prop) { return next[prop] }
+  function toNextProp (next, prop) {
+    return next[prop]
+  }
 
   return taskName.split('.')
                  .reduce(toNextProp, globalContext)
 }
 
 module.exports = walkGlobal
-

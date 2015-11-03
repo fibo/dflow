@@ -1,13 +1,12 @@
-
 var fs = require('fs')
 
 var emptyGraph = require('./emptyGraph.json')
 
-  /**
-  *
-  * @param {String} graphPath
-  * @param {Function} [callback]
-  */
+/**
+ *
+ * @param {String} graphPath
+ * @param {Function} [callback]
+ */
 
 function createEmptyGraph (graphPath, callback) {
   var jsonString = JSON.stringify(emptyGraph)
@@ -20,4 +19,3 @@ function createEmptyGraph (graphPath, callback) {
 }
 
 module.exports = createEmptyGraph
-
