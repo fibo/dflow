@@ -6,7 +6,10 @@
 "    endif
 """""""""""""""""""""""""""""""""""""""""""""""
 
-" Highly recommended to install plugin https://github.com/elzr/vim-json
+" It is highly recommended to install plugin elzr/vim-json
+
+"autocmd VimEnter * if @% == 'bin/dflow' | echo 'hello' | else | echo 'world' | endif
+autocmd BufRead,BufNewFile dflow set filetype=javascript
 
 " JavaScript Standard Style (standardjs.com)
 let b:syntastic_checkers = ['standard']
