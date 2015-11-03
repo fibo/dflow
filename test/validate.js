@@ -3,29 +3,40 @@ var validate = require('../src/engine/validate')
 
 describe('validate', function () {
   it('is aware that undefined argIndex means 0', function () {
-    validate({
-               task: { '1': 'x', '2': 'x' },
-               pipe: {
-                 'a': [ '1', '2' ] // pipe['a'][2] here defaults to 0
-               }
-             }).should.be.ok
+    var graph = {
+      task: { '1': 'x', '2': 'x' },
+      pipe: {
+        'a': [ '1', '2' ] // pipe['a'][2] here defaults to 0
+      }
+    }
+
+    validate(graph).should.be.ok
   })
 
   it('throws if an additional function name is "return"', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 'return': Function.prototype
-               })
+      var graph = {
+        task: {}, pipe: {}
+      }
+      var func = {
+        'return': Function.prototype
+      }
+
+      validate(graph, func)
     }).should.throwError(/Reserved function name/)
   })
 
   it('throws if an additional function name is "arguments"', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 'arguments': Function.prototype
-               })
+      var graph = {
+        task: {},
+        pipe: {}
+      }
+      var func = {
+        'arguments': Function.prototype
+      }
+
+      validate(graph, func)
     }).should.throwError(/Reserved function name/)
   })
 

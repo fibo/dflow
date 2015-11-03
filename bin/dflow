@@ -16,6 +16,7 @@ var editorServer = require('../src/editor/server')
 var knownOpts = {
   help: Boolean,
   indentJSON: Boolean,
+  runOnEdit: Boolean,
   port: Number
 }
 var shortHandOpts = {
@@ -30,6 +31,7 @@ if (opt.help) {
   console.log('  -h, --help          print this message and exit')
   console.log('  --indentJSON        indent saved JSON graph')
   console.log('  -p, --port          server port number, defaults to 3000 or PORT env var')
+  console.log('  --run-on-edit       execute graph while being edited')
   console.log('  --version           print current version and exit')
   console.log('\nFor more info point your browser to ' + pkg.homepage)
   process.exit(0)
