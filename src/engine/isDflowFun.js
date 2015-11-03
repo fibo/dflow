@@ -1,4 +1,3 @@
-
 var validate = require('./validate')
 
 /**
@@ -10,16 +9,16 @@ var validate = require('./validate')
  */
 
 function isDflowFun (f) {
-  var isFunction     = typeof f === 'function',
-      hasGraphObject = typeof f.graph === 'object',
-      hasFuncsObject = typeof f.funcs === 'object',
-      hasValidGraph  = false
+  var isFunction = typeof f === 'function'
+  var hasGraphObject = typeof f.graph === 'object'
+  var hasFuncsObject = typeof f.funcs === 'object'
+  var hasValidGraph = false
 
-  if (isFunction && hasGraphObject && hasFuncsObject)
+  if (isFunction && hasGraphObject && hasFuncsObject) {
     hasValidGraph = validate(f.graph, f.funcs)
+  }
 
   return hasValidGraph
 }
 
 module.exports = isDflowFun
-

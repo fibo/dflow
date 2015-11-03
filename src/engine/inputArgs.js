@@ -1,4 +1,3 @@
-
 var inputPipes = require('./inputPipes')
 
 /**
@@ -13,11 +12,11 @@ var inputPipes = require('./inputPipes')
 
 function inputArgs (outs, pipe, taskKey) {
   var args = []
-    , inputPipesOf = inputPipes.bind(null, pipe)
-  
+  var inputPipesOf = inputPipes.bind(null, pipe)
+
   function populateArg (inputPipe) {
     var index = inputPipe[2] || 0
-      , value = outs[inputPipe[0]]
+    var value = outs[inputPipe[0]]
 
     args[index] = value
   }
@@ -28,4 +27,3 @@ function inputArgs (outs, pipe, taskKey) {
 }
 
 module.exports = inputArgs
-
