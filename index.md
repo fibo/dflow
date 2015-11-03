@@ -22,6 +22,8 @@ title: dflow
 
 [![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
 
+[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+
 [![Throughput Graph](https://graphs.waffle.io/fibo/dflow/throughput.svg)](https://waffle.io/fibo/dflow)
 
 ## Status
@@ -132,6 +134,7 @@ Usage: dflow [options] [path/to/graph.json]
   -h, --help          print this message and exit
   --indentJSON        indent saved JSON graph
   -p, --port          server port number, defaults to 3000 or PORT env var
+  --run-on-edit       execute graph while being edited
   --version           print current version and exit
 
 For more info point your browser to http://g14n.info/dflow
@@ -203,7 +206,7 @@ A *graph* has the following properties
   * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
   * `.quz`, `.quz()`: returns a dot-operator-like function.
-  * any taskName found in global context, walking throw dot operator, is available as a task. For example
+  * any task found in global context, for example
     - `isFunction`
     - `Math.cos`
     - `process.version`: will resolve to a function that returns it
