@@ -1,22 +1,28 @@
 
-window.myDebug = require('debug')
-
-var fs = require('fs')
-var insertCss=require('insert-css')
+var debug         = require('debug')
+var fs            = require('fs')
+var insertCss     = require('insert-css')
+var regexAccessor = require('../../engine/regex/accessor')
 
 var socket = io()
 
-var normalize = fs.readFileSync(__dirname + '/../../../node_modules/normalize.css/normalize.css')
-insertCss(normalize)
+var cssPaths = [
+  '/../../../node_modules/normalize.css/normalize.css',
+  '/style.css'
+]
 
-var style = fs.readFileSync(__dirname + '/style.css')
-insertCss(style)
+function readAndInsertCSS (cssPath) {
+  insertCss(fs.readFileSync(__dirname + '/style.css'))
+}
 
-var regexAccessor = require('../../engine/regex/accessor')
+cssPaths.forEach(readAndInsertCSS)
 
 var graph = null
 
-window.onload = function () {
+window.myDebug = debug
+window.onload  = initPage
+
+function initPage () {
   // Debug setup.
   window.myDebug.enable('dflow')
   var debug = window.myDebug('dflow')
@@ -33,12 +39,12 @@ window.onload = function () {
     }
   })
 
-  var taskDataInitButton  = document.getElementById('task-data-initialize'),
-      taskDataElement     = document.getElementById('task-data'),
-      taskDataResetButton = document.getElementById('task-data-reset'),
-      taskDataTypeSelect  = document.getElementById('task-data-type'),
-      taskIdElement       = document.getElementById('task-id'),
-      taskNameElement     = document.getElementById('task-name')
+  var taskDataInitButton = document.getElementById('task-data-initialize')
+  var taskDataElement = document.getElementById('task-data')
+  var taskDataResetButton = document.getElementById('task-data-reset')
+  var taskDataTypeSelect = document.getElementById('task-data-type')
+  var taskIdElement = document.getElementById('task-id')
+  var taskNameElement = document.getElementById('task-name')
 
   var canvasMethods = ['addLink' , 'addNode',
                        'delLink' , 'delNode']
