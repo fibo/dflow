@@ -16,3 +16,5 @@ if executable('node_modules/.bin/standard')
   let b:syntastic_javascript_standard_exec = 'node_modules/.bin/standard'
 endif
 
+let g:syntastic_javascript_standard_args = "--global it --global describe"
+

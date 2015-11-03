@@ -1,18 +1,17 @@
 
-var inputArgs = require('../src/engine/inputArgs'),
-    should    = require('should')
+var inputArgs = require('../src/engine/inputArgs')
 
 var pipe = {
-      'a': [ '0', '1', 0 ],
-      'b': [ '1', '2', 0 ],
-      'c': [ '2', '3', 0 ],
-      'd': [ '1', '3', 1 ]
-    },
-    outs = {
-    '0': 'foo',
-    '1': 'bar',
-    '2': 'quz'
-    }
+  'a': [ '0', '1', 0 ],
+  'b': [ '1', '2', 0 ],
+  'c': [ '2', '3', 0 ],
+  'd': [ '1', '3', 1 ]
+}
+var outs = {
+  '0': 'foo',
+  '1': 'bar',
+  '2': 'quz'
+}
 
 var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
