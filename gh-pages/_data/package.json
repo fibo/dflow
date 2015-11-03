@@ -39,8 +39,16 @@
     "jekyll": "npm run homepage; npm run cp; cd gh-pages; jekyll build; cd ..",
     "jshint": "jshint -c .jshintrc src/*/*.js test/**.js",
     "minify": "uglifyjs dist/${npm_package_name}.js --output dist/${npm_package_name}.min.js --compress --mangle",
+    "mocha": "mocha --bail --require should --reporter min --recursive",
     "postversion": "git push origin v${npm_package_version}; npm publish",
-    "test": "mocha --bail --require should --reporter min --recursive"
+    "#TODO standard": "npm run standard:bin; npm run standard:editor; npm run standard:engine; npm run standard:test",
+    "standard": "npm run standard:bin",
+    "standard:bin": "standard bin/dflow",
+    "standard:editor": "cd src/editor/; standard; cd ..",
+    "standard:engine": "cd src/engine/; standard; cd ..",
+    "standard:test": "cd test; standard --global describe --global it; cd ..",
+    "test": "npm run standard; npm run mocha",
+    "watchify:client:edit": "watchify -e src/editor/client/edit.js -t brfs -o src/editor/public/edit.js -p errorify"
   },
   "dependencies": {
     "body-parser": "^1.14.1",
@@ -63,12 +71,15 @@
     "brfs": "^1.4.1",
     "browserify": "^11.2.0",
     "coveralls": "^2.11.2",
+    "errorify": "^0.3.1",
     "insert-css": "^0.2.0",
     "istanbul": "^0.3.14",
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "^1.0.0",
     "normalize.css": "^3.0.3",
     "should": "^7.1.0",
-    "uglify-js": "^2.4.24"
+    "standard": "^5.3.1",
+    "uglify-js": "^2.4.24",
+    "watchify": "^3.5.0"
   }
 }

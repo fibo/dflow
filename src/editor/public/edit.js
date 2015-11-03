@@ -8503,7 +8503,7 @@ module.exports = function (css, options) {
 },{}],34:[function(require,module,exports){
 (function (Buffer){
 
-var debug         = require('debug')
+var debug = require('debug')
 
 var insertCss     = require('insert-css')
 var regexAccessor = require('../../engine/regex/accessor')

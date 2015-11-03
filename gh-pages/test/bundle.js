@@ -5674,10 +5674,6 @@ exports.getElementById = function (id) {
   return window.document.getElementById(id)
 }
 
-exports.createElement = function (el) {
-  return window.document.createElement(el)
-}
-
 exports.innerHTML = function (node, content) {
   node.innerHTML = content
 
@@ -6802,20 +6798,19 @@ describe('fun', function () {
 
 },{"../src/engine/fun":32,"should":6}],68:[function(require,module,exports){
 
-var inputArgs = require('../src/engine/inputArgs'),
-    should    = require('should')
+var inputArgs = require('../src/engine/inputArgs')
 
 var pipe = {
-      'a': [ '0', '1', 0 ],
-      'b': [ '1', '2', 0 ],
-      'c': [ '2', '3', 0 ],
-      'd': [ '1', '3', 1 ]
-    },
-    outs = {
-    '0': 'foo',
-    '1': 'bar',
-    '2': 'quz'
-    }
+  'a': [ '0', '1', 0 ],
+  'b': [ '1', '2', 0 ],
+  'c': [ '2', '3', 0 ],
+  'd': [ '1', '3', 1 ]
+}
+var outs = {
+  '0': 'foo',
+  '1': 'bar',
+  '2': 'quz'
+}
 
 var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
@@ -6832,7 +6827,7 @@ describe('inputArgs', function () {
 })
 
 
-},{"../src/engine/inputArgs":43,"should":6}],69:[function(require,module,exports){
+},{"../src/engine/inputArgs":43}],69:[function(require,module,exports){
 
 var should     = require('should'),
     inputPipes = require('../src/engine/inputPipes')
@@ -7090,34 +7085,44 @@ describe('this.graph', function () {
 
 },{"../src/engine/fun":32,"should":6}],75:[function(require,module,exports){
 
-var should   = require('should'),
-    validate = require('../src/engine/validate')
+var validate = require('../src/engine/validate')
 
 describe('validate', function () {
   it('is aware that undefined argIndex means 0', function () {
-    validate({
-               task: { '1': 'x', '2': 'x' },
-               pipe: {
-                 'a': [ '1', '2' ] // pipe['a'][2] here defaults to 0
-               }
-             }).should.be.ok
+    var graph = {
+      task: { '1': 'x', '2': 'x' },
+      pipe: {
+        'a': [ '1', '2' ] // pipe['a'][2] here defaults to 0
+      }
+    }
+
+    validate(graph).should.be.ok
   })
 
   it('throws if an additional function name is "return"', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 'return': Function.prototype
-               })
+      var graph = {
+        task: {}, pipe: {}
+      }
+      var func = {
+        'return': Function.prototype
+      }
+
+      validate(graph, func)
     }).should.throwError(/Reserved function name/)
   })
 
   it('throws if an additional function name is "arguments"', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 'arguments': Function.prototype
-               })
+      var graph = {
+        task: {},
+        pipe: {}
+      }
+      var func = {
+        'arguments': Function.prototype
+      }
+
+      validate(graph, func)
     }).should.throwError(/Reserved function name/)
   })
 
@@ -7272,4 +7277,4 @@ describe('validate', function () {
 })
 
 
-},{"../src/engine/validate":55,"should":6}]},{},[65,66,67,68,69,70,71,72,73,74,75]);
+},{"../src/engine/validate":55}]},{},[65,66,67,68,69,70,71,72,73,74,75]);
