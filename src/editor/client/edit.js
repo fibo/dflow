@@ -1,5 +1,5 @@
 
-var debug         = require('debug')
+var debug = require('debug')
 var fs            = require('fs')
 var insertCss     = require('insert-css')
 var regexAccessor = require('../../engine/regex/accessor')

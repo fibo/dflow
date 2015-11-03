@@ -1,15 +1,15 @@
 
-var debug = require('debug')('dflow'),
-    fs    = require('fs')
+var debug = require('debug')('dflow')
+var fs = require('fs')
 
 var pkg = require('../../package.json')
 
-var accessorRegex = require('../engine/regex/accessor'),
-    commentRegex  = require('../engine/regex/comment'),
-    subgraphRegex = require('../engine/regex/subgraph')
+var accessorRegex = require('../engine/regex/accessor')
+var commentRegex = require('../engine/regex/comment')
+var subgraphRegex = require('../engine/regex/subgraph')
 
-var builtinFunctions = require('../engine/functions/builtin'),
-    windowFunctions  = require('../engine/functions/window')
+var builtinFunctions = require('../engine/functions/builtin')
+var windowFunctions = require('../engine/functions/window')
 
 var emptyGraph = require('../engine/emptyGraph.json')
 
