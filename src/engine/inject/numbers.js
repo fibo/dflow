@@ -1,4 +1,3 @@
-
 /**
  * Inject functions that return numbers.
  *
@@ -9,7 +8,6 @@
  */
 
 function injectNumbers (funcs, task) {
-
   /**
    * Inject a function that returns a number.
    *
@@ -21,10 +19,11 @@ function injectNumbers (funcs, task) {
 
     var num = parseFloat(taskName)
 
-    if (isNaN(num))
+    if (isNaN(num)) {
       return
-    else
+    } else {
       funcs[taskName] = function () { return num }
+    }
   }
 
   Object.keys(task)
@@ -32,4 +31,3 @@ function injectNumbers (funcs, task) {
 }
 
 module.exports = injectNumbers
-

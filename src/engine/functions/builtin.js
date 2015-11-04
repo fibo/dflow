@@ -1,78 +1,55 @@
-
 // Arithmetic operators
 
-function addition (a, b) { return a + b }
-exports['+'] = addition
+exports['+'] = function (a, b) { return a + b }
 
-function multiplication (a, b) { return a * b }
-exports['*'] = multiplication
+exports['*'] = function (a, b) { return a * b }
 
-function subtraction (a, b) { return a - b }
-exports['-'] = subtraction
+exports['-'] = function (a, b) { return a - b }
 
-function division (a, b) { return a / b }
-exports['/'] = division
+exports['/'] = function (a, b) { return a / b }
 
-function modulus (a, b) { return a % b }
-exports['%'] = modulus
+exports['%'] = function (a, b) { return a % b }
 
 // Logical operators
 
-function and (a, b) { return a && b }
-exports['&&'] = and
+exports['&&'] = function (a, b) { return a && b }
 
-function or (a, b) { return a || b }
-exports['||'] = or
+exports['||'] = function (a, b) { return a || b }
 
-function not (a) { return ! a }
-exports['!'] = not
+exports['!'] = function (a) { return !a }
 
 // Comparison operators
 
-function equalTo (a, b) { return a == b }
-exports['=='] = equalTo
+exports['==='] = function (a, b) { return a === b }
 
-function equalValueAndEqualType (a, b) { return a === b }
-exports['==='] = equalValueAndEqualType
+exports['!=='] = function (a, b) { return a !== b }
 
-function notEqual (a, b) { return a != b }
-exports['!='] = notEqual
+exports['>'] = function (a, b) { return a > b }
 
-function notEqualValueAndEqualType (a, b) { return a !== b }
-exports['!=='] = notEqualValueAndEqualType
+exports['<'] = function (a, b) { return a < b }
 
-function greaterThen (a, b) { return a > b }
-exports['>'] = greaterThen
+exports['>='] = function (a, b) { return a >= b }
 
-function lessThen (a, b) { return a < b }
-exports['<'] = lessThen
-
-function greaterThenOrEqualTo (a, b) { return a >= b }
-exports['>='] = greaterThenOrEqualTo
-
-function lessThenOrEqualTo (a, b) { return a <= b }
-exports['<='] = lessThenOrEqualTo
+exports['<='] = function (a, b) { return a <= b }
 
 // Other operators
 
-function applyMethod (fun, thisArg, argsArray) {
+exports.apply = function (fun, thisArg, argsArray) {
   return fun.apply(thisArg, argsArray)
 }
-exports.apply = applyMethod
 
-function dot (obj, prop) { return obj[prop] }
-exports['.'] = dot
+exports['.'] = function (obj, prop) { return obj[prop] }
 
 exports['typeof'] = function (a) { return typeof a }
 
-function newOperator () {
-  var Obj = arguments[0],
-      arg1 = arguments[1],
-      arg2 = arguments[2],
-      arg3 = arguments[3],
-      arg4 = arguments[4],
-      arg5 = arguments[5],
-      argN = arguments.length - 1
+exports['new'] = function () {
+  var Obj = arguments[0]
+  var arg1 = arguments[1]
+  var arg2 = arguments[2]
+  var arg3 = arguments[3]
+  var arg4 = arguments[4]
+  var arg5 = arguments[5]
+  var argN = arguments.length - 1
 
   if (argN === 0) return new Obj()
   if (argN === 1) return new Obj(arg1)
@@ -82,8 +59,6 @@ function newOperator () {
   if (argN === 5) return new Obj(arg1, arg2, arg3, arg4, arg5)
   // If you have a constructor with more than 5 arguments ... think about refactoring or redesign it.
 }
-
-exports['new'] = newOperator
 
 // Array
 
@@ -98,7 +73,7 @@ exports.pop = function (a, b) { return a.pop(b) }
 // console
 
 exports['console.error'] = console.error.bind(console)
-exports['console.log']   = console.log.bind(console)
+exports['console.log'] = console.log.bind(console)
 
 // Global
 
@@ -117,4 +92,3 @@ exports['{}'] = function () { return {} }
 exports.false = function () { return false }
 
 exports.true = function () { return true }
-

@@ -2,8 +2,8 @@
  * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
 
-var windowFunctions = require('../functions/window'),
-    fun             = require('../fun')
+var windowFunctions = require('../functions/window')
+var fun = require('../fun')
 
 function funBrowser (graph) {
   var additionalFunctions = arguments[1] || {}
@@ -18,4 +18,3 @@ function funBrowser (graph) {
 }
 
 exports.fun = funBrowser
-

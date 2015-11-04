@@ -1,4 +1,3 @@
-
 var argumentRegex = require('../regex/argument')
 
 /**
@@ -12,7 +11,6 @@ var argumentRegex = require('../regex/argument')
  */
 
 function injectArguments (funcs, task, args) {
-
   function getArgument (index) {
     return args[index]
   }
@@ -28,12 +26,12 @@ function injectArguments (funcs, task, args) {
 
     if (funcName === 'arguments') {
       funcs[funcName] = function getArguments () { return args }
-    }
-    else {
+    } else {
       var arg = argumentRegex.exec(funcName)
 
-      if (arg)
+      if (arg) {
         funcs[funcName] = getArgument.bind(null, arg[1])
+      }
     }
   }
 
@@ -42,4 +40,3 @@ function injectArguments (funcs, task, args) {
 }
 
 module.exports = injectArguments
-

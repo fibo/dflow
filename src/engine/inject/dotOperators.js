@@ -1,4 +1,3 @@
-
 var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
@@ -11,7 +10,6 @@ var dotOperatorRegex = require('../regex/dotOperator')
  */
 
 function injectDotOperators (funcs, task) {
-
   /**
    * Inject dot operator.
    *
@@ -36,16 +34,18 @@ function injectDotOperators (funcs, task) {
     function dotOperatorFunc (attributeName, obj) {
       var func
 
-      if (typeof obj === 'object')
+      if (typeof obj === 'object') {
         func = obj[attributeName]
+      }
 
-      if (typeof func === 'function')
+      if (typeof func === 'function') {
         return func.apply(obj, Array.prototype.slice.call(arguments, 2))
+      }
     }
 
     if (dotOperatorRegex.func.test(taskName)) {
       // .foo() -> foo
-      attributeName = taskName.substring(1, taskName.length - 2)
+      var attributeName = taskName.substring(1, taskName.length - 2)
 
       funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
     }
@@ -64,11 +64,13 @@ function injectDotOperators (funcs, task) {
     function dotOperatorAttr (attributeName, obj) {
       var attr
 
-      if (typeof obj === 'object')
+      if (typeof obj === 'object') {
         attr = obj[attributeName]
+      }
 
-      if (typeof attr === 'function')
+      if (typeof attr === 'function') {
         return attr.bind(obj)
+      }
 
       return attr
     }
@@ -85,4 +87,3 @@ function injectDotOperators (funcs, task) {
 }
 
 module.exports = injectDotOperators
-

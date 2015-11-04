@@ -1,4 +1,3 @@
-
 exports.document = function () {
   return document
 }
@@ -28,4 +27,3 @@ exports.innerHTML = function (node, content) {
 
   return node
 }
-

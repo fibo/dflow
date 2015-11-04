@@ -42,7 +42,7 @@
     "mocha": "mocha --bail --require should --reporter min --recursive",
     "postversion": "git push origin v${npm_package_version}; npm publish",
     "#TODO standard": "npm run standard:bin; npm run standard:editor; npm run standard:engine; npm run standard:test",
-    "standard": "npm run standard:bin",
+    "standard": "npm run standard:bin; npm run standard:engine",
     "standard:bin": "standard bin/dflow",
     "standard:editor": "cd src/editor/; standard; cd ..",
     "standard:engine": "cd src/engine/; standard; cd ..",
