@@ -149,9 +149,13 @@ Drag an output into an input to create a pipe.
 
 Click on a pipe to delete it.
 
-### Debug
+### Environment
 
 Set `DEBUG=dflow` environment variable to enable [debug](https://www.npmjs.com/package/debug) messages.
+
+Set `PORT` env var to the port number you want the editor server binds to.
+
+Set `RUN_ON_EDIT=1` to enable *run on edit* editor option.
 
 ## Api
 
