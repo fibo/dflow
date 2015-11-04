@@ -1,18 +1,17 @@
-
-var builtinFunctions          = require('./functions/builtin'),
-    commentRegex              = require('./regex/comment'),
-    injectAdditionalFunctions = require('./inject/additionalFunctions'),
-    injectArguments           = require('./inject/arguments'),
-    injectAccessors           = require('./inject/accessors'),
-    injectDotOperators        = require('./inject/dotOperators'),
-    injectGlobals             = require('./inject/globals'),
-    injectNumbers             = require('./inject/numbers'),
-    injectReferences          = require('./inject/references'),
-    injectStrings             = require('./inject/strings'),
-    inputArgs                 = require('./inputArgs'),
-    isDflowFun                = require('./isDflowFun'),
-    level                     = require('./level'),
-    validate                  = require('./validate')
+var builtinFunctions = require('./functions/builtin')
+var commentRegex = require('./regex/comment')
+var injectAdditionalFunctions = require('./inject/additionalFunctions')
+var injectArguments = require('./inject/arguments')
+var injectAccessors = require('./inject/accessors')
+var injectDotOperators = require('./inject/dotOperators')
+var injectGlobals = require('./inject/globals')
+var injectNumbers = require('./inject/numbers')
+var injectReferences = require('./inject/references')
+var injectStrings = require('./inject/strings')
+var inputArgs = require('./inputArgs')
+var isDflowFun = require('./isDflowFun')
+var level = require('./level')
+var validate = require('./validate')
 
 /**
  * Create a dflow function.
@@ -25,22 +24,25 @@ var builtinFunctions          = require('./functions/builtin'),
 
 function fun (graph, additionalFunctions) {
   // First of all, check if graph is valid.
-  try { validate(graph, additionalFunctions) }
-  catch (err) { throw err }
+  try {
+    validate(graph, additionalFunctions)
+  } catch (err) {
+    throw err
+  }
 
-  var func = graph.func || {},
-      pipe = graph.pipe,
-      task = graph.task
+  var func = graph.func || {}
+  var pipe = graph.pipe
+  var task = graph.task
 
-  var cachedLevelOf  = {},
-      computeLevelOf = level.bind(null, pipe, cachedLevelOf),
-      funcs          = builtinFunctions
+  var cachedLevelOf = {}
+  var computeLevelOf = level.bind(null, pipe, cachedLevelOf)
+  var funcs = builtinFunctions
 
   // Inject compile-time builtin tasks.
 
-  funcs['dflow.fun']        = fun
+  funcs['dflow.fun'] = fun
   funcs['dflow.isDflowFun'] = isDflowFun
-  funcs['dflow.validate']   = validate
+  funcs['dflow.validate'] = validate
 
   injectAccessors(funcs, graph)
   injectAdditionalFunctions(funcs, additionalFunctions)
@@ -70,9 +72,9 @@ function fun (graph, additionalFunctions) {
    */
 
   function dflowFun () {
-    var gotReturn = false,
-        outs = {},
-        returnValue
+    var gotReturn = false
+    var outs = {}
+    var returnValue
 
     var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
@@ -87,11 +89,13 @@ function fun (graph, additionalFunctions) {
      */
 
     function byLevel (a, b) {
-      if (typeof cachedLevelOf[a] === 'undefined')
+      if (typeof cachedLevelOf[a] === 'undefined') {
         cachedLevelOf[a] = computeLevelOf(a)
+      }
 
-      if (typeof cachedLevelOf[b] === 'undefined')
+      if (typeof cachedLevelOf[b] === 'undefined') {
         cachedLevelOf[b] = computeLevelOf(b)
+      }
 
       return cachedLevelOf[a] - cachedLevelOf[b]
     }
@@ -101,14 +105,15 @@ function fun (graph, additionalFunctions) {
      */
 
     function run (taskKey) {
-      var args     = inputArgsOf(taskKey),
-          funcName = task[taskKey],
-          f        = funcs[funcName]
+      var args = inputArgsOf(taskKey)
+      var funcName = task[taskKey]
+      var f = funcs[funcName]
 
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.
-      if (gotReturn)
+      if (gotReturn) {
         return
+      }
 
       if ((funcName === 'return') && (!gotReturn)) {
         returnValue = args[0]
@@ -116,8 +121,9 @@ function fun (graph, additionalFunctions) {
         return
       }
 
-      if (typeof f === 'undefined')
+      if (typeof f === 'undefined') {
         throw new TypeError('Task ' + funcName + ' [' + taskKey + '] is not defined')
+      }
 
       outs[taskKey] = f.apply(null, args)
     }
@@ -127,7 +133,7 @@ function fun (graph, additionalFunctions) {
      */
 
     function comments (key) {
-      return ! commentRegex.test(task[key])
+      return !commentRegex.test(task[key])
     }
 
     // Run every graph task, sorted by level.
@@ -146,4 +152,3 @@ function fun (graph, additionalFunctions) {
 }
 
 module.exports = fun
-

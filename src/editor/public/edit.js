@@ -8684,8 +8684,6 @@ function initPage () {
 
 }).call(this,require("buffer").Buffer)
 },{"../../engine/regex/accessor":35,"buffer":1,"debug":6,"flow-view":9,"insert-css":33}],35:[function(require,module,exports){
-
 module.exports = /^@[\w][\w\d]+$/
-
 
 },{}]},{},[34]);

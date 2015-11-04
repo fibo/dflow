@@ -6196,8 +6196,8 @@ module.exports = SVG
  * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
 
-var windowFunctions = require('../functions/window'),
-    fun             = require('../fun')
+var windowFunctions = require('../functions/window')
+var fun = require('../fun')
 
 function funBrowser (graph) {
   var additionalFunctions = arguments[1] || {}
@@ -6213,23 +6213,21 @@ function funBrowser (graph) {
 
 exports.fun = funBrowser
 
-
 },{"../fun":28,"../functions/window":30}],28:[function(require,module,exports){
-
-var builtinFunctions          = require('./functions/builtin'),
-    commentRegex              = require('./regex/comment'),
-    injectAdditionalFunctions = require('./inject/additionalFunctions'),
-    injectArguments           = require('./inject/arguments'),
-    injectAccessors           = require('./inject/accessors'),
-    injectDotOperators        = require('./inject/dotOperators'),
-    injectGlobals             = require('./inject/globals'),
-    injectNumbers             = require('./inject/numbers'),
-    injectReferences          = require('./inject/references'),
-    injectStrings             = require('./inject/strings'),
-    inputArgs                 = require('./inputArgs'),
-    isDflowFun                = require('./isDflowFun'),
-    level                     = require('./level'),
-    validate                  = require('./validate')
+var builtinFunctions = require('./functions/builtin')
+var commentRegex = require('./regex/comment')
+var injectAdditionalFunctions = require('./inject/additionalFunctions')
+var injectArguments = require('./inject/arguments')
+var injectAccessors = require('./inject/accessors')
+var injectDotOperators = require('./inject/dotOperators')
+var injectGlobals = require('./inject/globals')
+var injectNumbers = require('./inject/numbers')
+var injectReferences = require('./inject/references')
+var injectStrings = require('./inject/strings')
+var inputArgs = require('./inputArgs')
+var isDflowFun = require('./isDflowFun')
+var level = require('./level')
+var validate = require('./validate')
 
 /**
  * Create a dflow function.
@@ -6242,22 +6240,25 @@ var builtinFunctions          = require('./functions/builtin'),
 
 function fun (graph, additionalFunctions) {
   // First of all, check if graph is valid.
-  try { validate(graph, additionalFunctions) }
-  catch (err) { throw err }
+  try {
+    validate(graph, additionalFunctions)
+  } catch (err) {
+    throw err
+  }
 
-  var func = graph.func || {},
-      pipe = graph.pipe,
-      task = graph.task
+  var func = graph.func || {}
+  var pipe = graph.pipe
+  var task = graph.task
 
-  var cachedLevelOf  = {},
-      computeLevelOf = level.bind(null, pipe, cachedLevelOf),
-      funcs          = builtinFunctions
+  var cachedLevelOf = {}
+  var computeLevelOf = level.bind(null, pipe, cachedLevelOf)
+  var funcs = builtinFunctions
 
   // Inject compile-time builtin tasks.
 
-  funcs['dflow.fun']        = fun
+  funcs['dflow.fun'] = fun
   funcs['dflow.isDflowFun'] = isDflowFun
-  funcs['dflow.validate']   = validate
+  funcs['dflow.validate'] = validate
 
   injectAccessors(funcs, graph)
   injectAdditionalFunctions(funcs, additionalFunctions)
@@ -6287,9 +6288,9 @@ function fun (graph, additionalFunctions) {
    */
 
   function dflowFun () {
-    var gotReturn = false,
-        outs = {},
-        returnValue
+    var gotReturn = false
+    var outs = {}
+    var returnValue
 
     var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
@@ -6304,11 +6305,13 @@ function fun (graph, additionalFunctions) {
      */
 
     function byLevel (a, b) {
-      if (typeof cachedLevelOf[a] === 'undefined')
+      if (typeof cachedLevelOf[a] === 'undefined') {
         cachedLevelOf[a] = computeLevelOf(a)
+      }
 
-      if (typeof cachedLevelOf[b] === 'undefined')
+      if (typeof cachedLevelOf[b] === 'undefined') {
         cachedLevelOf[b] = computeLevelOf(b)
+      }
 
       return cachedLevelOf[a] - cachedLevelOf[b]
     }
@@ -6318,14 +6321,15 @@ function fun (graph, additionalFunctions) {
      */
 
     function run (taskKey) {
-      var args     = inputArgsOf(taskKey),
-          funcName = task[taskKey],
-          f        = funcs[funcName]
+      var args = inputArgsOf(taskKey)
+      var funcName = task[taskKey]
+      var f = funcs[funcName]
 
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.
-      if (gotReturn)
+      if (gotReturn) {
         return
+      }
 
       if ((funcName === 'return') && (!gotReturn)) {
         returnValue = args[0]
@@ -6333,8 +6337,9 @@ function fun (graph, additionalFunctions) {
         return
       }
 
-      if (typeof f === 'undefined')
+      if (typeof f === 'undefined') {
         throw new TypeError('Task ' + funcName + ' [' + taskKey + '] is not defined')
+      }
 
       outs[taskKey] = f.apply(null, args)
     }
@@ -6344,7 +6349,7 @@ function fun (graph, additionalFunctions) {
      */
 
     function comments (key) {
-      return ! commentRegex.test(task[key])
+      return !commentRegex.test(task[key])
     }
 
     // Run every graph task, sorted by level.
@@ -6364,83 +6369,59 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-
 },{"./functions/builtin":29,"./inject/accessors":31,"./inject/additionalFunctions":32,"./inject/arguments":33,"./inject/dotOperators":34,"./inject/globals":35,"./inject/numbers":36,"./inject/references":37,"./inject/strings":38,"./inputArgs":39,"./isDflowFun":41,"./level":42,"./regex/comment":46,"./validate":51}],29:[function(require,module,exports){
-
 // Arithmetic operators
 
-function addition (a, b) { return a + b }
-exports['+'] = addition
+exports['+'] = function (a, b) { return a + b }
 
-function multiplication (a, b) { return a * b }
-exports['*'] = multiplication
+exports['*'] = function (a, b) { return a * b }
 
-function subtraction (a, b) { return a - b }
-exports['-'] = subtraction
+exports['-'] = function (a, b) { return a - b }
 
-function division (a, b) { return a / b }
-exports['/'] = division
+exports['/'] = function (a, b) { return a / b }
 
-function modulus (a, b) { return a % b }
-exports['%'] = modulus
+exports['%'] = function (a, b) { return a % b }
 
 // Logical operators
 
-function and (a, b) { return a && b }
-exports['&&'] = and
+exports['&&'] = function (a, b) { return a && b }
 
-function or (a, b) { return a || b }
-exports['||'] = or
+exports['||'] = function (a, b) { return a || b }
 
-function not (a) { return ! a }
-exports['!'] = not
+exports['!'] = function (a) { return !a }
 
 // Comparison operators
 
-function equalTo (a, b) { return a == b }
-exports['=='] = equalTo
+exports['==='] = function (a, b) { return a === b }
 
-function equalValueAndEqualType (a, b) { return a === b }
-exports['==='] = equalValueAndEqualType
+exports['!=='] = function (a, b) { return a !== b }
 
-function notEqual (a, b) { return a != b }
-exports['!='] = notEqual
+exports['>'] = function (a, b) { return a > b }
 
-function notEqualValueAndEqualType (a, b) { return a !== b }
-exports['!=='] = notEqualValueAndEqualType
+exports['<'] = function (a, b) { return a < b }
 
-function greaterThen (a, b) { return a > b }
-exports['>'] = greaterThen
+exports['>='] = function (a, b) { return a >= b }
 
-function lessThen (a, b) { return a < b }
-exports['<'] = lessThen
-
-function greaterThenOrEqualTo (a, b) { return a >= b }
-exports['>='] = greaterThenOrEqualTo
-
-function lessThenOrEqualTo (a, b) { return a <= b }
-exports['<='] = lessThenOrEqualTo
+exports['<='] = function (a, b) { return a <= b }
 
 // Other operators
 
-function applyMethod (fun, thisArg, argsArray) {
+exports.apply = function (fun, thisArg, argsArray) {
   return fun.apply(thisArg, argsArray)
 }
-exports.apply = applyMethod
 
-function dot (obj, prop) { return obj[prop] }
-exports['.'] = dot
+exports['.'] = function (obj, prop) { return obj[prop] }
 
 exports['typeof'] = function (a) { return typeof a }
 
-function newOperator () {
-  var Obj = arguments[0],
-      arg1 = arguments[1],
-      arg2 = arguments[2],
-      arg3 = arguments[3],
-      arg4 = arguments[4],
-      arg5 = arguments[5],
-      argN = arguments.length - 1
+exports['new'] = function () {
+  var Obj = arguments[0]
+  var arg1 = arguments[1]
+  var arg2 = arguments[2]
+  var arg3 = arguments[3]
+  var arg4 = arguments[4]
+  var arg5 = arguments[5]
+  var argN = arguments.length - 1
 
   if (argN === 0) return new Obj()
   if (argN === 1) return new Obj(arg1)
@@ -6450,8 +6431,6 @@ function newOperator () {
   if (argN === 5) return new Obj(arg1, arg2, arg3, arg4, arg5)
   // If you have a constructor with more than 5 arguments ... think about refactoring or redesign it.
 }
-
-exports['new'] = newOperator
 
 // Array
 
@@ -6466,7 +6445,7 @@ exports.pop = function (a, b) { return a.pop(b) }
 // console
 
 exports['console.error'] = console.error.bind(console)
-exports['console.log']   = console.log.bind(console)
+exports['console.log'] = console.log.bind(console)
 
 // Global
 
@@ -6486,9 +6465,7 @@ exports.false = function () { return false }
 
 exports.true = function () { return true }
 
-
 },{}],30:[function(require,module,exports){
-
 exports.document = function () {
   return document
 }
@@ -6519,9 +6496,7 @@ exports.innerHTML = function (node, content) {
   return node
 }
 
-
 },{}],31:[function(require,module,exports){
-
 var accessorRegex = require('../regex/accessor')
 
 /**
@@ -6534,8 +6509,9 @@ var accessorRegex = require('../regex/accessor')
  */
 
 function injectAccessors (funcs, graph) {
-  if (typeof graph.data === 'undefined')
+  if (typeof graph.data === 'undefined') {
     graph.data = {}
+  }
 
   /**
    * Inject accessor.
@@ -6544,8 +6520,8 @@ function injectAccessors (funcs, graph) {
    */
 
   function inject (taskKey) {
-    var accessorName,
-        taskName = graph.task[taskKey]
+    var accessorName = null
+    var taskName = graph.task[taskKey]
 
     /**
      * Accessor-like function.
@@ -6554,8 +6530,9 @@ function injectAccessors (funcs, graph) {
      */
 
     function accessor () {
-      if (arguments.length === 1)
+      if (arguments.length === 1) {
         graph.data[accessorName] = arguments[0]
+      }
 
       return graph.data[accessorName]
     }
@@ -6572,9 +6549,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-
 },{"../regex/accessor":44}],32:[function(require,module,exports){
-
 /**
  * Optionally add custom functions.
  *
@@ -6586,8 +6561,9 @@ module.exports = injectAccessors
 
 function injectAdditionalFunctions (funcs, additionalFunctions) {
   // Nothing to do if no additional function is given.
-  if (typeof additionalFunctions === 'undefined')
+  if (typeof additionalFunctions === 'undefined') {
     return
+  }
 
   /**
    * Validate and insert an additional function.
@@ -6596,10 +6572,11 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
    */
 
   function injectAdditionalFunction (key) {
-    var isAFunction  = typeof additionalFunctions[key] === 'function'
+    var isAFunction = typeof additionalFunctions[key] === 'function'
 
-    if (isAFunction)
+    if (isAFunction) {
       funcs[key] = additionalFunctions[key]
+    }
   }
 
   Object.keys(additionalFunctions)
@@ -6608,9 +6585,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-
 },{}],33:[function(require,module,exports){
-
 var argumentRegex = require('../regex/argument')
 
 /**
@@ -6624,7 +6599,6 @@ var argumentRegex = require('../regex/argument')
  */
 
 function injectArguments (funcs, task, args) {
-
   function getArgument (index) {
     return args[index]
   }
@@ -6640,12 +6614,12 @@ function injectArguments (funcs, task, args) {
 
     if (funcName === 'arguments') {
       funcs[funcName] = function getArguments () { return args }
-    }
-    else {
+    } else {
       var arg = argumentRegex.exec(funcName)
 
-      if (arg)
+      if (arg) {
         funcs[funcName] = getArgument.bind(null, arg[1])
+      }
     }
   }
 
@@ -6655,9 +6629,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-
 },{"../regex/argument":45}],34:[function(require,module,exports){
-
 var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
@@ -6670,7 +6642,6 @@ var dotOperatorRegex = require('../regex/dotOperator')
  */
 
 function injectDotOperators (funcs, task) {
-
   /**
    * Inject dot operator.
    *
@@ -6695,16 +6666,18 @@ function injectDotOperators (funcs, task) {
     function dotOperatorFunc (attributeName, obj) {
       var func
 
-      if (typeof obj === 'object')
+      if (typeof obj === 'object') {
         func = obj[attributeName]
+      }
 
-      if (typeof func === 'function')
+      if (typeof func === 'function') {
         return func.apply(obj, Array.prototype.slice.call(arguments, 2))
+      }
     }
 
     if (dotOperatorRegex.func.test(taskName)) {
       // .foo() -> foo
-      attributeName = taskName.substring(1, taskName.length - 2)
+      var attributeName = taskName.substring(1, taskName.length - 2)
 
       funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
     }
@@ -6723,11 +6696,13 @@ function injectDotOperators (funcs, task) {
     function dotOperatorAttr (attributeName, obj) {
       var attr
 
-      if (typeof obj === 'object')
+      if (typeof obj === 'object') {
         attr = obj[attributeName]
+      }
 
-      if (typeof attr === 'function')
+      if (typeof attr === 'function') {
         return attr.bind(obj)
+      }
 
       return attr
     }
@@ -6745,9 +6720,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-
 },{"../regex/dotOperator":47}],35:[function(require,module,exports){
-
 var walkGlobal = require('../walkGlobal')
 
 /**
@@ -6760,7 +6733,6 @@ var walkGlobal = require('../walkGlobal')
  */
 
 function injectGlobals (funcs, task) {
-
   /**
    * Inject task
    *
@@ -6772,22 +6744,28 @@ function injectGlobals (funcs, task) {
 
     // Do not overwrite a function if already defined.
     // For example, console.log cannot be used as is, it must binded to console.
-    if (typeof funcs[taskName] === 'function')
+    if (typeof funcs[taskName] === 'function') {
       return
+    }
 
     // Skip also reserved keywords.
-    if ((taskName === 'return') || (taskName === 'this.graph'))
+    if ((taskName === 'return') || (taskName === 'this.graph')) {
       return
+    }
 
     var globalValue = walkGlobal(taskName)
 
-    if (typeof globalValue === 'undefined')
+    if (typeof globalValue === 'undefined') {
       return
+    }
 
-    if (typeof globalValue === 'function')
+    if (typeof globalValue === 'function') {
       funcs[taskName] = globalValue
-    else
-      funcs[taskName] = function () { return globalValue }
+    } else {
+      funcs[taskName] = function () {
+        return globalValue
+      }
+    }
   }
 
   Object.keys(task)
@@ -6796,9 +6774,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-
 },{"../walkGlobal":52}],36:[function(require,module,exports){
-
 /**
  * Inject functions that return numbers.
  *
@@ -6809,7 +6785,6 @@ module.exports = injectGlobals
  */
 
 function injectNumbers (funcs, task) {
-
   /**
    * Inject a function that returns a number.
    *
@@ -6821,10 +6796,11 @@ function injectNumbers (funcs, task) {
 
     var num = parseFloat(taskName)
 
-    if (isNaN(num))
+    if (isNaN(num)) {
       return
-    else
+    } else {
       funcs[taskName] = function () { return num }
+    }
   }
 
   Object.keys(task)
@@ -6833,12 +6809,9 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-
 },{}],37:[function(require,module,exports){
-
-var referenceRegex = require('../regex/reference'),
-    walkGlobal     = require('../walkGlobal')
-
+var referenceRegex = require('../regex/reference')
+var walkGlobal = require('../walkGlobal')
 
 /**
  * Inject references to functions.
@@ -6850,11 +6823,16 @@ var referenceRegex = require('../regex/reference'),
  */
 
 function injectReferences (funcs, task) {
+  /**
+   * Inject task.
+   *
+   * @api private
+   */
 
   function inject (taskKey) {
-    var referenceName,
-        referencedFunction,
-        taskName = task[taskKey]
+    var referenceName = null
+    var referencedFunction = null
+    var taskName = task[taskKey]
 
     /**
      * Inject reference.
@@ -6869,13 +6847,15 @@ function injectReferences (funcs, task) {
     if (referenceRegex.test(taskName)) {
       referenceName = taskName.substring(1)
 
-      if (typeof funcs[referenceName] === 'function')
+      if (typeof funcs[referenceName] === 'function') {
         referencedFunction = funcs[referenceName]
-      else
+      } else {
         referencedFunction = walkGlobal(referenceName)
+      }
 
-      if (typeof referencedFunction === 'function')
+      if (typeof referencedFunction === 'function') {
         funcs[taskName] = reference
+      }
     }
   }
 
@@ -6884,9 +6864,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-
 },{"../regex/reference":49,"../walkGlobal":52}],38:[function(require,module,exports){
-
 var quotedRegex = require('../regex/quoted')
 
 /**
@@ -6899,7 +6877,6 @@ var quotedRegex = require('../regex/quoted')
  */
 
 function injectStrings (funcs, task) {
-
   /**
    * Inject a function that returns a string.
    *
@@ -6909,8 +6886,11 @@ function injectStrings (funcs, task) {
   function inject (taskKey) {
     var taskName = task[taskKey]
 
-    if (quotedRegex.test(taskName))
-      funcs[taskName] = function () { return taskName.substr(1, taskName.length - 2) }
+    if (quotedRegex.test(taskName)) {
+      funcs[taskName] = function () {
+        return taskName.substr(1, taskName.length - 2)
+      }
+    }
   }
 
   Object.keys(task)
@@ -6919,9 +6899,7 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-
 },{"../regex/quoted":48}],39:[function(require,module,exports){
-
 var inputPipes = require('./inputPipes')
 
 /**
@@ -6936,11 +6914,11 @@ var inputPipes = require('./inputPipes')
 
 function inputArgs (outs, pipe, taskKey) {
   var args = []
-    , inputPipesOf = inputPipes.bind(null, pipe)
-  
+  var inputPipesOf = inputPipes.bind(null, pipe)
+
   function populateArg (inputPipe) {
     var index = inputPipe[2] || 0
-      , value = outs[inputPipe[0]]
+    var value = outs[inputPipe[0]]
 
     args[index] = value
   }
@@ -6952,9 +6930,7 @@ function inputArgs (outs, pipe, taskKey) {
 
 module.exports = inputArgs
 
-
 },{"./inputPipes":40}],40:[function(require,module,exports){
-
 /**
  * Compute pipes that feed a task.
  *
@@ -6972,7 +6948,7 @@ function inputPipes (pipe, taskKey) {
   }
 
   function ifIsInputPipe (key) {
-    return pipe[key][1] === taskKey 
+    return pipe[key][1] === taskKey
   }
 
   Object.keys(pipe).filter(ifIsInputPipe).forEach(pushPipe)
@@ -6982,9 +6958,7 @@ function inputPipes (pipe, taskKey) {
 
 module.exports = inputPipes
 
-
 },{}],41:[function(require,module,exports){
-
 var validate = require('./validate')
 
 /**
@@ -6996,22 +6970,21 @@ var validate = require('./validate')
  */
 
 function isDflowFun (f) {
-  var isFunction     = typeof f === 'function',
-      hasGraphObject = typeof f.graph === 'object',
-      hasFuncsObject = typeof f.funcs === 'object',
-      hasValidGraph  = false
+  var isFunction = typeof f === 'function'
+  var hasGraphObject = typeof f.graph === 'object'
+  var hasFuncsObject = typeof f.funcs === 'object'
+  var hasValidGraph = false
 
-  if (isFunction && hasGraphObject && hasFuncsObject)
+  if (isFunction && hasGraphObject && hasFuncsObject) {
     hasValidGraph = validate(f.graph, f.funcs)
+  }
 
   return hasValidGraph
 }
 
 module.exports = isDflowFun
 
-
 },{"./validate":51}],42:[function(require,module,exports){
-
 var parents = require('./parents')
 
 /**
@@ -7026,10 +6999,11 @@ var parents = require('./parents')
 
 function level (pipe, cachedLevelOf, taskKey) {
   var taskLevel = 0
-    , parentsOf = parents.bind(null, pipe)
+  var parentsOf = parents.bind(null, pipe)
 
-  if (typeof cachedLevelOf[taskKey] === 'number')
+  if (typeof cachedLevelOf[taskKey] === 'number') {
     return cachedLevelOf[taskKey]
+  }
 
   function computeLevel (parentTaskKey) {
                                  // ↓ Recursion here: the level of a task is the max level of its parents + 1.
@@ -7045,9 +7019,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 
 module.exports = level
 
-
 },{"./parents":43}],43:[function(require,module,exports){
-
 var inputPipes = require('./inputPipes')
 
 /**
@@ -7061,7 +7033,7 @@ var inputPipes = require('./inputPipes')
 
 function parents (pipe, taskKey) {
   var inputPipesOf = inputPipes.bind(null, pipe)
-    , parentTaskIds = []
+  var parentTaskIds = []
 
   function pushParentTaskId (pipe) {
     parentTaskIds.push(pipe[0])
@@ -7074,51 +7046,36 @@ function parents (pipe, taskKey) {
 
 module.exports = parents
 
-
 },{"./inputPipes":40}],44:[function(require,module,exports){
-
 module.exports = /^@[\w][\w\d]+$/
 
-
 },{}],45:[function(require,module,exports){
-
 module.exports = /^arguments\[(\d+)\]$/
 
-
 },{}],46:[function(require,module,exports){
-
 module.exports = /^\/\/.+$/
 
-
 },{}],47:[function(require,module,exports){
-
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-
 },{}],48:[function(require,module,exports){
-
 module.exports = /^'.+'$/
 
-
 },{}],49:[function(require,module,exports){
-
 module.exports = /^\&(.+)$/
 
-
 },{}],50:[function(require,module,exports){
-
 module.exports = /^\/[\w][\w\d]+$/
-
 
 },{}],51:[function(require,module,exports){
 
-var accessorRegex    = require('./regex/accessor'),
-    argumentRegex    = require('./regex/argument'),
-    dotOperatorRegex = require('./regex/dotOperator'),
-    referenceRegex   = require('./regex/reference')
-    subgraphRegex    = require('./regex/subgraph')
+var accessorRegex = require('./regex/accessor')
+var argumentRegex = require('./regex/argument')
+var dotOperatorRegex = require('./regex/dotOperator')
+var referenceRegex = require('./regex/reference')
+var subgraphRegex = require('./regex/subgraph')
 
 /**
  * Check graph consistency.
@@ -7131,13 +7088,13 @@ var accessorRegex    = require('./regex/accessor'),
 
 function validate (graph, additionalFunctions) {
   // Required properties.
-  var pipe = graph.pipe,
-      task = graph.task
+  var pipe = graph.pipe
+  var task = graph.task
 
   // Optional properties.
-  var data = graph.data || {},
-      func = graph.func || {},
-      info = graph.info || {}
+  var data = graph.data || {}
+  var func = graph.func || {}
+  var info = graph.info || {}
 
   var seenPipe = {}
 
@@ -7145,90 +7102,108 @@ function validate (graph, additionalFunctions) {
   // Check there are no reserved keys.
 
   function throwIfEquals (taskName, reservedKey) {
-    if (taskName === reservedKey)
+    if (taskName === reservedKey) {
       throw new TypeError('Reserved function name: ' + taskName)
+    }
   }
 
   if (typeof additionalFunctions === 'object') {
     for (var taskName in additionalFunctions) {
-      var reservedKeys = ['return', 'arguments', 'this', 'this.graph'],
-          throwIfEqualsTaskName = throwIfEquals.bind(null, taskName)
+      var reservedKeys = ['return', 'arguments', 'this', 'this.graph']
+      var throwIfEqualsTaskName = throwIfEquals.bind(null, taskName)
 
       reservedKeys.forEach(throwIfEqualsTaskName)
 
-      if (argumentRegex.test(taskName))
+      if (argumentRegex.test(taskName)) {
         throw new TypeError('Reserved function name: ' + taskName)
+      }
 
-      if (accessorRegex.test(taskName))
+      if (accessorRegex.test(taskName)) {
         throw new TypeError('Function name cannot start with "@": ' + taskName)
+      }
 
-      if (dotOperatorRegex.attr.test(taskName))
+      if (dotOperatorRegex.attr.test(taskName)) {
         throw new TypeError('Function name cannot start with ".":' + taskName)
+      }
 
-      if (dotOperatorRegex.func.test(taskName))
+      if (dotOperatorRegex.func.test(taskName)) {
         throw new TypeError('Function name cannot start with "." and end with "()":' + taskName)
+      }
 
-      if (referenceRegex.test(taskName))
+      if (referenceRegex.test(taskName)) {
         throw new TypeError('Function name cannot start with "&": ' + taskName)
+      }
     }
   }
 
   // Check pipe and task are objects.
 
-  if (typeof pipe !== 'object')
+  if (typeof pipe !== 'object') {
     throw new TypeError('Not an object: pipe ' + pipe)
+  }
 
-  if (typeof task !== 'object')
+  if (typeof task !== 'object') {
     throw new TypeError('Not an object: task ' + task)
+  }
 
   // Check optional data, func, info and view are objects.
 
-  if (typeof data !== 'object')
+  if (typeof data !== 'object') {
     throw new TypeError('Not an object: data ' + data)
+  }
 
-  if (typeof func !== 'object')
+  if (typeof func !== 'object') {
     throw new TypeError('Not an object: func ' + func)
+  }
 
-  if (typeof info !== 'object')
+  if (typeof info !== 'object') {
     throw new TypeError('Not an object: info ' + info)
-
+  }
 
   function checkPipe (key) {
-    var arg  = pipe[key][2] || 0,
-        from = pipe[key][0],
-        to   = pipe[key][1]
+    var arg = pipe[key][2] || 0
+    var from = pipe[key][0]
+    var to = pipe[key][1]
 
     // Check types.
 
-    if (typeof arg !== 'number')
+    if (typeof arg !== 'number') {
       throw new TypeError('Invalid pipe: ' + pipe[key])
+    }
 
-    if (typeof from !== 'string')
+    if (typeof from !== 'string') {
       throw new TypeError('Invalid pipe: ' + pipe[key])
+    }
 
-    if (typeof to !== 'string')
+    if (typeof to !== 'string') {
       throw new TypeError('Invalid pipe: ' + pipe[key])
+    }
 
     // Check for orphan pipes.
 
-    if (typeof task[from] === 'undefined')
+    if (typeof task[from] === 'undefined') {
       throw new Error('Orphan pipe: ' + pipe[key])
+    }
 
-    if (typeof task[to] === 'undefined')
+    if (typeof task[to] === 'undefined') {
       throw new Error('Orphan pipe: ' + pipe[key])
+    }
 
     // Remember pipes, avoid duplicates.
 
-    if (typeof seenPipe[from] === 'undefined')
+    if (typeof seenPipe[from] === 'undefined') {
       seenPipe[from] = {}
+    }
 
-    if (typeof seenPipe[from][to] === 'undefined')
+    if (typeof seenPipe[from][to] === 'undefined') {
       seenPipe[from][to] = []
+    }
 
-    if (typeof seenPipe[from][to][arg] === 'undefined')
+    if (typeof seenPipe[from][to][arg] === 'undefined') {
       seenPipe[from][to][arg] = true
-    else
+    } else {
       throw new Error('Duplicated pipe: ' + pipe[key])
+    }
   }
 
   Object.keys(pipe)
@@ -7247,8 +7222,9 @@ function validate (graph, additionalFunctions) {
 
     var funcName = taskName.substring(1)
 
-    if (typeof func[funcName] === 'undefined')
+    if (typeof func[funcName] === 'undefined') {
       throw new Error('Undefined subgraph: ' + funcName)
+    }
   }
 
   Object.keys(task)
@@ -7261,26 +7237,27 @@ function validate (graph, additionalFunctions) {
     validate(func[key], additionalFunctions)
   }
 
-  if (typeof func === 'object')
+  if (typeof func === 'object') {
     Object.keys(func)
           .forEach(checkFunc)
+  }
 
   return true
 }
 
 module.exports = validate
 
-
 },{"./regex/accessor":44,"./regex/argument":45,"./regex/dotOperator":47,"./regex/reference":49,"./regex/subgraph":50}],52:[function(require,module,exports){
 (function (global){
-
 var globalContext
 
-if (typeof window === 'object')
+if (typeof window === 'object') {
   globalContext = window
+}
 
-if (typeof global === 'object')
+if (typeof global === 'object') {
   globalContext = global
+}
 
 /**
  * Walk through global context.
@@ -7292,14 +7269,15 @@ if (typeof global === 'object')
  */
 
 function walkGlobal (taskName) {
-   function toNextProp (next, prop) { return next[prop] }
+  function toNextProp (next, prop) {
+    return next[prop]
+  }
 
   return taskName.split('.')
                  .reduce(toNextProp, globalContext)
 }
 
 module.exports = walkGlobal
-
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],53:[function(require,module,exports){

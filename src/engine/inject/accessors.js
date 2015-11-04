@@ -1,4 +1,3 @@
-
 var accessorRegex = require('../regex/accessor')
 
 /**
@@ -11,8 +10,9 @@ var accessorRegex = require('../regex/accessor')
  */
 
 function injectAccessors (funcs, graph) {
-  if (typeof graph.data === 'undefined')
+  if (typeof graph.data === 'undefined') {
     graph.data = {}
+  }
 
   /**
    * Inject accessor.
@@ -21,8 +21,8 @@ function injectAccessors (funcs, graph) {
    */
 
   function inject (taskKey) {
-    var accessorName,
-        taskName = graph.task[taskKey]
+    var accessorName = null
+    var taskName = graph.task[taskKey]
 
     /**
      * Accessor-like function.
@@ -31,8 +31,9 @@ function injectAccessors (funcs, graph) {
      */
 
     function accessor () {
-      if (arguments.length === 1)
+      if (arguments.length === 1) {
         graph.data[accessorName] = arguments[0]
+      }
 
       return graph.data[accessorName]
     }
@@ -48,4 +49,3 @@ function injectAccessors (funcs, graph) {
 }
 
 module.exports = injectAccessors
-
