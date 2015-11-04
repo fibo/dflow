@@ -14,8 +14,15 @@ var windowFunctions = require('../engine/functions/window')
 var emptyGraph = require('../engine/emptyGraph.json')
 
 var defaultOpt = {
+  indentJSON: false,
   port: 3000,
-  indentJSON: false
+  runOnEdit: false
+}
+
+function throwErr (err) {
+  if (err) {
+    throw err
+  }
 }
 
 /**
@@ -35,11 +42,7 @@ function saveGraph (graphPath, indentJSON, graph) {
 
   var jsonString = JSON.stringify(graph, null, indentLevel)
 
-  fs.writeFile(graphPath, jsonString, 'utf8', function (err) {
-    if (err) {
-      throw err
-    }
-  })
+  fs.writeFile(graphPath, jsonString, 'utf8', throwErr)
 }
 
 function editorServer (graphPath, opt) {
@@ -55,9 +58,14 @@ function editorServer (graphPath, opt) {
   // Environment overrides defaults.
 
   var envPORT = process.env.PORT
+  var envRUN_ON_EDIT = process.env.RUN_ON_EDIT
 
   if (typeof envPORT !== 'undefined') {
     defaultOpt.port = envPORT
+  }
+
+  if (typeof envRUN_ON_EDIT !== 'undefined') {
+    defaultOpt.runOnEdit = envRUN_ON_EDIT
   }
 
   // Default options.
