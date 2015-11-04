@@ -1,6 +1,6 @@
 
 var debug = require('debug')('dflow')
-var fs = require('fs')
+var write = require('write-file-utf8')
 
 var pkg = require('../../package.json')
 
@@ -17,12 +17,6 @@ var defaultOpt = {
   indentJSON: false,
   port: 3000,
   runOnEdit: false
-}
-
-function throwErr (err) {
-  if (err) {
-    throw err
-  }
 }
 
 /**
@@ -42,7 +36,7 @@ function saveGraph (graphPath, indentJSON, graph) {
 
   var jsonString = JSON.stringify(graph, null, indentLevel)
 
-  fs.writeFile(graphPath, jsonString, 'utf8', throwErr)
+  write(graphPath, jsonString)
 }
 
 function editorServer (graphPath, opt) {
