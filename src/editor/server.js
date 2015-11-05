@@ -291,12 +291,6 @@ function editorServer (graphPath, opt) {
         if (noOutput.indexOf(taskName) === -1) {
           data.outs = [{ name: 'out' }]
         }
-
-        // Add task.
-        graph.task[id] = taskName
-
-        // Associate node and task.
-        graph.view.node[id].task = id
       }
 
       // If node is an accessor,
@@ -327,8 +321,14 @@ function editorServer (graphPath, opt) {
         }
       }
 
+      // Add task.
+      graph.task[id] = taskName
+
       // Add node to view.
       graph.view.node[id] = data
+
+      // Associate node and task.
+      graph.view.node[id].task = id
 
       io.emit('addNode', data)
 

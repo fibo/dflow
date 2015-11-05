@@ -8502,13 +8502,12 @@ module.exports = function (css, options) {
 
 },{}],34:[function(require,module,exports){
 (function (Buffer){
-
 var debug = require('debug')
 
-var insertCss     = require('insert-css')
+var insertCss = require('insert-css')
 var regexAccessor = require('../../engine/regex/accessor')
 
-var socket = io()
+var socket = window.io()
 
 var cssPaths = [
   '/../../../node_modules/normalize.css/normalize.css',
@@ -8524,7 +8523,7 @@ cssPaths.forEach(readAndInsertCSS)
 var graph = null
 
 window.myDebug = debug
-window.onload  = initPage
+window.onload = initPage
 
 function initPage () {
   // Debug setup.
@@ -8550,8 +8549,8 @@ function initPage () {
   var taskIdElement = document.getElementById('task-id')
   var taskNameElement = document.getElementById('task-name')
 
-  var canvasMethods = ['addLink' , 'addNode',
-                       'delLink' , 'delNode']
+  var canvasMethods = ['addLink', 'addNode',
+                       'delLink', 'delNode']
 
   canvasMethods.forEach(function (methodName) {
     canvas.broker.removeAllListeners(methodName)
@@ -8577,8 +8576,8 @@ function initPage () {
     })
 
     socket.on(methodName, function (data) {
-      var id       = data.nodeid,
-          position = data.position
+      var id = data.nodeid
+      var position = data.position
 
       var node = canvas.node[id]
 
@@ -8603,43 +8602,39 @@ function initPage () {
     var taskName = nodeJSON.text
 
     taskNameElement.innerHTML = taskName
-    taskIdElement.innerHTML   = id
+    taskIdElement.innerHTML = id
 
-    var taskIsAccessor  = regexAccessor.test(taskName),
-        taskDataContent = null,
-        taskDataProp    = null,
-        taskDataType    = null
+    var taskIsAccessor = regexAccessor.test(taskName)
+    var taskDataContent = null
+    var taskDataProp = null
 
     // Show task-data element if task is an accessor.
-    if (taskIsAccessor)
+    if (taskIsAccessor) {
       taskDataElement.style.display = 'block'
-    else
+    } else {
       taskDataElement.style.display = 'none'
+    }
 
     function resetData () {
-      console.log('reset '+taskDataProp)
       graph.data[taskDataProp] = null
       // TODO emit dataChange event
     }
 
     if (taskIsAccessor) {
-      taskDataProp    = taskName.substr(1)
+      taskDataProp = taskName.substr(1)
       taskDataContent = graph.data[taskDataProp]
 
       if (taskDataContent) {
-        taskDataType = typeof taskDataContent
-
         // Show reset button if task data has content.
-        taskDataInitButton.style.display  = 'none'
-        taskDataTypeSelect.style.display  = 'none'
+        taskDataInitButton.style.display = 'none'
+        taskDataTypeSelect.style.display = 'none'
         taskDataResetButton.style.display = 'block'
 
         taskDataResetButton.onclick = resetData
-      }
-      else {
+      } else {
         // Show initialization form if task data is empty.
-        taskDataInitButton.style.display  = 'block'
-        taskDataTypeSelect.style.display  = 'block'
+        taskDataInitButton.style.display = 'block'
+        taskDataTypeSelect.style.display = 'block'
         taskDataResetButton.style.display = 'none'
       }
     }
@@ -8648,8 +8643,8 @@ function initPage () {
   socket.on('moveNode', function (data) {
     debug('moveNode', data)
 
-    var x  = data.x
-        y  = data.y
+    var x = data.x
+    var y = data.y
 
     var node = canvas.node[data.nodeid]
 
@@ -8659,16 +8654,18 @@ function initPage () {
       Object.keys(output.link).forEach(function (id) {
         var link = output.link[id]
 
-        if (link)
+        if (link) {
           link.linePlot()
+        }
       })
     })
 
     node.ins.forEach(function (input) {
       var link = input.link
 
-      if (link)
+      if (link) {
         link.linePlot()
+      }
     })
   })
 
@@ -8680,7 +8677,6 @@ function initPage () {
     canvas.render(graph.view)
   })
 }
-
 
 }).call(this,require("buffer").Buffer)
 },{"../../engine/regex/accessor":35,"buffer":1,"debug":6,"flow-view":9,"insert-css":33}],35:[function(require,module,exports){
