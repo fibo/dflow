@@ -48,7 +48,8 @@
     "standard:engine": "cd src/engine/; standard; cd ..",
     "standard:test": "cd test; standard --global describe --global it; cd ..",
     "test": "npm run standard; npm run mocha",
-    "watchify:client:edit": "watchify -e src/editor/client/edit.js -t brfs -o src/editor/public/edit.js -p errorify"
+    "watchify:client:edit": "watchify -e src/editor/client/edit.js -t brfs -o src/editor/public/edit.js -p errorify",
+    "wget:img.shields.io": "wget 'https://img.shields.io/github/watchers/fibo/dflow.svg?style=social&label=Watch' -O gh-pages/svg/img.shields.io/watchers.svg"
   },
   "dependencies": {
     "body-parser": "^1.14.1",
