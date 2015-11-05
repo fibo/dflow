@@ -124,7 +124,7 @@ Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/sr
 *dflow* is [MIT](http://g14n.info/mit-license) licensed.
 
 It is developed in my spare time and, as far as I know, by now *I am my only user*.
-By the way, I got a stimulating feedback by [Stamplay](https://stamplay.com/)'s founder, who it is pretty much interested in using *dflow* maybe in the future. **Grazie** Giuliano, I hope you all the best.
+By the way, I got a stimulating feedback by [Stamplay](https://stamplay.com/)'s founder, who is pretty much interested in using *dflow* maybe in the future. **Grazie** Giuliano, I hope you all the best.
 
 I wrote few times a [Dataflow engine][4], the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
 
