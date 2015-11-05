@@ -6269,7 +6269,7 @@ function fun (graph, additionalFunctions) {
   injectStrings(funcs, task)
 
   /**
-   * Compile each sub graph.
+   * Compiles a sub graph.
    */
 
   function compileSubgraph (key) {
@@ -6280,6 +6280,23 @@ function fun (graph, additionalFunctions) {
     funcs[funcName] = fun(subGraph, additionalFunctions)
   }
 
+  /**
+   * Sorts tasks by their level.
+   */
+
+  function byLevel (a, b) {
+    if (typeof cachedLevelOf[a] === 'undefined') {
+      cachedLevelOf[a] = computeLevelOf(a)
+    }
+
+    if (typeof cachedLevelOf[b] === 'undefined') {
+      cachedLevelOf[b] = computeLevelOf(b)
+    }
+
+    return cachedLevelOf[a] - cachedLevelOf[b]
+  }
+
+  // Compile each subgraph.
   Object.keys(func)
         .forEach(compileSubgraph)
 
@@ -6299,22 +6316,6 @@ function fun (graph, additionalFunctions) {
     funcs['this'] = function () { return dflowFun }
     funcs['this.graph'] = function () { return graph }
     injectArguments(funcs, task, arguments)
-
-    /**
-     * Sorts tasks by their level.
-     */
-
-    function byLevel (a, b) {
-      if (typeof cachedLevelOf[a] === 'undefined') {
-        cachedLevelOf[a] = computeLevelOf(a)
-      }
-
-      if (typeof cachedLevelOf[b] === 'undefined') {
-        cachedLevelOf[b] = computeLevelOf(b)
-      }
-
-      return cachedLevelOf[a] - cachedLevelOf[b]
-    }
 
     /**
      * Execute task.
@@ -6337,15 +6338,21 @@ function fun (graph, additionalFunctions) {
         return
       }
 
+      // If task is not defined, throw an error.
       if (typeof f === 'undefined') {
-        throw new TypeError('Task ' + funcName + ' [' + taskKey + '] is not defined')
+        throw new Error('Task ' + funcName + ' [' + taskKey + '] is not defined')
       }
 
-      outs[taskKey] = f.apply(null, args)
+      // Try to execute task.
+      try {
+        outs[taskKey] = f.apply(null, args)
+      } catch (err) {
+        throw err
+      }
     }
 
     /**
-     * Ignore comments.
+     * Ignores comments.
      */
 
     function comments (key) {
