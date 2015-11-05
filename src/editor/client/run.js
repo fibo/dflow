@@ -1,7 +1,7 @@
 
 var dflow = require('dflow')
 
-var xmlhttp = new XMLHttpRequest()
+var xmlhttp = new window.XMLHttpRequest()
 
 function runGraph () {
   if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
@@ -12,6 +12,5 @@ function runGraph () {
 }
 
 xmlhttp.onreadystatechange = runGraph
-xmlhttp.open("GET", '/graph', true)
+xmlhttp.open('GET', '/graph', true)
 xmlhttp.send()
-

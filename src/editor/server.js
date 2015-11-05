@@ -1,4 +1,3 @@
-
 var debug = require('debug')('dflow')
 var write = require('write-file-utf8')
 
@@ -12,6 +11,9 @@ var builtinFunctions = require('../engine/functions/builtin')
 var windowFunctions = require('../engine/functions/window')
 
 var emptyGraph = require('../engine/emptyGraph.json')
+
+var noOutput = ['return', 'console.log', 'console.error']
+var oneInput = ['return', 'console.log', 'console.error']
 
 var defaultOpt = {
   indentJSON: false,
@@ -127,7 +129,13 @@ function editorServer (graphPath, opt) {
   })
 
   app.get('/tasklist', function (req, res) {
-    var taskList = []
+    var taskList = [
+      'arguments',
+      'arguments[0]',
+      'arguments[1]',
+      'arguments[2]',
+      'return'
+    ]
 
     function addToTaskList (item) {
       taskList.push(item)
@@ -238,9 +246,6 @@ function editorServer (graphPath, opt) {
       var key = null
       var taskName = data.text
 
-      // Add node to view.
-      graph.view.node[id] = data
-
       if (commentRegex.test(taskName)) {
         // Do not add a task if node is a comment.
         debug('comment', taskName)
@@ -275,11 +280,17 @@ function editorServer (graphPath, opt) {
             data.ins.push({ name: 'in' + i })
           }
         }
-        // TODO Manage also global, and process functions
+
+        if (oneInput.indexOf(taskName) > -1) {
+          data.ins = [{ name: 'in' }]
+        }
 
         // Every node in dflow is a function hence it has an out,
         // i.e. the return value of the function.
-        data.outs = [{ name: 'out' }]
+        // Few tasks has no output, i.e. console.log, return, etc.
+        if (noOutput.indexOf(taskName) === -1) {
+          data.outs = [{ name: 'out' }]
+        }
 
         // Add task.
         graph.task[id] = taskName
@@ -288,7 +299,8 @@ function editorServer (graphPath, opt) {
         graph.view.node[id].task = id
       }
 
-      // If node is an accessor, create its data entry if it does not exists.
+      // If node is an accessor,
+      // create its data entry if it does not exists.
       if (accessorRegex.test(taskName)) {
         key = taskName.substring(1)
 
@@ -301,7 +313,8 @@ function editorServer (graphPath, opt) {
         }
       }
 
-      // If node is a subgraph, create its func entry if it does not exists.
+      // If node is a subgraph,
+      // create its func entry if it does not exists.
       if (subgraphRegex.test(taskName)) {
         key = taskName.substring(1)
 
@@ -313,6 +326,9 @@ function editorServer (graphPath, opt) {
           graph.func[key] = Object.assign({}, emptyGraph)
         }
       }
+
+      // Add node to view.
+      graph.view.node[id] = data
 
       io.emit('addNode', data)
 
@@ -427,4 +443,3 @@ function editorServer (graphPath, opt) {
 }
 
 module.exports = editorServer
-
