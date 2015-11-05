@@ -18,11 +18,11 @@ title: dflow
 
 [![NPM version](https://badge.fury.io/js/dflow.png)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.png?branch=master)](https://travis-ci.org/fibo/dflow?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.png)](https://gemnasium.com/fibo/dflow) [![Coverage Status](https://coveralls.io/repos/fibo/dflow/badge.svg?branch=master)](https://coveralls.io/r/fibo/dflow?branch=master) [![Test page](https://img.shields.io/badge/test-page-blue.svg)](http://g14n.info/dflow/test)
 
-[![Whatchers](https://img.shields.io/github/watchers/fibo/dflow.svg?style=social&label=Watch)](https://github.com/fibo/dflow/watchers) [![Stargazers](https://img.shields.io/github/stars/fibo/dflow.svg?style=social&label=Star)](https://github.com/fibo/dflow/stargazers) [![Forks](https://img.shields.io/github/forks/fibo/dflow.svg?style=social&label=Forks)](https://github.com/fibo/dflow/network/members)
-
-[![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
+[![Whatchers](http://g14n.info/dflow/svg/img.shields.io/watchers.svg)](https://github.com/fibo/dflow/watchers) [![Stargazers](https://img.shields.io/github/stars/fibo/dflow.svg?style=social&label=Star)](https://github.com/fibo/dflow/stargazers) [![Forks](https://img.shields.io/github/forks/fibo/dflow.svg?style=social&label=Forks)](https://github.com/fibo/dflow/network/members)
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+
+[![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
 
 [![Throughput Graph](https://graphs.waffle.io/fibo/dflow/throughput.svg)](https://waffle.io/fibo/dflow)
 
