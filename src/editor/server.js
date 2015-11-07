@@ -100,17 +100,15 @@ function editorServer (graphPath, opt) {
   app.set('views', path.join(__dirname, 'views'))
   app.set('view engine', 'ejs')
 
-  // Public dir.
+  // Static dirs.
 
   var publicDir = express.static(path.join(__dirname, 'public'))
-
   app.use(publicDir)
 
-  // Routes.
+  var semanticDir = express.static(path.join(__dirname, 'client', 'semantic', 'dist'))
+  app.use(semanticDir)
 
-  app.get('/', function (req, res) {
-    res.redirect('/edit')
-  })
+  // Routes.
 
   app.get('/edit', function (req, res) {
     if (typeof graphPath === 'undefined') {
