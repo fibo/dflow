@@ -110,6 +110,10 @@ function editorServer (graphPath, opt) {
 
   // Routes.
 
+  app.get('/', function (req, res) {
+    res.redirect('/edit')
+  })
+
   app.get('/edit', function (req, res) {
     if (typeof graphPath === 'undefined') {
       res.render('edit', {graphPath: '(in memory)', version: pkg.version})
