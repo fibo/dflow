@@ -307,7 +307,7 @@ function isUndefined(arg) {
 module.exports = require('../..')
 
 
-},{"../..":27}],3:[function(require,module,exports){
+},{"../..":28}],3:[function(require,module,exports){
 
 module.exports = require('./src')
 
@@ -445,6 +445,8 @@ module.exports = Broker
 
 },{"events":1,"inherits":23}],5:[function(require,module,exports){
 
+var objectAssign = require('object-assign')
+
 var SVG = require('./SVG')
 
 var Broker        = require('./Broker'),
@@ -466,6 +468,7 @@ var defaultTheme = require('./default/theme.json'),
  * @param {Number} arg.height
  * @param {Number} arg.width
  * @param {Object} arg.eventHooks
+ * @param {Object} arg.theme
  * @param {Object} arg.nodeSelector
  */
 
@@ -481,8 +484,10 @@ function Canvas (id, arg) {
   broker.init(eventHooks)
   this.broker = broker
 
-  var theme = defaultTheme
-  this.theme = theme
+  if (typeof arg.theme === 'undefined')
+    arg.theme = {}
+
+  var theme = this.theme = objectAssign(defaultTheme, arg.theme)
 
   this.node = {}
   this.link = {}
@@ -731,7 +736,7 @@ Canvas.prototype.selectNode = selectNode
 module.exports = Canvas
 
 
-},{"./Broker":4,"./Link":7,"./Node":8,"./NodeControls":13,"./NodeSelector":14,"./SVG":22,"./default/theme.json":18,"./default/view.json":19,"./validate":21}],6:[function(require,module,exports){
+},{"./Broker":4,"./Link":7,"./Node":8,"./NodeControls":13,"./NodeSelector":14,"./SVG":22,"./default/theme.json":18,"./default/view.json":19,"./validate":21,"object-assign":24}],6:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin')
@@ -1900,9 +1905,8 @@ module.exports = PreLink
 
 },{}],18:[function(require,module,exports){
 module.exports={
-  "fillCircle": "#fff",
   "fillLabel": "#333",
-    "fillPin": "#333",
+  "fillPin": "#333",
   "fillPinHighlighted": "#d63518",
   "fillRect": "#ccc",
   "halfPinSize": 5,
@@ -1972,7 +1976,7 @@ require('svg.foreignobject.js')
 module.exports = SVG
 
 
-},{"svg.draggable.js":24,"svg.foreignobject.js":25,"svg.js":26}],23:[function(require,module,exports){
+},{"svg.draggable.js":25,"svg.foreignobject.js":26,"svg.js":27}],23:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1998,6 +2002,47 @@ if (typeof Object.create === 'function') {
 }
 
 },{}],24:[function(require,module,exports){
+/* eslint-disable no-unused-vars */
+'use strict';
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+module.exports = Object.assign || function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (Object.getOwnPropertySymbols) {
+			symbols = Object.getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+},{}],25:[function(require,module,exports){
 /*! svg.draggable.js - v1.0.0 - 2015-06-12
 * https://github.com/wout/svg.draggable.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -2189,7 +2234,7 @@ if (typeof Object.create === 'function') {
   })
 
 }).call(this);
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /*! svg.foreignobject.js - v1.0.0 - 2015-06-14
 * https://github.com/fibo/svg.foreignobject.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -2222,7 +2267,7 @@ SVG.extend(SVG.Container, {
   }
 })
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
 * @version 2.1.1
@@ -6211,7 +6256,7 @@ return SVG;
 
 }));
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
@@ -6233,7 +6278,7 @@ function funBrowser (graph) {
 
 exports.fun = funBrowser
 
-},{"../fun":28,"../functions/window":30}],28:[function(require,module,exports){
+},{"../fun":29,"../functions/window":31}],29:[function(require,module,exports){
 var builtinFunctions = require('./functions/builtin')
 var commentRegex = require('./regex/comment')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
@@ -6396,7 +6441,7 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./functions/builtin":29,"./inject/accessors":31,"./inject/additionalFunctions":32,"./inject/arguments":33,"./inject/dotOperators":34,"./inject/globals":35,"./inject/numbers":36,"./inject/references":37,"./inject/strings":38,"./inputArgs":39,"./isDflowFun":41,"./level":42,"./regex/comment":46,"./validate":51}],29:[function(require,module,exports){
+},{"./functions/builtin":30,"./inject/accessors":32,"./inject/additionalFunctions":33,"./inject/arguments":34,"./inject/dotOperators":35,"./inject/globals":36,"./inject/numbers":37,"./inject/references":38,"./inject/strings":39,"./inputArgs":40,"./isDflowFun":42,"./level":43,"./regex/comment":47,"./validate":52}],30:[function(require,module,exports){
 // Arithmetic operators
 
 exports['+'] = function (a, b) { return a + b }
@@ -6492,7 +6537,7 @@ exports.false = function () { return false }
 
 exports.true = function () { return true }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 exports.document = function () {
   return document
 }
@@ -6523,7 +6568,7 @@ exports.innerHTML = function (node, content) {
   return node
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var accessorRegex = require('../regex/accessor')
 
 /**
@@ -6576,7 +6621,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":44}],32:[function(require,module,exports){
+},{"../regex/accessor":45}],33:[function(require,module,exports){
 /**
  * Optionally add custom functions.
  *
@@ -6612,7 +6657,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var argumentRegex = require('../regex/argument')
 
 /**
@@ -6656,7 +6701,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":45}],34:[function(require,module,exports){
+},{"../regex/argument":46}],35:[function(require,module,exports){
 var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
@@ -6747,7 +6792,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":47}],35:[function(require,module,exports){
+},{"../regex/dotOperator":48}],36:[function(require,module,exports){
 var walkGlobal = require('../walkGlobal')
 
 /**
@@ -6801,7 +6846,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../walkGlobal":52}],36:[function(require,module,exports){
+},{"../walkGlobal":53}],37:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -6836,7 +6881,7 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var referenceRegex = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
@@ -6891,7 +6936,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":49,"../walkGlobal":52}],38:[function(require,module,exports){
+},{"../regex/reference":50,"../walkGlobal":53}],39:[function(require,module,exports){
 var quotedRegex = require('../regex/quoted')
 
 /**
@@ -6926,7 +6971,7 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":48}],39:[function(require,module,exports){
+},{"../regex/quoted":49}],40:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -6957,7 +7002,7 @@ function inputArgs (outs, pipe, taskKey) {
 
 module.exports = inputArgs
 
-},{"./inputPipes":40}],40:[function(require,module,exports){
+},{"./inputPipes":41}],41:[function(require,module,exports){
 /**
  * Compute pipes that feed a task.
  *
@@ -6985,7 +7030,7 @@ function inputPipes (pipe, taskKey) {
 
 module.exports = inputPipes
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 var validate = require('./validate')
 
 /**
@@ -7011,7 +7056,7 @@ function isDflowFun (f) {
 
 module.exports = isDflowFun
 
-},{"./validate":51}],42:[function(require,module,exports){
+},{"./validate":52}],43:[function(require,module,exports){
 var parents = require('./parents')
 
 /**
@@ -7046,7 +7091,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 
 module.exports = level
 
-},{"./parents":43}],43:[function(require,module,exports){
+},{"./parents":44}],44:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -7073,30 +7118,30 @@ function parents (pipe, taskKey) {
 
 module.exports = parents
 
-},{"./inputPipes":40}],44:[function(require,module,exports){
+},{"./inputPipes":41}],45:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)\]$/
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 module.exports = /^\/\/.+$/
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 module.exports = /^\&(.+)$/
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 module.exports = /^\/[\w][\w\d]+$/
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 
 var accessorRegex = require('./regex/accessor')
 var argumentRegex = require('./regex/argument')
@@ -7274,7 +7319,7 @@ function validate (graph, additionalFunctions) {
 
 module.exports = validate
 
-},{"./regex/accessor":44,"./regex/argument":45,"./regex/dotOperator":47,"./regex/reference":49,"./regex/subgraph":50}],52:[function(require,module,exports){
+},{"./regex/accessor":45,"./regex/argument":46,"./regex/dotOperator":48,"./regex/reference":50,"./regex/subgraph":51}],53:[function(require,module,exports){
 (function (global){
 var globalContext
 
@@ -7307,7 +7352,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "&isFinite",
@@ -7332,7 +7377,7 @@ module.exports={
   }
 }
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7353,7 +7398,7 @@ module.exports={
   }
 }
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -7394,7 +7439,7 @@ module.exports={
   }
 }
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7421,7 +7466,7 @@ module.exports={
   }
 }
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7444,7 +7489,7 @@ module.exports={
   }
 }
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7467,7 +7512,7 @@ module.exports={
   }
 }
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 
 exports.apply          = require('./graph/apply.json')
 exports.dateParse      = require('./graph/dateParse.json')
@@ -7477,7 +7522,7 @@ exports.or             = require('./graph/or.json')
 exports.sum            = require('./graph/sum.json')
 
 
-},{"./graph/apply.json":53,"./graph/dateParse.json":54,"./graph/hello-world.json":55,"./graph/indexOf.json":56,"./graph/or.json":57,"./graph/sum.json":58}],"examples-renderer":[function(require,module,exports){
+},{"./graph/apply.json":54,"./graph/dateParse.json":55,"./graph/hello-world.json":56,"./graph/indexOf.json":57,"./graph/or.json":58,"./graph/sum.json":59}],"examples-renderer":[function(require,module,exports){
 
 var Canvas   = require('flow-view').Canvas,
     dflow    = require('dflow'),
@@ -7507,4 +7552,4 @@ function renderExample (divId, example) {
 module.exports = renderExample
 
 
-},{"./index":59,"dflow":2,"flow-view":3}]},{},[]);
+},{"./index":60,"dflow":2,"flow-view":3}]},{},[]);
