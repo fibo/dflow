@@ -935,6 +935,8 @@ module.exports = Broker
 
 },{"events":1,"inherits":25}],7:[function(require,module,exports){
 
+var objectAssign = require('object-assign')
+
 var SVG = require('./SVG')
 
 var Broker        = require('./Broker'),
@@ -956,6 +958,7 @@ var defaultTheme = require('./default/theme.json'),
  * @param {Number} arg.height
  * @param {Number} arg.width
  * @param {Object} arg.eventHooks
+ * @param {Object} arg.theme
  * @param {Object} arg.nodeSelector
  */
 
@@ -971,8 +974,10 @@ function Canvas (id, arg) {
   broker.init(eventHooks)
   this.broker = broker
 
-  var theme = defaultTheme
-  this.theme = theme
+  if (typeof arg.theme === 'undefined')
+    arg.theme = {}
+
+  var theme = this.theme = objectAssign(defaultTheme, arg.theme)
 
   this.node = {}
   this.link = {}
@@ -1221,7 +1226,7 @@ Canvas.prototype.selectNode = selectNode
 module.exports = Canvas
 
 
-},{"./Broker":6,"./Link":9,"./Node":10,"./NodeControls":15,"./NodeSelector":16,"./SVG":24,"./default/theme.json":20,"./default/view.json":21,"./validate":23}],8:[function(require,module,exports){
+},{"./Broker":6,"./Link":9,"./Node":10,"./NodeControls":15,"./NodeSelector":16,"./SVG":24,"./default/theme.json":20,"./default/view.json":21,"./validate":23,"object-assign":26}],8:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin')
@@ -2390,9 +2395,8 @@ module.exports = PreLink
 
 },{}],20:[function(require,module,exports){
 module.exports={
-  "fillCircle": "#fff",
   "fillLabel": "#333",
-    "fillPin": "#333",
+  "fillPin": "#333",
   "fillPinHighlighted": "#d63518",
   "fillRect": "#ccc",
   "halfPinSize": 5,
@@ -2462,7 +2466,7 @@ require('svg.foreignobject.js')
 module.exports = SVG
 
 
-},{"svg.draggable.js":26,"svg.foreignobject.js":27,"svg.js":28}],25:[function(require,module,exports){
+},{"svg.draggable.js":27,"svg.foreignobject.js":28,"svg.js":29}],25:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -2488,6 +2492,47 @@ if (typeof Object.create === 'function') {
 }
 
 },{}],26:[function(require,module,exports){
+/* eslint-disable no-unused-vars */
+'use strict';
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+module.exports = Object.assign || function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (Object.getOwnPropertySymbols) {
+			symbols = Object.getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+},{}],27:[function(require,module,exports){
 /*! svg.draggable.js - v1.0.0 - 2015-06-12
 * https://github.com/wout/svg.draggable.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -2679,7 +2724,7 @@ if (typeof Object.create === 'function') {
   })
 
 }).call(this);
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /*! svg.foreignobject.js - v1.0.0 - 2015-06-14
 * https://github.com/fibo/svg.foreignobject.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -2712,7 +2757,7 @@ SVG.extend(SVG.Container, {
   }
 })
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
 * @version 2.1.1
@@ -6701,7 +6746,7 @@ return SVG;
 
 }));
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 var debug = require('debug')
 
 var socket = window.io()
@@ -6812,4 +6857,4 @@ function initPage () {
   })
 }
 
-},{"debug":2,"flow-view":5}]},{},[29]);
+},{"debug":2,"flow-view":5}]},{},[30]);
