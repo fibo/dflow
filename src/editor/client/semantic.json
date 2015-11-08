@@ -20,15 +20,11 @@
     "site",
     "button",
     "container",
-    "dropdown",
     "input",
     "icon",
     "menu",
     "item",
-    "checkbox",
-    "sidebar",
-    "sticky",
-    "api"
+    "sticky"
   ],
   "permission": false,
   "rtl": false,

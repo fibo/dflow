@@ -9,32 +9,28 @@
 
     <script src="/socket.io/socket.io.js"></script>
 
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
     <script src="/edit.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="semantic.min.css">
+    <script src="semantic.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div id="toolbar">
-      <em>dflow v<%= version %>,</em>
-      <strong>editing graph:</strong><%= graphPath %>
-      <a href="/graph">Download</a>
-      <a href="/run" target="_blank">Run</a>
+    <div class="ui fixed inverted menu">
+      <div class="ui container">
+        <a href="#" class="header item">dlow
+          <em>v<%= version %>,</em>
+          <strong>editing graph:</strong><%= graphPath %>
+        </a>
+        <a class="item" href="/graph">Download</a>
+        <a class="item" href="/run" target="_blank">Run</a>
+      </div>
     </div>
-    <div id="container">
-      <div id="inspector" class="dflow-inspector">
-      <p id="task-name">None selected</p>
-      <p id="task-id">null</p>
-      <p id="task-data">
-        <select id="task-data-type">
-          <option value="string">string<option>
-          <option value="number">number<option>
-          <option value="object">object<option>
-          <option value="array">array<option>
-          <option value="boolean">boolean<option>
-        </select>
-        <button id="task-data-initialize">Initialize</button>
-        <button id="task-data-reset">Reset</button>
-      </p>
-      </div>
-      <div id="graph" class="dflow-graph"></div>
-      </div>
+    <div id="ui container">
+      <div id="graph" class="item"></div>
+    </div>
   </body>
 </html>

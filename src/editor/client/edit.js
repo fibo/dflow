@@ -1,20 +1,6 @@
 var debug = require('debug')
-var fs = require('fs')
-var insertCss = require('insert-css')
-var regexAccessor = require('../../engine/regex/accessor')
 
 var socket = window.io()
-
-var cssPaths = [
-  '/../../../node_modules/normalize.css/normalize.css',
-  '/style.css'
-]
-
-function readAndInsertCSS (cssPath) {
-  insertCss(fs.readFileSync(__dirname + '/style.css'))
-}
-
-cssPaths.forEach(readAndInsertCSS)
 
 var graph = null
 
@@ -37,13 +23,6 @@ function initPage () {
       }
     }
   })
-
-  var taskDataInitButton = document.getElementById('task-data-initialize')
-  var taskDataElement = document.getElementById('task-data')
-  var taskDataResetButton = document.getElementById('task-data-reset')
-  var taskDataTypeSelect = document.getElementById('task-data-type')
-  var taskIdElement = document.getElementById('task-id')
-  var taskNameElement = document.getElementById('task-name')
 
   var canvasMethods = ['addLink', 'addNode',
                        'delLink', 'delNode']
@@ -84,56 +63,6 @@ function initPage () {
   canvas.broker.on('moveNode', function (data) {
     debug('moveNode', data)
     socket.emit('moveNode', data)
-  })
-
-  canvas.broker.on('selectNode', function (data) {
-    debug('selectNode', data)
-
-    var id = data.nodeid
-
-    var node = canvas.node[id]
-
-    var nodeJSON = node.toJSON()
-
-    var taskName = nodeJSON.text
-
-    taskNameElement.innerHTML = taskName
-    taskIdElement.innerHTML = id
-
-    var taskIsAccessor = regexAccessor.test(taskName)
-    var taskDataContent = null
-    var taskDataProp = null
-
-    // Show task-data element if task is an accessor.
-    if (taskIsAccessor) {
-      taskDataElement.style.display = 'block'
-    } else {
-      taskDataElement.style.display = 'none'
-    }
-
-    function resetData () {
-      graph.data[taskDataProp] = null
-      // TODO emit dataChange event
-    }
-
-    if (taskIsAccessor) {
-      taskDataProp = taskName.substr(1)
-      taskDataContent = graph.data[taskDataProp]
-
-      if (taskDataContent) {
-        // Show reset button if task data has content.
-        taskDataInitButton.style.display = 'none'
-        taskDataTypeSelect.style.display = 'none'
-        taskDataResetButton.style.display = 'block'
-
-        taskDataResetButton.onclick = resetData
-      } else {
-        // Show initialization form if task data is empty.
-        taskDataInitButton.style.display = 'block'
-        taskDataTypeSelect.style.display = 'block'
-        taskDataResetButton.style.display = 'none'
-      }
-    }
   })
 
   socket.on('moveNode', function (data) {
