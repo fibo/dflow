@@ -65,6 +65,11 @@ function initPage () {
     socket.emit('moveNode', data)
   })
 
+  canvas.broker.on('dblclickNode', function (data) {
+    debug('dblclickNode', data)
+    $('.ui.modal').modal('show')
+  })
+
   socket.on('moveNode', function (data) {
     debug('moveNode', data)
 
