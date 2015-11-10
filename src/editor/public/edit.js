@@ -6816,7 +6816,13 @@ function initPage () {
 
   canvas.broker.on('dblclickNode', function (data) {
     debug('dblclickNode', data)
-    $('.ui.modal').modal('show')
+
+    var taskName = 'foo'
+    var taskId = 12
+
+    $('#task-name').html(`${taskName}<div class="detail">${taskId}</div>`)
+
+    $('#inspector').modal('show')
   })
 
   socket.on('moveNode', function (data) {
