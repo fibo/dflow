@@ -1,0 +1,37 @@
+doctype
+html(lang='en')
+   head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    meta(name='description' content='dflow editor')
+
+    title dflow editor
+
+    script(src='/socket.io/socket.io.js')
+
+    script(src='https://code.jquery.com/jquery-2.1.4.min.js')
+
+    script(src='/edit.js')
+
+    link(rel='stylesheet' type='text/css' href='semantic.min.css')
+    script(src='semantic.min.js')
+
+    <link rel='stylesheet' type='text/css' href='style.css')
+  body
+    .ui.fixed.inverted.menu
+      .ui.container
+        a.header.item(href='#') dlow
+        a.item(href='/graph') Download
+        a.item(href='/run' target='_blank') Run
+    .ui.grid
+      #graph.sixteen.wide.column
+    #inspector.ui.modal
+      i.close.icon
+      .header Task inspector
+      .description
+      .ui.header
+        #task-name.ui.label
+      p Edit task
+      .actions
+        .ui.positive.right.labeled.icon.button Save
+          i.checkmark.icon
