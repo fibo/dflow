@@ -6817,11 +6817,14 @@ function initPage () {
   canvas.broker.on('dblclickNode', function (data) {
     debug('dblclickNode', data)
 
-    var taskName = 'foo'
-    var taskId = 12
+    var nodeid = data.nodeid
+    var node = canvas.node[nodeid]
+
+    var taskName = node.text
+    var taskId = node.id
 
     $('#task-name').html(`
-      <span>${taskName}</span>
+      ${taskName}
       <div class="detail">${taskId}</div>
     `)
 
