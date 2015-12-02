@@ -71,7 +71,10 @@ function initPage () {
     var taskName = 'foo'
     var taskId = 12
 
-    $('#task-name').html(`${taskName}<div class="detail">${taskId}</div>`)
+    $('#task-name').html(`
+      <span>${taskName}</span>
+      <div class="detail">${taskId}</div>
+    `)
 
     $('#inspector').modal('show')
   })
