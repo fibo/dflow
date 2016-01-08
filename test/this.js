@@ -1,7 +1,5 @@
-
-var should = require('should'),
-    fun    = require('../src/engine/fun')
-
+var should = require('should')
+var fun = require('../src/engine/fun')
 
 describe('this', function () {
   var graph = {

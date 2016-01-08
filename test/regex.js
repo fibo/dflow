@@ -1,11 +1,10 @@
 
-var accessor    = require('../src/engine/regex/accessor'),
-    argument    = require('../src/engine/regex/argument'),
-    comment     = require('../src/engine/regex/comment'),
-    dotOperator = require('../src/engine/regex/dotOperator'),
-    reference   = require('../src/engine/regex/reference'),
-    subgraph    = require('../src/engine/regex/subgraph'),
-    should      = require('should')
+var accessor = require('../src/engine/regex/accessor')
+var argument = require('../src/engine/regex/argument')
+var comment = require('../src/engine/regex/comment')
+var dotOperator = require('../src/engine/regex/dotOperator')
+var reference = require('../src/engine/regex/reference')
+var subgraph = require('../src/engine/regex/subgraph')
 
 describe('regex', function () {
   describe('accessor', function () {

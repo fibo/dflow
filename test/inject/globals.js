@@ -1,11 +1,9 @@
-
-var injectGlobals = require('../../src/engine/inject/globals'),
-    should        = require('should')
+var injectGlobals = require('../../src/engine/inject/globals')
 
 describe('injectGlobals', function () {
   it('modifies funcs object with globals injected', function () {
-    var funcs = {},
-        task = { '1' : 'setTimeout' }
+    var funcs = {}
+    var task = { '1': 'setTimeout' }
 
     injectGlobals(funcs, task)
 
@@ -13,8 +11,8 @@ describe('injectGlobals', function () {
   })
 
   it('walks through taskName using dot operator syntax', function () {
-    var funcs = {},
-        task = { '1' : 'process.version' }
+    var funcs = {}
+    var task = { '1': 'process.version' }
 
     injectGlobals(funcs, task)
 
@@ -22,12 +20,11 @@ describe('injectGlobals', function () {
   })
 
   it('works with global constants', function () {
-    var funcs = {},
-        task = { '1' : 'Math.E' }
+    var funcs = {}
+    var task = { '1': 'Math.E' }
 
     injectGlobals(funcs, task)
 
     funcs['Math.E']().should.be.eql(Math.E)
   })
 })
-

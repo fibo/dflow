@@ -1,8 +1,6 @@
-
-var examples   = require('../src/examples'),
-    fun        = require('../src/engine/fun'),
-    isDflowFun = require('../src/engine/isDflowFun'),
-    should     = require('should')
+var examples = require('../src/examples')
+var fun = require('../src/engine/fun')
+var isDflowFun = require('../src/engine/isDflowFun')
 
 describe('isDflowFun', function () {
   describe('returns false if it', function () {

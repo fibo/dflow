@@ -1,21 +1,20 @@
 
-var injectDotOperators = require('../../src/engine/inject/dotOperators'),
-    should             = require('should')
+var injectDotOperators = require('../../src/engine/inject/dotOperators')
 
 describe('injectDotOperators', function () {
   it('modifies funcs object with dot operators attribute-like injected', function () {
-    var funcs = {},
-        graph = {
-          task: {
-            '1': '.version',
-            '2': '.exit'
-          }
-        }
+    var funcs = {}
+    var graph = {
+      task: {
+        '1': '.version',
+        '2': '.exit'
+      }
+    }
 
     injectDotOperators(funcs, graph.task)
 
-    var getVersion = funcs['.version'],
-        exit       = funcs['.exit']
+    var getVersion = funcs['.version']
+    var exit = funcs['.exit']
 
     getVersion.should.be.a.Function
     exit.should.be.a.Function
@@ -27,18 +26,18 @@ describe('injectDotOperators', function () {
   })
 
   it('modifies funcs object with dot operators function-like injected', function () {
-    var funcs = {},
-        graph = {
-          task: {
-            '1': '.foo()',
-            '2': '.sum()'
-          }
-        }
+    var funcs = {}
+    var graph = {
+      task: {
+        '1': '.foo()',
+        '2': '.sum()'
+      }
+    }
 
     injectDotOperators(funcs, graph.task)
 
-    var foo = funcs['.foo()'],
-        sum = funcs['.sum()']
+    var foo = funcs['.foo()']
+    var sum = funcs['.sum()']
 
     foo.should.be.a.Function
 
@@ -52,4 +51,3 @@ describe('injectDotOperators', function () {
     sum(Obj, 2).should.be.eql(3) // 1 + 2 = 3, executed in Obj context.
   })
 })
-

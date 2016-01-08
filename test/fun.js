@@ -1,6 +1,6 @@
 
-var should = require('should'),
-    fun    = require('../src/engine/fun')
+var should = require('should')
+var fun = require('../src/engine/fun')
 
 describe('fun', function () {
   it('returns a function', function () {
@@ -13,7 +13,7 @@ describe('fun', function () {
         '4': '*',
         '5': '@result',
         '6': 'return',
-        '7': '// this is a comment',
+        '7': '// this is a comment'
       },
       pipe: {
         'a': [ '0', '2', 0 ],
@@ -58,26 +58,26 @@ describe('fun', function () {
 
   it('accepts an empty graph', function () {
     var emptyGraph = {
-          task: {},
-          pipe: {}
-        }
+      task: {},
+      pipe: {}
+    }
 
     var empty = fun(emptyGraph)
 
     should.deepEqual(empty.graph, emptyGraph)
   })
 
-  it('can use dflow functions as tasks', function (){
+  it('can use dflow functions as tasks', function () {
     var graph = {
-          task: {
-            '1': 'dflow.fun',
-            '2': 'dflow.isDflowFun',
-            '3': 'dflow.validate'
-          },
-          pipe: {}
-        }
+      task: {
+        '1': 'dflow.fun',
+        '2': 'dflow.isDflowFun',
+        '3': 'dflow.validate'
+      },
+      pipe: {}
+    }
 
-    var f = fun(graph)
+    fun(graph)
   })
 })
 

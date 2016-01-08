@@ -1,13 +1,11 @@
-
-var parents = require('../src/engine/parents'),
-    should  = require('should')
+var parents = require('../src/engine/parents')
 
 var pipe = {
-      'a': [ '0', '1' ],
-      'b': [ '1', '2' ],
-      'c': [ '1', '3' ],
-      'd': [ '2', '3' ]
-    }
+  'a': [ '0', '1' ],
+  'b': [ '1', '2' ],
+  'c': [ '1', '3' ],
+  'd': [ '2', '3' ]
+}
 
 var parentsOf = parents.bind(null, pipe)
 
