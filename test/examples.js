@@ -1,6 +1,5 @@
-
-var dflow  = require('dflow'),
-    should = require('should')
+var dflow = require('dflow')
+var should = require('should')
 
 var examples = require('../src/examples')
 
@@ -16,9 +15,6 @@ describe('example', function () {
       it('returns expected results', function () {
         graph.data.results.forEach(function (test) {
           var result = f.apply(null, test.args)
-
-          // result.should.be.ok will throw if result is undefined
-          var gotExpected = (result === test.expected)
 
           should.deepEqual(result, test.expected)
         })
@@ -41,4 +37,3 @@ describe('example', function () {
     })
   })
 })
-

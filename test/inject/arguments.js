@@ -1,13 +1,11 @@
-
-var injectArguments = require('../../src/engine/inject/arguments'),
-    should          = require('should')
+var injectArguments = require('../../src/engine/inject/arguments')
 
 var funcs = {}
-  , task = {
-      '1' : 'arguments',
-      '2': 'arguments[0]',
-      '3': 'arguments[1]'
-  }
+var task = {
+  '1' : 'arguments',
+  '2': 'arguments[0]',
+  '3': 'arguments[1]'
+}
 
 describe('injectArguments', function () {
   it('modifies funcs object with arguments[N] injected', function () {
@@ -32,4 +30,3 @@ describe('injectArguments', function () {
     })('foo', 'bar', 'quz')
   })
 })
-

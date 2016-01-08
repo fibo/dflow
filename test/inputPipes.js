@@ -1,13 +1,11 @@
-
-var should     = require('should'),
-    inputPipes = require('../src/engine/inputPipes')
+var inputPipes = require('../src/engine/inputPipes')
 
 var pipe = {
-      'a': [ '0', '1' ],
-      'b': [ '1', '2' ],
-      'c': [ '1', '3' ],
-      'd': [ '2', '3' ]
-    }
+  'a': [ '0', '1' ],
+  'b': [ '1', '2' ],
+  'c': [ '1', '3' ],
+  'd': [ '2', '3' ]
+}
 
 var inputPipesOf = inputPipes.bind(null, pipe)
 
@@ -22,4 +20,3 @@ describe('inputPipes', function () {
     inputPipesOf('3').should.eql([pipe.c, pipe.d])
   })
 })
-

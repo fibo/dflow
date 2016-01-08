@@ -1,21 +1,19 @@
-
-var injectAccessors = require('../../src/engine/inject/accessors'),
-    should          = require('should')
+var injectAccessors = require('../../src/engine/inject/accessors')
 
 describe('injectAccessors', function () {
   it('modifies funcs object with accessors injected', function () {
-    var data,
-        funcs = {},
-        graph = {
-          task: {
-            '1': '@foo',
-            '2': '@bar'
-          },
-          data: {
-            'foo': 1,
-            'bar': [2]
-          }
-        }
+    var data
+    var funcs = {}
+    var graph = {
+      task: {
+        '1': '@foo',
+        '2': '@bar'
+      },
+      data: {
+        'foo': 1,
+        'bar': [2]
+      }
+    }
 
     injectAccessors(funcs, graph)
 
@@ -34,4 +32,3 @@ describe('injectAccessors', function () {
     foo().should.be.eql(data)
   })
 })
-

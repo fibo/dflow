@@ -1,13 +1,11 @@
-
-var injectStrings = require('../../src/engine/inject/strings'),
-    should        = require('should')
+var injectStrings = require('../../src/engine/inject/strings')
 
 describe('injectStrings', function () {
   it('modifies funcs object with strings injected', function () {
     var funcs = {}
-      , task = {
-          'a' : "'string'"
-      }
+    var task = {
+      'a': "'string'"
+    }
 
     injectStrings(funcs, task)
 
@@ -18,4 +16,3 @@ describe('injectStrings', function () {
     a().should.be.eql('string')
   })
 })
-
