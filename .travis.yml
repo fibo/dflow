@@ -1,6 +1,5 @@
 language: node_js
 node_js:
-  - 0.10.9
   - 0.12.9
   - 4.2.4
   - "stable"

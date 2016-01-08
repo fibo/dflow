@@ -105,8 +105,8 @@ function editorServer (graphPath, opt) {
   var publicDir = express.static(path.join(__dirname, 'public'))
   app.use(publicDir)
 
-  var semanticDir = express.static(path.join(__dirname, 'client', 'semantic', 'dist'))
-  app.use(semanticDir)
+  var bowerComponentsDir = express.static(path.join(__dirname, 'bower_components'))
+  app.use(bowerComponentsDir)
 
   // Routes.
 

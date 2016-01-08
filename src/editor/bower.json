@@ -1,0 +1,25 @@
+{
+  "name": "dflow-editor",
+  "description": "Dataflow Programming editor",
+  "main": "edit.js",
+  "authors": [
+    "Gianluca Casati"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "dflow"
+  ],
+  "homepage": "http://g14n.info/dflow",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "semantic": "semantic-ui#~2.1.8"
+  }
+}
