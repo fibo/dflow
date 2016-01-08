@@ -8,9 +8,11 @@
  */
 /* eslint-disable no-proto */
 
+'use strict'
+
 var base64 = require('base64-js')
 var ieee754 = require('ieee754')
-var isArray = require('is-array')
+var isArray = require('isarray')
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -90,8 +92,10 @@ function Buffer (arg) {
     return new Buffer(arg)
   }
 
-  this.length = 0
-  this.parent = undefined
+  if (!Buffer.TYPED_ARRAY_SUPPORT) {
+    this.length = 0
+    this.parent = undefined
+  }
 
   // Common case.
   if (typeof arg === 'number') {
@@ -222,6 +226,10 @@ function fromJsonObject (that, object) {
 if (Buffer.TYPED_ARRAY_SUPPORT) {
   Buffer.prototype.__proto__ = Uint8Array.prototype
   Buffer.__proto__ = Uint8Array
+} else {
+  // pre-set for values that may exist in the future
+  Buffer.prototype.length = undefined
+  Buffer.prototype.parent = undefined
 }
 
 function allocate (that, length) {
@@ -371,10 +379,6 @@ function byteLength (string, encoding) {
   }
 }
 Buffer.byteLength = byteLength
-
-// pre-set for values that may exist in the future
-Buffer.prototype.length = undefined
-Buffer.prototype.parent = undefined
 
 function slowToString (encoding, start, end) {
   var loweredCase = false
@@ -1467,7 +1471,7 @@ function utf8ToBytes (string, units) {
       }
 
       // valid surrogate pair
-      codePoint = leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00 | 0x10000
+      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
     } else if (leadSurrogate) {
       // valid bmp char, but last char was a lead
       if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
@@ -1546,7 +1550,7 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":2,"ieee754":3,"is-array":4}],2:[function(require,module,exports){
+},{"base64-js":2,"ieee754":3,"isarray":4}],2:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -1759,38 +1763,10 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 }
 
 },{}],4:[function(require,module,exports){
+var toString = {}.toString;
 
-/**
- * isArray
- */
-
-var isArray = Array.isArray;
-
-/**
- * toString
- */
-
-var str = Object.prototype.toString;
-
-/**
- * Whether or not the given `val`
- * is an array.
- *
- * example:
- *
- *        isArray([]);
- *        // > true
- *        isArray(arguments);
- *        // > false
- *        isArray('');
- *        // > false
- *
- * @param {mixed} val
- * @return {bool}
- */
-
-module.exports = isArray || function (val) {
-  return !! val && '[object Array]' == str.call(val);
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
 };
 
 },{}],5:[function(require,module,exports){
@@ -6638,10 +6614,8 @@ module.exports={
 }
 
 },{}],65:[function(require,module,exports){
-
-var emptyGraph = require('../src/engine/emptyGraph.json'),
-    should     = require('should'),
-    validate   = require('../src/engine/validate')
+var emptyGraph = require('../src/engine/emptyGraph.json')
+var validate = require('../src/engine/validate')
 
 describe('emptyGraph', function () {
   it('is a valid graph', function () {
@@ -6649,11 +6623,9 @@ describe('emptyGraph', function () {
   })
 })
 
-
-},{"../src/engine/emptyGraph.json":31,"../src/engine/validate":55,"should":6}],66:[function(require,module,exports){
-
-var dflow  = require('dflow'),
-    should = require('should')
+},{"../src/engine/emptyGraph.json":31,"../src/engine/validate":55}],66:[function(require,module,exports){
+var dflow = require('dflow')
+var should = require('should')
 
 var examples = require('../src/examples')
 
@@ -6669,9 +6641,6 @@ describe('example', function () {
       it('returns expected results', function () {
         graph.data.results.forEach(function (test) {
           var result = f.apply(null, test.args)
-
-          // result.should.be.ok will throw if result is undefined
-          var gotExpected = (result === test.expected)
 
           should.deepEqual(result, test.expected)
         })
@@ -6695,11 +6664,10 @@ describe('example', function () {
   })
 })
 
-
 },{"../src/examples":63,"../src/examples/packagedGraph":64,"dflow":5,"should":6}],67:[function(require,module,exports){
 
-var should = require('should'),
-    fun    = require('../src/engine/fun')
+var should = require('should')
+var fun = require('../src/engine/fun')
 
 describe('fun', function () {
   it('returns a function', function () {
@@ -6712,7 +6680,7 @@ describe('fun', function () {
         '4': '*',
         '5': '@result',
         '6': 'return',
-        '7': '// this is a comment',
+        '7': '// this is a comment'
       },
       pipe: {
         'a': [ '0', '2', 0 ],
@@ -6757,26 +6725,26 @@ describe('fun', function () {
 
   it('accepts an empty graph', function () {
     var emptyGraph = {
-          task: {},
-          pipe: {}
-        }
+      task: {},
+      pipe: {}
+    }
 
     var empty = fun(emptyGraph)
 
     should.deepEqual(empty.graph, emptyGraph)
   })
 
-  it('can use dflow functions as tasks', function (){
+  it('can use dflow functions as tasks', function () {
     var graph = {
-          task: {
-            '1': 'dflow.fun',
-            '2': 'dflow.isDflowFun',
-            '3': 'dflow.validate'
-          },
-          pipe: {}
-        }
+      task: {
+        '1': 'dflow.fun',
+        '2': 'dflow.isDflowFun',
+        '3': 'dflow.validate'
+      },
+      pipe: {}
+    }
 
-    var f = fun(graph)
+    fun(graph)
   })
 })
 
@@ -6813,16 +6781,14 @@ describe('inputArgs', function () {
 
 
 },{"../src/engine/inputArgs":43}],69:[function(require,module,exports){
-
-var should     = require('should'),
-    inputPipes = require('../src/engine/inputPipes')
+var inputPipes = require('../src/engine/inputPipes')
 
 var pipe = {
-      'a': [ '0', '1' ],
-      'b': [ '1', '2' ],
-      'c': [ '1', '3' ],
-      'd': [ '2', '3' ]
-    }
+  'a': [ '0', '1' ],
+  'b': [ '1', '2' ],
+  'c': [ '1', '3' ],
+  'd': [ '2', '3' ]
+}
 
 var inputPipesOf = inputPipes.bind(null, pipe)
 
@@ -6838,13 +6804,10 @@ describe('inputPipes', function () {
   })
 })
 
-
-},{"../src/engine/inputPipes":44,"should":6}],70:[function(require,module,exports){
-
-var examples   = require('../src/examples'),
-    fun        = require('../src/engine/fun'),
-    isDflowFun = require('../src/engine/isDflowFun'),
-    should     = require('should')
+},{"../src/engine/inputPipes":44}],70:[function(require,module,exports){
+var examples = require('../src/examples')
+var fun = require('../src/engine/fun')
+var isDflowFun = require('../src/engine/isDflowFun')
 
 describe('isDflowFun', function () {
   describe('returns false if it', function () {
@@ -6897,45 +6860,37 @@ describe('isDflowFun', function () {
 })
 
 
-},{"../src/engine/fun":32,"../src/engine/isDflowFun":45,"../src/examples":63,"should":6}],71:[function(require,module,exports){
-
-var level  = require('../src/engine/level'),
-    should = require('should')
+},{"../src/engine/fun":32,"../src/engine/isDflowFun":45,"../src/examples":63}],71:[function(require,module,exports){
+var level = require('../src/engine/level')
 
 var pipe = {
-      'a': [ '0', '1' ],
-      'b': [ '1', '2' ],
-      'c': [ '1', '3' ],
-      'd': [ '2', '3' ]
-    }
+  'a': [ '0', '1' ],
+  'b': [ '1', '2' ],
+  'c': [ '1', '3' ],
+  'd': [ '2', '3' ]
+}
 
-var cachedLevelOf  = {},
-    computeLevelOf = level.bind(null, pipe, cachedLevelOf)
+var cachedLevelOf = {}
+var computeLevelOf = level.bind(null, pipe, cachedLevelOf)
 
 describe('level', function () {
   it('returns level of task', function () {
     computeLevelOf('0').should.eql(0)
-
     computeLevelOf('1').should.eql(1)
-
     computeLevelOf('2').should.eql(2)
-
     computeLevelOf('3').should.eql(3)
   })
 })
 
-
-},{"../src/engine/level":46,"should":6}],72:[function(require,module,exports){
-
-var parents = require('../src/engine/parents'),
-    should  = require('should')
+},{"../src/engine/level":46}],72:[function(require,module,exports){
+var parents = require('../src/engine/parents')
 
 var pipe = {
-      'a': [ '0', '1' ],
-      'b': [ '1', '2' ],
-      'c': [ '1', '3' ],
-      'd': [ '2', '3' ]
-    }
+  'a': [ '0', '1' ],
+  'b': [ '1', '2' ],
+  'c': [ '1', '3' ],
+  'd': [ '2', '3' ]
+}
 
 var parentsOf = parents.bind(null, pipe)
 
@@ -6961,15 +6916,14 @@ describe('parentsOf', function () {
 })
 
 
-},{"../src/engine/parents":47,"should":6}],73:[function(require,module,exports){
+},{"../src/engine/parents":47}],73:[function(require,module,exports){
 
-var accessor    = require('../src/engine/regex/accessor'),
-    argument    = require('../src/engine/regex/argument'),
-    comment     = require('../src/engine/regex/comment'),
-    dotOperator = require('../src/engine/regex/dotOperator'),
-    reference   = require('../src/engine/regex/reference'),
-    subgraph    = require('../src/engine/regex/subgraph'),
-    should      = require('should')
+var accessor = require('../src/engine/regex/accessor')
+var argument = require('../src/engine/regex/argument')
+var comment = require('../src/engine/regex/comment')
+var dotOperator = require('../src/engine/regex/dotOperator')
+var reference = require('../src/engine/regex/reference')
+var subgraph = require('../src/engine/regex/subgraph')
 
 describe('regex', function () {
   describe('accessor', function () {
@@ -7023,11 +6977,9 @@ describe('regex', function () {
 })
 
 
-},{"../src/engine/regex/accessor":48,"../src/engine/regex/argument":49,"../src/engine/regex/comment":50,"../src/engine/regex/dotOperator":51,"../src/engine/regex/reference":53,"../src/engine/regex/subgraph":54,"should":6}],74:[function(require,module,exports){
-
-var should = require('should'),
-    fun    = require('../src/engine/fun')
-
+},{"../src/engine/regex/accessor":48,"../src/engine/regex/argument":49,"../src/engine/regex/comment":50,"../src/engine/regex/dotOperator":51,"../src/engine/regex/reference":53,"../src/engine/regex/subgraph":54}],74:[function(require,module,exports){
+var should = require('should')
+var fun = require('../src/engine/fun')
 
 describe('this', function () {
   var graph = {
@@ -7069,7 +7021,6 @@ describe('this.graph', function () {
 })
 
 },{"../src/engine/fun":32,"should":6}],75:[function(require,module,exports){
-
 var validate = require('../src/engine/validate')
 
 describe('validate', function () {
@@ -7113,153 +7064,145 @@ describe('validate', function () {
 
   it('throws if an additional function name is "argument[N]"', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 'arguments[0]': Function.prototype
-               })
+      validate({ task: {}, pipe: {} }, {'arguments[0]': Function.prototype})
     }).should.throwError(/Reserved function name/)
 
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 'arguments[1]': Function.prototype
-               })
+      validate({ task: {}, pipe: {} }, { 'arguments[1]': Function.prototype })
     }).should.throwError(/Reserved function name/)
   })
 
   it('throws if an additional function name is "this"', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 'this': Function.prototype
-               })
+      validate({ task: {}, pipe: {} }, { 'this': Function.prototype })
     }).should.throwError(/Reserved function name/)
   })
 
   it('throws if an additional function name is "this.graph"', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 'this.graph': Function.prototype
-               })
+      validate({ task: {}, pipe: {} }, { 'this.graph': Function.prototype })
     }).should.throwError(/Reserved function name/)
   })
 
   it('throws if an additional function name starts with a "@"', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 '@foo': Function.prototype
-               })
+      validate({ task: {}, pipe: {} }, { '@foo': Function.prototype })
     }).should.throwError(/Function name cannot start with "@"/)
   })
 
   it('throws if an additional function name starts with a "&"', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 '&bar': Function.prototype
-               })
+      validate({ task: {}, pipe: {} }, { '&bar': Function.prototype })
     }).should.throwError(/Function name cannot start with "&"/)
   })
 
   it('throws if an additional function name starts with a "."', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 '.quz': Function.prototype
-               })
+      validate({ task: {}, pipe: {} }, { '.quz': Function.prototype })
     }).should.throwError(/Function name cannot start with "\."/)
 
     ;(function () {
-      validate({ task: {}, pipe: {} },
-               {
-                 '.quz()': Function.prototype
-               })
+      validate({ task: {}, pipe: {} }, { '.quz()': Function.prototype })
     }).should.throwError(/Function name cannot start with "\."/)
   })
 
   it('throws if pipe or task is not an object', function () {
-    ;(function () { validate({ task: 'not an object', pipe: {} }) }).should.throwError(/Not an object: task/)
+    ;(function () {
+      validate({ task: 'not an object', pipe: {} })
+    }).should.throwError(/Not an object: task/)
 
-    ;(function () { validate({ pipe: 'not an object', task: {} }) }).should.throwError(/Not an object: pipe/)
+    ;(function () {
+      validate({ pipe: 'not an object', task: {} })
+    }).should.throwError(/Not an object: pipe/)
   })
 
   it('throws if optional data, func or info is not an object', function () {
-    ;(function () { validate({ task: {}, pipe: {}, data: 'not an object' }) }).should.throwError(/Not an object: data/)
+    ;(function () {
+      validate({ task: {}, pipe: {}, data: 'not an object' })
+    }).should.throwError(/Not an object: data/)
 
-    ;(function () { validate({ task: {}, pipe: {}, func: 'not an object' }) }).should.throwError(/Not an object: func/)
+    ;(function () {
+      validate({ task: {}, pipe: {}, func: 'not an object' })
+    }).should.throwError(/Not an object: func/)
 
-    ;(function () { validate({ task: {}, pipe: {}, info: 'not an object' }) }).should.throwError(/Not an object: info/)
+    ;(function () {
+      validate({ task: {}, pipe: {}, info: 'not an object' })
+    }).should.throwError(/Not an object: info/)
   })
 
   it('throws if some pipe has invalid type', function () {
-    ;(function () { validate({ task: {}, pipe: { '1': [ '1', '2', 'zero' ] } }) }).should.throwError(/Invalid pipe:/)
+    ;(function () {
+      validate({ task: {}, pipe: { '1': [ '1', '2', 'zero' ] } })
+    }).should.throwError(/Invalid pipe:/)
 
-    ;(function () { validate({ task: {}, pipe: { '1': [ '1', 2, 0 ] } }) }).should.throwError(/Invalid pipe:/)
+    ;(function () {
+      validate({ task: {}, pipe: { '1': [ '1', 2, 0 ] } })
+    }).should.throwError(/Invalid pipe:/)
 
-    ;(function () { validate({ task: {}, pipe: { '1': [ 1, '2', 0 ] } }) }).should.throwError(/Invalid pipe:/)
+    ;(function () {
+      validate({ task: {}, pipe: { '1': [ 1, '2', 0 ] } })
+    }).should.throwError(/Invalid pipe:/)
   })
 
   it('throws if pipe has duplicates', function () {
     ;(function () {
-        validate(
-          { task: { '1': 'foo', '2': 'bar' },
-            pipe: {
-             'a': [ '1', '2', 1 ],
-             'b': [ '1', '2', 1 ],
-            }
-          })
-      }).should.throwError(/Duplicated pipe:/)
+      validate({
+        task: { '1': 'foo', '2': 'bar' },
+        pipe: {
+          a: [ '1', '2', 1 ],
+          b: [ '1', '2', 1 ]
+        }
+      })
+    }).should.throwError(/Duplicated pipe:/)
 
     ;(function () {
-        validate(
-          { task: { '1': 'foo', '2': 'bar' },
-            pipe: {
-             'a': [ '1', '2', 0 ],
-             'b': [ '1', '2' ] // Since pipe['b'][2] defaults to 0, pipe['b'] is a duplicate.
-            }
-          })
-      }).should.throwError(/Duplicated pipe:/)
+      validate({
+        task: { '1': 'foo', '2': 'bar' },
+        pipe: {
+          a: [ '1', '2', 0 ],
+          b: [ '1', '2' ] // Since pipe['b'][2] defaults to 0, pipe['b'] is a duplicate.
+        }
+      })
+    }).should.throwError(/Duplicated pipe:/)
   })
 
   it('throws if some pipe is orphan', function () {
     ;(function () {
-        validate(
-          { task: {},
-            pipe: {
-             'a': [ '1', '2', 0 ]
-            }
-          })
-      }).should.throwError(/Orphan pipe:/)
+      validate({
+        task: {},
+        pipe: {
+          a: [ '1', '2', 0 ]
+        }
+      })
+    }).should.throwError(/Orphan pipe:/)
   })
 
   it('throws if some func is not a valid (sub)graph', function () {
     ;(function () {
-        validate(
-          { task: {},
-            pipe: {},
-            func: {
-              'a': { task: {},
-                     pipe: {
-                       'a': [ '1', '2', 0 ]
-                     }
-                   }
+      validate({
+        task: {},
+        pipe: {},
+        func: {
+          a: {
+            task: {},
+            pipe: {
+              b: [ '1', '2', 0 ]
             }
-          })
-      }).should.throwError(/Orphan pipe:/)
+          }
+        }
+      })
+    }).should.throwError(/Orphan pipe:/)
   })
 
   it('throws if subgraph is not defined', function () {
     ;(function () {
-      validate(
-        { task: { '1': '/foo' },
-          pipe: {},
-          func: {}
-        })
-      }).should.throwError(/Undefined subgraph:/)
+      validate({
+        task: { '1': '/foo' },
+        pipe: {},
+        func: {}
+      })
+    }).should.throwError(/Undefined subgraph:/)
   })
 })
-
 
 },{"../src/engine/validate":55}]},{},[65,66,67,68,69,70,71,72,73,74,75]);
