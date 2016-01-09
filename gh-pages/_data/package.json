@@ -1,7 +1,7 @@
 {
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "homepage": "http://g14n.info/dflow",
   "author": {
     "name": "Gianluca Casati",
@@ -33,6 +33,7 @@
     "cp": "npm run cp:dist; npm run cp:package.json",
     "cp:dist": "cp -r dist/ gh-pages/",
     "cp:package.json": "cp package.json gh-pages/_data/",
+    "decrypt:.coveralls.yml": "keybase decrypt -o .coveralls.yml .coveralls.yml.asc",
     "gh-pages:push": "git subtree --prefix gh-pages push origin gh-pages",
     "gh-pages:pull": "git subtree --prefix gh-pages pull origin gh-pages",
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
@@ -47,7 +48,7 @@
     "lint:test": "cd test; standard --global describe --global it; cd -",
     "minify": "uglifyjs dist/${npm_package_name}.js --output dist/${npm_package_name}.min.js --compress --mangle",
     "postinstall": "npm run bower",
-    "postversion": "npm run bower.json; git push origin v${npm_package_version}; npm publish; npm run _push",
+    "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push",
     "test": "mocha --bail --require should --reporter min --recursive",
     "watchify:client:edit": "watchify -e src/editor/client/edit.js -t brfs -o src/editor/public/edit.js -p errorify",
     "wget:img.shields.io": "for x in forks stars watchers; do npm run wget:img.shields.io:$x; done",
@@ -81,14 +82,14 @@
   ],
   "devDependencies": {
     "brfs": "^1.4.1",
-    "browserify": "^11.2.0",
+    "browserify": "^12.0.2",
     "coveralls": "^2.11.2",
     "errorify": "^0.3.1",
-    "istanbul": "^0.3.14",
+    "istanbul": "^0.4.1",
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "^1.0.0",
     "pre-commit": "^1.1.2",
-    "should": "^7.1.0",
+    "should": "^8.0.2",
     "standard": "^5.3.1",
     "uglify-js": "^2.4.24",
     "watchify": "^3.5.0"
