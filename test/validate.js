@@ -41,7 +41,7 @@ describe('validate', function () {
 
   it('throws if an additional function name is "argument[N]"', function () {
     ;(function () {
-      validate({ task: {}, pipe: {} }, {'arguments[0]': Function.prototype})
+      validate({ task: {}, pipe: {} }, { 'arguments[0]': Function.prototype })
     }).should.throwError(/Reserved function name/)
 
     ;(function () {

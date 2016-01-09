@@ -1,5 +1,4 @@
-
-var dflow = require('dflow');
+var dflow = require('dflow')
 
 // A JSON that represents the execution graph.
 var graph = {
@@ -16,4 +15,3 @@ var graph = {
 var f = dflow.fun(graph)
 
 f('Hello World') // prints "Hello World"
-

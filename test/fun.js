@@ -79,5 +79,20 @@ describe('fun', function () {
 
     fun(graph)
   })
+
+  it('throws if graph is not valid', function () {
+    ;(function () {
+      var graphWithOrphanPipe = {
+        task: {
+          '3': 'return'
+        },
+        pipe: {
+          '1': [ '2', '3' ]
+        }
+      }
+
+      fun(graphWithOrphanPipe)
+    }).should.throwError(/Orphan pipe:/)
+  })
 })
 
