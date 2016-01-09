@@ -1,6 +1,6 @@
 # dflow
 
-> Is a minimal [Dataflow programming][4] engine.
+> is a minimal [Dataflow programming][4] engine
 
 [![Heroku demo](https://img.shields.io/badge/heroku-demo-663399.svg)](https://dflow.herokuapp.com/) [![Join the chat at https://gitter.im/fibo/dflow](https://badges.gitter.im/fibo/dflow.svg)](https://gitter.im/fibo/dflow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
