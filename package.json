@@ -48,7 +48,7 @@
     "lint:test": "cd test; standard --global describe --global it; cd -",
     "minify": "uglifyjs dist/${npm_package_name}.js --output dist/${npm_package_name}.min.js --compress --mangle",
     "postinstall": "npm run bower",
-    "postversion": "npm run bower.json; git push origin v${npm_package_version}; npm publish; npm run _push",
+    "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push",
     "test": "mocha --bail --require should --reporter min --recursive",
     "watchify:client:edit": "watchify -e src/editor/client/edit.js -t brfs -o src/editor/public/edit.js -p errorify",
     "wget:img.shields.io": "for x in forks stars watchers; do npm run wget:img.shields.io:$x; done",
