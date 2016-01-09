@@ -1,5 +1,7 @@
 # dflow
 
+[![Join the chat at https://gitter.im/fibo/dflow](https://badges.gitter.im/fibo/dflow.svg)](https://gitter.im/fibo/dflow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 > Is a minimal [Dataflow programming][4] engine.
 
 [Try dflow now!](https://dflow.herokuapp.com/) (on Heroku).
