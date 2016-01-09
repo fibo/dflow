@@ -33,6 +33,7 @@
     "cp": "npm run cp:dist; npm run cp:package.json",
     "cp:dist": "cp -r dist/ gh-pages/",
     "cp:package.json": "cp package.json gh-pages/_data/",
+    "decrypt:.coveralls.yml": "keybase decrypt -o .coveralls.yml .coveralls.yml.asc",
     "gh-pages:push": "git subtree --prefix gh-pages push origin gh-pages",
     "gh-pages:pull": "git subtree --prefix gh-pages pull origin gh-pages",
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
