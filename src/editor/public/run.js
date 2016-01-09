@@ -815,10 +815,14 @@ function isDflowFun (f) {
   var isFunction = typeof f === 'function'
   var hasGraphObject = typeof f.graph === 'object'
   var hasFuncsObject = typeof f.funcs === 'object'
-  var hasValidGraph = false
+  var hasValidGraph = true
 
   if (isFunction && hasGraphObject && hasFuncsObject) {
-    hasValidGraph = validate(f.graph, f.funcs)
+    try {
+      validate(f.graph, f.funcs)
+    } catch (ignore) {
+      hasValidGraph = false
+    }
   }
 
   return hasValidGraph
