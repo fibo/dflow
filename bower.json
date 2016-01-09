@@ -6,7 +6,7 @@
   "authors": [
     "Gianluca Casati"
   ],
-  "description": "Dataflow programming",
+  "description": "is a minimal Dataflow programming engine",
   "moduleType": [
     "node"
   ],
