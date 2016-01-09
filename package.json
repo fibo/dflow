@@ -81,14 +81,14 @@
   ],
   "devDependencies": {
     "brfs": "^1.4.1",
-    "browserify": "^11.2.0",
+    "browserify": "^12.0.2",
     "coveralls": "^2.11.2",
     "errorify": "^0.3.1",
-    "istanbul": "^0.3.14",
+    "istanbul": "^0.4.1",
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "^1.0.0",
     "pre-commit": "^1.1.2",
-    "should": "^7.1.0",
+    "should": "^8.0.2",
     "standard": "^5.3.1",
     "uglify-js": "^2.4.24",
     "watchify": "^3.5.0"
