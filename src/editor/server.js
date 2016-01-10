@@ -1,4 +1,6 @@
 var debug = require('debug')('dflow')
+var path = require('path')
+var express = require('express')
 var write = require('write-file-utf8')
 
 var pkg = require('../../package.json')
@@ -22,6 +24,22 @@ var defaultOpt = {
 }
 
 /**
+ * Stringify graph to JSON
+ */
+
+function graphToJSON (indentJSON, graph) {
+  var indentLevel = 0
+
+  if (indentJSON) {
+    indentLevel = 2
+  }
+
+  var jsonString = JSON.stringify(graph, null, indentLevel)
+
+  return jsonString
+}
+
+/**
  * Save graph json file
  */
 
@@ -30,13 +48,7 @@ function saveGraph (graphPath, indentJSON, graph) {
     return
   }
 
-  var indentLevel = 0
-
-  if (indentJSON) {
-    indentLevel = 2
-  }
-
-  var jsonString = JSON.stringify(graph, null, indentLevel)
+  var jsonString = graphToJSON(indentJSON, graph)
 
   write(graphPath, jsonString)
 }
@@ -88,9 +100,6 @@ function editorServer (graphPath, opt) {
     return currentId
   }
 
-  var express = require('express')
-  var path = require('path')
-
   var app = express()
   var http = require('http').Server(app)
   var io = require('socket.io')(http)
@@ -115,15 +124,39 @@ function editorServer (graphPath, opt) {
   })
 
   app.get('/edit', function (req, res) {
-    if (typeof graphPath === 'undefined') {
-      res.render('edit', {graphPath: '(in memory)', version: pkg.version})
-    } else {
-      res.render('edit', {graphPath: graphPath, version: pkg.version})
+    var editData = {
+      graphPath: null,
+      version: pkg.version
     }
+
+    if (typeof graphPath === 'undefined') {
+      editData.graphPath = '(in memory)'
+    } else {
+      editData.graphPath = graphPath
+    }
+
+    res.render('edit', editData)
   })
 
   app.get('/graph', function (req, res) {
-    res.json(graph)
+    res.send(graph)
+  })
+
+  app.get('/download', function (req, res) {
+    var jsonString = graphToJSON(indentJSON, graph)
+
+    var fileName = 'graph.json'
+
+    if (typeof graphPath === 'undefined') {
+      fileName = 'dflowGraph.json'
+    } else {
+      fileName = path.basename(graphPath)
+    }
+
+    res.append('Content-Disposition', 'attachment; filename=' + fileName)
+
+    res.send(jsonString)
+    res.end()
   })
 
   app.get('/run', function (req, res) {
