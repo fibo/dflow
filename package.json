@@ -8,7 +8,7 @@
     "url": "http://g14n.info"
   },
   "license": "MIT",
-  "bin": "bin/dflow",
+  "bin": "src/bin/dflow",
   "main": "index.js",
   "engines": {
     "node": ">0.12.9"
