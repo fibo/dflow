@@ -1,5 +1,4 @@
-.travis.yml
-.jshintrc
+.*
 bower.json
 coverage
 dist/

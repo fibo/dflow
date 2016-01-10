@@ -6,10 +6,10 @@ var fs = require('fs')
 var nopt = require('nopt')
 var path = require('path')
 
-var pkg = require('../package.json')
+var pkg = require('../../package.json')
 
-var createEmptyGraph = require('../src/engine/createEmptyGraph')
-var editorServer = require('../src/editor/server')
+var createEmptyGraph = require('../engine/createEmptyGraph')
+var editorServer = require('../editor/server')
 
 // Process arguments.
 
