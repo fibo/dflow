@@ -1,4 +1,7 @@
 var debug = require('debug')
+var ReactDOM = require('react-dom')
+
+var UsersCount = require('./component/UsersCount')
 
 var socket = window.io()
 
@@ -8,6 +11,13 @@ window.myDebug = debug
 window.onload = initPage
 
 function initPage () {
+  /*
+  ReactDOM.render(
+    <UsersCount num="99"/>,
+    document.getElementById('users-count')
+  )
+  */
+
   // Debug setup.
   window.myDebug.enable('dflow')
   var debug = window.myDebug('dflow')

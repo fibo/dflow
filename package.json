@@ -22,8 +22,8 @@
     "bower": "cd src/editor; bower install; cd -",
     "browserify": "npm run browserify:client; npm run browserify:dist; npm run browserify:examples; npm run browserify:test",
     "browserify:client": "npm run browserify:client:edit; npm run browserify:client:run",
-    "browserify:client:edit": "browserify -e src/editor/client/edit.js -t brfs -o src/editor/public/edit.js",
-    "browserify:client:run": "browserify -e src/editor/client/run.js -t brfs -o src/editor/public/run.js",
+    "browserify:client:edit": "browserify src/editor/client/edit.js -t [ babelify --presets [ es2015 react ]",
+    "browserify:client:run": "cd src/editor/client; browserify -e run.js -t brfs -o run.js; cd -",
     "browserify:dist": "browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
     "browserify:test": "browserify test/*.js -o gh-pages/test/bundle.js",
     "browserify:examples": "browserify -r ./src/examples/renderer.js:examples-renderer -o gh-pages/js/examples-renderer.js",
@@ -47,7 +47,7 @@
     "lint:engine": "cd src/engine/; standard; cd -",
     "lint:test": "cd test; standard --global describe --global it; cd -",
     "minify": "uglifyjs dist/${npm_package_name}.js --output dist/${npm_package_name}.min.js --compress --mangle",
-    "postinstall": "npm run bower",
+    "postinstall": "npm run bower; npm run browserify:client",
     "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push",
     "test": "mocha --bail --require should --reporter min --recursive",
     "watchify:client:edit": "watchify -e src/editor/client/edit.js -t brfs -o src/editor/public/edit.js -p errorify",
@@ -69,6 +69,8 @@
     "flow-view": "^0.10.0",
     "jade": "^1.11.0",
     "nopt": "^3.0.4",
+    "react": "^0.14.6",
+    "react-dom": "^0.14.6",
     "socket.io": "^1.3.7",
     "write-file-utf8": "^1.0.0"
   },
@@ -81,6 +83,9 @@
     "visual"
   ],
   "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react": "^6.3.13",
+    "babelify": "^7.2.0",
     "brfs": "^1.4.1",
     "browserify": "^12.0.2",
     "coveralls": "^2.11.2",
