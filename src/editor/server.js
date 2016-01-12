@@ -111,7 +111,7 @@ function editorServer (graphPath, opt) {
 
   // Static dirs.
 
-  var publicDir = express.static(path.join(__dirname, 'public'))
+  var publicDir = express.static(path.join(__dirname, 'client', 'public'))
   app.use(publicDir)
 
   var bowerComponentsDir = express.static(path.join(__dirname, 'bower_components'))
