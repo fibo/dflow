@@ -21,7 +21,7 @@
     "_pull": "git pull origin master && npm run gh-pages_pull",
     "bower": "cd src/editor; bower --silent --config.analytics=false install; cd -",
     "browserify": "npm run browserify_client; npm run browserify_dist; npm run browserify_examples; npm run browserify_test",
-    "browserify_client": "browserify src/editor/client/main.js -t babelify -o src/editor/client/public/bundle.js",
+    "browserify_client": "node_modules/.bin/browserify src/editor/client/main.js -t babelify -o src/editor/client/public/bundle.js",
     "browserify_dist": "browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
     "browserify_test": "browserify test/*.js -o gh-pages/test/bundle.js",
     "browserify_examples": "browserify -r ./src/examples/renderer.js:examples-renderer -o gh-pages/js/examples-renderer.js",
