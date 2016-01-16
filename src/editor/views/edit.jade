@@ -11,7 +11,7 @@ html(lang='en')
 
     script(src='jquery/dist/jquery.min.js')
 
-    script(src='/edit.js')
+    script(src='/bundle.js')
 
     link(rel='stylesheet' type='text/css' href='semantic/dist/semantic.min.css')
     script(src='semantic/dist/semantic.min.js')
@@ -20,9 +20,11 @@ html(lang='en')
   body
     .ui.fixed.inverted.menu
       .ui.container
-        a.header.item(href='#') dlow
+        a.header.item(href='//g14n.info/dflow' _target='_blank') dflow
         a.item(href='/download') Download
         a.item(href='/run' target='_blank') Run
+        a.item(href='https://github.com/fibo/dflow' target='_blank')
+         i.github.icon
     .ui.grid
       #graph.sixteen.wide.column
     #inspector.ui.modal
@@ -35,3 +37,4 @@ html(lang='en')
       .actions
         .ui.positive.right.labeled.icon.button Save
           i.checkmark.icon
+    #users-count

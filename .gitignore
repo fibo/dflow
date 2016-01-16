@@ -4,8 +4,6 @@ npm-debug.log
 Gemfile*
 gh-pages/_site
 
-src/editor/bower_components
-
 # Running dflow cli with no arguments will create this file
 graph.json
 

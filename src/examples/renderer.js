@@ -1,6 +1,6 @@
 
 var Canvas   = require('flow-view').Canvas,
-    dflow    = require('dflow'),
+    dflow    = require('../../index'),
     examples = require('./index')
 
 /**
@@ -25,4 +25,3 @@ function renderExample (divId, example) {
 }
 
 module.exports = renderExample
-
