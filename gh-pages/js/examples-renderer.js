@@ -300,16 +300,10 @@ function isUndefined(arg) {
 
 },{}],2:[function(require,module,exports){
 
-// Cheating npm require.
-module.exports = require('../..')
-
-
-},{"../..":28}],3:[function(require,module,exports){
-
 module.exports = require('./src')
 
 
-},{"./src":25}],4:[function(require,module,exports){
+},{"./src":24}],3:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -334,7 +328,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /* eslint-disable no-unused-vars */
 'use strict';
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -375,7 +369,7 @@ module.exports = Object.assign || function (target, source) {
 	return to;
 };
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /*! svg.draggable.js - v1.0.0 - 2015-06-12
 * https://github.com/wout/svg.draggable.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -567,7 +561,7 @@ module.exports = Object.assign || function (target, source) {
   })
 
 }).call(this);
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*! svg.foreignobject.js - v1.0.0 - 2015-06-14
 * https://github.com/fibo/svg.foreignobject.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -600,7 +594,7 @@ SVG.extend(SVG.Container, {
   }
 })
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
 * @version 2.2.5
@@ -4808,7 +4802,7 @@ var abcdef = 'abcdef'.split('')
 return SVG
 
 }));
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 
 var EventEmitter = require('events').EventEmitter,
     inherits     = require('inherits')
@@ -4939,7 +4933,7 @@ Broker.prototype.init = init
 module.exports = Broker
 
 
-},{"events":1,"inherits":4}],10:[function(require,module,exports){
+},{"events":1,"inherits":3}],9:[function(require,module,exports){
 
 var objectAssign = require('object-assign')
 
@@ -5232,7 +5226,7 @@ Canvas.prototype.selectNode = selectNode
 module.exports = Canvas
 
 
-},{"./Broker":9,"./Link":12,"./Node":13,"./NodeControls":18,"./NodeSelector":19,"./SVG":27,"./default/theme.json":23,"./default/view.json":24,"./validate":26,"object-assign":5}],11:[function(require,module,exports){
+},{"./Broker":8,"./Link":11,"./Node":12,"./NodeControls":17,"./NodeSelector":18,"./SVG":26,"./default/theme.json":22,"./default/view.json":23,"./validate":25,"object-assign":4}],10:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin')
@@ -5267,7 +5261,7 @@ Input.prototype.render = render
 module.exports = Input
 
 
-},{"./Pin":21,"inherits":4}],12:[function(require,module,exports){
+},{"./Pin":20,"inherits":3}],11:[function(require,module,exports){
 
 /**
  * Connect an output to an input
@@ -5389,7 +5383,7 @@ Link.prototype.linePlot = linePlot
 module.exports = Link
 
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 
 var Input   = require('./Input'),
     Output  = require('./Output')
@@ -5677,7 +5671,7 @@ Node.prototype.addOutput = addOutput
 module.exports = Node
 
 
-},{"./Input":11,"./Output":20}],14:[function(require,module,exports){
+},{"./Input":10,"./Output":19}],13:[function(require,module,exports){
 
 function NodeButton (canvas, relativeCoordinate) {
   this.relativeCoordinate = relativeCoordinate
@@ -5705,7 +5699,7 @@ NodeButton.prototype.detach = detachNodeButton
 module.exports = NodeButton
 
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -5784,7 +5778,7 @@ AddInput.prototype.attachTo = attachTo
 module.exports = AddInput
 
 
-},{"../NodeButton":14,"inherits":4}],16:[function(require,module,exports){
+},{"../NodeButton":13,"inherits":3}],15:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -5864,7 +5858,7 @@ module.exports = AddOutput
 
 
 
-},{"../NodeButton":14,"inherits":4}],17:[function(require,module,exports){
+},{"../NodeButton":13,"inherits":3}],16:[function(require,module,exports){
 
 var inherits   = require('inherits'),
     NodeButton = require('../NodeButton')
@@ -5942,7 +5936,7 @@ DeleteNode.prototype.attachTo = attachTo
 module.exports = DeleteNode
 
 
-},{"../NodeButton":14,"inherits":4}],18:[function(require,module,exports){
+},{"../NodeButton":13,"inherits":3}],17:[function(require,module,exports){
 
 var AddInputButton   = require('./NodeButton/AddInput'),
     AddOutputButton  = require('./NodeButton/AddOutput'),
@@ -5981,7 +5975,7 @@ NodeControls.prototype.detach = nodeControlsDetach
 module.exports = NodeControls
 
 
-},{"./NodeButton/AddInput":15,"./NodeButton/AddOutput":16,"./NodeButton/DeleteNode":17}],19:[function(require,module,exports){
+},{"./NodeButton/AddInput":14,"./NodeButton/AddOutput":15,"./NodeButton/DeleteNode":16}],18:[function(require,module,exports){
 
 /**
  * Create new nodes.
@@ -6130,7 +6124,7 @@ NodeSelector.prototype.show = show
 module.exports = NodeSelector
 
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin'),
@@ -6177,7 +6171,7 @@ Output.prototype.render = render
 module.exports = Output
 
 
-},{"./Pin":21,"./PreLink":22,"inherits":4}],21:[function(require,module,exports){
+},{"./Pin":20,"./PreLink":21,"inherits":3}],20:[function(require,module,exports){
 
 function Pin (type, node, position) {
   var self = this
@@ -6272,7 +6266,7 @@ Pin.prototype.toJSON = toJSON
 module.exports = Pin
 
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 
 /**
  * A link that is not already attached
@@ -6399,7 +6393,7 @@ function PreLink (canvas, output) {
 module.exports = PreLink
 
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports={
   "fillLabel": "#333",
   "fillPin": "#333",
@@ -6424,18 +6418,18 @@ module.exports={
   "unitWidth": 10
 }
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports={
   "node": {},
   "link": {}
 }
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 
 exports.Canvas = require('./Canvas')
 
 
-},{"./Canvas":10}],26:[function(require,module,exports){
+},{"./Canvas":9}],25:[function(require,module,exports){
 
 function validate (view) {
   if (typeof view !== 'object')
@@ -6451,7 +6445,7 @@ function validate (view) {
 module.exports = validate
 
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 
 // Consider this module will be browserified.
 
@@ -6472,7 +6466,7 @@ require('svg.foreignobject.js')
 module.exports = SVG
 
 
-},{"svg.draggable.js":6,"svg.foreignobject.js":7,"svg.js":8}],28:[function(require,module,exports){
+},{"svg.draggable.js":5,"svg.foreignobject.js":6,"svg.js":7}],27:[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
@@ -6494,7 +6488,7 @@ function funBrowser (graph) {
 
 exports.fun = funBrowser
 
-},{"../fun":29,"../functions/window":31}],29:[function(require,module,exports){
+},{"../fun":28,"../functions/window":30}],28:[function(require,module,exports){
 var builtinFunctions = require('./functions/builtin')
 var commentRegex = require('./regex/comment')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
@@ -6657,7 +6651,7 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./functions/builtin":30,"./inject/accessors":32,"./inject/additionalFunctions":33,"./inject/arguments":34,"./inject/dotOperators":35,"./inject/globals":36,"./inject/numbers":37,"./inject/references":38,"./inject/strings":39,"./inputArgs":40,"./isDflowFun":42,"./level":43,"./regex/comment":47,"./validate":52}],30:[function(require,module,exports){
+},{"./functions/builtin":29,"./inject/accessors":31,"./inject/additionalFunctions":32,"./inject/arguments":33,"./inject/dotOperators":34,"./inject/globals":35,"./inject/numbers":36,"./inject/references":37,"./inject/strings":38,"./inputArgs":39,"./isDflowFun":41,"./level":42,"./regex/comment":46,"./validate":51}],29:[function(require,module,exports){
 // Arithmetic operators
 
 exports['+'] = function (a, b) { return a + b }
@@ -6753,7 +6747,7 @@ exports.false = function () { return false }
 
 exports.true = function () { return true }
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 exports.document = function () {
   return document
 }
@@ -6784,7 +6778,7 @@ exports.innerHTML = function (node, content) {
   return node
 }
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 var accessorRegex = require('../regex/accessor')
 
 /**
@@ -6837,7 +6831,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":45}],33:[function(require,module,exports){
+},{"../regex/accessor":44}],32:[function(require,module,exports){
 /**
  * Optionally add custom functions.
  *
@@ -6873,7 +6867,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 var argumentRegex = require('../regex/argument')
 
 /**
@@ -6917,7 +6911,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":46}],35:[function(require,module,exports){
+},{"../regex/argument":45}],34:[function(require,module,exports){
 var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
@@ -7008,7 +7002,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":48}],36:[function(require,module,exports){
+},{"../regex/dotOperator":47}],35:[function(require,module,exports){
 var walkGlobal = require('../walkGlobal')
 
 /**
@@ -7062,7 +7056,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../walkGlobal":53}],37:[function(require,module,exports){
+},{"../walkGlobal":52}],36:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -7097,7 +7091,7 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 var referenceRegex = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
@@ -7152,7 +7146,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":50,"../walkGlobal":53}],39:[function(require,module,exports){
+},{"../regex/reference":49,"../walkGlobal":52}],38:[function(require,module,exports){
 var quotedRegex = require('../regex/quoted')
 
 /**
@@ -7187,7 +7181,7 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":49}],40:[function(require,module,exports){
+},{"../regex/quoted":48}],39:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -7218,7 +7212,7 @@ function inputArgs (outs, pipe, taskKey) {
 
 module.exports = inputArgs
 
-},{"./inputPipes":41}],41:[function(require,module,exports){
+},{"./inputPipes":40}],40:[function(require,module,exports){
 /**
  * Compute pipes that feed a task.
  *
@@ -7246,7 +7240,7 @@ function inputPipes (pipe, taskKey) {
 
 module.exports = inputPipes
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 var validate = require('./validate')
 
 /**
@@ -7276,7 +7270,7 @@ function isDflowFun (f) {
 
 module.exports = isDflowFun
 
-},{"./validate":52}],43:[function(require,module,exports){
+},{"./validate":51}],42:[function(require,module,exports){
 var parents = require('./parents')
 
 /**
@@ -7311,7 +7305,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 
 module.exports = level
 
-},{"./parents":44}],44:[function(require,module,exports){
+},{"./parents":43}],43:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -7338,30 +7332,30 @@ function parents (pipe, taskKey) {
 
 module.exports = parents
 
-},{"./inputPipes":41}],45:[function(require,module,exports){
+},{"./inputPipes":40}],44:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)\]$/
 
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 module.exports = /^\/\/.+$/
 
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],50:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 module.exports = /^\&(.+)$/
 
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 module.exports = /^\/[\w][\w\d]+$/
 
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 
 var accessorRegex = require('./regex/accessor')
 var argumentRegex = require('./regex/argument')
@@ -7539,7 +7533,7 @@ function validate (graph, additionalFunctions) {
 
 module.exports = validate
 
-},{"./regex/accessor":45,"./regex/argument":46,"./regex/dotOperator":48,"./regex/reference":50,"./regex/subgraph":51}],53:[function(require,module,exports){
+},{"./regex/accessor":44,"./regex/argument":45,"./regex/dotOperator":47,"./regex/reference":49,"./regex/subgraph":50}],52:[function(require,module,exports){
 (function (global){
 var globalContext
 
@@ -7572,7 +7566,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "&isFinite",
@@ -7597,7 +7591,7 @@ module.exports={
   }
 }
 
-},{}],55:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7618,7 +7612,7 @@ module.exports={
   }
 }
 
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -7659,7 +7653,7 @@ module.exports={
   }
 }
 
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7686,7 +7680,7 @@ module.exports={
   }
 }
 
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7709,7 +7703,7 @@ module.exports={
   }
 }
 
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7732,7 +7726,7 @@ module.exports={
   }
 }
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 
 exports.apply          = require('./graph/apply.json')
 exports.dateParse      = require('./graph/dateParse.json')
@@ -7742,10 +7736,10 @@ exports.or             = require('./graph/or.json')
 exports.sum            = require('./graph/sum.json')
 
 
-},{"./graph/apply.json":54,"./graph/dateParse.json":55,"./graph/hello-world.json":56,"./graph/indexOf.json":57,"./graph/or.json":58,"./graph/sum.json":59}],"examples-renderer":[function(require,module,exports){
+},{"./graph/apply.json":53,"./graph/dateParse.json":54,"./graph/hello-world.json":55,"./graph/indexOf.json":56,"./graph/or.json":57,"./graph/sum.json":58}],"examples-renderer":[function(require,module,exports){
 
 var Canvas   = require('flow-view').Canvas,
-    dflow    = require('dflow'),
+    dflow    = require('../../index'),
     examples = require('./index')
 
 /**
@@ -7771,5 +7765,4 @@ function renderExample (divId, example) {
 
 module.exports = renderExample
 
-
-},{"./index":60,"dflow":2,"flow-view":3}]},{},[]);
+},{"../../index":27,"./index":59,"flow-view":2}]},{},[]);

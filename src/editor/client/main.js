@@ -1,27 +1,27 @@
-var debug = require('debug')
-var ReactDOM = require('react-dom')
+import _debug from 'debug'
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-var UsersCount = require('./component/UsersCount')
+import UsersCount from './components/UsersCount'
 
-var socket = window.io()
+const socket = window.io()
 
-var graph = null
+let graph = null
 
-window.myDebug = debug
+// window.myDebug = debug
+// Debug setup.
+// window.myDebug.enable('dflow')
+_debug.enable('dflow')
+const debug = _debug('dflow')
+  // TODO add Debug toogle button
+
 window.onload = initPage
 
 function initPage () {
-  /*
   ReactDOM.render(
-    <UsersCount num="99"/>,
+    <UsersCount />,
     document.getElementById('users-count')
   )
-  */
-
-  // Debug setup.
-  window.myDebug.enable('dflow')
-  var debug = window.myDebug('dflow')
-  // TODO add Debug toogle button
 
   // Initialize canvas and other elements.
   var Canvas = require('flow-view').Canvas
