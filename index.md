@@ -28,9 +28,10 @@ title: dflow
 
 ## Status
 
-*dflow* is beta software.
-The [editor][5] is usable but with no css (help me!) and collaborative editing feature is working but buggy (I am proud of my bugs and they will be fixed in version **1.0** :).
+*dflow* is **beta** software.
 The engine is almost stable.
+The [editor][5] is usable but with no css (help me!): I have just started using React to implement the editor view.
+Collaborative editing feature is working but buggy (I am proud of my bugs and they will be fixed in version **1.0** :)).
 
 Next steps:
 
