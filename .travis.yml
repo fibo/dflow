@@ -2,6 +2,7 @@ language: node_js
 node_js:
   - 0.12.9
   - 4.2.4
+  - 5.4.0
   - "stable"
 # Use container-based infrastructure
 sudo: false
