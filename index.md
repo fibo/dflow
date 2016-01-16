@@ -11,7 +11,7 @@ title: dflow
 
 * [Installation](#installation)
 * [Examples](http://g14n.info/dflow/examples)
-* [Editor](http://g14n.info/dflow/editor)
+* [Editor][5]
 * [Api](http://g14n.info/dflow/api)
 * [Specification](http://g14n.info/dflow/specification)
 * [Support and license](#support-and-license)
@@ -29,13 +29,13 @@ title: dflow
 ## Status
 
 *dflow* is beta software.
-The editor is usable but with no css (help me!) and collaborative editing feature is working but buggy (I am proud of my bugs and they will be fixed in version **1.0** :).
+The [editor][5] is usable but with no css (help me!) and collaborative editing feature is working but buggy (I am proud of my bugs and they will be fixed in version **1.0** :).
 The engine is almost stable.
 
 Next steps:
 
 * start using *dflow*,
-* improve editor look&feel,
+* improve editor's look&feel,
 * add more examples using the editor
 * and go for a stable version!
 
@@ -51,7 +51,7 @@ $ bower install dflow
 
 ### Server side
 
-If you are new to *dflow*, you probably want to try the [editor](#editor), so you need to install globally to get *dflow* cli in your path.
+If you are new to *dflow*, you probably want to try the [editor][5], so you need to install globally to get *dflow* cli in your path.
 With [npm](https://npmjs.org/) do
 
 ```bash
@@ -104,4 +104,5 @@ My goal is to say to a *dflow* user:
  [2]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
  [3]: https://github.com/fibo/dflow/blob/master/src/engine/functions/builtin.js "builtin functions"
  [4]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
+ [5]: http://g14n.info/dflow/editor "dflow editor"
 

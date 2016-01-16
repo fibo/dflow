@@ -37,9 +37,6 @@ var rootParent = {}
  *   - Firefox 4-29 lacks support for adding new properties to `Uint8Array` instances,
  *     See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
  *
- *   - Safari 5-7 lacks support for changing the `Object.prototype.constructor` property
- *     on objects.
- *
  *   - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
  *
  *   - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
@@ -53,13 +50,10 @@ Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== undefined
   : typedArraySupport()
 
 function typedArraySupport () {
-  function Bar () {}
   try {
     var arr = new Uint8Array(1)
     arr.foo = function () { return 42 }
-    arr.constructor = Bar
     return arr.foo() === 42 && // typed array instances can be augmented
-        arr.constructor === Bar && // constructor can be set
         typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
         arr.subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
   } catch (e) {
@@ -185,10 +179,12 @@ function fromTypedArray (that, array) {
 }
 
 function fromArrayBuffer (that, array) {
+  array.byteLength // this throws if `array` is not a valid ArrayBuffer
+
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     // Return an augmented `Uint8Array` instance, for best performance
-    array.byteLength
-    that = Buffer._augment(new Uint8Array(array))
+    that = new Uint8Array(array)
+    that.__proto__ = Buffer.prototype
   } else {
     // Fallback: Return an object instance of the Buffer class
     that = fromTypedArray(that, new Uint8Array(array))
@@ -235,12 +231,11 @@ if (Buffer.TYPED_ARRAY_SUPPORT) {
 function allocate (that, length) {
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     // Return an augmented `Uint8Array` instance, for best performance
-    that = Buffer._augment(new Uint8Array(length))
+    that = new Uint8Array(length)
     that.__proto__ = Buffer.prototype
   } else {
     // Fallback: Return an object instance of the Buffer class
     that.length = length
-    that._isBuffer = true
   }
 
   var fromPool = length !== 0 && length <= Buffer.poolSize >>> 1
@@ -423,6 +418,10 @@ function slowToString (encoding, start, end) {
   }
 }
 
+// Even though this property is private, it shouldn't be removed because it is
+// used by `is-buffer` to detect buffer instances in Safari 5-7.
+Buffer.prototype._isBuffer = true
+
 Buffer.prototype.toString = function toString () {
   var length = this.length | 0
   if (length === 0) return ''
@@ -491,18 +490,6 @@ Buffer.prototype.indexOf = function indexOf (val, byteOffset) {
   }
 
   throw new TypeError('val must be string, number or Buffer')
-}
-
-// `get` is deprecated
-Buffer.prototype.get = function get (offset) {
-  console.log('.get() is deprecated. Access using array indexes instead.')
-  return this.readUInt8(offset)
-}
-
-// `set` is deprecated
-Buffer.prototype.set = function set (v, offset) {
-  console.log('.set() is deprecated. Access using array indexes instead.')
-  return this.writeUInt8(v, offset)
 }
 
 function hexWrite (buf, string, offset, length) {
@@ -800,7 +787,8 @@ Buffer.prototype.slice = function slice (start, end) {
 
   var newBuf
   if (Buffer.TYPED_ARRAY_SUPPORT) {
-    newBuf = Buffer._augment(this.subarray(start, end))
+    newBuf = this.subarray(start, end)
+    newBuf.__proto__ = Buffer.prototype
   } else {
     var sliceLen = end - start
     newBuf = new Buffer(sliceLen, undefined)
@@ -1280,7 +1268,11 @@ Buffer.prototype.copy = function copy (target, targetStart, start, end) {
       target[i + targetStart] = this[i + start]
     }
   } else {
-    target._set(this.subarray(start, start + len), targetStart)
+    Uint8Array.prototype.set.call(
+      target,
+      this.subarray(start, start + len),
+      targetStart
+    )
   }
 
   return len
@@ -1317,96 +1309,8 @@ Buffer.prototype.fill = function fill (value, start, end) {
   return this
 }
 
-/**
- * Creates a new `ArrayBuffer` with the *copied* memory of the buffer instance.
- * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
- */
-Buffer.prototype.toArrayBuffer = function toArrayBuffer () {
-  if (typeof Uint8Array !== 'undefined') {
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      return (new Buffer(this)).buffer
-    } else {
-      var buf = new Uint8Array(this.length)
-      for (var i = 0, len = buf.length; i < len; i += 1) {
-        buf[i] = this[i]
-      }
-      return buf.buffer
-    }
-  } else {
-    throw new TypeError('Buffer.toArrayBuffer not supported in this browser')
-  }
-}
-
 // HELPER FUNCTIONS
 // ================
-
-var BP = Buffer.prototype
-
-/**
- * Augment a Uint8Array *instance* (not the Uint8Array class!) with Buffer methods
- */
-Buffer._augment = function _augment (arr) {
-  arr.constructor = Buffer
-  arr._isBuffer = true
-
-  // save reference to original Uint8Array set method before overwriting
-  arr._set = arr.set
-
-  // deprecated
-  arr.get = BP.get
-  arr.set = BP.set
-
-  arr.write = BP.write
-  arr.toString = BP.toString
-  arr.toLocaleString = BP.toString
-  arr.toJSON = BP.toJSON
-  arr.equals = BP.equals
-  arr.compare = BP.compare
-  arr.indexOf = BP.indexOf
-  arr.copy = BP.copy
-  arr.slice = BP.slice
-  arr.readUIntLE = BP.readUIntLE
-  arr.readUIntBE = BP.readUIntBE
-  arr.readUInt8 = BP.readUInt8
-  arr.readUInt16LE = BP.readUInt16LE
-  arr.readUInt16BE = BP.readUInt16BE
-  arr.readUInt32LE = BP.readUInt32LE
-  arr.readUInt32BE = BP.readUInt32BE
-  arr.readIntLE = BP.readIntLE
-  arr.readIntBE = BP.readIntBE
-  arr.readInt8 = BP.readInt8
-  arr.readInt16LE = BP.readInt16LE
-  arr.readInt16BE = BP.readInt16BE
-  arr.readInt32LE = BP.readInt32LE
-  arr.readInt32BE = BP.readInt32BE
-  arr.readFloatLE = BP.readFloatLE
-  arr.readFloatBE = BP.readFloatBE
-  arr.readDoubleLE = BP.readDoubleLE
-  arr.readDoubleBE = BP.readDoubleBE
-  arr.writeUInt8 = BP.writeUInt8
-  arr.writeUIntLE = BP.writeUIntLE
-  arr.writeUIntBE = BP.writeUIntBE
-  arr.writeUInt16LE = BP.writeUInt16LE
-  arr.writeUInt16BE = BP.writeUInt16BE
-  arr.writeUInt32LE = BP.writeUInt32LE
-  arr.writeUInt32BE = BP.writeUInt32BE
-  arr.writeIntLE = BP.writeIntLE
-  arr.writeIntBE = BP.writeIntBE
-  arr.writeInt8 = BP.writeInt8
-  arr.writeInt16LE = BP.writeInt16LE
-  arr.writeInt16BE = BP.writeInt16BE
-  arr.writeInt32LE = BP.writeInt32LE
-  arr.writeInt32BE = BP.writeInt32BE
-  arr.writeFloatLE = BP.writeFloatLE
-  arr.writeFloatBE = BP.writeFloatBE
-  arr.writeDoubleLE = BP.writeDoubleLE
-  arr.writeDoubleBE = BP.writeDoubleBE
-  arr.fill = BP.fill
-  arr.inspect = BP.inspect
-  arr.toArrayBuffer = BP.toArrayBuffer
-
-  return arr
-}
 
 var INVALID_BASE64_RE = /[^+\/0-9A-Za-z-_]/g
 
@@ -1551,129 +1455,123 @@ function blitBuffer (src, dst, offset, length) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"base64-js":2,"ieee754":3,"isarray":4}],2:[function(require,module,exports){
-var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
 ;(function (exports) {
-	'use strict';
+  'use strict'
+
+  var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 
   var Arr = (typeof Uint8Array !== 'undefined')
     ? Uint8Array
     : Array
 
-	var PLUS   = '+'.charCodeAt(0)
-	var SLASH  = '/'.charCodeAt(0)
-	var NUMBER = '0'.charCodeAt(0)
-	var LOWER  = 'a'.charCodeAt(0)
-	var UPPER  = 'A'.charCodeAt(0)
-	var PLUS_URL_SAFE = '-'.charCodeAt(0)
-	var SLASH_URL_SAFE = '_'.charCodeAt(0)
+  var PLUS = '+'.charCodeAt(0)
+  var SLASH = '/'.charCodeAt(0)
+  var NUMBER = '0'.charCodeAt(0)
+  var LOWER = 'a'.charCodeAt(0)
+  var UPPER = 'A'.charCodeAt(0)
+  var PLUS_URL_SAFE = '-'.charCodeAt(0)
+  var SLASH_URL_SAFE = '_'.charCodeAt(0)
 
-	function decode (elt) {
-		var code = elt.charCodeAt(0)
-		if (code === PLUS ||
-		    code === PLUS_URL_SAFE)
-			return 62 // '+'
-		if (code === SLASH ||
-		    code === SLASH_URL_SAFE)
-			return 63 // '/'
-		if (code < NUMBER)
-			return -1 //no match
-		if (code < NUMBER + 10)
-			return code - NUMBER + 26 + 26
-		if (code < UPPER + 26)
-			return code - UPPER
-		if (code < LOWER + 26)
-			return code - LOWER + 26
-	}
+  function decode (elt) {
+    var code = elt.charCodeAt(0)
+    if (code === PLUS || code === PLUS_URL_SAFE) return 62 // '+'
+    if (code === SLASH || code === SLASH_URL_SAFE) return 63 // '/'
+    if (code < NUMBER) return -1 // no match
+    if (code < NUMBER + 10) return code - NUMBER + 26 + 26
+    if (code < UPPER + 26) return code - UPPER
+    if (code < LOWER + 26) return code - LOWER + 26
+  }
 
-	function b64ToByteArray (b64) {
-		var i, j, l, tmp, placeHolders, arr
+  function b64ToByteArray (b64) {
+    var i, j, l, tmp, placeHolders, arr
 
-		if (b64.length % 4 > 0) {
-			throw new Error('Invalid string. Length must be a multiple of 4')
-		}
+    if (b64.length % 4 > 0) {
+      throw new Error('Invalid string. Length must be a multiple of 4')
+    }
 
-		// the number of equal signs (place holders)
-		// if there are two placeholders, than the two characters before it
-		// represent one byte
-		// if there is only one, then the three characters before it represent 2 bytes
-		// this is just a cheap hack to not do indexOf twice
-		var len = b64.length
-		placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0
+    // the number of equal signs (place holders)
+    // if there are two placeholders, than the two characters before it
+    // represent one byte
+    // if there is only one, then the three characters before it represent 2 bytes
+    // this is just a cheap hack to not do indexOf twice
+    var len = b64.length
+    placeHolders = b64.charAt(len - 2) === '=' ? 2 : b64.charAt(len - 1) === '=' ? 1 : 0
 
-		// base64 is 4/3 + up to two characters of the original data
-		arr = new Arr(b64.length * 3 / 4 - placeHolders)
+    // base64 is 4/3 + up to two characters of the original data
+    arr = new Arr(b64.length * 3 / 4 - placeHolders)
 
-		// if there are placeholders, only get up to the last complete 4 chars
-		l = placeHolders > 0 ? b64.length - 4 : b64.length
+    // if there are placeholders, only get up to the last complete 4 chars
+    l = placeHolders > 0 ? b64.length - 4 : b64.length
 
-		var L = 0
+    var L = 0
 
-		function push (v) {
-			arr[L++] = v
-		}
+    function push (v) {
+      arr[L++] = v
+    }
 
-		for (i = 0, j = 0; i < l; i += 4, j += 3) {
-			tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
-			push((tmp & 0xFF0000) >> 16)
-			push((tmp & 0xFF00) >> 8)
-			push(tmp & 0xFF)
-		}
+    for (i = 0, j = 0; i < l; i += 4, j += 3) {
+      tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
+      push((tmp & 0xFF0000) >> 16)
+      push((tmp & 0xFF00) >> 8)
+      push(tmp & 0xFF)
+    }
 
-		if (placeHolders === 2) {
-			tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
-			push(tmp & 0xFF)
-		} else if (placeHolders === 1) {
-			tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
-			push((tmp >> 8) & 0xFF)
-			push(tmp & 0xFF)
-		}
+    if (placeHolders === 2) {
+      tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
+      push(tmp & 0xFF)
+    } else if (placeHolders === 1) {
+      tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
+      push((tmp >> 8) & 0xFF)
+      push(tmp & 0xFF)
+    }
 
-		return arr
-	}
+    return arr
+  }
 
-	function uint8ToBase64 (uint8) {
-		var i,
-			extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
-			output = "",
-			temp, length
+  function uint8ToBase64 (uint8) {
+    var i
+    var extraBytes = uint8.length % 3 // if we have 1 byte left, pad 2 bytes
+    var output = ''
+    var temp, length
 
-		function encode (num) {
-			return lookup.charAt(num)
-		}
+    function encode (num) {
+      return lookup.charAt(num)
+    }
 
-		function tripletToBase64 (num) {
-			return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
-		}
+    function tripletToBase64 (num) {
+      return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
+    }
 
-		// go through the array every three bytes, we'll deal with trailing stuff later
-		for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
-			temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
-			output += tripletToBase64(temp)
-		}
+    // go through the array every three bytes, we'll deal with trailing stuff later
+    for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
+      temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+      output += tripletToBase64(temp)
+    }
 
-		// pad the end with zeros, but make sure to not forget the extra bytes
-		switch (extraBytes) {
-			case 1:
-				temp = uint8[uint8.length - 1]
-				output += encode(temp >> 2)
-				output += encode((temp << 4) & 0x3F)
-				output += '=='
-				break
-			case 2:
-				temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
-				output += encode(temp >> 10)
-				output += encode((temp >> 4) & 0x3F)
-				output += encode((temp << 2) & 0x3F)
-				output += '='
-				break
-		}
+    // pad the end with zeros, but make sure to not forget the extra bytes
+    switch (extraBytes) {
+      case 1:
+        temp = uint8[uint8.length - 1]
+        output += encode(temp >> 2)
+        output += encode((temp << 4) & 0x3F)
+        output += '=='
+        break
+      case 2:
+        temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
+        output += encode(temp >> 10)
+        output += encode((temp >> 4) & 0x3F)
+        output += encode((temp << 2) & 0x3F)
+        output += '='
+        break
+      default:
+        break
+    }
 
-		return output
-	}
+    return output
+  }
 
-	exports.toByteArray = b64ToByteArray
-	exports.fromByteArray = uint8ToBase64
+  exports.toByteArray = b64ToByteArray
+  exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
 },{}],3:[function(require,module,exports){
@@ -1770,12 +1668,6 @@ module.exports = Array.isArray || function (arr) {
 };
 
 },{}],5:[function(require,module,exports){
-
-// Cheating npm require.
-module.exports = require('../..')
-
-
-},{"../..":31}],6:[function(require,module,exports){
 var should = require('./lib/should');
 
 var defaultProto = Object.prototype;
@@ -1791,7 +1683,7 @@ try {
 
 module.exports = should;
 
-},{"./lib/should":23}],7:[function(require,module,exports){
+},{"./lib/should":22}],6:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -1885,7 +1777,7 @@ AssertionError.prototype = Object.create(Error.prototype, {
 
 module.exports = AssertionError;
 
-},{"./util":24}],8:[function(require,module,exports){
+},{"./util":23}],7:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -2164,7 +2056,7 @@ Assertion.addChain('any', function() {
 module.exports = Assertion;
 module.exports.PromisedAssertion = PromisedAssertion;
 
-},{"./assertion-error":7}],9:[function(require,module,exports){
+},{"./assertion-error":6}],8:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -2183,7 +2075,7 @@ var config = {
 
 module.exports = config;
 
-},{"should-format":27}],10:[function(require,module,exports){
+},{"should-format":26}],9:[function(require,module,exports){
 // implement assert interface using already written peaces of should.js
 
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
@@ -2468,7 +2360,7 @@ assert.ifError = function(err) {
   }
 };
 
-},{"./../assertion":8,"should-equal":26}],11:[function(require,module,exports){
+},{"./../assertion":7,"should-equal":25}],10:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -2539,7 +2431,7 @@ module.exports = function(should) {
     }
   };
 };
-},{"../assertion-error":7,"../util":24,"./_assert":10}],12:[function(require,module,exports){
+},{"../assertion-error":6,"../util":23,"./_assert":9}],11:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -2608,7 +2500,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -2640,7 +2532,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -2800,7 +2692,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{"../util":24,"should-equal":26}],15:[function(require,module,exports){
+},{"../util":23,"should-equal":25}],14:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -2938,7 +2830,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{"../util":24,"should-equal":26,"should-type":29}],16:[function(require,module,exports){
+},{"../util":23,"should-equal":25,"should-type":28}],15:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -3049,7 +2941,7 @@ module.exports = function(should, Assertion) {
   Assertion.alias('throw', 'throwError');
 };
 
-},{"../util":24}],17:[function(require,module,exports){
+},{"../util":23}],16:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -3259,7 +3151,7 @@ module.exports = function(should, Assertion) {
   Assertion.alias('matchEach', 'matchEvery');
 };
 
-},{"../util":24,"should-equal":26}],18:[function(require,module,exports){
+},{"../util":23,"should-equal":25}],17:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -3427,7 +3319,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -3461,14 +3353,22 @@ module.exports = function(should) {
   });
 
   /**
-   * Assert given promise will be fulfilled
+   * Assert given promise will be fulfilled. Result of assertion is still .thenable and should be handled accordingly.
    *
    * @name fulfilled
    * @memberOf Assertion
    * @returns {Promise}
    * @category assertion promises
    * @example
-   * (new Promise(function(resolve, reject) { resolve(10); })).should.be.fulfilled()
+   * 
+   * // don't forget to handle async nature
+   * (new Promise(function(resolve, reject) { resolve(10); })).should.be.fulfilled();
+   * 
+   * // test example with mocha it is possible to return promise
+   * it('is async', () => {
+   *    return new Promise(resolve => resolve(10))
+   *      .should.be.fulfilled();
+   * });
    */
   Assertion.prototype.fulfilled = function Assertion$fulfilled() {
     this.params = {operator: 'to be fulfilled'};
@@ -3490,14 +3390,23 @@ module.exports = function(should) {
   };
 
   /**
-   * Assert given promise will be rejected
+   * Assert given promise will be rejected. Result of assertion is still .thenable and should be handled accordingly.
    *
    * @name rejected
    * @memberOf Assertion
    * @category assertion promises
    * @returns {Promise}
    * @example
-   * (new Promise(function(resolve, reject) { resolve(10); })).should.not.be.rejected()
+   * 
+   * // don't forget to handle async nature
+   * (new Promise(function(resolve, reject) { resolve(10); }))
+   *    .should.not.be.rejected();
+   * 
+   * // test example with mocha it is possible to return promise
+   * it('is async', () => {
+   *    return new Promise((resolve, reject) => reject(new Error('boom')))
+   *      .should.be.rejected();
+   * });
    */
   Assertion.prototype.rejected = function() {
     this.params = {operator: 'to be rejected'};
@@ -3519,14 +3428,24 @@ module.exports = function(should) {
   };
 
   /**
-   * Assert given promise will be fulfilled with some expected value.
+   * Assert given promise will be fulfilled with some expected value (value compared using .eql).
+   * Result of assertion is still .thenable and should be handled accordingly.
    *
    * @name fulfilledWith
    * @memberOf Assertion
    * @category assertion promises
    * @returns {Promise}
    * @example
-   * (new Promise(function(resolve, reject) { resolve(10); })).should.be.fulfilledWith(10)
+   * 
+   * // don't forget to handle async nature
+   * (new Promise(function(resolve, reject) { resolve(10); }))
+   *    .should.be.fulfilledWith(10);
+   * 
+   * // test example with mocha it is possible to return promise
+   * it('is async', () => {
+   *    return new Promise((resolve, reject) => resolve(10))
+   *       .should.be.fulfilledWith(10);
+   * });
    */
   Assertion.prototype.fulfilledWith = function(expectedValue) {
     this.params = {operator: 'to be fulfilled'};
@@ -3549,7 +3468,8 @@ module.exports = function(should) {
   };
 
   /**
-   * Assert given promise will be rejected with some sort of error. Arguments is the same for Assertion#throw
+   * Assert given promise will be rejected with some sort of error. Arguments is the same for Assertion#throw.
+   * Result of assertion is still .thenable and should be handled accordingly.
    *
    * @name rejectedWith
    * @memberOf Assertion
@@ -3558,15 +3478,20 @@ module.exports = function(should) {
    * @example
    *
    * function failedPromise() {
-  *   return new Promise(function(resolve, reject) {
-  *     reject(new Error('boom'))
-  *   })
-  * }
-   * failedPromise().should.be.rejectedWith(Error)
-   * failedPromise().should.be.rejectedWith('boom')
-   * failedPromise().should.be.rejectedWith(/boom/)
-   * failedPromise().should.be.rejectedWith(Error, { message: 'boom' })
-   * failedPromise().should.be.rejectedWith({ message: 'boom' })
+   *   return new Promise(function(resolve, reject) {
+   *     reject(new Error('boom'))
+   *   })
+   * }
+   * failedPromise().should.be.rejectedWith(Error);
+   * failedPromise().should.be.rejectedWith('boom');
+   * failedPromise().should.be.rejectedWith(/boom/);
+   * failedPromise().should.be.rejectedWith(Error, { message: 'boom' });
+   * failedPromise().should.be.rejectedWith({ message: 'boom' });
+   * 
+   * // test example with mocha it is possible to return promise
+   * it('is async', () => {
+   *    return failedPromise().should.be.rejectedWith({ message: 'boom' });
+   * });
    */
   Assertion.prototype.rejectedWith = function(message, properties) {
     this.params = {operator: 'to be rejected'};
@@ -3634,7 +3559,9 @@ module.exports = function(should) {
   };
 
   /**
-   * Assert given object is promise and wrap it in PromisedAssertion, which has all properties of Assertion. That means you can chain as with usual Assertion.
+   * Assert given object is promise and wrap it in PromisedAssertion, which has all properties of Assertion. 
+   * That means you can chain as with usual Assertion.
+   * Result of assertion is still .thenable and should be handled accordingly.
    *
    * @name finally
    * @memberOf Assertion
@@ -3643,7 +3570,14 @@ module.exports = function(should) {
    * @returns {PromisedAssertion} Like Assertion, but .then this.obj in Assertion
    * @example
    *
-   * (new Promise(function(resolve, reject) { resolve(10); })).should.be.eventually.equal(10)
+   * (new Promise(function(resolve, reject) { resolve(10); }))
+   *    .should.be.eventually.equal(10);
+   * 
+   * // test example with mocha it is possible to return promise
+   * it('is async', () => {
+   *    return new Promise(resolve => resolve(10))
+   *      .should.be.finally.equal(10);
+   * });
    */
   Object.defineProperty(Assertion.prototype, 'finally', {
     get: function() {
@@ -3665,7 +3599,7 @@ module.exports = function(should) {
   Assertion.alias('finally', 'eventually');
 };
 
-},{"../assertion":8,"../util":24}],20:[function(require,module,exports){
+},{"../assertion":7,"../util":23}],19:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -4037,7 +3971,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{"../util":24,"should-equal":26}],21:[function(require,module,exports){
+},{"../util":23,"should-equal":25}],20:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -4080,7 +4014,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -4221,6 +4155,18 @@ module.exports = function(should, Assertion) {
   });
 
   /**
+   * Assert given object is a date
+   * @name Date
+   * @memberOf Assertion
+   * @category assertion types
+   */
+  Assertion.add('Date', function() {
+    this.params = {operator: 'to be a date'};
+
+    this.have.instanceOf(Date);
+  });
+
+  /**
    * Assert given object is null
    * @name null
    * @alias Assertion#Null
@@ -4306,7 +4252,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{"../util":24}],23:[function(require,module,exports){
+},{"../util":23}],22:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -4366,6 +4312,8 @@ exports = module.exports = should;
 /**
  * Allow to extend given prototype with should property using given name. This getter will **unwrap** all standard wrappers like `Number`, `Boolean`, `String`.
  * Using `should(obj)` is the equivalent of using `obj.should` with known issues (like nulls and method calls etc).
+ * 
+ * To add new assertions, need to use Assertion.add method.
  *
  * @param {string} [propertyName] Name of property to add. Default is `'should'`.
  * @param {Object} [proto] Prototype to extend with. Default is `Object.prototype`.
@@ -4467,7 +4415,7 @@ should
   .use(require('./ext/contain'))
   .use(require('./ext/promise'));
 
-},{"./assertion":8,"./assertion-error":7,"./config":9,"./ext/assert":11,"./ext/bool":12,"./ext/chain":13,"./ext/contain":14,"./ext/eql":15,"./ext/error":16,"./ext/match":17,"./ext/number":18,"./ext/promise":19,"./ext/property":20,"./ext/string":21,"./ext/type":22,"./util":24,"should-type":29}],24:[function(require,module,exports){
+},{"./assertion":7,"./assertion-error":6,"./config":8,"./ext/assert":10,"./ext/bool":11,"./ext/chain":12,"./ext/contain":13,"./ext/eql":14,"./ext/error":15,"./ext/match":16,"./ext/number":17,"./ext/promise":18,"./ext/property":19,"./ext/string":20,"./ext/type":21,"./util":23,"should-type":28}],23:[function(require,module,exports){
 /*
  * Should
  * Copyright(c) 2010-2015 TJ Holowaychuk <tj@vision-media.ca>
@@ -4604,7 +4552,7 @@ exports.formatProp = function(value) {
   return config.getFormatter().formatPropertyName(String(value));
 };
 
-},{"./config":9,"should-format":27,"should-type":29}],25:[function(require,module,exports){
+},{"./config":8,"should-format":26,"should-type":28}],24:[function(require,module,exports){
 module.exports = function format(msg) {
   var args = arguments;
   for(var i = 1, l = args.length; i < l; i++) {
@@ -4613,7 +4561,7 @@ module.exports = function format(msg) {
   return msg;
 }
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var getType = require('should-type');
 var format = require('./format');
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -4961,7 +4909,7 @@ module.exports = eq;
 
 eq.r = REASON;
 
-},{"./format":25,"should-type":29}],27:[function(require,module,exports){
+},{"./format":24,"should-type":28}],26:[function(require,module,exports){
 var getType = require('should-type');
 var util = require('./util');
 
@@ -5424,7 +5372,7 @@ function defaultFormat(value, opts) {
 defaultFormat.Formatter = Formatter;
 module.exports = defaultFormat;
 
-},{"./util":28,"should-type":29}],28:[function(require,module,exports){
+},{"./util":27,"should-type":28}],27:[function(require,module,exports){
 function addSpaces(v) {
   return v.split('\n').map(function(vv) { return '  ' + vv; }).join('\n');
 }
@@ -5454,7 +5402,7 @@ module.exports = {
   }
 };
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 (function (Buffer){
 var toString = Object.prototype.toString;
 
@@ -5617,7 +5565,7 @@ Object.keys(types).forEach(function(typeName) {
 module.exports = getGlobalType;
 
 }).call(this,require("buffer").Buffer)
-},{"./types":30,"buffer":1}],30:[function(require,module,exports){
+},{"./types":29,"buffer":1}],29:[function(require,module,exports){
 var types = {
   NUMBER: 'number',
   UNDEFINED: 'undefined',
@@ -5660,7 +5608,7 @@ var types = {
 
 module.exports = types;
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
@@ -5682,7 +5630,7 @@ function funBrowser (graph) {
 
 exports.fun = funBrowser
 
-},{"../fun":33,"../functions/window":35}],32:[function(require,module,exports){
+},{"../fun":32,"../functions/window":34}],31:[function(require,module,exports){
 module.exports={
   "data": {},
   "pipe": {},
@@ -5693,7 +5641,7 @@ module.exports={
   }
 }
 
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var builtinFunctions = require('./functions/builtin')
 var commentRegex = require('./regex/comment')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
@@ -5856,7 +5804,7 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./functions/builtin":34,"./inject/accessors":36,"./inject/additionalFunctions":37,"./inject/arguments":38,"./inject/dotOperators":39,"./inject/globals":40,"./inject/numbers":41,"./inject/references":42,"./inject/strings":43,"./inputArgs":44,"./isDflowFun":46,"./level":47,"./regex/comment":51,"./validate":56}],34:[function(require,module,exports){
+},{"./functions/builtin":33,"./inject/accessors":35,"./inject/additionalFunctions":36,"./inject/arguments":37,"./inject/dotOperators":38,"./inject/globals":39,"./inject/numbers":40,"./inject/references":41,"./inject/strings":42,"./inputArgs":43,"./isDflowFun":45,"./level":46,"./regex/comment":50,"./validate":55}],33:[function(require,module,exports){
 // Arithmetic operators
 
 exports['+'] = function (a, b) { return a + b }
@@ -5952,7 +5900,7 @@ exports.false = function () { return false }
 
 exports.true = function () { return true }
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 exports.document = function () {
   return document
 }
@@ -5983,7 +5931,7 @@ exports.innerHTML = function (node, content) {
   return node
 }
 
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 var accessorRegex = require('../regex/accessor')
 
 /**
@@ -6036,7 +5984,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":49}],37:[function(require,module,exports){
+},{"../regex/accessor":48}],36:[function(require,module,exports){
 /**
  * Optionally add custom functions.
  *
@@ -6072,7 +6020,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 var argumentRegex = require('../regex/argument')
 
 /**
@@ -6116,7 +6064,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":50}],39:[function(require,module,exports){
+},{"../regex/argument":49}],38:[function(require,module,exports){
 var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
@@ -6207,7 +6155,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":52}],40:[function(require,module,exports){
+},{"../regex/dotOperator":51}],39:[function(require,module,exports){
 var walkGlobal = require('../walkGlobal')
 
 /**
@@ -6261,7 +6209,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../walkGlobal":57}],41:[function(require,module,exports){
+},{"../walkGlobal":56}],40:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -6296,7 +6244,7 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 var referenceRegex = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
@@ -6351,7 +6299,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":54,"../walkGlobal":57}],43:[function(require,module,exports){
+},{"../regex/reference":53,"../walkGlobal":56}],42:[function(require,module,exports){
 var quotedRegex = require('../regex/quoted')
 
 /**
@@ -6386,7 +6334,7 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":53}],44:[function(require,module,exports){
+},{"../regex/quoted":52}],43:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -6417,7 +6365,7 @@ function inputArgs (outs, pipe, taskKey) {
 
 module.exports = inputArgs
 
-},{"./inputPipes":45}],45:[function(require,module,exports){
+},{"./inputPipes":44}],44:[function(require,module,exports){
 /**
  * Compute pipes that feed a task.
  *
@@ -6445,7 +6393,7 @@ function inputPipes (pipe, taskKey) {
 
 module.exports = inputPipes
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var validate = require('./validate')
 
 /**
@@ -6475,7 +6423,7 @@ function isDflowFun (f) {
 
 module.exports = isDflowFun
 
-},{"./validate":56}],47:[function(require,module,exports){
+},{"./validate":55}],46:[function(require,module,exports){
 var parents = require('./parents')
 
 /**
@@ -6510,7 +6458,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 
 module.exports = level
 
-},{"./parents":48}],48:[function(require,module,exports){
+},{"./parents":47}],47:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -6537,30 +6485,30 @@ function parents (pipe, taskKey) {
 
 module.exports = parents
 
-},{"./inputPipes":45}],49:[function(require,module,exports){
+},{"./inputPipes":44}],48:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
-},{}],50:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)\]$/
 
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 module.exports = /^\/\/.+$/
 
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 module.exports = /^\&(.+)$/
 
-},{}],55:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 module.exports = /^\/[\w][\w\d]+$/
 
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 
 var accessorRegex = require('./regex/accessor')
 var argumentRegex = require('./regex/argument')
@@ -6738,7 +6686,7 @@ function validate (graph, additionalFunctions) {
 
 module.exports = validate
 
-},{"./regex/accessor":49,"./regex/argument":50,"./regex/dotOperator":52,"./regex/reference":54,"./regex/subgraph":55}],57:[function(require,module,exports){
+},{"./regex/accessor":48,"./regex/argument":49,"./regex/dotOperator":51,"./regex/reference":53,"./regex/subgraph":54}],56:[function(require,module,exports){
 (function (global){
 var globalContext
 
@@ -6771,7 +6719,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "&isFinite",
@@ -6796,7 +6744,7 @@ module.exports={
   }
 }
 
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -6817,7 +6765,7 @@ module.exports={
   }
 }
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -6858,7 +6806,7 @@ module.exports={
   }
 }
 
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -6885,7 +6833,7 @@ module.exports={
   }
 }
 
-},{}],62:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6908,7 +6856,7 @@ module.exports={
   }
 }
 
-},{}],63:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6931,7 +6879,7 @@ module.exports={
   }
 }
 
-},{}],64:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 
 exports.apply          = require('./graph/apply.json')
 exports.dateParse      = require('./graph/dateParse.json')
@@ -6941,7 +6889,7 @@ exports.or             = require('./graph/or.json')
 exports.sum            = require('./graph/sum.json')
 
 
-},{"./graph/apply.json":58,"./graph/dateParse.json":59,"./graph/hello-world.json":60,"./graph/indexOf.json":61,"./graph/or.json":62,"./graph/sum.json":63}],65:[function(require,module,exports){
+},{"./graph/apply.json":57,"./graph/dateParse.json":58,"./graph/hello-world.json":59,"./graph/indexOf.json":60,"./graph/or.json":61,"./graph/sum.json":62}],64:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6960,7 +6908,7 @@ module.exports={
   "view": {}
 }
 
-},{}],66:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 var emptyGraph = require('../src/engine/emptyGraph.json')
 var validate = require('../src/engine/validate')
 
@@ -6970,7 +6918,7 @@ describe('emptyGraph', function () {
   })
 })
 
-},{"../src/engine/emptyGraph.json":32,"../src/engine/validate":56}],67:[function(require,module,exports){
+},{"../src/engine/emptyGraph.json":31,"../src/engine/validate":55}],66:[function(require,module,exports){
 var dflow = require('dflow')
 var should = require('should')
 
@@ -7011,7 +6959,7 @@ describe('example', function () {
   })
 })
 
-},{"../src/examples":64,"../src/examples/packagedGraph":65,"dflow":5,"should":6}],68:[function(require,module,exports){
+},{"../src/examples":63,"../src/examples/packagedGraph":64,"dflow":72,"should":5}],67:[function(require,module,exports){
 
 var should = require('should')
 var fun = require('../src/engine/fun')
@@ -7111,7 +7059,7 @@ describe('fun', function () {
 })
 
 
-},{"../src/engine/fun":33,"should":6}],69:[function(require,module,exports){
+},{"../src/engine/fun":32,"should":5}],68:[function(require,module,exports){
 
 var inputArgs = require('../src/engine/inputArgs')
 
@@ -7142,7 +7090,7 @@ describe('inputArgs', function () {
 })
 
 
-},{"../src/engine/inputArgs":44}],70:[function(require,module,exports){
+},{"../src/engine/inputArgs":43}],69:[function(require,module,exports){
 var inputPipes = require('../src/engine/inputPipes')
 
 var pipe = {
@@ -7166,7 +7114,7 @@ describe('inputPipes', function () {
   })
 })
 
-},{"../src/engine/inputPipes":45}],71:[function(require,module,exports){
+},{"../src/engine/inputPipes":44}],70:[function(require,module,exports){
 var examples = require('../src/examples')
 var fun = require('../src/engine/fun')
 var isDflowFun = require('../src/engine/isDflowFun')
@@ -7231,7 +7179,7 @@ describe('isDflowFun', function () {
 })
 
 
-},{"../src/engine/fun":33,"../src/engine/isDflowFun":46,"../src/examples":64}],72:[function(require,module,exports){
+},{"../src/engine/fun":32,"../src/engine/isDflowFun":45,"../src/examples":63}],71:[function(require,module,exports){
 var level = require('../src/engine/level')
 
 var pipe = {
@@ -7253,7 +7201,13 @@ describe('level', function () {
   })
 })
 
-},{"../src/engine/level":47}],73:[function(require,module,exports){
+},{"../src/engine/level":46}],72:[function(require,module,exports){
+
+// Cheating npm require.
+module.exports = require('../../..')
+
+
+},{"../../..":30}],73:[function(require,module,exports){
 var parents = require('../src/engine/parents')
 
 var pipe = {
@@ -7287,7 +7241,7 @@ describe('parentsOf', function () {
 })
 
 
-},{"../src/engine/parents":48}],74:[function(require,module,exports){
+},{"../src/engine/parents":47}],74:[function(require,module,exports){
 
 var accessor = require('../src/engine/regex/accessor')
 var argument = require('../src/engine/regex/argument')
@@ -7348,7 +7302,7 @@ describe('regex', function () {
 })
 
 
-},{"../src/engine/regex/accessor":49,"../src/engine/regex/argument":50,"../src/engine/regex/comment":51,"../src/engine/regex/dotOperator":52,"../src/engine/regex/reference":54,"../src/engine/regex/subgraph":55}],75:[function(require,module,exports){
+},{"../src/engine/regex/accessor":48,"../src/engine/regex/argument":49,"../src/engine/regex/comment":50,"../src/engine/regex/dotOperator":51,"../src/engine/regex/reference":53,"../src/engine/regex/subgraph":54}],75:[function(require,module,exports){
 var should = require('should')
 var fun = require('../src/engine/fun')
 
@@ -7391,7 +7345,7 @@ describe('this.graph', function () {
   })
 })
 
-},{"../src/engine/fun":33,"should":6}],76:[function(require,module,exports){
+},{"../src/engine/fun":32,"should":5}],76:[function(require,module,exports){
 var validate = require('../src/engine/validate')
 
 describe('validate', function () {
@@ -7576,4 +7530,4 @@ describe('validate', function () {
   })
 })
 
-},{"../src/engine/validate":56}]},{},[66,67,68,69,70,71,72,73,74,75,76]);
+},{"../src/engine/validate":55}]},{},[65,66,67,68,69,70,71,73,74,75,76]);
