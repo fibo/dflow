@@ -19,7 +19,7 @@
     "_build": "npm test && npm run browserify && npm run minify && npm run jekyll; git status",
     "_push": "git push origin master && npm run gh-pages_push",
     "_pull": "git pull origin master && npm run gh-pages_pull",
-    "bower": "cd src/editor; bower --config.analytics=false install; cd -",
+    "bower": "cd src/editor; bower --silent --config.analytics=false install; cd -",
     "browserify": "npm run browserify_client; npm run browserify_dist; npm run browserify_examples; npm run browserify_test",
     "browserify_client": "browserify src/editor/client/main.js -t babelify -o src/editor/client/public/bundle.js",
     "browserify_dist": "browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
