@@ -8,7 +8,7 @@ title: Examples
 
 The following simple graph is executed client side by *dflow* engine.
 
-[![Hello World](http://g14n.info/dflow/svg/hello-world.svg)][2]
+[![Hello World](http://g14n.info/dflow/svg/hello-world.svg)](http://g14n.info/dflow/examples/hello-world.html)
 
 ## RequireBin
 
@@ -40,3 +40,4 @@ Also every *dflow* graph is a function itself, so why not packaging it and put i
 It is really easy: create your *dflow* graph and save it to a JSON file, *index.json* for instance; then launch `npm init` as usual and when prompted for the *entry point* write *index.json*.
 
 Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/src/examples/packagedGraph) as an example.
+
