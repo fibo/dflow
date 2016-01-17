@@ -35,7 +35,7 @@
     "decrypt_.coveralls.yml": "keybase decrypt -o .coveralls.yml .coveralls.yml.asc",
     "gh-pages_push": "git subtree --prefix gh-pages push origin gh-pages",
     "gh-pages_pull": "git subtree --prefix gh-pages pull origin gh-pages",
-    "heroku": "git remote add heroku https://git.heroku.com/dflow.git; git push heroku master",
+    "heroku": "git remote add heroku https://git.heroku.com/dflow.git; git push heroku master; git remote remove heroku",
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
     "istanbul": "istanbul cover _mocha -- --recursive",
     "jekyll": "npm run homepage; npm run cp; cd gh-pages; jekyll build; cd ..",

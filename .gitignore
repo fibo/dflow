@@ -10,6 +10,3 @@ graph.json
 # Test coverage
 coverage
 .coveralls.yml
-
-# Heroku deploy
-heroku
