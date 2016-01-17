@@ -1,7 +1,7 @@
 {
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
-  "version": "0.12.5",
+  "version": "0.12.6",
   "homepage": "http://g14n.info/dflow",
   "author": {
     "name": "Gianluca Casati",
@@ -28,10 +28,9 @@
     "check-deps": "npm outdated",
     "coverage": "npm run istanbul && npm run coveralls",
     "coveralls": "cat ./coverage/lcov.info | coveralls --verbose",
-    "cp": "npm run cp_dist; npm run cp_package.json; npm run cp_style.css",
+    "cp": "npm run cp_dist; npm run cp_package.json",
     "cp_dist": "cp -r dist/ gh-pages/",
     "cp_package.json": "cp package.json gh-pages/_data/",
-    "cp_style.css": "cp src/editor/client/style.css src/editor/client/public",
     "decrypt_.coveralls.yml": "keybase decrypt -o .coveralls.yml .coveralls.yml.asc",
     "gh-pages_push": "git subtree --prefix gh-pages push origin gh-pages",
     "gh-pages_pull": "git subtree --prefix gh-pages pull origin gh-pages",
