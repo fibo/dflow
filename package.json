@@ -1,27 +1,26 @@
-{
-  "name": "dflow",
-  "description": "is a minimal Dataflow programming engine",
-  "version": "0.12.7",
-  "homepage": "http://g14n.info/dflow",
-  "author": {
-    "name": "Gianluca Casati",
-    "url": "http://g14n.info"
-  },
-  "license": "MIT",
-  "bin": "src/bin/dflow",
-  "main": "index.js",
-  "engines": {
-    "node": ">0.12.9"
-  },
-  "browser": "./src/engine/context/client-window.js",
-  "scripts": {
-    "start": "node src/bin/dflow",
-    "_build": "npm test && npm run browserify && npm run minify && npm run jekyll; git status",
-    "_push": "git push origin master && npm run gh-pages_push",
-    "_pull": "git pull origin master && npm run gh-pages_pull",
+  {
+    "name": "dflow",
+    "description": "is a minimal Dataflow programming engine",
+    "version": "0.12.7",
+    "homepage": "http://g14n.info/dflow",
+    "author": {
+      "name": "Gianluca Casati",
+      "url": "http://g14n.info"
+    },
+    "license": "MIT",
+    "bin": "src/bin/dflow",
+    "main": "index.js",
+    "engines": {
+      "node": ">0.12.9"
+    },
+    "browser": "./src/engine/context/client-window.js",
+    "scripts": {
+      "start": "node src/bin/dflow",
+      "_build": "npm test && npm run browserify && npm run minify && npm run jekyll; git status",
+      "_push": "git push origin master && npm run gh-pages_push",
+      "_pull": "git pull origin master && npm run gh-pages_pull",
     "bower": "cd src/editor; bower --silent --config.analytics=false install; cd -",
     "browserify": "for x in client dist examples test; do npm run browserify_$x; done",
-    "browserify": "npm run browserify_client; npm run browserify_dist; npm run browserify_examples; npm run browserify_test",
     "browserify_client": "browserify src/editor/client/main.js -t babelify -o src/editor/client/public/bundle.js",
     "browserify_dist": "browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
     "browserify_examples": "browserify -r ./src/examples/renderer.js:examples-renderer -o gh-pages/js/examples-renderer.js",
@@ -39,7 +38,7 @@
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
     "istanbul": "istanbul cover _mocha -- --recursive",
     "jekyll": "npm run homepage; npm run cp; cd gh-pages; jekyll build; cd ..",
-    "lint": "for x in bin editor engine; do npm run lint_$x; done",
+    "lint": "for x in bin editor engine test; do npm run lint_$x; done",
     "lint_bin": "standard bin/dflow",
     "lint_editor": "npm run lint_editor_client; npm run lint_editor_server",
     "lint_editor_client": "standard --global $ src/editor/client/*js",
@@ -49,7 +48,7 @@
     "minify": "uglifyjs dist/${npm_package_name}.js --output dist/${npm_package_name}.min.js --compress --mangle",
     "postinstall": "npm run bower; npm run browserify_client",
     "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push; npm run heroku",
-    "test": "mocha --bail --require should --reporter min --recursive",
+    "test": "mocha",
     "wget_img.shields.io": "for x in forks stars watchers; do npm run wget_img.shields.io_$x; done",
     "wget_img.shields.io_forks": "wget 'https://img.shields.io/github/forks/fibo/dflow.svg?style=social&label=Forks' -O gh-pages/svg/img.shields.io/forks.svg",
     "wget_img.shields.io_stars": "wget 'https://img.shields.io/github/stars/fibo/dflow.svg?style=social&label=Star' -O gh-pages/svg/img.shields.io/stars.svg",
