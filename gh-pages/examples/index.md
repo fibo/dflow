@@ -10,6 +10,18 @@ The following simple graph is executed client side by *dflow* engine.
 
 [![Hello World](http://g14n.info/dflow/svg/hello-world.svg)](http://g14n.info/dflow/examples/hello-world.html)
 
+Follows a list of more example graphs:
+
+* [apply](http://g14n.info/dflow/examples/apply.html)
+* [createParagraph](http://g14n.info/dflow/examples/createParagraph.html)
+* [dateParse](http://g14n.info/dflow/examples/dateParse.html)
+* [dotOperator](http://g14n.info/dflow/examples/dotOperator.html)
+* [indexOf](http://g14n.info/dflow/examples/indexOf.html)
+* [new](http://g14n.info/dflow/examples/new.html)
+* [or](http://g14n.info/dflow/examples/or.html)
+* [sum](http://g14n.info/dflow/examples/sum.html)
+* [welcome](http://g14n.info/dflow/examples/welcome.html)
+
 ## RequireBin
 
 An example of *dflow* in a browser context, testing DOM manipulation.

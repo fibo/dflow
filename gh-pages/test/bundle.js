@@ -6746,6 +6746,188 @@ module.exports={
 
 },{}],58:[function(require,module,exports){
 module.exports={
+  "data": {
+    "results": []
+  },
+  "pipe": {
+    "7": [
+      "6",
+      "4",
+      1
+    ],
+    "10": [
+      "8",
+      "9"
+    ],
+    "13": [
+      "4",
+      "9",
+      1
+    ],
+    "15": [
+      "12",
+      "14"
+    ],
+    "17": [
+      "14",
+      "4"
+    ]
+  },
+  "task": {
+    "4": "innerHTML",
+    "6": "'This is a paragraph'",
+    "8": "body",
+    "9": ".appendChild()",
+    "12": "document",
+    "14": ".createElement()"
+  },
+  "view": {
+    "node": {
+      "4": {
+        "text": "innerHTML",
+        "x": 293,
+        "y": 338,
+        "ins": [
+          {
+            "name": "in0"
+          },
+          {
+            "name": "in1"
+          }
+        ],
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "4"
+      },
+      "6": {
+        "text": "'This is a paragraph'",
+        "x": 394,
+        "y": 227,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "6"
+      },
+      "8": {
+        "text": "body",
+        "x": 144,
+        "y": 379,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "8"
+      },
+      "9": {
+        "text": ".appendChild()",
+        "x": 145,
+        "y": 476,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "9",
+        "ins": [
+          {},
+          {}
+        ]
+      },
+      "12": {
+        "text": "document",
+        "x": 295,
+        "y": 69,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "12"
+      },
+      "14": {
+        "text": ".createElement()",
+        "x": 294,
+        "y": 173,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "14",
+        "ins": [
+          {},
+          {}
+        ]
+      }
+    },
+    "link": {
+      "7": {
+        "from": [
+          "6",
+          0
+        ],
+        "to": [
+          "4",
+          1
+        ],
+        "id": "7"
+      },
+      "10": {
+        "from": [
+          "8",
+          0
+        ],
+        "to": [
+          "9",
+          0
+        ],
+        "id": "10"
+      },
+      "13": {
+        "from": [
+          "4",
+          0
+        ],
+        "to": [
+          "9",
+          1
+        ],
+        "id": "13"
+      },
+      "15": {
+        "from": [
+          "12",
+          0
+        ],
+        "to": [
+          "14",
+          0
+        ],
+        "id": "15"
+      },
+      "17": {
+        "from": [
+          "14",
+          0
+        ],
+        "to": [
+          "4",
+          0
+        ],
+        "id": "17"
+      }
+    }
+  }
+}
+
+},{}],59:[function(require,module,exports){
+module.exports={
   "task": {
     "a": "arguments[0]",
     "b": "Date.parse",
@@ -6765,7 +6947,30 @@ module.exports={
   }
 }
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
+module.exports={
+  "task": {
+    "a": "arguments[0]",
+    "b": "arguments[1]",
+    "c": ".",
+    "d": "return"
+  },
+  "pipe": {
+    "1": [ "a", "c", 0 ],
+    "2": [ "b", "c", 1 ],
+    "3": [ "c", "d" ]
+  },
+  "data": {
+    "results": [
+      {
+        "args": [ { "foo": "bar" }, "foo" ],
+        "expected": "bar"
+      }
+    ]
+  }
+}
+
+},{}],61:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -6806,7 +7011,7 @@ module.exports={
   }
 }
 
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -6833,7 +7038,168 @@ module.exports={
   }
 }
 
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
+module.exports={
+  "data": {
+    "results": []
+  },
+  "pipe": {
+    "7": [
+      "6",
+      "1"
+    ],
+    "9": [
+      "2",
+      "1",
+      1
+    ],
+    "10": [
+      "3",
+      "1",
+      2
+    ],
+    "11": [
+      "8",
+      "1",
+      3
+    ],
+    "13": [
+      "1",
+      "12"
+    ]
+  },
+  "task": {
+    "1": "new",
+    "2": "arguments[0]",
+    "3": "arguments[1]",
+    "6": "&Date",
+    "8": "arguments[2]",
+    "12": "return"
+  },
+  "view": {
+    "node": {
+      "1": {
+        "text": "new",
+        "x": 90,
+        "y": 126,
+        "task": "1",
+        "outs": [
+          {}
+        ],
+        "ins": [
+          {},
+          {},
+          {},
+          {}
+        ]
+      },
+      "2": {
+        "text": "arguments[0]",
+        "x": 196,
+        "y": 42,
+        "task": "2",
+        "outs": [
+          {}
+        ]
+      },
+      "3": {
+        "text": "arguments[1]",
+        "x": 372,
+        "y": 41,
+        "task": "3",
+        "outs": [
+          {}
+        ]
+      },
+      "6": {
+        "text": "&Date",
+        "x": 90,
+        "y": 41,
+        "task": "6",
+        "outs": [
+          {}
+        ]
+      },
+      "8": {
+        "text": "arguments[2]",
+        "x": 554,
+        "y": 41,
+        "task": "8",
+        "outs": [
+          {}
+        ]
+      },
+      "12": {
+        "text": "return",
+        "x": 92,
+        "y": 232,
+        "task": "12",
+        "ins": [
+          {}
+        ]
+      }
+    },
+    "link": {
+      "7": {
+        "from": [
+          "6",
+          0
+        ],
+        "to": [
+          "1",
+          0
+        ],
+        "id": "7"
+      },
+      "9": {
+        "from": [
+          "2",
+          0
+        ],
+        "to": [
+          "1",
+          1
+        ],
+        "id": "9"
+      },
+      "10": {
+        "from": [
+          "3",
+          0
+        ],
+        "to": [
+          "1",
+          2
+        ],
+        "id": "10"
+      },
+      "11": {
+        "from": [
+          "8",
+          0
+        ],
+        "to": [
+          "1",
+          3
+        ],
+        "id": "11"
+      },
+      "13": {
+        "from": [
+          "1",
+          0
+        ],
+        "to": [
+          "12",
+          0
+        ],
+        "id": "13"
+      }
+    }
+  }
+}
+
+},{}],64:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6856,7 +7222,7 @@ module.exports={
   }
 }
 
-},{}],62:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6879,17 +7245,77 @@ module.exports={
   }
 }
 
-},{}],63:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
+module.exports={
+  "data": {
+    "results": []
+  },
+  "pipe": {
+    "4": [
+      "2",
+      "3"
+    ]
+  },
+  "task": {
+    "2": "arguments",
+    "3": "return"
+  },
+  "view": {
+    "node": {
+      "2": {
+        "text": "arguments",
+        "x": 456,
+        "y": 129,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "2"
+      },
+      "3": {
+        "text": "return",
+        "x": 457,
+        "y": 219,
+        "ins": [
+          {
+            "name": "in"
+          }
+        ],
+        "task": "3"
+      }
+    },
+    "link": {
+      "4": {
+        "from": [
+          "2",
+          0
+        ],
+        "to": [
+          "3",
+          0
+        ],
+        "id": "4"
+      }
+    }
+  }
+}
 
-exports.apply          = require('./graph/apply.json')
-exports.dateParse      = require('./graph/dateParse.json')
+},{}],67:[function(require,module,exports){
+// Do not use dynamic imports, for example importing the whole graph folder;
+// use explicit imports instead, otherwise browserify will not include graphs.
+exports.apply = require('./graph/apply.json')
+exports.createParagraph = require('./graph/createParagraph.json')
+exports.dateParse = require('./graph/dateParse.json')
+exports.dotOperator = require('./graph/dotOperator.json')
 exports['hello-world'] = require('./graph/hello-world.json')
-exports.indexOf        = require('./graph/indexOf.json')
-exports.or             = require('./graph/or.json')
-exports.sum            = require('./graph/sum.json')
+exports.indexOf = require('./graph/indexOf.json')
+exports['new'] = require('./graph/new.json')
+exports.or = require('./graph/or.json')
+exports.sum = require('./graph/sum.json')
+exports.welcome = require('./graph/welcome.json')
 
-
-},{"./graph/apply.json":57,"./graph/dateParse.json":58,"./graph/hello-world.json":59,"./graph/indexOf.json":60,"./graph/or.json":61,"./graph/sum.json":62}],64:[function(require,module,exports){
+},{"./graph/apply.json":57,"./graph/createParagraph.json":58,"./graph/dateParse.json":59,"./graph/dotOperator.json":60,"./graph/hello-world.json":61,"./graph/indexOf.json":62,"./graph/new.json":63,"./graph/or.json":64,"./graph/sum.json":65,"./graph/welcome.json":66}],68:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -6908,7 +7334,7 @@ module.exports={
   "view": {}
 }
 
-},{}],65:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 var emptyGraph = require('../src/engine/emptyGraph.json')
 var validate = require('../src/engine/validate')
 
@@ -6918,7 +7344,7 @@ describe('emptyGraph', function () {
   })
 })
 
-},{"../src/engine/emptyGraph.json":31,"../src/engine/validate":55}],66:[function(require,module,exports){
+},{"../src/engine/emptyGraph.json":31,"../src/engine/validate":55}],70:[function(require,module,exports){
 var dflow = require('dflow')
 var should = require('should')
 
@@ -6959,7 +7385,7 @@ describe('example', function () {
   })
 })
 
-},{"../src/examples":63,"../src/examples/packagedGraph":64,"dflow":72,"should":5}],67:[function(require,module,exports){
+},{"../src/examples":67,"../src/examples/packagedGraph":68,"dflow":76,"should":5}],71:[function(require,module,exports){
 
 var should = require('should')
 var fun = require('../src/engine/fun')
@@ -7059,7 +7485,7 @@ describe('fun', function () {
 })
 
 
-},{"../src/engine/fun":32,"should":5}],68:[function(require,module,exports){
+},{"../src/engine/fun":32,"should":5}],72:[function(require,module,exports){
 
 var inputArgs = require('../src/engine/inputArgs')
 
@@ -7090,7 +7516,7 @@ describe('inputArgs', function () {
 })
 
 
-},{"../src/engine/inputArgs":43}],69:[function(require,module,exports){
+},{"../src/engine/inputArgs":43}],73:[function(require,module,exports){
 var inputPipes = require('../src/engine/inputPipes')
 
 var pipe = {
@@ -7114,7 +7540,7 @@ describe('inputPipes', function () {
   })
 })
 
-},{"../src/engine/inputPipes":44}],70:[function(require,module,exports){
+},{"../src/engine/inputPipes":44}],74:[function(require,module,exports){
 var examples = require('../src/examples')
 var fun = require('../src/engine/fun')
 var isDflowFun = require('../src/engine/isDflowFun')
@@ -7179,7 +7605,7 @@ describe('isDflowFun', function () {
 })
 
 
-},{"../src/engine/fun":32,"../src/engine/isDflowFun":45,"../src/examples":63}],71:[function(require,module,exports){
+},{"../src/engine/fun":32,"../src/engine/isDflowFun":45,"../src/examples":67}],75:[function(require,module,exports){
 var level = require('../src/engine/level')
 
 var pipe = {
@@ -7201,13 +7627,13 @@ describe('level', function () {
   })
 })
 
-},{"../src/engine/level":46}],72:[function(require,module,exports){
+},{"../src/engine/level":46}],76:[function(require,module,exports){
 
 // Cheating npm require.
 module.exports = require('../../..')
 
 
-},{"../../..":30}],73:[function(require,module,exports){
+},{"../../..":30}],77:[function(require,module,exports){
 var parents = require('../src/engine/parents')
 
 var pipe = {
@@ -7241,7 +7667,7 @@ describe('parentsOf', function () {
 })
 
 
-},{"../src/engine/parents":47}],74:[function(require,module,exports){
+},{"../src/engine/parents":47}],78:[function(require,module,exports){
 
 var accessor = require('../src/engine/regex/accessor')
 var argument = require('../src/engine/regex/argument')
@@ -7302,7 +7728,7 @@ describe('regex', function () {
 })
 
 
-},{"../src/engine/regex/accessor":48,"../src/engine/regex/argument":49,"../src/engine/regex/comment":50,"../src/engine/regex/dotOperator":51,"../src/engine/regex/reference":53,"../src/engine/regex/subgraph":54}],75:[function(require,module,exports){
+},{"../src/engine/regex/accessor":48,"../src/engine/regex/argument":49,"../src/engine/regex/comment":50,"../src/engine/regex/dotOperator":51,"../src/engine/regex/reference":53,"../src/engine/regex/subgraph":54}],79:[function(require,module,exports){
 var should = require('should')
 var fun = require('../src/engine/fun')
 
@@ -7345,7 +7771,7 @@ describe('this.graph', function () {
   })
 })
 
-},{"../src/engine/fun":32,"should":5}],76:[function(require,module,exports){
+},{"../src/engine/fun":32,"should":5}],80:[function(require,module,exports){
 var validate = require('../src/engine/validate')
 
 describe('validate', function () {
@@ -7530,4 +7956,4 @@ describe('validate', function () {
   })
 })
 
-},{"../src/engine/validate":55}]},{},[65,66,67,68,69,70,71,73,74,75,76]);
+},{"../src/engine/validate":55}]},{},[69,70,71,72,73,74,75,77,78,79,80]);
