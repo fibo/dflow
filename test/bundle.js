@@ -3997,7 +3997,7 @@ module.exports = function(should, Assertion) {
   });
 
   /**
-   * Assert given string starts with prefix
+   * Assert given string ends with prefix
    * @name endWith
    * @memberOf Assertion
    * @category assertion strings
@@ -4287,6 +4287,7 @@ should.util = util;
  * Object with configuration.
  * It contains such properties:
  * * `checkProtoEql` boolean - Affect if `.eql` will check objects prototypes
+ * * `plusZeroAndMinusZeroEqual` boolean - Affect if `.eql` will treat +0 and -0 as equal
  * Also it can contain options for should-format.
  *
  * @type {Object}
@@ -4312,7 +4313,7 @@ exports = module.exports = should;
 /**
  * Allow to extend given prototype with should property using given name. This getter will **unwrap** all standard wrappers like `Number`, `Boolean`, `String`.
  * Using `should(obj)` is the equivalent of using `obj.should` with known issues (like nulls and method calls etc).
- * 
+ *
  * To add new assertions, need to use Assertion.add method.
  *
  * @param {string} [propertyName] Name of property to add. Default is `'should'`.
@@ -4626,7 +4627,7 @@ function eqInternal(a, b, opts, stackA, stackB, path, fails) {
   // equal a and b exit early
   if(a === b) {
     // check for +0 !== -0;
-    return result(a !== 0 || (1 / a == 1 / b), REASON.PLUS_0_AND_MINUS_0);
+    return result(a !== 0 || (1 / a == 1 / b) || opts.plusZeroAndMinusZeroEqual, REASON.PLUS_0_AND_MINUS_0);
   }
 
   var l, p;
@@ -4648,8 +4649,7 @@ function eqInternal(a, b, opts, stackA, stackB, path, fails) {
     case 'number':
       // NaN !== NaN
       return (a !== a) ? result(b !== b, REASON.NAN_NUMBER)
-        // but treat `+0` vs. `-0` as not equal
-        : (a === 0 ? result(1 / a === 1 / b, REASON.PLUS_0_AND_MINUS_0) : result(a === b, REASON.EQUALITY));
+        : result(a === b, REASON.EQUALITY);
 
     case 'boolean':
     case 'string':
@@ -4888,7 +4888,8 @@ function eqInternal(a, b, opts, stackA, stackB, path, fails) {
 
 var defaultOptions = {
   checkProtoEql: true,
-  checkSubType: true
+  checkSubType: true,
+  plusZeroAndMinusZeroEqual: false
 };
 
 function eq(a, b, opts) {
@@ -4898,6 +4899,9 @@ function eq(a, b, opts) {
   }
   if(typeof opts.checkSubType !== 'boolean') {
     opts.checkSubType = defaultOptions.checkSubType;
+  }
+  if(typeof opts.plusZeroAndMinusZeroEqual !== 'boolean') {
+    opts.plusZeroAndMinusZeroEqual = defaultOptions.plusZeroAndMinusZeroEqual;
   }
 
   var fails = [];
