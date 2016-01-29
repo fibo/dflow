@@ -48,6 +48,14 @@ If you have some [graphs](#specification) ready to run on client side, you can i
 $ bower install dflow
 ```
 
+or use a CDN adding this to your HTML page
+
+```
+https://cdn.rawgit.com/fibo/dflow/master/dist/dflow.min.js
+```
+
+Client distribution contains just the engine and minified version is around **10k**.
+
 ### Server side
 
 If you are new to *dflow*, you probably want to try the [editor][5], so you need to install globally to get *dflow* cli in your path.
