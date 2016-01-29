@@ -4,18 +4,11 @@ title: Examples
 
 # Examples
 
-## Hello world
-
-The following simple graph is executed client side by *dflow* engine.
-
-[![Hello World](http://g14n.info/dflow/svg/hello-world.svg)](http://g14n.info/dflow/examples/hello-world.html)
-
-Follows a list of more example graphs:
-
-* [apply](http://g14n.info/dflow/examples/apply.html)
-
 <!--
 
+List of example graphs:
+
+* [apply](http://g14n.info/dflow/examples/apply.html)
 * [createParagraph](http://g14n.info/dflow/examples/createParagraph.html)
 * [dateParse](http://g14n.info/dflow/examples/dateParse.html)
 * [dotOperator](http://g14n.info/dflow/examples/dotOperator.html)

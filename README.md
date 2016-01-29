@@ -24,6 +24,12 @@
 
 [![Throughput Graph](https://graphs.waffle.io/fibo/dflow/throughput.svg)](https://waffle.io/fibo/dflow)
 
+## Hello world
+
+The following simple graph is executed client side by *dflow* engine.
+
+[![Hello World](http://g14n.info/dflow/svg/hello-world.svg)](http://g14n.info/dflow/examples/hello-world.html)
+
 ## Status
 
 *dflow* is **beta** software.
