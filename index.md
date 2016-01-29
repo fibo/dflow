@@ -48,7 +48,7 @@ Next steps:
 If you have some [graphs](#specification) ready to run on client side, you can install dflow engine with [bower](http://bower.io/)
 
 ```bash
-$ bower install dflow
+bower install dflow
 ```
 
 or use a CDN adding this to your HTML page
@@ -65,22 +65,22 @@ If you are new to *dflow*, you probably want to try the [editor][5], so you need
 With [npm](https://npmjs.org/) do
 
 ```bash
-$ npm install dflow -g
+npm install dflow -g
 ```
 
 However, if you need to require the *dflow* engine in your package, or you need to browserify it, or even you want to use the *dflow* cli in your npm scripts, or whatever, you can install *dflow* locally with
 
 ```bash
-$ npm install dflow
+npm install dflow
 ```
 
 If you want start hacking on *dflow* run
 
 ```bash
-$ git clone https://github.com/fibo/dflow.git
-$ cd dflow
-$ npm install
-$ npm start
+git clone https://github.com/fibo/dflow.git
+cd dflow
+npm install
+npm start
 ```
 
 which will clone repo, install deps, and start the *dflow* cli.
@@ -90,7 +90,7 @@ Note that by opening another browser window you can try the **collaborative edit
 Note that `npm start` will edit a graph **in memory**, if you want to edit your graph and save it to a file, for instance *graph.json*, launch
 
 ```
-$ npm start -- graph.json
+npm start -- graph.json
 ```
 
 ## Support and License
