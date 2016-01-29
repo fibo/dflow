@@ -47,7 +47,7 @@
     "lint_examples": "cd src/examples/; standard; cd -",
     "lint_test": "cd test; standard --global describe --global it; cd -",
     "minify": "cd dist; uglifyjs ${npm_package_name}.js --source-map ${npm_package_name}.map --output ${npm_package_name}.min.js --compress --mangle --preamble \"// ${npm_package_name}.js ${npm_package_homepage} \n// license ${npm_package_license}\"; cd -",
-    "postinstall": "npm run bower; npm run browserify_client",
+    "postinstall": "npm run bower",
     "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push; npm run heroku",
     "test": "mocha",
     "wget_img.shields.io": "for x in forks stars watchers; do npm run wget_img.shields.io_$x; done",
