@@ -1,8 +1,10 @@
-
-exports.apply          = require('./graph/apply.json')
-exports.dateParse      = require('./graph/dateParse.json')
+exports.apply = require('./graph/apply.json')
+exports.createParagraph = require('./createParagraph.json')
+exports.dateParse = require('./graph/dateParse.json')
+exports.dotOperator = require('dotOperator.json')
 exports['hello-world'] = require('./graph/hello-world.json')
-exports.indexOf        = require('./graph/indexOf.json')
-exports.or             = require('./graph/or.json')
-exports.sum            = require('./graph/sum.json')
-
+exports.indexOf = require('./graph/indexOf.json')
+exports['new'] = require('./graph/new.json')
+exports.or = require('./graph/or.json')
+exports.sum = require('./graph/sum.json')
+exports.welcome = require('./graph/welcome.json')
