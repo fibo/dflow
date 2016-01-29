@@ -1,6 +1,6 @@
 ---
 title: Hello World
-description: Open your Console (try with <kbd>F12</kbd>) and see message from *dflow*.
+description: Open your Console (try with <kbd>F12</kbd>) and see message from <strong>dflow</strong>.
 layout: example
 graph:
   name: hello-world
