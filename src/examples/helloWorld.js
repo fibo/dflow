@@ -2,12 +2,12 @@ var dflow = require('dflow')
 
 // A JSON that represents the execution graph.
 var graph = {
-  "task": {
-    "1": "arguments[0]",
-    "2": "console.log"
+  task: {
+    a: 'arguments[0]',
+    b: 'console.log'
   },
-  "pipe": {
-    "3": [ "1", "2" ]
+  pipe: {
+    c: [ 'a', 'b' ]
   }
 }
 

@@ -1,7 +1,6 @@
-
-var Canvas   = require('flow-view').Canvas,
-    dflow    = require('../../index'),
-    examples = require('./index')
+var Canvas = require('flow-view').Canvas
+var dflow = require('../../index')
+var examples = require('./index')
 
 /**
  * Render example into given div.
