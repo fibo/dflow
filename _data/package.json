@@ -1,7 +1,7 @@
 {
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "homepage": "http://g14n.info/dflow",
   "author": {
     "name": "Gianluca Casati",
@@ -11,7 +11,7 @@
   "bin": "src/bin/dflow",
   "main": "index.js",
   "engines": {
-    "node": ">0.12.9"
+    "node": ">=0.12.9 <5"
   },
   "browser": "./src/engine/context/client-window.js",
   "scripts": {
