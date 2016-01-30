@@ -11,7 +11,7 @@
   "bin": "src/bin/dflow",
   "main": "index.js",
   "engines": {
-    "node": ">0.12.9"
+    "node": ">=0.12.9"
   },
   "browser": "./src/engine/context/client-window.js",
   "scripts": {
