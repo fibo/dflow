@@ -126,6 +126,23 @@ function editorServer (graphPath, opt) {
     res.redirect('/edit')
   })
 
+  app.get('/download', function (req, res) {
+    var jsonString = graphToJSON(indentJSON, graph)
+
+    var fileName = 'graph.json'
+
+    if (typeof graphPath === 'undefined') {
+      fileName = 'dflowGraph.json'
+    } else {
+      fileName = path.basename(graphPath)
+    }
+
+    res.append('Content-Disposition', 'attachment; filename=' + fileName)
+
+    res.send(jsonString)
+    res.end()
+  })
+
   app.get('/edit', function (req, res) {
     var editData = {
       graphPath: null,
@@ -145,21 +162,8 @@ function editorServer (graphPath, opt) {
     res.send(graph)
   })
 
-  app.get('/download', function (req, res) {
-    var jsonString = graphToJSON(indentJSON, graph)
-
-    var fileName = 'graph.json'
-
-    if (typeof graphPath === 'undefined') {
-      fileName = 'dflowGraph.json'
-    } else {
-      fileName = path.basename(graphPath)
-    }
-
-    res.append('Content-Disposition', 'attachment; filename=' + fileName)
-
-    res.send(jsonString)
-    res.end()
+  app.get('/package', function (req, res) {
+    res.json(pkg)
   })
 
   app.get('/run', function (req, res) {
@@ -172,6 +176,9 @@ function editorServer (graphPath, opt) {
       'arguments[0]',
       'arguments[1]',
       'arguments[2]',
+      'this',
+      'this.graph',
+      'this.graph.data',
       'return'
     ]
 
