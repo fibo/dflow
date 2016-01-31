@@ -24,6 +24,7 @@ A *graph* has the following properties
   * `arguments[0]` ... `arguments[N]`: tasks that return the *arguments[i]* of *dflowFun*.
   * `this`: refers the *dflowFun* function.
   * `this.graph`: contains the graph itself.
+  * `this.graph.data`: returns the graph data content.
   * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
   * `.quz`, `.quz()`: returns a dot-operator-like function.
