@@ -72,6 +72,7 @@
     "express": "^4.13.4",
     "flow-view": "^1.0.0",
     "jade": "^1.11.0",
+    "jsoneditor": "^5.1.2",
     "nopt": "^3.0.4",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
