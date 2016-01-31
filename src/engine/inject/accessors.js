@@ -1,7 +1,7 @@
 var accessorRegex = require('../regex/accessor')
 
 /**
- * Inject functions to set or get context keywords.
+ * Inject functions to set or get graph data.
  *
  * @api private
  *
@@ -13,6 +13,8 @@ function injectAccessors (funcs, graph) {
   if (typeof graph.data === 'undefined') {
     graph.data = {}
   }
+
+  funcs['this.graph.data'] = function () { return graph.data }
 
   /**
    * Inject accessor.
