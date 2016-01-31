@@ -26081,6 +26081,10 @@ window.onload = initPage;
 function initPage() {
   _reactDom2.default.render(_react2.default.createElement(_UsersCount2.default, null), document.getElementById('users-count'));
 
+  $('#toggle-json-editor').click(function () {
+    $('.ui.sidebar').sidebar('toggle');
+  });
+
   // Initialize canvas and other elements.
   var Canvas = require('flow-view').Canvas;
 

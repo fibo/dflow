@@ -23,23 +23,28 @@ html(lang='en')
         height: 800px;
       }
   body
-    .ui.fixed.inverted.menu
-      .ui.container
-        a.header.item(href='//g14n.info/dflow' _target='_blank') dflow
-        a.item(href='/download') Download
-        a.item(href='/run' target='_blank') Run
-        a.item(href='https://github.com/fibo/dflow' target='_blank')
-         i.github.icon
-    .ui.grid
-      #graph.sixteen.wide.column
-    #inspector.ui.modal
-      i.close.icon
-      .header Task inspector
-      .description
-      .ui.header
-        #task-name.ui.label
-      p Edit task (sorry, still in progress ... :)
-      .actions
-        .ui.positive.right.labeled.icon.button Save
-          i.checkmark.icon
-    #users-count
+    .ui.sidebar
+      #json-editor
+    .pusher
+      .ui.fixed.inverted.menu
+        a#toggle-json-editor.item.left.ignored
+          i.database.icon
+        .ui.container
+          a.header.item(href='//g14n.info/dflow' _target='_blank') dflow
+          a.item(href='/download') Download
+          a.item(href='/run' target='_blank') Run
+          a.item(href='https://github.com/fibo/dflow' target='_blank')
+            i.github.icon
+      .ui.grid
+        #graph.sixteen.wide.column
+      #inspector.ui.modal
+        i.close.icon
+        .header Task inspector
+        .description
+        .ui.header
+          #task-name.ui.label
+        p Edit task (sorry, still in progress ... :)
+        .actions
+          .ui.positive.right.labeled.icon.button Save
+            i.checkmark.icon
+      #users-count

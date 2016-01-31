@@ -23,6 +23,8 @@ function initPage () {
     document.getElementById('users-count')
   )
 
+  $('#toggle-json-editor').click(() => { $('.ui.sidebar').sidebar('toggle') })
+
   // Initialize canvas and other elements.
   var Canvas = require('flow-view').Canvas
 
