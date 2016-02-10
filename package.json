@@ -56,9 +56,9 @@
     "wget_img.shields.io_watchers": "wget 'https://img.shields.io/github/watchers/fibo/dflow.svg?style=social&label=Watch' -O gh-pages/svg/img.shields.io/watchers.svg"
   },
   "pre-commit": [
-    "check-deps",
     "lint",
-    "test"
+    "test",
+    "check-deps"
   ],
   "dependencies": {
     "babel-preset-es2015": "^6.3.13",
