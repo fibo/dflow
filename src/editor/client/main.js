@@ -21,7 +21,14 @@ function initPage () {
     document.getElementById('users-count')
   )
 
-  var jsonEditor = new JSONEditor(document.getElementById('json-editor'), { mode: 'tree' })
+  var jsonEditorConfig = {
+    mode: 'tree',
+    history: true
+  }
+
+  var jsonEditorElement = document.getElementById('json-editor')
+
+  var jsonEditor = new JSONEditor(jsonEditorElement, jsonEditorConfig)
 
   var graphData = {foo: 'bar'}
   jsonEditor.set(graphData)
