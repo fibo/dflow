@@ -92,3 +92,7 @@ exports['{}'] = function () { return {} }
 exports.false = function () { return false }
 
 exports.true = function () { return true }
+
+// Date
+
+exports.now = function () { return new Date() }
