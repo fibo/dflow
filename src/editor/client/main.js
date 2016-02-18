@@ -8,12 +8,10 @@ const socket = window.io()
 
 let graph = null
 
-// window.myDebug = debug
 // Debug setup.
-// window.myDebug.enable('dflow')
+// TODO add Debug toogle button
 _debug.enable('dflow')
 const debug = _debug('dflow')
-  // TODO add Debug toogle button
 
 window.onload = initPage
 
@@ -23,7 +21,20 @@ function initPage () {
     document.getElementById('users-count')
   )
 
-  $('#toggle-json-editor').click(() => { $('.ui.sidebar').sidebar('toggle') })
+  var jsonEditor = new JSONEditor(document.getElementById('json-editor'), { mode: 'tree' })
+
+  var graphData = {foo: 'bar'}
+  jsonEditor.set(graphData)
+
+  $('#toggle-json-editor').click(() => {
+    var $sidebar = $('#data-sidebar')
+
+    $sidebar.sidebar('toggle')
+
+//    $sidebar.onShow(() => {
+ //     console.log('sidebar is hidden')
+  //  })
+  })
 
   // Initialize canvas and other elements.
   var Canvas = require('flow-view').Canvas
