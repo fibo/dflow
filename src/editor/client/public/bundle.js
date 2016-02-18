@@ -26079,21 +26079,6 @@ window.onload = initPage;
 function initPage() {
   _reactDom2.default.render(_react2.default.createElement(_UsersCount2.default, null), document.getElementById('users-count'));
 
-  var jsonEditor = new JSONEditor(document.getElementById('json-editor'), { mode: 'tree' });
-
-  var graphData = { foo: 'bar' };
-  jsonEditor.set(graphData);
-
-  $('#toggle-json-editor').click(function () {
-    var $sidebar = $('#data-sidebar');
-
-    $sidebar.sidebar('toggle');
-
-    //    $sidebar.onShow(() => {
-    //     console.log('sidebar is hidden')
-    //  })
-  });
-
   // Initialize canvas and other elements.
   var Canvas = require('flow-view').Canvas;
 
@@ -26192,8 +26177,43 @@ function initPage() {
     debug('loadGraph', data);
 
     graph = data;
+
     canvas.deleteView();
     canvas.render(graph.view);
+
+    var jsonEditorConfig = {
+      mode: 'tree',
+      history: true
+    };
+
+    var jsonEditorElement = document.getElementById('json-editor');
+
+    var jsonEditor = new JSONEditor(jsonEditorElement, jsonEditorConfig);
+
+    var $sidebar = $('#data-sidebar');
+
+    $sidebar.sidebar({
+      onHide: function onHide() {
+        var data = jsonEditor.get();
+
+        graph.data = data;
+
+        socket.emit('changeData', data);
+      },
+      onShow: function onShow() {
+        var jsonData = {};
+
+        if (graph !== null) {
+          jsonData = graph.data;
+        }
+
+        jsonEditor.set(jsonData);
+      }
+    });
+
+    $('#toggle-json-editor').click(function () {
+      $sidebar.sidebar('toggle');
+    });
   });
 }
 

@@ -383,6 +383,23 @@ function editorServer (graphPath, opt) {
     socket.on('addNode', addNode)
 
     /**
+     * On changeData event.
+     */
+
+    function changeData (data) {
+      debug('changeData', data)
+
+      // Overwrite data.
+      graph.data = data
+
+      socket.broadcast.emit('changeData', data)
+
+      save(graph)
+    }
+
+    socket.on('changeData', changeData)
+
+    /**
      * On delLink event.
      */
 
