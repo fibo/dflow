@@ -21,28 +21,6 @@ function initPage () {
     document.getElementById('users-count')
   )
 
-  var jsonEditorConfig = {
-    mode: 'tree',
-    history: true
-  }
-
-  var jsonEditorElement = document.getElementById('json-editor')
-
-  var jsonEditor = new JSONEditor(jsonEditorElement, jsonEditorConfig)
-
-  var graphData = {foo: 'bar'}
-  jsonEditor.set(graphData)
-
-  $('#toggle-json-editor').click(() => {
-    var $sidebar = $('#data-sidebar')
-
-    $sidebar.sidebar('toggle')
-
-//    $sidebar.onShow(() => {
- //     console.log('sidebar is hidden')
-  //  })
-  })
-
   // Initialize canvas and other elements.
   var Canvas = require('flow-view').Canvas
 
@@ -145,7 +123,42 @@ function initPage () {
     debug('loadGraph', data)
 
     graph = data
+
     canvas.deleteView()
     canvas.render(graph.view)
+
+    var jsonEditorConfig = {
+      mode: 'tree',
+      history: true
+    }
+
+    var jsonEditorElement = document.getElementById('json-editor')
+
+    var jsonEditor = new JSONEditor(jsonEditorElement, jsonEditorConfig)
+
+    var $sidebar = $('#data-sidebar')
+
+    $sidebar.sidebar({
+      onHide: function () {
+        var data = jsonEditor.get()
+
+        graph.data = data
+
+        socket.emit('changeData', data)
+      },
+      onShow: function () {
+        var jsonData = {}
+
+        if (graph !== null) {
+          jsonData = graph.data
+        }
+
+        jsonEditor.set(jsonData)
+      }
+    })
+
+    $('#toggle-json-editor').click(() => {
+      $sidebar.sidebar('toggle')
+    })
   })
 }

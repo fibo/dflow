@@ -5946,6 +5946,10 @@ exports.false = function () { return false }
 
 exports.true = function () { return true }
 
+// Date
+
+exports.now = function () { return new Date() }
+
 },{}],34:[function(require,module,exports){
 exports.document = function () {
   return document
