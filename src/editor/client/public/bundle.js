@@ -26188,7 +26188,7 @@ function initPage() {
 
     var jsonEditorElement = document.getElementById('json-editor');
 
-    var jsonEditor = new JSONEditor(jsonEditorElement, jsonEditorConfig);
+    var jsonEditor = new window.JSONEditor(jsonEditorElement, jsonEditorConfig);
 
     var $sidebar = $('#data-sidebar');
 
