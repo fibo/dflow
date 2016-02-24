@@ -22,8 +22,6 @@
 
 [![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
 
-[![Throughput Graph](https://graphs.waffle.io/fibo/dflow/throughput.svg)](https://waffle.io/fibo/dflow)
-
 ## Hello world
 
 The following simple graph is executed client side by *dflow* engine.
