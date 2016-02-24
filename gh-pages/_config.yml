@@ -6,8 +6,6 @@ gems:
 
 markdown: kramdown
 
-highlighter: rouge
-
 collections:
   examples:
     output: true
