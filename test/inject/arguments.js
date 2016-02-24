@@ -2,7 +2,7 @@ var injectArguments = require('../../src/engine/inject/arguments')
 
 var funcs = {}
 var task = {
-  '1' : 'arguments',
+  '1': 'arguments',
   '2': 'arguments[0]',
   '3': 'arguments[1]'
 }
