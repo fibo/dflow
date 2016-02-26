@@ -14,10 +14,10 @@ A *graph* has the following properties
   * **pipe**: connections from the output of a task to an input of another task.
   * **data**: (optional) persistence object.
   * **func**: (optional) collection of subgraphs.
-  * **view**: (ignored) object containing information used by [flow-view][1] to render a graphic representation of the graph.
+  * **view**: (ignored) object containing information used by [flow-view][flow-view] to render a graphic representation of the graph.
   * **info**: (to be defined) meta data, like *author*, *version* and, above all, *doc* which is a dflow graph itself.
 
-*dflow* provides few [builtin functions][3] and injects the following ones
+*dflow* provides few [builtin functions][builtin-functions] and injects the following ones
 
   * `return`: a task that accepts one argument and behaves like a [Return statement](http://en.wikipedia.org/wiki/Return_statement).
   * `arguments`: task that returns the *arguments* of *dflowFun*.
@@ -42,3 +42,5 @@ Note that optional collection of *additionalFunctions*, in order to avoid confli
   * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]`, `this` and `this.graph` are reserved names.
   * cannot start with a dot, ampersand or at sign: names `@foo`, `&bar`, `.quz` and `.quz()` for an additional function are not allowed.
 
+[flow-view]: http://g14n.info/flow-view
+[builtin-functions]: https://github.com/fibo/dflow/blob/master/src/engine/functions/builtin.js
