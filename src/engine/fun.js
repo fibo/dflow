@@ -1,5 +1,4 @@
 var builtinFunctions = require('./functions/builtin')
-var commentRegex = require('./regex/comment')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
 var injectArguments = require('./inject/arguments')
 var injectAccessors = require('./inject/accessors')
@@ -11,7 +10,15 @@ var injectStrings = require('./inject/strings')
 var inputArgs = require('./inputArgs')
 var isDflowFun = require('./isDflowFun')
 var level = require('./level')
+var notDefined = require('not-defined')
+var regexArgument = require('./regex/argument')
+var regexComment = require('./regex/comment')
+var regexSubgraph = require('./regex/subgraph')
+var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
+var walkGlobal = require('./walkGlobal')
+
+var defined = function (x) { return !notDefined(x) }
 
 /**
  * Create a dflow function.
@@ -80,9 +87,51 @@ function fun (graph, additionalFunctions) {
     return cachedLevelOf[a] - cachedLevelOf[b]
   }
 
+  /**
+   * Ignores comments.
+   */
+
+  function comments (key) {
+    return !regexComment.test(task[key])
+  }
+
   // Compile each subgraph.
   Object.keys(func)
         .forEach(compileSubgraph)
+
+  /**
+   * Throw if a task is not defined.
+   */
+
+  function checkTaskIsDefined (taskKey) {
+    var taskName = task[taskKey]
+
+    // Ignore tasks injected at run time.
+    if (reservedKeys.indexOf(taskName) > -1) return
+
+    var msg = 'Task not found: ' + taskName + ' [' + taskKey + ']'
+
+    // Check subgraphs.
+    if (regexSubgraph.test(taskName)) {
+      var subgraphKey = taskName.substring(1)
+
+      if (notDefined(graph.func[subgraphKey])) throw new Error(msg)
+      else return
+    }
+
+    // Skip arguments[0] ... arguments[N].
+    if (regexArgument.exec(taskName)) return
+
+    // Skip globals.
+    if (defined(walkGlobal(taskName))) return
+
+    if (notDefined(funcs[taskName])) throw new Error(msg)
+  }
+
+  // Check if there is some missing task.
+  Object.keys(task)
+        .filter(comments)
+        .forEach(checkTaskIsDefined)
 
   /**
    * Here we are, this is the ❤ of dflow.
@@ -107,8 +156,8 @@ function fun (graph, additionalFunctions) {
 
     function run (taskKey) {
       var args = inputArgsOf(taskKey)
-      var funcName = task[taskKey]
-      var f = funcs[funcName]
+      var taskName = task[taskKey]
+      var f = funcs[taskName]
 
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.
@@ -116,15 +165,15 @@ function fun (graph, additionalFunctions) {
         return
       }
 
-      if ((funcName === 'return') && (!gotReturn)) {
+      if ((taskName === 'return') && (!gotReturn)) {
         returnValue = args[0]
         gotReturn = true
         return
       }
 
-      // If task is not defined, throw an error.
+      // If task is not defined at run time, throw an error.
       if (typeof f === 'undefined') {
-        throw new Error('Task ' + funcName + ' [' + taskKey + '] is not defined')
+        throw new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
       }
 
       // Try to execute task.
@@ -133,14 +182,6 @@ function fun (graph, additionalFunctions) {
       } catch (err) {
         throw err
       }
-    }
-
-    /**
-     * Ignores comments.
-     */
-
-    function comments (key) {
-      return !commentRegex.test(task[key])
     }
 
     // Run every graph task, sorted by level.

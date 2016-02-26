@@ -15,7 +15,9 @@ A *graph* has the following properties
   * **data**: (optional) persistence object.
   * **func**: (optional) collection of subgraphs.
   * **view**: (ignored) object containing information used by [flow-view][flow-view] to render a graphic representation of the graph.
-  * **info**: (to be defined) meta data, like *author*, *version* and, above all, *doc* which is a dflow graph itself.
+  * **info**: (to be defined) meta data, like *author*, *version* and, above all, *doc* which is a dflow graph itself. See [info draft](#info)
+
+## Builtin functions
 
 *dflow* provides few [builtin functions][builtin-functions] and injects the following ones
 
@@ -41,6 +43,19 @@ Note that optional collection of *additionalFunctions*, in order to avoid confli
 
   * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]`, `this` and `this.graph` are reserved names.
   * cannot start with a dot, ampersand or at sign: names `@foo`, `&bar`, `.quz` and `.quz()` for an additional function are not allowed.
+
+## Info
+
+**This section is a draft**
+
+### context
+
+Context tells if the graph should run client side or server side. Values can be
+
+* client
+* server
+
+If not specified, it is assumed to be *universal* a.k.a. *isomorphic*.
 
 [flow-view]: http://g14n.info/flow-view
 [builtin-functions]: https://github.com/fibo/dflow/blob/master/src/engine/functions/builtin.js

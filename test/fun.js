@@ -94,5 +94,24 @@ describe('fun', function () {
       fun(graphWithOrphanPipe)
     }).should.throwError(/Orphan pipe:/)
   })
-})
 
+  it('throws if a task is not found', function () {
+    ;(function () {
+      var graphWithTaskNotFound = {
+        task: {
+          '2': 'available task',
+          '3': 'foo'
+        },
+        pipe: {
+          '1': [ '2', '3' ]
+        }
+      }
+
+      var funcs = {
+        'available task': function () { return 'ok' }
+      }
+
+      fun(graphWithTaskNotFound, funcs)
+    }).should.throwError(/Task not found:/)
+  })
+})

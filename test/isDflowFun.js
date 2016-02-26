@@ -2,6 +2,8 @@ var examples = require('../src/examples')
 var fun = require('../src/engine/fun')
 var isDflowFun = require('../src/engine/isDflowFun')
 
+var context = (typeof window === 'object') ? 'client' : 'server'
+
 describe('isDflowFun', function () {
   describe('returns false if it', function () {
     it('is a function, has graph and func properties but graph is not valid', function () {
@@ -53,9 +55,14 @@ describe('isDflowFun', function () {
       for (var exampleName in examples) {
         var exampleGraph = examples[exampleName]
 
-        var f = fun(exampleGraph)
+        var graphInfo = exampleGraph.info || {}
+        var graphContext = graphInfo.context || 'universal'
 
-        isDflowFun(f).should.be.ko
+        if (graphContext === context) {
+          var f = fun(exampleGraph)
+
+          isDflowFun(f).should.be.ko
+        }
       }
     })
   })

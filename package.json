@@ -70,6 +70,7 @@
     "flow-view": "^1.0.2",
     "jade": "^1.11.0",
     "nopt": "^3.0.4",
+    "not-defined": "^1.0.0",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
     "socket.io": "^1.4.5",

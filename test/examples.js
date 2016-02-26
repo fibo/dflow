@@ -3,6 +3,8 @@ var should = require('should')
 
 var examples = require('../src/examples')
 
+var context = (typeof window === 'object') ? 'client' : 'server'
+
 describe('example', function () {
   function testExample (name, graph) {
     describe(name, function () {
@@ -24,7 +26,13 @@ describe('example', function () {
 
   for (var exampleName in examples) {
     var exampleGraph = examples[exampleName]
-    testExample(exampleName, exampleGraph)
+
+    var graphInfo = exampleGraph.info || {}
+    var graphContext = graphInfo.context || 'universal'
+
+    if (graphContext === context) {
+      testExample(exampleName, exampleGraph)
+    }
   }
 
   describe('packagedGraph', function () {
