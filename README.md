@@ -1,6 +1,6 @@
 # dflow
 
-> is a minimal [Dataflow programming][4] engine
+> is a minimal [Dataflow programming][dataflow-wikipedia] engine
 
 [![Heroku demo](https://img.shields.io/badge/heroku-demo-663399.svg)](https://dflow.herokuapp.com/) [![Join the chat at https://gitter.im/fibo/dflow](https://badges.gitter.im/fibo/dflow.svg)](https://gitter.im/fibo/dflow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -8,7 +8,7 @@
 
 * [Installation](#installation)
 * [Examples](http://g14n.info/dflow/examples)
-* [Editor][5]
+* [Editor][dflow-editor]
 * [Api](http://g14n.info/dflow/api)
 * [Specification](http://g14n.info/dflow/specification)
 * [Contributing](http://g14n.info/dflow/contributing)
@@ -26,7 +26,7 @@
 
 The following simple graph is executed client side by *dflow* engine.
 
-[![Hello World](http://g14n.info/dflow/svg/hello-world.svg)](http://g14n.info/dflow/examples/hello-world.html)
+[![Hello World](http://g14n.info/dflow/svg/hello-world.svg)][hello-world]
 
 ## Status
 
@@ -111,9 +111,7 @@ My goal is to say to a *dflow* user:
 
 > Mamma mia! Did you achieve that with dflow?
 
- [1]: http://g14n.info/flow-view "flow-view"
- [2]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
- [3]: https://github.com/fibo/dflow/blob/master/src/engine/functions/builtin.js "builtin functions"
- [4]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
- [5]: http://g14n.info/dflow/editor "dflow editor"
+[dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
+[dflow-editor]: http://g14n.info/dflow/editor "dflow editor"
+[hello-world]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
 
