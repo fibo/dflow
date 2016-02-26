@@ -1,4 +1,7 @@
 {
+  "info": {
+    "context": "client"
+  },
   "data": {
     "results": []
   },

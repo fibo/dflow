@@ -1,8 +1,8 @@
-
 var accessorRegex = require('./regex/accessor')
 var argumentRegex = require('./regex/argument')
 var dotOperatorRegex = require('./regex/dotOperator')
 var referenceRegex = require('./regex/reference')
+var reservedKeys = require('./reservedKeys')
 var subgraphRegex = require('./regex/subgraph')
 
 /**
