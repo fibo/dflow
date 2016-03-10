@@ -1,6 +1,10 @@
 {
   "name": "dflow",
-  "main": "dist/dflow.js",
+  "main": [
+    "dist/dflow.js",
+    "dist/dflow.map",
+    "dist/dflow.min.js"
+  ],
   "homepage": "http://g14n.info/dflow",
   "authors": [
     "Gianluca Casati"
