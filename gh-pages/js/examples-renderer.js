@@ -727,7 +727,7 @@ Canvas.prototype.selectNode = selectNode
 module.exports = Canvas
 
 
-},{"./Broker":3,"./Link":6,"./Node":7,"./NodeControls":12,"./NodeSelector":13,"./SVG":21,"./default/theme.json":17,"./default/view.json":18,"./validate":20,"object-assign":23}],5:[function(require,module,exports){
+},{"./Broker":3,"./Link":6,"./Node":7,"./NodeControls":12,"./NodeSelector":13,"./SVG":21,"./default/theme.json":17,"./default/view.json":18,"./validate":20,"object-assign":24}],5:[function(require,module,exports){
 
 var inherits = require('inherits'),
     Pin      = require('./Pin')
@@ -1964,7 +1964,7 @@ require('svg.foreignobject.js')
 module.exports = SVG
 
 
-},{"svg.draggable.js":24,"svg.foreignobject.js":25,"svg.js":26}],22:[function(require,module,exports){
+},{"svg.draggable.js":25,"svg.foreignobject.js":26,"svg.js":27}],22:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1990,6 +1990,9 @@ if (typeof Object.create === 'function') {
 }
 
 },{}],23:[function(require,module,exports){
+module.exports=function(x){return typeof x==='undefined'}
+
+},{}],24:[function(require,module,exports){
 /* eslint-disable no-unused-vars */
 'use strict';
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -2030,7 +2033,7 @@ module.exports = Object.assign || function (target, source) {
 	return to;
 };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /*! svg.draggable.js - v1.0.0 - 2015-06-12
 * https://github.com/wout/svg.draggable.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -2222,7 +2225,7 @@ module.exports = Object.assign || function (target, source) {
   })
 
 }).call(this);
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /*! svg.foreignobject.js - v1.0.0 - 2015-06-14
 * https://github.com/fibo/svg.foreignobject.js
 * Copyright (c) 2015 Wout Fierens; Licensed MIT */
@@ -2255,7 +2258,7 @@ SVG.extend(SVG.Container, {
   }
 })
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
 * @version 2.2.5
@@ -6463,7 +6466,7 @@ var abcdef = 'abcdef'.split('')
 return SVG
 
 }));
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
@@ -6485,9 +6488,8 @@ function funBrowser (graph) {
 
 exports.fun = funBrowser
 
-},{"../fun":28,"../functions/window":30}],28:[function(require,module,exports){
+},{"../fun":29,"../functions/window":31}],29:[function(require,module,exports){
 var builtinFunctions = require('./functions/builtin')
-var commentRegex = require('./regex/comment')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
 var injectArguments = require('./inject/arguments')
 var injectAccessors = require('./inject/accessors')
@@ -6499,7 +6501,15 @@ var injectStrings = require('./inject/strings')
 var inputArgs = require('./inputArgs')
 var isDflowFun = require('./isDflowFun')
 var level = require('./level')
+var notDefined = require('not-defined')
+var regexArgument = require('./regex/argument')
+var regexComment = require('./regex/comment')
+var regexSubgraph = require('./regex/subgraph')
+var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
+var walkGlobal = require('./walkGlobal')
+
+var defined = function (x) { return !notDefined(x) }
 
 /**
  * Create a dflow function.
@@ -6568,9 +6578,51 @@ function fun (graph, additionalFunctions) {
     return cachedLevelOf[a] - cachedLevelOf[b]
   }
 
+  /**
+   * Ignores comments.
+   */
+
+  function comments (key) {
+    return !regexComment.test(task[key])
+  }
+
   // Compile each subgraph.
   Object.keys(func)
         .forEach(compileSubgraph)
+
+  /**
+   * Throw if a task is not defined.
+   */
+
+  function checkTaskIsDefined (taskKey) {
+    var taskName = task[taskKey]
+
+    // Ignore tasks injected at run time.
+    if (reservedKeys.indexOf(taskName) > -1) return
+
+    var msg = 'Task not found: ' + taskName + ' [' + taskKey + ']'
+
+    // Check subgraphs.
+    if (regexSubgraph.test(taskName)) {
+      var subgraphKey = taskName.substring(1)
+
+      if (notDefined(graph.func[subgraphKey])) throw new Error(msg)
+      else return
+    }
+
+    // Skip arguments[0] ... arguments[N].
+    if (regexArgument.exec(taskName)) return
+
+    // Skip globals.
+    if (defined(walkGlobal(taskName))) return
+
+    if (notDefined(funcs[taskName])) throw new Error(msg)
+  }
+
+  // Check if there is some missing task.
+  Object.keys(task)
+        .filter(comments)
+        .forEach(checkTaskIsDefined)
 
   /**
    * Here we are, this is the ❤ of dflow.
@@ -6595,8 +6647,8 @@ function fun (graph, additionalFunctions) {
 
     function run (taskKey) {
       var args = inputArgsOf(taskKey)
-      var funcName = task[taskKey]
-      var f = funcs[funcName]
+      var taskName = task[taskKey]
+      var f = funcs[taskName]
 
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.
@@ -6604,15 +6656,15 @@ function fun (graph, additionalFunctions) {
         return
       }
 
-      if ((funcName === 'return') && (!gotReturn)) {
+      if ((taskName === 'return') && (!gotReturn)) {
         returnValue = args[0]
         gotReturn = true
         return
       }
 
-      // If task is not defined, throw an error.
+      // If task is not defined at run time, throw an error.
       if (typeof f === 'undefined') {
-        throw new Error('Task ' + funcName + ' [' + taskKey + '] is not defined')
+        throw new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
       }
 
       // Try to execute task.
@@ -6621,14 +6673,6 @@ function fun (graph, additionalFunctions) {
       } catch (err) {
         throw err
       }
-    }
-
-    /**
-     * Ignores comments.
-     */
-
-    function comments (key) {
-      return !commentRegex.test(task[key])
     }
 
     // Run every graph task, sorted by level.
@@ -6648,7 +6692,7 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./functions/builtin":29,"./inject/accessors":31,"./inject/additionalFunctions":32,"./inject/arguments":33,"./inject/dotOperators":34,"./inject/globals":35,"./inject/numbers":36,"./inject/references":37,"./inject/strings":38,"./inputArgs":39,"./isDflowFun":41,"./level":42,"./regex/comment":46,"./validate":51}],29:[function(require,module,exports){
+},{"./functions/builtin":30,"./inject/accessors":32,"./inject/additionalFunctions":33,"./inject/arguments":34,"./inject/dotOperators":35,"./inject/globals":36,"./inject/numbers":37,"./inject/references":38,"./inject/strings":39,"./inputArgs":40,"./isDflowFun":42,"./level":43,"./regex/argument":46,"./regex/comment":47,"./regex/subgraph":51,"./reservedKeys":52,"./validate":53,"./walkGlobal":54,"not-defined":23}],30:[function(require,module,exports){
 // Arithmetic operators
 
 exports['+'] = function (a, b) { return a + b }
@@ -6748,7 +6792,7 @@ exports.true = function () { return true }
 
 exports.now = function () { return new Date() }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 exports.document = function () {
   return document
 }
@@ -6779,7 +6823,7 @@ exports.innerHTML = function (node, content) {
   return node
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var accessorRegex = require('../regex/accessor')
 
 /**
@@ -6834,7 +6878,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":44}],32:[function(require,module,exports){
+},{"../regex/accessor":45}],33:[function(require,module,exports){
 /**
  * Optionally add custom functions.
  *
@@ -6870,7 +6914,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var argumentRegex = require('../regex/argument')
 
 /**
@@ -6914,7 +6958,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":45}],34:[function(require,module,exports){
+},{"../regex/argument":46}],35:[function(require,module,exports){
 var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
@@ -7005,7 +7049,9 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":47}],35:[function(require,module,exports){
+},{"../regex/dotOperator":48}],36:[function(require,module,exports){
+var notDefined = require('not-defined')
+var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
 
 /**
@@ -7029,20 +7075,14 @@ function injectGlobals (funcs, task) {
 
     // Do not overwrite a function if already defined.
     // For example, console.log cannot be used as is, it must binded to console.
-    if (typeof funcs[taskName] === 'function') {
-      return
-    }
+    if (typeof funcs[taskName] === 'function') return
 
     // Skip also reserved keywords.
-    if ((taskName === 'return') || (taskName === 'this.graph')) {
-      return
-    }
+    if (reservedKeys.indexOf(taskName) > -1) return
 
     var globalValue = walkGlobal(taskName)
 
-    if (typeof globalValue === 'undefined') {
-      return
-    }
+    if (notDefined(globalValue)) return
 
     if (typeof globalValue === 'function') {
       funcs[taskName] = globalValue
@@ -7059,7 +7099,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../walkGlobal":52}],36:[function(require,module,exports){
+},{"../reservedKeys":52,"../walkGlobal":54,"not-defined":23}],37:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -7094,7 +7134,7 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var referenceRegex = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
@@ -7149,7 +7189,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":49,"../walkGlobal":52}],38:[function(require,module,exports){
+},{"../regex/reference":50,"../walkGlobal":54}],39:[function(require,module,exports){
 var quotedRegex = require('../regex/quoted')
 
 /**
@@ -7184,7 +7224,7 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":48}],39:[function(require,module,exports){
+},{"../regex/quoted":49}],40:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -7215,7 +7255,7 @@ function inputArgs (outs, pipe, taskKey) {
 
 module.exports = inputArgs
 
-},{"./inputPipes":40}],40:[function(require,module,exports){
+},{"./inputPipes":41}],41:[function(require,module,exports){
 /**
  * Compute pipes that feed a task.
  *
@@ -7243,7 +7283,7 @@ function inputPipes (pipe, taskKey) {
 
 module.exports = inputPipes
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 var validate = require('./validate')
 
 /**
@@ -7273,7 +7313,7 @@ function isDflowFun (f) {
 
 module.exports = isDflowFun
 
-},{"./validate":51}],42:[function(require,module,exports){
+},{"./validate":53}],43:[function(require,module,exports){
 var parents = require('./parents')
 
 /**
@@ -7308,7 +7348,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 
 module.exports = level
 
-},{"./parents":43}],43:[function(require,module,exports){
+},{"./parents":44}],44:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -7335,35 +7375,46 @@ function parents (pipe, taskKey) {
 
 module.exports = parents
 
-},{"./inputPipes":40}],44:[function(require,module,exports){
+},{"./inputPipes":41}],45:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)\]$/
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 module.exports = /^\/\/.+$/
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 module.exports = /^\&(.+)$/
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 module.exports = /^\/[\w][\w\d]+$/
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
+module.exports = [
+  'arguments',
+  'dflow.fun',
+  'dflow.isDflowFun',
+  'dflow.validate',
+  'return',
+  'this',
+  'this.graph'
+]
 
+},{}],53:[function(require,module,exports){
 var accessorRegex = require('./regex/accessor')
 var argumentRegex = require('./regex/argument')
 var dotOperatorRegex = require('./regex/dotOperator')
 var referenceRegex = require('./regex/reference')
+var reservedKeys = require('./reservedKeys')
 var subgraphRegex = require('./regex/subgraph')
 
 /**
@@ -7536,7 +7587,7 @@ function validate (graph, additionalFunctions) {
 
 module.exports = validate
 
-},{"./regex/accessor":44,"./regex/argument":45,"./regex/dotOperator":47,"./regex/reference":49,"./regex/subgraph":50}],52:[function(require,module,exports){
+},{"./regex/accessor":45,"./regex/argument":46,"./regex/dotOperator":48,"./regex/reference":50,"./regex/subgraph":51,"./reservedKeys":52}],54:[function(require,module,exports){
 (function (global){
 var globalContext
 
@@ -7569,7 +7620,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports={
   "data": {
     "results": [
@@ -7724,8 +7775,11 @@ module.exports={
   }
 }
 
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 module.exports={
+  "info": {
+    "context": "client"
+  },
   "data": {
     "results": []
   },
@@ -7906,7 +7960,7 @@ module.exports={
   }
 }
 
-},{}],55:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7927,7 +7981,7 @@ module.exports={
   }
 }
 
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7950,7 +8004,7 @@ module.exports={
   }
 }
 
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -7991,7 +8045,7 @@ module.exports={
   }
 }
 
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -8018,7 +8072,7 @@ module.exports={
   }
 }
 
-},{}],59:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 module.exports={
   "data": {
     "results": []
@@ -8179,7 +8233,7 @@ module.exports={
   }
 }
 
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -8202,7 +8256,7 @@ module.exports={
   }
 }
 
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -8225,7 +8279,7 @@ module.exports={
   }
 }
 
-},{}],62:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 module.exports={
   "data": {
     "results": []
@@ -8281,7 +8335,7 @@ module.exports={
   }
 }
 
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 // Do not use dynamic imports, for example importing the whole graph folder;
 // use explicit imports instead, otherwise browserify will not include graphs.
 exports['apply'] = require('./graph/apply.json')
@@ -8295,7 +8349,7 @@ exports.or = require('./graph/or.json')
 exports.sum = require('./graph/sum.json')
 exports.welcome = require('./graph/welcome.json')
 
-},{"./graph/apply.json":53,"./graph/createParagraph.json":54,"./graph/dateParse.json":55,"./graph/dotOperator.json":56,"./graph/hello-world.json":57,"./graph/indexOf.json":58,"./graph/new.json":59,"./graph/or.json":60,"./graph/sum.json":61,"./graph/welcome.json":62}],"examples-renderer":[function(require,module,exports){
+},{"./graph/apply.json":55,"./graph/createParagraph.json":56,"./graph/dateParse.json":57,"./graph/dotOperator.json":58,"./graph/hello-world.json":59,"./graph/indexOf.json":60,"./graph/new.json":61,"./graph/or.json":62,"./graph/sum.json":63,"./graph/welcome.json":64}],"examples-renderer":[function(require,module,exports){
 var Canvas = require('flow-view').Canvas
 var dflow = require('../../index')
 var examples = require('./index')
@@ -8323,4 +8377,4 @@ function renderExample (divId, example) {
 
 module.exports = renderExample
 
-},{"../../index":27,"./index":63,"flow-view":2}]},{},[]);
+},{"../../index":28,"./index":65,"flow-view":2}]},{},[]);

@@ -1,135 +1,118 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-;(function (exports) {
-  'use strict'
+'use strict'
 
+exports.toByteArray = toByteArray
+exports.fromByteArray = fromByteArray
+
+var lookup = []
+var revLookup = []
+var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
+
+function init () {
   var i
   var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-  var lookup = []
-  for (i = 0; i < code.length; i++) {
+  var len = code.length
+
+  for (i = 0; i < len; i++) {
     lookup[i] = code[i]
   }
-  var revLookup = []
 
-  for (i = 0; i < code.length; ++i) {
+  for (i = 0; i < len; ++i) {
     revLookup[code.charCodeAt(i)] = i
   }
   revLookup['-'.charCodeAt(0)] = 62
   revLookup['_'.charCodeAt(0)] = 63
+}
 
-  var Arr = (typeof Uint8Array !== 'undefined')
-    ? Uint8Array
-    : Array
+init()
 
-  function decode (elt) {
-    var v = revLookup[elt.charCodeAt(0)]
-    return v !== undefined ? v : -1
+function toByteArray (b64) {
+  var i, j, l, tmp, placeHolders, arr
+  var len = b64.length
+
+  if (len % 4 > 0) {
+    throw new Error('Invalid string. Length must be a multiple of 4')
   }
 
-  function b64ToByteArray (b64) {
-    var i, j, l, tmp, placeHolders, arr
+  // the number of equal signs (place holders)
+  // if there are two placeholders, than the two characters before it
+  // represent one byte
+  // if there is only one, then the three characters before it represent 2 bytes
+  // this is just a cheap hack to not do indexOf twice
+  placeHolders = b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
 
-    if (b64.length % 4 > 0) {
-      throw new Error('Invalid string. Length must be a multiple of 4')
-    }
+  // base64 is 4/3 + up to two characters of the original data
+  arr = new Arr(len * 3 / 4 - placeHolders)
 
-    // the number of equal signs (place holders)
-    // if there are two placeholders, than the two characters before it
-    // represent one byte
-    // if there is only one, then the three characters before it represent 2 bytes
-    // this is just a cheap hack to not do indexOf twice
-    var len = b64.length
-    placeHolders = b64.charAt(len - 2) === '=' ? 2 : b64.charAt(len - 1) === '=' ? 1 : 0
+  // if there are placeholders, only get up to the last complete 4 chars
+  l = placeHolders > 0 ? len - 4 : len
 
-    // base64 is 4/3 + up to two characters of the original data
-    arr = new Arr(b64.length * 3 / 4 - placeHolders)
+  var L = 0
 
-    // if there are placeholders, only get up to the last complete 4 chars
-    l = placeHolders > 0 ? b64.length - 4 : b64.length
-
-    var L = 0
-
-    function push (v) {
-      arr[L++] = v
-    }
-
-    for (i = 0, j = 0; i < l; i += 4, j += 3) {
-      tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
-      push((tmp & 0xFF0000) >> 16)
-      push((tmp & 0xFF00) >> 8)
-      push(tmp & 0xFF)
-    }
-
-    if (placeHolders === 2) {
-      tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
-      push(tmp & 0xFF)
-    } else if (placeHolders === 1) {
-      tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
-      push((tmp >> 8) & 0xFF)
-      push(tmp & 0xFF)
-    }
-
-    return arr
+  for (i = 0, j = 0; i < l; i += 4, j += 3) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)]
+    arr[L++] = (tmp & 0xFF0000) >> 16
+    arr[L++] = (tmp & 0xFF00) >> 8
+    arr[L++] = tmp & 0xFF
   }
 
-  function encode (num) {
-    return lookup[num]
+  if (placeHolders === 2) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4)
+    arr[L++] = tmp & 0xFF
+  } else if (placeHolders === 1) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2)
+    arr[L++] = (tmp >> 8) & 0xFF
+    arr[L++] = tmp & 0xFF
   }
 
-  function tripletToBase64 (num) {
-    return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
+  return arr
+}
+
+function tripletToBase64 (num) {
+  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
+}
+
+function encodeChunk (uint8, start, end) {
+  var tmp
+  var output = []
+  for (var i = start; i < end; i += 3) {
+    tmp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+    output.push(tripletToBase64(tmp))
+  }
+  return output.join('')
+}
+
+function fromByteArray (uint8) {
+  var tmp
+  var len = uint8.length
+  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
+  var output = ''
+  var parts = []
+  var maxChunkLength = 16383 // must be multiple of 3
+
+  // go through the array every three bytes, we'll deal with trailing stuff later
+  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
   }
 
-  function encodeChunk (uint8, start, end) {
-    var temp
-    var output = []
-    for (var i = start; i < end; i += 3) {
-      temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
-      output.push(tripletToBase64(temp))
-    }
-    return output.join('')
+  // pad the end with zeros, but make sure to not forget the extra bytes
+  if (extraBytes === 1) {
+    tmp = uint8[len - 1]
+    output += lookup[tmp >> 2]
+    output += lookup[(tmp << 4) & 0x3F]
+    output += '=='
+  } else if (extraBytes === 2) {
+    tmp = (uint8[len - 2] << 8) + (uint8[len - 1])
+    output += lookup[tmp >> 10]
+    output += lookup[(tmp >> 4) & 0x3F]
+    output += lookup[(tmp << 2) & 0x3F]
+    output += '='
   }
 
-  function uint8ToBase64 (uint8) {
-    var i
-    var extraBytes = uint8.length % 3 // if we have 1 byte left, pad 2 bytes
-    var output = ''
-    var parts = []
-    var temp, length
-    var maxChunkLength = 16383 // must be multiple of 3
+  parts.push(output)
 
-    // go through the array every three bytes, we'll deal with trailing stuff later
-
-    for (i = 0, length = uint8.length - extraBytes; i < length; i += maxChunkLength) {
-      parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > length ? length : (i + maxChunkLength)))
-    }
-
-    // pad the end with zeros, but make sure to not forget the extra bytes
-    switch (extraBytes) {
-      case 1:
-        temp = uint8[uint8.length - 1]
-        output += encode(temp >> 2)
-        output += encode((temp << 4) & 0x3F)
-        output += '=='
-        break
-      case 2:
-        temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
-        output += encode(temp >> 10)
-        output += encode((temp >> 4) & 0x3F)
-        output += encode((temp << 2) & 0x3F)
-        output += '='
-        break
-      default:
-        break
-    }
-
-    parts.push(output)
-
-    return parts.join('')
-  }
-
-  exports.toByteArray = b64ToByteArray
-  exports.fromByteArray = uint8ToBase64
-}(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
+  return parts.join('')
+}
 
 },{}],2:[function(require,module,exports){
 (function (global){
@@ -1691,6 +1674,9 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 }
 
 },{}],5:[function(require,module,exports){
+module.exports=function(x){return typeof x==='undefined'}
+
+},{}],6:[function(require,module,exports){
 module.exports = function format(msg) {
   var args = arguments;
   for(var i = 1, l = args.length; i < l; i++) {
@@ -1699,7 +1685,7 @@ module.exports = function format(msg) {
   return msg;
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var getType = require('should-type');
 var format = require('./format');
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -2050,7 +2036,7 @@ module.exports = eq;
 
 eq.r = REASON;
 
-},{"./format":5,"should-type":9}],7:[function(require,module,exports){
+},{"./format":6,"should-type":10}],8:[function(require,module,exports){
 var getType = require('should-type');
 var util = require('./util');
 
@@ -2513,7 +2499,7 @@ function defaultFormat(value, opts) {
 defaultFormat.Formatter = Formatter;
 module.exports = defaultFormat;
 
-},{"./util":8,"should-type":9}],8:[function(require,module,exports){
+},{"./util":9,"should-type":10}],9:[function(require,module,exports){
 function addSpaces(v) {
   return v.split('\n').map(function(vv) { return '  ' + vv; }).join('\n');
 }
@@ -2543,7 +2529,7 @@ module.exports = {
   }
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 (function (Buffer){
 var toString = Object.prototype.toString;
 
@@ -2706,7 +2692,7 @@ Object.keys(types).forEach(function(typeName) {
 module.exports = getGlobalType;
 
 }).call(this,require("buffer").Buffer)
-},{"./types":10,"buffer":2}],10:[function(require,module,exports){
+},{"./types":11,"buffer":2}],11:[function(require,module,exports){
 var types = {
   NUMBER: 'number',
   UNDEFINED: 'undefined',
@@ -2749,7 +2735,7 @@ var types = {
 
 module.exports = types;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var should = require('./lib/should');
 
 var defaultProto = Object.prototype;
@@ -2765,7 +2751,7 @@ try {
 
 module.exports = should;
 
-},{"./lib/should":28}],12:[function(require,module,exports){
+},{"./lib/should":29}],13:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -2860,7 +2846,7 @@ AssertionError.prototype = Object.create(Error.prototype, {
 
 module.exports = AssertionError;
 
-},{"./util":29}],13:[function(require,module,exports){
+},{"./util":30}],14:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3140,7 +3126,7 @@ Assertion.addChain('any', function() {
 module.exports = Assertion;
 module.exports.PromisedAssertion = PromisedAssertion;
 
-},{"./assertion-error":12}],14:[function(require,module,exports){
+},{"./assertion-error":13}],15:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3160,7 +3146,7 @@ var config = {
 
 module.exports = config;
 
-},{"should-format":7}],15:[function(require,module,exports){
+},{"should-format":8}],16:[function(require,module,exports){
 // implement assert interface using already written peaces of should.js
 
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
@@ -3445,7 +3431,7 @@ assert.ifError = function(err) {
   }
 };
 
-},{"./../assertion":13,"should-equal":6}],16:[function(require,module,exports){
+},{"./../assertion":14,"should-equal":7}],17:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3518,7 +3504,7 @@ module.exports = function(should) {
   };
 };
 
-},{"../assertion-error":12,"../util":29,"./_assert":15}],17:[function(require,module,exports){
+},{"../assertion-error":13,"../util":30,"./_assert":16}],18:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3588,7 +3574,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3621,7 +3607,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3782,7 +3768,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{"../util":29,"should-equal":6}],20:[function(require,module,exports){
+},{"../util":30,"should-equal":7}],21:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3921,7 +3907,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{"../util":29,"should-equal":6,"should-type":9}],21:[function(require,module,exports){
+},{"../util":30,"should-equal":7,"should-type":10}],22:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -4033,7 +4019,7 @@ module.exports = function(should, Assertion) {
   Assertion.alias('throw', 'throwError');
 };
 
-},{"../util":29}],22:[function(require,module,exports){
+},{"../util":30}],23:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -4244,7 +4230,7 @@ module.exports = function(should, Assertion) {
   Assertion.alias('matchEach', 'matchEvery');
 };
 
-},{"../util":29,"should-equal":6}],23:[function(require,module,exports){
+},{"../util":30,"should-equal":7}],24:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -4413,7 +4399,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -4694,7 +4680,7 @@ module.exports = function(should) {
   Assertion.alias('finally', 'eventually');
 };
 
-},{"../assertion":13,"../util":29}],25:[function(require,module,exports){
+},{"../assertion":14,"../util":30}],26:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -5068,7 +5054,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{"../util":29,"should-equal":6}],26:[function(require,module,exports){
+},{"../util":30,"should-equal":7}],27:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -5112,7 +5098,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -5351,7 +5337,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{"../util":29}],28:[function(require,module,exports){
+},{"../util":30}],29:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -5516,7 +5502,7 @@ should
   .use(require('./ext/contain'))
   .use(require('./ext/promise'));
 
-},{"./assertion":13,"./assertion-error":12,"./config":14,"./ext/assert":16,"./ext/bool":17,"./ext/chain":18,"./ext/contain":19,"./ext/eql":20,"./ext/error":21,"./ext/match":22,"./ext/number":23,"./ext/promise":24,"./ext/property":25,"./ext/string":26,"./ext/type":27,"./util":29,"should-type":9}],29:[function(require,module,exports){
+},{"./assertion":14,"./assertion-error":13,"./config":15,"./ext/assert":17,"./ext/bool":18,"./ext/chain":19,"./ext/contain":20,"./ext/eql":21,"./ext/error":22,"./ext/match":23,"./ext/number":24,"./ext/promise":25,"./ext/property":26,"./ext/string":27,"./ext/type":28,"./util":30,"should-type":10}],30:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -5654,7 +5640,7 @@ exports.formatProp = function(value) {
   return config.getFormatter().formatPropertyName(String(value));
 };
 
-},{"./config":14,"should-format":7,"should-type":9}],30:[function(require,module,exports){
+},{"./config":15,"should-format":8,"should-type":10}],31:[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/flow-view
  */
@@ -5676,7 +5662,7 @@ function funBrowser (graph) {
 
 exports.fun = funBrowser
 
-},{"../fun":32,"../functions/window":34}],31:[function(require,module,exports){
+},{"../fun":33,"../functions/window":35}],32:[function(require,module,exports){
 module.exports={
   "data": {},
   "pipe": {},
@@ -5687,9 +5673,8 @@ module.exports={
   }
 }
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 var builtinFunctions = require('./functions/builtin')
-var commentRegex = require('./regex/comment')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
 var injectArguments = require('./inject/arguments')
 var injectAccessors = require('./inject/accessors')
@@ -5701,7 +5686,15 @@ var injectStrings = require('./inject/strings')
 var inputArgs = require('./inputArgs')
 var isDflowFun = require('./isDflowFun')
 var level = require('./level')
+var notDefined = require('not-defined')
+var regexArgument = require('./regex/argument')
+var regexComment = require('./regex/comment')
+var regexSubgraph = require('./regex/subgraph')
+var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
+var walkGlobal = require('./walkGlobal')
+
+var defined = function (x) { return !notDefined(x) }
 
 /**
  * Create a dflow function.
@@ -5770,9 +5763,51 @@ function fun (graph, additionalFunctions) {
     return cachedLevelOf[a] - cachedLevelOf[b]
   }
 
+  /**
+   * Ignores comments.
+   */
+
+  function comments (key) {
+    return !regexComment.test(task[key])
+  }
+
   // Compile each subgraph.
   Object.keys(func)
         .forEach(compileSubgraph)
+
+  /**
+   * Throw if a task is not defined.
+   */
+
+  function checkTaskIsDefined (taskKey) {
+    var taskName = task[taskKey]
+
+    // Ignore tasks injected at run time.
+    if (reservedKeys.indexOf(taskName) > -1) return
+
+    var msg = 'Task not found: ' + taskName + ' [' + taskKey + ']'
+
+    // Check subgraphs.
+    if (regexSubgraph.test(taskName)) {
+      var subgraphKey = taskName.substring(1)
+
+      if (notDefined(graph.func[subgraphKey])) throw new Error(msg)
+      else return
+    }
+
+    // Skip arguments[0] ... arguments[N].
+    if (regexArgument.exec(taskName)) return
+
+    // Skip globals.
+    if (defined(walkGlobal(taskName))) return
+
+    if (notDefined(funcs[taskName])) throw new Error(msg)
+  }
+
+  // Check if there is some missing task.
+  Object.keys(task)
+        .filter(comments)
+        .forEach(checkTaskIsDefined)
 
   /**
    * Here we are, this is the ❤ of dflow.
@@ -5797,8 +5832,8 @@ function fun (graph, additionalFunctions) {
 
     function run (taskKey) {
       var args = inputArgsOf(taskKey)
-      var funcName = task[taskKey]
-      var f = funcs[funcName]
+      var taskName = task[taskKey]
+      var f = funcs[taskName]
 
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.
@@ -5806,15 +5841,15 @@ function fun (graph, additionalFunctions) {
         return
       }
 
-      if ((funcName === 'return') && (!gotReturn)) {
+      if ((taskName === 'return') && (!gotReturn)) {
         returnValue = args[0]
         gotReturn = true
         return
       }
 
-      // If task is not defined, throw an error.
+      // If task is not defined at run time, throw an error.
       if (typeof f === 'undefined') {
-        throw new Error('Task ' + funcName + ' [' + taskKey + '] is not defined')
+        throw new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
       }
 
       // Try to execute task.
@@ -5823,14 +5858,6 @@ function fun (graph, additionalFunctions) {
       } catch (err) {
         throw err
       }
-    }
-
-    /**
-     * Ignores comments.
-     */
-
-    function comments (key) {
-      return !commentRegex.test(task[key])
     }
 
     // Run every graph task, sorted by level.
@@ -5850,7 +5877,7 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./functions/builtin":33,"./inject/accessors":35,"./inject/additionalFunctions":36,"./inject/arguments":37,"./inject/dotOperators":38,"./inject/globals":39,"./inject/numbers":40,"./inject/references":41,"./inject/strings":42,"./inputArgs":43,"./isDflowFun":45,"./level":46,"./regex/comment":50,"./validate":55}],33:[function(require,module,exports){
+},{"./functions/builtin":34,"./inject/accessors":36,"./inject/additionalFunctions":37,"./inject/arguments":38,"./inject/dotOperators":39,"./inject/globals":40,"./inject/numbers":41,"./inject/references":42,"./inject/strings":43,"./inputArgs":44,"./isDflowFun":46,"./level":47,"./regex/argument":50,"./regex/comment":51,"./regex/subgraph":55,"./reservedKeys":56,"./validate":57,"./walkGlobal":58,"not-defined":5}],34:[function(require,module,exports){
 // Arithmetic operators
 
 exports['+'] = function (a, b) { return a + b }
@@ -5950,7 +5977,7 @@ exports.true = function () { return true }
 
 exports.now = function () { return new Date() }
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 exports.document = function () {
   return document
 }
@@ -5981,7 +6008,7 @@ exports.innerHTML = function (node, content) {
   return node
 }
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var accessorRegex = require('../regex/accessor')
 
 /**
@@ -6036,7 +6063,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":48}],36:[function(require,module,exports){
+},{"../regex/accessor":49}],37:[function(require,module,exports){
 /**
  * Optionally add custom functions.
  *
@@ -6072,7 +6099,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var argumentRegex = require('../regex/argument')
 
 /**
@@ -6116,7 +6143,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":49}],38:[function(require,module,exports){
+},{"../regex/argument":50}],39:[function(require,module,exports){
 var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
@@ -6207,7 +6234,9 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":51}],39:[function(require,module,exports){
+},{"../regex/dotOperator":52}],40:[function(require,module,exports){
+var notDefined = require('not-defined')
+var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
 
 /**
@@ -6231,20 +6260,14 @@ function injectGlobals (funcs, task) {
 
     // Do not overwrite a function if already defined.
     // For example, console.log cannot be used as is, it must binded to console.
-    if (typeof funcs[taskName] === 'function') {
-      return
-    }
+    if (typeof funcs[taskName] === 'function') return
 
     // Skip also reserved keywords.
-    if ((taskName === 'return') || (taskName === 'this.graph')) {
-      return
-    }
+    if (reservedKeys.indexOf(taskName) > -1) return
 
     var globalValue = walkGlobal(taskName)
 
-    if (typeof globalValue === 'undefined') {
-      return
-    }
+    if (notDefined(globalValue)) return
 
     if (typeof globalValue === 'function') {
       funcs[taskName] = globalValue
@@ -6261,7 +6284,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../walkGlobal":56}],40:[function(require,module,exports){
+},{"../reservedKeys":56,"../walkGlobal":58,"not-defined":5}],41:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -6296,7 +6319,7 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 var referenceRegex = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
@@ -6351,7 +6374,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":53,"../walkGlobal":56}],42:[function(require,module,exports){
+},{"../regex/reference":54,"../walkGlobal":58}],43:[function(require,module,exports){
 var quotedRegex = require('../regex/quoted')
 
 /**
@@ -6386,7 +6409,7 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":52}],43:[function(require,module,exports){
+},{"../regex/quoted":53}],44:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -6417,7 +6440,7 @@ function inputArgs (outs, pipe, taskKey) {
 
 module.exports = inputArgs
 
-},{"./inputPipes":44}],44:[function(require,module,exports){
+},{"./inputPipes":45}],45:[function(require,module,exports){
 /**
  * Compute pipes that feed a task.
  *
@@ -6445,7 +6468,7 @@ function inputPipes (pipe, taskKey) {
 
 module.exports = inputPipes
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 var validate = require('./validate')
 
 /**
@@ -6475,7 +6498,7 @@ function isDflowFun (f) {
 
 module.exports = isDflowFun
 
-},{"./validate":55}],46:[function(require,module,exports){
+},{"./validate":57}],47:[function(require,module,exports){
 var parents = require('./parents')
 
 /**
@@ -6510,7 +6533,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 
 module.exports = level
 
-},{"./parents":47}],47:[function(require,module,exports){
+},{"./parents":48}],48:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -6537,35 +6560,46 @@ function parents (pipe, taskKey) {
 
 module.exports = parents
 
-},{"./inputPipes":44}],48:[function(require,module,exports){
+},{"./inputPipes":45}],49:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)\]$/
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 module.exports = /^\/\/.+$/
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 module.exports = /^\&(.+)$/
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports = /^\/[\w][\w\d]+$/
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
+module.exports = [
+  'arguments',
+  'dflow.fun',
+  'dflow.isDflowFun',
+  'dflow.validate',
+  'return',
+  'this',
+  'this.graph'
+]
 
+},{}],57:[function(require,module,exports){
 var accessorRegex = require('./regex/accessor')
 var argumentRegex = require('./regex/argument')
 var dotOperatorRegex = require('./regex/dotOperator')
 var referenceRegex = require('./regex/reference')
+var reservedKeys = require('./reservedKeys')
 var subgraphRegex = require('./regex/subgraph')
 
 /**
@@ -6738,7 +6772,7 @@ function validate (graph, additionalFunctions) {
 
 module.exports = validate
 
-},{"./regex/accessor":48,"./regex/argument":49,"./regex/dotOperator":51,"./regex/reference":53,"./regex/subgraph":54}],56:[function(require,module,exports){
+},{"./regex/accessor":49,"./regex/argument":50,"./regex/dotOperator":52,"./regex/reference":54,"./regex/subgraph":55,"./reservedKeys":56}],58:[function(require,module,exports){
 (function (global){
 var globalContext
 
@@ -6771,7 +6805,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 module.exports={
   "data": {
     "results": [
@@ -6926,8 +6960,11 @@ module.exports={
   }
 }
 
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 module.exports={
+  "info": {
+    "context": "client"
+  },
   "data": {
     "results": []
   },
@@ -7108,7 +7145,7 @@ module.exports={
   }
 }
 
-},{}],59:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7129,7 +7166,7 @@ module.exports={
   }
 }
 
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7152,7 +7189,7 @@ module.exports={
   }
 }
 
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "@message",
@@ -7193,7 +7230,7 @@ module.exports={
   }
 }
 
-},{}],62:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -7220,7 +7257,7 @@ module.exports={
   }
 }
 
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 module.exports={
   "data": {
     "results": []
@@ -7381,7 +7418,7 @@ module.exports={
   }
 }
 
-},{}],64:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7404,7 +7441,7 @@ module.exports={
   }
 }
 
-},{}],65:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7427,7 +7464,7 @@ module.exports={
   }
 }
 
-},{}],66:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 module.exports={
   "data": {
     "results": []
@@ -7483,7 +7520,7 @@ module.exports={
   }
 }
 
-},{}],67:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 // Do not use dynamic imports, for example importing the whole graph folder;
 // use explicit imports instead, otherwise browserify will not include graphs.
 exports['apply'] = require('./graph/apply.json')
@@ -7497,7 +7534,7 @@ exports.or = require('./graph/or.json')
 exports.sum = require('./graph/sum.json')
 exports.welcome = require('./graph/welcome.json')
 
-},{"./graph/apply.json":57,"./graph/createParagraph.json":58,"./graph/dateParse.json":59,"./graph/dotOperator.json":60,"./graph/hello-world.json":61,"./graph/indexOf.json":62,"./graph/new.json":63,"./graph/or.json":64,"./graph/sum.json":65,"./graph/welcome.json":66}],68:[function(require,module,exports){
+},{"./graph/apply.json":59,"./graph/createParagraph.json":60,"./graph/dateParse.json":61,"./graph/dotOperator.json":62,"./graph/hello-world.json":63,"./graph/indexOf.json":64,"./graph/new.json":65,"./graph/or.json":66,"./graph/sum.json":67,"./graph/welcome.json":68}],70:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -7516,7 +7553,7 @@ module.exports={
   "view": {}
 }
 
-},{}],69:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 var emptyGraph = require('../src/engine/emptyGraph.json')
 var validate = require('../src/engine/validate')
 
@@ -7526,11 +7563,13 @@ describe('emptyGraph', function () {
   })
 })
 
-},{"../src/engine/emptyGraph.json":31,"../src/engine/validate":55}],70:[function(require,module,exports){
+},{"../src/engine/emptyGraph.json":32,"../src/engine/validate":57}],72:[function(require,module,exports){
 var dflow = require('dflow')
 var should = require('should')
 
 var examples = require('../src/examples')
+
+var context = (typeof window === 'object') ? 'client' : 'server'
 
 describe('example', function () {
   function testExample (name, graph) {
@@ -7553,7 +7592,13 @@ describe('example', function () {
 
   for (var exampleName in examples) {
     var exampleGraph = examples[exampleName]
-    testExample(exampleName, exampleGraph)
+
+    var graphInfo = exampleGraph.info || {}
+    var graphContext = graphInfo.context || 'universal'
+
+    if (graphContext === context) {
+      testExample(exampleName, exampleGraph)
+    }
   }
 
   describe('packagedGraph', function () {
@@ -7567,7 +7612,7 @@ describe('example', function () {
   })
 })
 
-},{"../src/examples":67,"../src/examples/packagedGraph":68,"dflow":76,"should":11}],71:[function(require,module,exports){
+},{"../src/examples":69,"../src/examples/packagedGraph":70,"dflow":78,"should":12}],73:[function(require,module,exports){
 
 var should = require('should')
 var fun = require('../src/engine/fun')
@@ -7664,10 +7709,29 @@ describe('fun', function () {
       fun(graphWithOrphanPipe)
     }).should.throwError(/Orphan pipe:/)
   })
+
+  it('throws if a task is not found', function () {
+    ;(function () {
+      var graphWithTaskNotFound = {
+        task: {
+          '2': 'available task',
+          '3': 'foo'
+        },
+        pipe: {
+          '1': [ '2', '3' ]
+        }
+      }
+
+      var funcs = {
+        'available task': function () { return 'ok' }
+      }
+
+      fun(graphWithTaskNotFound, funcs)
+    }).should.throwError(/Task not found:/)
+  })
 })
 
-
-},{"../src/engine/fun":32,"should":11}],72:[function(require,module,exports){
+},{"../src/engine/fun":33,"should":12}],74:[function(require,module,exports){
 
 var inputArgs = require('../src/engine/inputArgs')
 
@@ -7698,7 +7762,7 @@ describe('inputArgs', function () {
 })
 
 
-},{"../src/engine/inputArgs":43}],73:[function(require,module,exports){
+},{"../src/engine/inputArgs":44}],75:[function(require,module,exports){
 var inputPipes = require('../src/engine/inputPipes')
 
 var pipe = {
@@ -7722,10 +7786,12 @@ describe('inputPipes', function () {
   })
 })
 
-},{"../src/engine/inputPipes":44}],74:[function(require,module,exports){
+},{"../src/engine/inputPipes":45}],76:[function(require,module,exports){
 var examples = require('../src/examples')
 var fun = require('../src/engine/fun')
 var isDflowFun = require('../src/engine/isDflowFun')
+
+var context = (typeof window === 'object') ? 'client' : 'server'
 
 describe('isDflowFun', function () {
   describe('returns false if it', function () {
@@ -7778,16 +7844,21 @@ describe('isDflowFun', function () {
       for (var exampleName in examples) {
         var exampleGraph = examples[exampleName]
 
-        var f = fun(exampleGraph)
+        var graphInfo = exampleGraph.info || {}
+        var graphContext = graphInfo.context || 'universal'
 
-        isDflowFun(f).should.be.ko
+        if (graphContext === context) {
+          var f = fun(exampleGraph)
+
+          isDflowFun(f).should.be.ko
+        }
       }
     })
   })
 })
 
 
-},{"../src/engine/fun":32,"../src/engine/isDflowFun":45,"../src/examples":67}],75:[function(require,module,exports){
+},{"../src/engine/fun":33,"../src/engine/isDflowFun":46,"../src/examples":69}],77:[function(require,module,exports){
 var level = require('../src/engine/level')
 
 var pipe = {
@@ -7809,13 +7880,13 @@ describe('level', function () {
   })
 })
 
-},{"../src/engine/level":46}],76:[function(require,module,exports){
+},{"../src/engine/level":47}],78:[function(require,module,exports){
 
 // Cheating npm require.
 module.exports = require('../../..')
 
 
-},{"../../..":30}],77:[function(require,module,exports){
+},{"../../..":31}],79:[function(require,module,exports){
 var parents = require('../src/engine/parents')
 
 var pipe = {
@@ -7849,7 +7920,7 @@ describe('parentsOf', function () {
 })
 
 
-},{"../src/engine/parents":47}],78:[function(require,module,exports){
+},{"../src/engine/parents":48}],80:[function(require,module,exports){
 
 var accessor = require('../src/engine/regex/accessor')
 var argument = require('../src/engine/regex/argument')
@@ -7910,7 +7981,7 @@ describe('regex', function () {
 })
 
 
-},{"../src/engine/regex/accessor":48,"../src/engine/regex/argument":49,"../src/engine/regex/comment":50,"../src/engine/regex/dotOperator":51,"../src/engine/regex/reference":53,"../src/engine/regex/subgraph":54}],79:[function(require,module,exports){
+},{"../src/engine/regex/accessor":49,"../src/engine/regex/argument":50,"../src/engine/regex/comment":51,"../src/engine/regex/dotOperator":52,"../src/engine/regex/reference":54,"../src/engine/regex/subgraph":55}],81:[function(require,module,exports){
 var should = require('should')
 var fun = require('../src/engine/fun')
 
@@ -7953,7 +8024,7 @@ describe('this.graph', function () {
   })
 })
 
-},{"../src/engine/fun":32,"should":11}],80:[function(require,module,exports){
+},{"../src/engine/fun":33,"should":12}],82:[function(require,module,exports){
 var validate = require('../src/engine/validate')
 
 describe('validate', function () {
@@ -8138,4 +8209,4 @@ describe('validate', function () {
   })
 })
 
-},{"../src/engine/validate":55}]},{},[69,70,71,72,73,74,75,77,78,79,80]);
+},{"../src/engine/validate":57}]},{},[71,72,73,74,75,76,77,79,80,81,82]);

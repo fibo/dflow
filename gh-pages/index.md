@@ -3,7 +3,7 @@ title: dflow
 ---
 # dflow
 
-> is a minimal [Dataflow programming][4] engine
+> is a minimal [Dataflow programming][dataflow-wikipedia] engine
 
 [![Heroku demo](https://img.shields.io/badge/heroku-demo-663399.svg)](https://dflow.herokuapp.com/) [![Join the chat at https://gitter.im/fibo/dflow](https://badges.gitter.im/fibo/dflow.svg)](https://gitter.im/fibo/dflow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -11,13 +11,13 @@ title: dflow
 
 * [Installation](#installation)
 * [Examples](http://g14n.info/dflow/examples)
-* [Editor][5]
+* [Editor][dflow-editor]
 * [Api](http://g14n.info/dflow/api)
 * [Specification](http://g14n.info/dflow/specification)
 * [Contributing](http://g14n.info/dflow/contributing)
 * [Support and license](#support-and-license)
 
-[![Node engine](https://img.shields.io/node/v/dflow.svg)](https://nodejs.org/en/) [![NPM version](https://badge.fury.io/js/dflow.svg)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.svg?branch=master)](https://travis-ci.org/fibo/dflow?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.svg)](https://gemnasium.com/fibo/dflow) [![Coverage Status](https://coveralls.io/repos/fibo/dflow/badge.svg?branch=master)](https://coveralls.io/r/fibo/dflow?branch=master) [![Test page](https://img.shields.io/badge/test-page-blue.svg)](http://g14n.info/dflow/test)
+[![Node engine](https://img.shields.io/node/v/dflow.svg)](https://nodejs.org/en/) [![NPM version](https://badge.fury.io/js/dflow.svg)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.svg?branch=master)](https://travis-ci.org/fibo/dflow?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.svg)](https://gemnasium.com/fibo/dflow) [![Coverage Status](https://coveralls.io/repos/fibo/dflow/badge.svg?branch=master)](https://coveralls.io/r/fibo/dflow?branch=master) [![Test page](https://img.shields.io/badge/test-page-blue.svg)](http://g14n.info/dflow/test) [![Change log](https://img.shields.io/badge/change-log-blue.svg)](http://g14n.info/dflow/changelog)
 
 [![Whatchers](http://g14n.info/svg/github/watchers/dflow.svg)](https://github.com/fibo/dflow/watchers) [![Stargazers](http://g14n.info/svg/github/stars/dflow.svg)](https://github.com/fibo/dflow/stargazers) [![Forks](http://g14n.info/svg/github/forks/dflow.svg)](https://github.com/fibo/dflow/network/members)
 
@@ -25,13 +25,11 @@ title: dflow
 
 [![NPM](https://nodei.co/npm-dl/dflow.png)](https://nodei.co/npm-dl/dflow/)
 
-[![Throughput Graph](https://graphs.waffle.io/fibo/dflow/throughput.svg)](https://waffle.io/fibo/dflow)
-
 ## Hello world
 
 The following simple graph is executed client side by *dflow* engine.
 
-[![Hello World](http://g14n.info/dflow/svg/hello-world.svg)](http://g14n.info/dflow/examples/hello-world.html)
+[![Hello World](http://g14n.info/dflow/svg/hello-world.svg)][hello-world]
 
 ## Status
 
@@ -116,9 +114,7 @@ My goal is to say to a *dflow* user:
 
 > Mamma mia! Did you achieve that with dflow?
 
- [1]: http://g14n.info/flow-view "flow-view"
- [2]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
- [3]: https://github.com/fibo/dflow/blob/master/src/engine/functions/builtin.js "builtin functions"
- [4]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
- [5]: http://g14n.info/dflow/editor "dflow editor"
+[dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
+[dflow-editor]: http://g14n.info/dflow/editor "dflow editor"
+[hello-world]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
 
