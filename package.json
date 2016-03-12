@@ -52,7 +52,6 @@
     "lint_examples": "cd src/examples/; standard; cd -",
     "lint_test": "cd test; standard --global describe --global it; cd -",
     "minify": "cd dist; uglifyjs ${npm_package_name}.js --source-map ${npm_package_name}.map --output ${npm_package_name}.min.js --compress --mangle --preamble \"// ${npm_package_name}.js ${npm_package_homepage} \n// license ${npm_package_license}\"; cd -",
-    "postinstall": "npm run bower; npm run browserify_client; npm run riot",
     "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push; npm run heroku",
     "riot": "riot src/editor/client/tags src/editor/client/public/dflow-tags.js",
     "test": "mocha"
@@ -64,16 +63,11 @@
   ],
   "dependencies": {
     "body-parser": "^1.14.1",
-    "bower": "^1.7.7",
-    "brfs": "^1.4.3",
-    "browserify": "^13.0.0",
     "debug": "^2.2.0",
     "express": "^4.13.4",
     "flow-view": "^1.0.2",
-    "jade": "^1.11.0",
     "nopt": "^3.0.4",
     "not-defined": "^1.0.0",
-    "socket.io": "^1.4.5",
     "write-file-utf8": "^1.0.0"
   },
   "repository": {
@@ -84,5 +78,8 @@
     "dataflow",
     "visual"
   ],
-  "devDependencies": {}
+  "devDependencies": {
+    "mocha": "^2.4.5",
+    "should": "^8.2.2"
+  }
 }
