@@ -1,0 +1,40 @@
+{
+  "name": "dflow-dev",
+  "version": "1.0.0",
+  "private": true,
+  "description": "dflow dev dependencies",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "npm install riot keybase -g"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fibo/dflow.git"
+  },
+  "keywords": [
+    "dflow",
+    "dev"
+  ],
+  "author": {
+    "name": "Gianluca Casati",
+    "url": "http://g14n.info"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fibo/dflow/issues"
+  },
+  "homepage": "http://g14n.info/dflow",
+  "dependencies": {
+    "bower": "^1.7.7",
+    "brfs": "^1.4.3",
+    "browserify": "^13.0.0",
+    "coveralls": "^2.11.2",
+    "heroku": "^0.1.3",
+    "istanbul": "^0.4.1",
+    "mocha-lcov-reporter": "^1.2.0",
+    "pre-commit": "^1.1.2",
+    "standard": "^6.0.8",
+    "uglify-js": "^2.6.2"
+  }
+}
