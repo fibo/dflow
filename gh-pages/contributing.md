@@ -26,6 +26,7 @@ It is something like
 git clone git@github.com/roccosiffredi/dflow.git
 cd dflow
 npm install
+npm install fibo/dflow-dev
 git checkout -b mycontribution
 ```
 
