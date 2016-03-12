@@ -21,6 +21,7 @@
   ],
   "dependencies": {
     "semantic": "semantic-ui#~2.1.8",
-    "jsoneditor": "^5.1.5"
+    "jsoneditor": "^5.1.5",
+    "riot": "^2.3.17"
   }
 }
