@@ -35,6 +35,8 @@
     "decrypt_.coveralls.yml": "keybase decrypt -o .coveralls.yml .coveralls.yml.asc",
     "gh-pages_push": "git subtree --prefix gh-pages push origin gh-pages",
     "gh-pages_pull": "git subtree --prefix gh-pages pull origin gh-pages",
+    "git_add-f": "npm run git_add-f_riot",
+    "git_add-f_riot": "git add -f src/editor/bower_components/riot/riot.min.js",
     "heroku": "git remote add heroku https://git.heroku.com/dflow.git; git push heroku master; git remote remove heroku",
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
     "istanbul": "istanbul cover _mocha -- --recursive",
@@ -69,7 +71,6 @@
     "jade": "^1.11.0",
     "nopt": "^3.0.4",
     "not-defined": "^1.0.0",
-    "riot": "^2.3.17",
     "socket.io": "^1.4.5",
     "write-file-utf8": "^1.0.0"
   },
