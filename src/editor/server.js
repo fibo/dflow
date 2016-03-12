@@ -123,7 +123,7 @@ function editorServer (graphPath, opt) {
   // Routes.
 
   app.get('/', function (req, res) {
-    res.redirect('/edit')
+    res.sendFile(path.join(__dirname, 'client', 'index.html'))
   })
 
   app.get('/download', function (req, res) {
