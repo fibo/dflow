@@ -18,6 +18,9 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ### Added
 
+- Riotjs
+- optimized installation
+
 - CHANGELOG.md
 
 [Unreleased]: https://github.com/fibo/{{ package.name }}/compare/v{{ package.version }}...HEAD

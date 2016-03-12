@@ -1,13 +1,12 @@
-var _debug = require('debug')
+var pkg = require('../../../package.json')
 
-var socket = window.io()
+// var socket = window.io()
 
-let graph = null
+var graph = require('../../examples/graph/hello-world.json')
 
 // Debug setup.
-// TODO add Debug toogle button
-_debug.enable('dflow')
-var debug = _debug('dflow')
+window.dflowDebug = require('debug')
+var debug = dflowDebug('dflow')
 
 window.onload = initPage
 
@@ -15,7 +14,7 @@ function initPage () {
   // Initialize canvas and other elements.
   var Canvas = require('flow-view').Canvas
 
-  var canvas = new Canvas('graph', {
+  var canvas = new Canvas('flow-view-canvas', {
     nodeSelector: {
       dataList: {
         URL: '/tasklist'
@@ -23,6 +22,12 @@ function initPage () {
     }
   })
 
+  debug('dflow', pkg.version)
+
+  canvas.deleteView()
+  canvas.render(graph.view)
+
+  /*
   var canvasMethods = ['addLink', 'addNode',
                        'delLink', 'delNode']
 
@@ -152,4 +157,5 @@ function initPage () {
       $sidebar.sidebar('toggle')
     })
   })
+    */
 }
