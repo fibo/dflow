@@ -35,7 +35,7 @@ The following simple graph is executed client side by *dflow* engine.
 
 *dflow* is **beta** software.
 The engine is almost stable.
-The [editor][5] is usable but with no css (help me!): I have just started using React to implement the editor view.
+The [editor][dflow-editor] is usable but with no css (help me!): I have just started using React to implement the editor view.
 Collaborative editing feature is working but buggy (I am proud of my bugs and they will be fixed in version **1.0** :)).
 
 Next steps:
@@ -65,7 +65,7 @@ Client distribution contains just the engine and minified version is around **10
 
 ### Server side
 
-If you are new to *dflow*, you probably want to try the [editor][5], so you need to install globally to get *dflow* cli in your path.
+If you are new to *dflow*, you probably want to try the [editor][dflow-editor], so you need to install globally to get *dflow* cli in your path.
 With [npm](https://npmjs.org/) do
 
 ```bash
