@@ -10,3 +10,6 @@ graph.json
 # Test coverage
 coverage
 .coveralls.yml
+
+# src/editor/client/public/.gitignore
+# src/editor/client/bower_components/.gitignore
