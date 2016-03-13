@@ -22,6 +22,6 @@
   "dependencies": {
     "jsoneditor": "^5.1.5",
     "riot": "^2.3.17",
-    "flow-view": "^1.1.0"
+    "flow-view": "^1.1.1"
   }
 }
