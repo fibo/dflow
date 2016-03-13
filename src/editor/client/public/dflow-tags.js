@@ -21,5 +21,5 @@ riot.tag2('dflow-debug-toggle', '<input type="checkbox" id="debug-toggle" onchan
   }.bind(this)
 });
 
-riot.tag2('dflow-navbar', '<p>navbar</p>', '', '', function(opts) {
+riot.tag2('dflow-navbar', '<ul> <li><a href="http://g14n.info/dflow" target="_blank">Docs</a></li> </ul>', 'dflow-navbar ul { list-style-type: none; margin: 0; padding: 0; overflow: hidden; background-color: #333; } dflow-navbar li { float: left; } dflow-navbar li a { display: inline-block; color: white; text-align: center; padding: 14px 16px; text-decoration: none; } dflow-navbar li a:hover { background-color: #111; }', '', function(opts) {
 });
