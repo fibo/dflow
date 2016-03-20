@@ -19,7 +19,6 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 ### Added
 
 - CHANGELOG.md
-- Riotjs
 - optimized installation, many deps moved to dev/package.json or bower
 - separated dev package
 - removed semantic ui
