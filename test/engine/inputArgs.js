@@ -1,5 +1,4 @@
-
-var inputArgs = require('../src/engine/inputArgs')
+var inputArgs = require('../../src/engine/inputArgs')
 
 var pipe = {
   'a': [ '0', '1', 0 ],
@@ -26,4 +25,3 @@ describe('inputArgs', function () {
     inputArgsOf('3').should.eql(['quz', 'bar'])
   })
 })
-

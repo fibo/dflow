@@ -63,8 +63,8 @@
   ],
   "dependencies": {
     "body-parser": "^1.14.1",
+    "budo": "^8.2.1",
     "debug": "^2.2.0",
-    "express": "^4.13.4",
     "nopt": "^3.0.4",
     "not-defined": "^1.0.0",
     "write-file-utf8": "^1.0.0"
@@ -78,7 +78,10 @@
     "visual"
   ],
   "devDependencies": {
+    "bulma": "0.0.21",
+    "connect": "^3.4.1",
     "mocha": "^2.4.5",
-    "should": "^8.2.2"
+    "should": "^8.2.2",
+    "supertest": "^1.2.0"
   }
 }
