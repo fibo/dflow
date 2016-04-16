@@ -40,7 +40,6 @@
     "git_add-f_public": "git add -f src/editor/client/public/*",
     "git_add-f_bower_components": "for x in flow-view; do npm run git_add-f_bower_component_$x; done",
     "git_add-f_bower_component_flow-view": "git add -f src/editor/bower_components/flow-view/dist/flow-view.min.js",
-    "heroku": "git remote add heroku https://git.heroku.com/dflow.git; git push heroku master; git remote remove heroku",
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
     "istanbul": "istanbul cover _mocha -- --recursive",
     "jekyll": "npm run homepage; npm run cp; npm run data_repo; cd gh-pages; jekyll build; cd ..",
@@ -53,7 +52,7 @@
     "lint_examples": "cd src/examples/; standard; cd -",
     "lint_test": "cd test; standard --global describe --global it; cd -",
     "minify": "cd dist; uglifyjs ${npm_package_name}.js --source-map ${npm_package_name}.map --output ${npm_package_name}.min.js --compress --mangle --preamble \"// ${npm_package_name}.js ${npm_package_homepage} \n// license ${npm_package_license}\"; cd -",
-    "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push; npm run heroku",
+    "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push",
     "test": "mocha"
   },
   "pre-commit": [
