@@ -516,7 +516,7 @@ module.exports={
     "_build": "npm test && npm run browserify && npm run minify && npm run jekyll; git status",
     "_push": "git push origin master && npm run gh-pages_push",
     "_pull": "git pull origin master && npm run gh-pages_pull",
-    "bower": "npm run bower_install; npm run git_add-f",
+    "bower": "npm run bower_install; npm run git_add-f_bower_components",
     "bower_install": "cd src/editor; bower --silent --config.analytics=false install; cd -",
     "browserify": "for x in client dist examples test; do npm run browserify_$x; done",
     "browserify_client": "browserify src/editor/client/main.js --exclude flow-view -o src/editor/client/public/bundle.js",
@@ -533,11 +533,10 @@ module.exports={
     "decrypt_.coveralls.yml": "keybase decrypt -o .coveralls.yml .coveralls.yml.asc",
     "gh-pages_push": "git subtree --prefix gh-pages push origin gh-pages",
     "gh-pages_pull": "git subtree --prefix gh-pages pull origin gh-pages",
-    "git_add-f": "for x in public flow-view riot; do npm run git_add-f_$x; done",
+    "git_add-f": "for x in bower_components public; do npm run git_add-f_$x; done",
     "git_add-f_public": "git add -f src/editor/client/public/*",
-    "git_add-f_flow-view": "git add -f src/editor/bower_components/flow-view/dist/flow-view.min.js",
-    "git_add-f_riot": "git add -f src/editor/bower_components/riot/riot.min.js",
-    "heroku": "git remote add heroku https://git.heroku.com/dflow.git; git push heroku master; git remote remove heroku",
+    "git_add-f_bower_components": "for x in flow-view; do npm run git_add-f_bower_component_$x; done",
+    "git_add-f_bower_component_flow-view": "git add -f src/editor/bower_components/flow-view/dist/flow-view.min.js",
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
     "istanbul": "istanbul cover _mocha -- --recursive",
     "jekyll": "npm run homepage; npm run cp; npm run data_repo; cd gh-pages; jekyll build; cd ..",
@@ -550,8 +549,7 @@ module.exports={
     "lint_examples": "cd src/examples/; standard; cd -",
     "lint_test": "cd test; standard --global describe --global it; cd -",
     "minify": "cd dist; uglifyjs ${npm_package_name}.js --source-map ${npm_package_name}.map --output ${npm_package_name}.min.js --compress --mangle --preamble \"// ${npm_package_name}.js ${npm_package_homepage} \n// license ${npm_package_license}\"; cd -",
-    "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push; npm run heroku",
-    "riot": "riot src/editor/client/tags src/editor/client/public/dflow-tags.js",
+    "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push",
     "test": "mocha"
   },
   "pre-commit": [
@@ -561,10 +559,12 @@ module.exports={
   ],
   "dependencies": {
     "body-parser": "^1.14.1",
+    "budo": "^8.2.1",
+    "connect": "^3.4.1",
     "debug": "^2.2.0",
-    "express": "^4.13.4",
     "nopt": "^3.0.4",
     "not-defined": "^1.0.0",
+    "swagger-tools": "^0.10.1",
     "write-file-utf8": "^1.0.0"
   },
   "repository": {
@@ -576,8 +576,16 @@ module.exports={
     "visual"
   ],
   "devDependencies": {
+    "brfs": "^1.4.3",
+    "browserify": "^13.0.0",
+    "istanbul": "^0.4.3",
     "mocha": "^2.4.5",
-    "should": "^8.2.2"
+    "mocha-lcov-reporter": "^1.2.0",
+    "pre-commit": "^1.1.2",
+    "should": "^8.2.2",
+    "standard": "^6.0.8",
+    "supertest": "^1.2.0",
+    "uglify-js": "^2.6.2"
   }
 }
 

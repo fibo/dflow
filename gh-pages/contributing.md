@@ -26,7 +26,6 @@ It is something like
 git clone git@github.com/roccosiffredi/dflow.git
 cd dflow
 npm install
-npm install src/dev
 git checkout -b mycontribution
 ```
 
@@ -39,12 +38,10 @@ Three commit bits are needed to publish a new version:
 
 * npm
 * GitHub repository
-* Heroku app
 
 Once you are added as a collaborator on the sites above,
 when you launch [npm-version](https://docs.npmjs.com/cli/version) *npm scripts* will do the dirty work, i.e.
 
 1. Publish on npm
 2. Push on GitHub and update the GitHub Pages
-3. Update Heroku demo
 

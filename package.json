@@ -79,9 +79,15 @@
     "visual"
   ],
   "devDependencies": {
-    "bulma": "0.0.21",
+    "brfs": "^1.4.3",
+    "browserify": "^13.0.0",
+    "istanbul": "^0.4.3",
     "mocha": "^2.4.5",
+    "mocha-lcov-reporter": "^1.2.0",
+    "pre-commit": "^1.1.2",
     "should": "^8.2.2",
-    "supertest": "^1.2.0"
+    "standard": "^6.0.8",
+    "supertest": "^1.2.0",
+    "uglify-js": "^2.6.2"
   }
 }
