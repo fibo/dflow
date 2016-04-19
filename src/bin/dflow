@@ -2,6 +2,15 @@
 
 process.title = 'dflow'
 
+// TODO use budo for edit or run client side actions
+// add run server side and validate actions
+// possible actions
+//
+// serve: renders graph client side
+// edit: opens editor
+// run: executes server side
+// validate: checks that graph is ok
+
 var fs = require('fs')
 var nopt = require('nopt')
 var path = require('path')
