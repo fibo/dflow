@@ -1,1 +1,1 @@
-exports.version = require('./version')
+exports.info = require('./info')
