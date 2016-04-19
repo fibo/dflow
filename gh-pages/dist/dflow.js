@@ -248,6 +248,8 @@ exports.apply = function (fun, thisArg, argsArray) {
 
 exports['.'] = function (obj, prop) { return obj[prop] }
 
+exports['='] = function (a, b) { return a = b }
+
 exports['typeof'] = function (a) { return typeof a }
 
 exports['new'] = function () {
