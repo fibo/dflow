@@ -1,6 +1,6 @@
-
 var should = require('should')
-var fun = require('../src/engine/fun')
+
+var fun = require('engine/fun')
 
 describe('fun', function () {
   it('returns a function', function () {
