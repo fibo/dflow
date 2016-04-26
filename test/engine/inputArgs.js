@@ -1,4 +1,4 @@
-var inputArgs = require('../../src/engine/inputArgs')
+var inputArgs = require('engine/inputArgs')
 
 var pipe = {
   'a': [ '0', '1', 0 ],

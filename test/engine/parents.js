@@ -1,4 +1,4 @@
-var parents = require('../../src/engine/parents')
+var parents = require('engine/parents')
 
 var pipe = {
   'a': [ '0', '1' ],

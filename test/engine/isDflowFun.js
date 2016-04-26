@@ -1,8 +1,8 @@
-describe('isDflowFun', function () {
-  var examples = require('../../src/examples')
-  var fun = require('../../src/engine/fun')
-  var isDflowFun = require('../../src/engine/isDflowFun')
+var examples = require('examples')
+var fun = require('engine/fun')
+var isDflowFun = require('engine/isDflowFun')
 
+describe('isDflowFun', function () {
   var context = (typeof window === 'object') ? 'client' : 'server'
 
   describe('returns false if it', function () {
