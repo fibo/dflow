@@ -1,1 +1,0 @@
-exports.info = require('./info')
