@@ -2,5 +2,29 @@
 
 process.title = 'dflow'
 
-console.log(process.argv)
+var nopt = require('nopt')
 
+var pkg = require('../../package.json')
+var usage = require('./usage')
+
+var knownOpts = {
+  help: Boolean,
+  version: Boolean
+}
+var shortHandOpts = {
+  h: '--help'
+}
+
+var opt = nopt(knownOpts, shortHandOpts, process.argv, 2)
+
+if (opt.help) {
+  console.log(usage)
+  process.exit(0)
+}
+
+if (opt.version) {
+  console.log(pkg.version)
+  process.exit(0)
+}
+
+console.log(opt.argv.remain)
