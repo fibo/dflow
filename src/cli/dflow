@@ -6,6 +6,10 @@ var nopt = require('nopt')
 
 var pkg = require('../../package.json')
 var usage = require('./usage')
+var actions = require('./actions')
+
+var edit = actions.edit
+var validate = actions.validate
 
 var knownOpts = {
   help: Boolean,
@@ -27,4 +31,6 @@ if (opt.version) {
   process.exit(0)
 }
 
-console.log(opt.argv.remain)
+var remain = opt.argv.remain
+
+if (remain[0] === 'validate') validate()

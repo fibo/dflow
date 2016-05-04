@@ -62,12 +62,12 @@
   ],
   "dependencies": {
     "body-parser": "^1.14.1",
-    "budo": "^8.2.1",
+    "budo": "^8.2.2",
     "connect": "^3.4.1",
     "debug": "^2.2.0",
     "nopt": "^3.0.4",
     "not-defined": "^1.0.0",
-    "write-file-utf8": "^1.0.0"
+    "write-file-utf8": "^1.1.0"
   },
   "repository": {
     "type": "git",
