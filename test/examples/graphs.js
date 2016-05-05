@@ -1,11 +1,11 @@
 var dflow = require('dflow')
 var should = require('should')
 
-var examples = require('examples')
+var examples = require('examples/graphs')
 
 var context = (typeof window === 'object') ? 'client' : 'server'
 
-describe('example', function () {
+describe('example graph', function () {
   function testExample (name, graph) {
     describe(name, function () {
       var f = dflow.fun(graph)
@@ -35,13 +35,4 @@ describe('example', function () {
     }
   }
 
-  describe('packagedGraph', function () {
-    it('is a dflow graph packages with npm', function () {
-      var graph = require('examples/packagedGraph')
-
-      var sum = dflow.fun(graph)
-
-      sum(2, 2).should.be.eql(4)
-    })
-  })
 })
