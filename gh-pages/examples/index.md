@@ -49,5 +49,5 @@ Also every *dflow* graph is a function itself, so why not packaging it and put i
 
 It is really easy: create your *dflow* graph and save it to a JSON file, *index.json* for instance; then launch `npm init` as usual and when prompted for the *entry point* write *index.json*.
 
-Simple as that, see [packagedGraph](https://github.com/fibo/dflow/tree/master/src/examples/packagedGraph) as an example.
+Simple as that, see [npm-package-minimal](https://github.com/fibo/dflow/tree/master/src/examples/packages/npm-package-minimal) as an example.
 
