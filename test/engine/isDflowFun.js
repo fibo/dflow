@@ -1,4 +1,4 @@
-var examples = require('examples')
+var examples = require('examples/graphs')
 var fun = require('engine/fun')
 var isDflowFun = require('engine/isDflowFun')
 

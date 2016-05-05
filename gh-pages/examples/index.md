@@ -51,3 +51,4 @@ It is really easy: create your *dflow* graph and save it to a JSON file, *index.
 
 Simple as that, see [npm-package-minimal](https://github.com/fibo/dflow/tree/master/src/examples/packages/npm-package-minimal) as an example.
 
+For a more complete example, see [npm-package-template](https://github.com/fibo/dflow/tree/master/src/examples/packages/npm-package-template).
