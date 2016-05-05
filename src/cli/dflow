@@ -15,11 +15,14 @@ var knownOpts = {
   help: Boolean,
   version: Boolean
 }
+
 var shortHandOpts = {
   h: '--help'
 }
 
-var opt = nopt(knownOpts, shortHandOpts, process.argv, 2)
+var args = process.argv
+
+var opt = nopt(knownOpts, shortHandOpts, args, 2)
 
 if (opt.help) {
   console.log(usage)
@@ -33,4 +36,9 @@ if (opt.version) {
 
 var remain = opt.argv.remain
 
-if (remain[0] === 'validate') validate()
+// Default action is *edit*
+if (remain.length === 0) edit(args)
+
+if (remain[0] === 'edit') edit(args)
+
+if (remain[0] === 'validate') validate(args)

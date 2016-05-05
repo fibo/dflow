@@ -39,10 +39,10 @@ A *graph* has the following properties
   * `123`: any number or float will resolve to a function that returns that number.
   * `// comment`: every task starting with `//` is ignored.
 
-Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by following the rules:
+Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by the following rules:
 
-  * cannot be the name of an injected function: `return`, `arguments`, `arguments[0]` ... `arguments[N]`, `this` and `this.graph` are reserved names.
-  * cannot start with a dot, ampersand or at sign: names `@foo`, `&bar`, `.quz` and `.quz()` for an additional function are not allowed.
+  * cannot be the name of an injected function: `arguments[0]` ... `arguments[N]`, [reserver keys][reserved-keys] like `this` and `return` are not allowed.
+  * cannot start with a *dot*, *ampersand* or *at sign*: names `@foo`, `&bar`, `.quz` and `.quz()` for an additional function are not allowed.
 
 ## Info
 
@@ -59,3 +59,5 @@ If not specified, it is assumed to be *universal* a.k.a. *isomorphic*.
 
 [flow-view]: http://g14n.info/flow-view
 [builtin-functions]: https://github.com/fibo/dflow/blob/master/src/engine/functions/builtin.js
+[reserved-keys]: https://github.com/fibo/dflow/blob/master/src/engine/reservedKeys.js
+

@@ -1,3 +1,4 @@
+// Also arguments[0] ... arguments[N] are reserved.
 module.exports = [
   'arguments',
   'dflow.fun',

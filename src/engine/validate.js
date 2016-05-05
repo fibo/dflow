@@ -37,7 +37,6 @@ function validate (graph, additionalFunctions) {
 
   if (typeof additionalFunctions === 'object') {
     for (var taskName in additionalFunctions) {
-      var reservedKeys = ['return', 'arguments', 'this', 'this.graph']
       var throwIfEqualsTaskName = throwIfEquals.bind(null, taskName)
 
       reservedKeys.forEach(throwIfEqualsTaskName)

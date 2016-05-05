@@ -1,43 +1,63 @@
-// var createEmptyGraph = require('../../engine/createEmptyGraph')
-// var fs = require('fs')
+var budo = require('budo')
+var createEmptyGraph = require('../../../engine/createEmptyGraph')
+var fs = require('fs')
 var nopt = require('nopt')
-var path = require('path')
 var usage = require('./usage')
+var path = require('path')
+var utils = require('../../utils')
+
+var info = require('../../../rest/info.js')
+var middleware = [info]
+
+var dotJson = utils.dotJson
+var appendCwd = utils.appendCwd
 
 var knownOpts = {
   help: Boolean
 }
+
 var shortHandOpts = {
   h: '--help'
 }
 
-var opt = nopt(knownOpts, shortHandOpts, process.argv, 3)
-
-if (opt.help) {
-  console.log(usage)
-  process.exit(0)
+function startServer () {
+  console.log('startServer')
+  budo(null, {
+    dir: [ path.join(__dirname, '../../../editor/static') ],
+    middleware: middleware,
+    debug: true,
+    live: true
+  })
 }
 
-var remain = opt.argv.remain
+module.exports = (args) => {
+  var opt = nopt(knownOpts, shortHandOpts, args, 3)
 
-function appendCurrentWorkingDir (givenPath) {
-  return path.join(process.cwd(), givenPath)
-}
-
-var graphPath = remain.map(appendCurrentWorkingDir)
-
-function checkGraphPath (err, stats) {
-  if (err && err.code === 'ENOENT') {
-//    createEmptyGraph(graphPath, editorServer.bind(null, graphPath, opt))
-  } else {
-    if (stats.isFile()) {
-//      editorServer(graphPath, opt)
-    }
+  if (opt.help) {
+    console.log(usage)
+    process.exit(0)
   }
-}
 
-if (typeof graphPath === 'undefined') {
-//  editorServer(graphPath, opt)
-} else {
-//  fs.stat(graphPath, checkGraphPath)
+  var graphPath = null
+  var remain = opt.argv.remain
+
+  if (remain.length === 0) {
+    graphPath = 'graph.json'
+  } else {
+    graphPath = remain.filter(dotJson)
+                      .map(appendCwd)
+                      .shift()
+  }
+
+  fs.stat(graphPath, (err, stats) => {
+    if (err && err.code === 'ENOENT') {
+      createEmptyGraph(graphPath, () => {
+        startServer()
+      })
+    } else {
+      if (stats.isFile()) {
+        startServer()
+      }
+    }
+  })
 }
