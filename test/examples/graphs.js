@@ -34,5 +34,4 @@ describe('example graph', function () {
       testExample(exampleName, exampleGraph)
     }
   }
-
 })
