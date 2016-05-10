@@ -1,9 +1,7 @@
 {
   "name": "dflow",
   "main": [
-    "dist/dflow.js",
-    "dist/dflow.map",
-    "dist/dflow.min.js"
+    "dist/dflow.js"
   ],
   "homepage": "http://g14n.info/dflow",
   "authors": [
