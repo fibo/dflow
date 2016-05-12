@@ -1,23 +1,23 @@
-var connect = require('connect')
-var http = require('http')
+var express = require('express')
 var request = require('supertest')
+var routes = require('server/routes')
+
+var info = routes.info
+var app = express()
+
+app.get('/info', info)
 
 var pkg = require('../../../package.json')
-var info = require('server/routes/info')
 
-describe('info', function () {
+describe('GET /info', function () {
   it('returns package info', function (done) {
-    var app = connect()
-
-    app.use('/info', info)
-
-    var server = http.createServer(app)
-
-    request(server).get('/info')
-                   .set('Accept', 'application/json')
-                   .expect(200, {
-                     name: pkg.name,
-                     version: pkg.version
-                   }, done)
+    request(app)
+      .get('/info')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, {
+        name: pkg.name,
+        version: pkg.version
+      }, done)
   })
 })
