@@ -112,6 +112,6 @@ My goal is to say to a *dflow* user:
 > Mamma mia! Did you achieve that with dflow?
 
 [dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
-[dflow-editor]: http://g14n.info/dflow/editor "dflow editor"
+[dflow-editor]: http://g14n.info/dflow/cli#editor "dflow editor"
 [hello-world]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
 
