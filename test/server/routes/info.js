@@ -2,8 +2,8 @@ var connect = require('connect')
 var http = require('http')
 var request = require('supertest')
 
-var pkg = require('../../package.json')
-var info = require('../../src/rest/info')
+var pkg = require('../../../package.json')
+var info = require('server/routes/info')
 
 describe('info', function () {
   it('returns package info', function (done) {

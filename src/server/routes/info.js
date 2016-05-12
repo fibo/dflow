@@ -1,4 +1,4 @@
-var pkg = require('../../package.json')
+var pkg = require('../../../package.json')
 
 function info (req, res) {
   res.setHeader('Content-Type', 'application/json')
