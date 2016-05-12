@@ -1,4 +1,3 @@
-var budo = require('budo')
 var createEmptyGraph = require('../../../engine/createEmptyGraph')
 var fs = require('fs')
 var nopt = require('nopt')
@@ -21,13 +20,8 @@ var shortHandOpts = {
 }
 
 function startServer () {
-  console.log('startServer')
-  budo(null, {
-    dir: [ path.join(__dirname, '../../../editor/static') ],
-    middleware: middleware,
-    debug: true,
-    live: true
-  })
+  var staticDir = path.join(__dirname, '../../../editor/static')
+  console.log(staticDir)
 }
 
 module.exports = (args) => {
