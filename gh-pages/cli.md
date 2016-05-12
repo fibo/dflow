@@ -1,10 +1,12 @@
 ---
-title: Editor
+title: CLI
 ---
 
-# Editor
+# CLI
 
-## Usage
+## Editor
+
+### Usage
 
 Launch *dflow* from command line, and start editing your first graph using your favourite browser.
 
@@ -32,7 +34,7 @@ Drag an output into an input to create a pipe.
 
 Click on a pipe to delete it.
 
-## Environment
+### Environment
 
 Set `DEBUG=dflow` environment variable to enable [debug](https://www.npmjs.com/package/debug) messages.
 
