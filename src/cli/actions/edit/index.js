@@ -1,12 +1,10 @@
+var app = require('../../../server/app')
 var createEmptyGraph = require('../../../engine/createEmptyGraph')
 var fs = require('fs')
 var nopt = require('nopt')
 var usage = require('./usage')
-var path = require('path')
+var http = require('http')
 var utils = require('../../utils')
-
-var info = require('../../../rest/info.js')
-var middleware = [info]
 
 var dotJson = utils.dotJson
 var appendCwd = utils.appendCwd
@@ -20,8 +18,11 @@ var shortHandOpts = {
 }
 
 function startServer () {
-  var staticDir = path.join(__dirname, '../../../editor/static')
-  console.log(staticDir)
+  var port = 3000
+
+  var server = http.Server(app)
+
+  server.listen(port)
 }
 
 module.exports = (args) => {
