@@ -1,10 +1,10 @@
 var express = require('express')
-var routes = require('./routes')
+var Router = require('./Router')
 
 var info = routes.info
 
 var app = express()
-
-app.get('/info', info)
+var router = new Router()
+router.registerRoutesOn(app)
 
 module.exports = app

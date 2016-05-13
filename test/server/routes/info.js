@@ -2,7 +2,7 @@ var express = require('express')
 var request = require('supertest')
 var routes = require('server/routes')
 
-var info = routes.info
+var info = routes.GET['/info']
 var app = express()
 
 app.get('/info', info)
