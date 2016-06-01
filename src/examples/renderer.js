@@ -1,20 +1,18 @@
 var Canvas = require('flow-view').Canvas
 var dflow = require('../../index')
-var examples = require('./index')
+var graphs = require('./graphs')
 
 /**
- * Render example into given div.
- *
- * Alos, execute dflow graph.
+ * Render example into given div and execute dflow graph.
  *
  * @param {String} divId
  * @param {String} example
  *
- * @returns {Object} graph
+ * @returns {undefined}
  */
 
 function renderExample (divId, example) {
-  var graph = examples[example]
+  var graph = graphs[example]
 
   var canvas = new Canvas(divId)
 

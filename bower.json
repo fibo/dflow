@@ -18,7 +18,6 @@
   "license": "MIT",
   "ignore": [
     "**/.*",
-    "bin",
     "gh-pages",
     "index.js",
     "node_modules",

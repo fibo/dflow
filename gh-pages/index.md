@@ -7,17 +7,15 @@ title: dflow
 
 [![Join the chat at https://gitter.im/fibo/dflow](https://badges.gitter.im/fibo/dflow.svg)](https://gitter.im/fibo/dflow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-**Table Of Contents:**
+[Installation](#installation) |
+[Examples](http://g14n.info/dflow/examples) |
+[Editor][dflow-editor] |
+[Api](http://g14n.info/dflow/api) |
+[Specification](http://g14n.info/dflow/specification) |
+[Contributing](http://g14n.info/dflow/contributing) |
+[Support and license](#support-and-license)
 
-* [Installation](#installation)
-* [Examples](http://g14n.info/dflow/examples)
-* [Editor][dflow-editor]
-* [Api](http://g14n.info/dflow/api)
-* [Specification](http://g14n.info/dflow/specification)
-* [Contributing](http://g14n.info/dflow/contributing)
-* [Support and license](#support-and-license)
-
-[![Node engine](https://img.shields.io/node/v/dflow.svg)](https://nodejs.org/en/) [![NPM version](https://badge.fury.io/js/dflow.svg)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.svg?branch=master)](https://travis-ci.org/fibo/dflow?branch=master) [![Dependency Status](https://gemnasium.com/fibo/dflow.svg)](https://gemnasium.com/fibo/dflow) [![Coverage Status](https://coveralls.io/repos/fibo/dflow/badge.svg?branch=master)](https://coveralls.io/r/fibo/dflow?branch=master) [![Test page](https://img.shields.io/badge/test-page-blue.svg)](http://g14n.info/dflow/test) [![Change log](https://img.shields.io/badge/change-log-blue.svg)](http://g14n.info/dflow/changelog)
+[![Node engine](https://img.shields.io/node/v/dflow.svg)](https://nodejs.org/en/) [![NPM version](https://badge.fury.io/js/dflow.svg)](http://badge.fury.io/js/dflow) [![Build Status](https://travis-ci.org/fibo/dflow.svg?branch=master)](https://travis-ci.org/fibo/dflow?branch=master) [![Dependency Status](https://david-dm.org/fibo/dflow.svg)](https://david-dm.org/fibo/dflow) [![Coverage Status](https://coveralls.io/repos/fibo/dflow/badge.svg?branch=master)](https://coveralls.io/r/fibo/dflow?branch=master) [![Test page](https://img.shields.io/badge/test-page-blue.svg)](http://g14n.info/dflow/test) [![Change log](https://img.shields.io/badge/change-log-blue.svg)](http://g14n.info/dflow/changelog)
 
 [![Whatchers](http://g14n.info/svg/github/watchers/dflow.svg)](https://github.com/fibo/dflow/watchers) [![Stargazers](http://g14n.info/svg/github/stars/dflow.svg)](https://github.com/fibo/dflow/stargazers) [![Forks](http://g14n.info/svg/github/forks/dflow.svg)](https://github.com/fibo/dflow/network/members)
 
@@ -115,6 +113,6 @@ My goal is to say to a *dflow* user:
 > Mamma mia! Did you achieve that with dflow?
 
 [dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
-[dflow-editor]: http://g14n.info/dflow/editor "dflow editor"
+[dflow-editor]: http://g14n.info/dflow/cli#editor "dflow editor"
 [hello-world]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
 

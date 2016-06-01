@@ -248,7 +248,7 @@ exports.apply = function (fun, thisArg, argsArray) {
 
 exports['.'] = function (obj, prop) { return obj[prop] }
 
-exports['='] = function (a, b) { return a = b }
+exports['='] = function (a, b) { return (a = b) }
 
 exports['typeof'] = function (a) { return typeof a }
 
@@ -914,6 +914,7 @@ module.exports = /^\&(.+)$/
 module.exports = /^\/[\w][\w\d]+$/
 
 },{}],25:[function(require,module,exports){
+// Also arguments[0] ... arguments[N] are reserved.
 module.exports = [
   'arguments',
   'dflow.fun',
@@ -964,7 +965,6 @@ function validate (graph, additionalFunctions) {
 
   if (typeof additionalFunctions === 'object') {
     for (var taskName in additionalFunctions) {
-      var reservedKeys = ['return', 'arguments', 'this', 'this.graph']
       var throwIfEqualsTaskName = throwIfEquals.bind(null, taskName)
 
       reservedKeys.forEach(throwIfEqualsTaskName)

@@ -1,9 +1,10 @@
 *~
 node_modules
 npm-debug.log
+
+# Jekyll stuff
 Gemfile*
 gh-pages/_site
-gh-pages/test/bundle.js
 
 # Running dflow cli with no arguments will create this file
 graph.json
@@ -11,6 +12,3 @@ graph.json
 # Test coverage
 coverage
 .coveralls.yml
-
-# src/editor/client/public/.gitignore
-# src/editor/client/bower_components/.gitignore
