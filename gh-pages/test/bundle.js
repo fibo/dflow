@@ -128,9 +128,6 @@ var isArray = require('isarray')
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
 exports.INSPECT_MAX_BYTES = 50
-Buffer.poolSize = 8192 // not used by this implementation
-
-var rootParent = {}
 
 /**
  * If `Buffer.TYPED_ARRAY_SUPPORT`:
@@ -160,6 +157,11 @@ Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== undefined
   ? global.TYPED_ARRAY_SUPPORT
   : typedArraySupport()
 
+/*
+ * Export kMaxLength after typed array support is determined.
+ */
+exports.kMaxLength = kMaxLength()
+
 function typedArraySupport () {
   try {
     var arr = new Uint8Array(1)
@@ -178,6 +180,25 @@ function kMaxLength () {
     : 0x3fffffff
 }
 
+function createBuffer (that, length) {
+  if (kMaxLength() < length) {
+    throw new RangeError('Invalid typed array length')
+  }
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    // Return an augmented `Uint8Array` instance, for best performance
+    that = new Uint8Array(length)
+    that.__proto__ = Buffer.prototype
+  } else {
+    // Fallback: Return an object instance of the Buffer class
+    if (that === null) {
+      that = new Buffer(length)
+    }
+    that.length = length
+  }
+
+  return that
+}
+
 /**
  * The Buffer constructor returns instances of `Uint8Array` that have their
  * prototype changed to `Buffer.prototype`. Furthermore, `Buffer` is a subclass of
@@ -187,31 +208,25 @@ function kMaxLength () {
  *
  * The `Uint8Array` prototype remains unmodified.
  */
-function Buffer (arg) {
-  if (!(this instanceof Buffer)) {
-    // Avoid going through an ArgumentsAdaptorTrampoline in the common case.
-    if (arguments.length > 1) return new Buffer(arg, arguments[1])
-    return new Buffer(arg)
-  }
 
-  if (!Buffer.TYPED_ARRAY_SUPPORT) {
-    this.length = 0
-    this.parent = undefined
+function Buffer (arg, encodingOrOffset, length) {
+  if (!Buffer.TYPED_ARRAY_SUPPORT && !(this instanceof Buffer)) {
+    return new Buffer(arg, encodingOrOffset, length)
   }
 
   // Common case.
   if (typeof arg === 'number') {
-    return fromNumber(this, arg)
+    if (typeof encodingOrOffset === 'string') {
+      throw new Error(
+        'If encoding is specified then the first argument must be a string'
+      )
+    }
+    return allocUnsafe(this, arg)
   }
-
-  // Slightly less common case.
-  if (typeof arg === 'string') {
-    return fromString(this, arg, arguments.length > 1 ? arguments[1] : 'utf8')
-  }
-
-  // Unusual.
-  return fromObject(this, arg)
+  return from(this, arg, encodingOrOffset, length)
 }
+
+Buffer.poolSize = 8192 // not used by this implementation
 
 // TODO: Legacy, not needed anymore. Remove in next major version.
 Buffer._augment = function (arr) {
@@ -219,118 +234,32 @@ Buffer._augment = function (arr) {
   return arr
 }
 
-function fromNumber (that, length) {
-  that = allocate(that, length < 0 ? 0 : checked(length) | 0)
-  if (!Buffer.TYPED_ARRAY_SUPPORT) {
-    for (var i = 0; i < length; i++) {
-      that[i] = 0
-    }
+function from (that, value, encodingOrOffset, length) {
+  if (typeof value === 'number') {
+    throw new TypeError('"value" argument must not be a number')
   }
-  return that
+
+  if (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) {
+    return fromArrayBuffer(that, value, encodingOrOffset, length)
+  }
+
+  if (typeof value === 'string') {
+    return fromString(that, value, encodingOrOffset)
+  }
+
+  return fromObject(that, value)
 }
 
-function fromString (that, string, encoding) {
-  if (typeof encoding !== 'string' || encoding === '') encoding = 'utf8'
-
-  // Assumption: byteLength() return value is always < kMaxLength.
-  var length = byteLength(string, encoding) | 0
-  that = allocate(that, length)
-
-  that.write(string, encoding)
-  return that
-}
-
-function fromObject (that, object) {
-  if (Buffer.isBuffer(object)) return fromBuffer(that, object)
-
-  if (isArray(object)) return fromArray(that, object)
-
-  if (object == null) {
-    throw new TypeError('must start with number, buffer, array or string')
-  }
-
-  if (typeof ArrayBuffer !== 'undefined') {
-    if (object.buffer instanceof ArrayBuffer) {
-      return fromTypedArray(that, object)
-    }
-    if (object instanceof ArrayBuffer) {
-      return fromArrayBuffer(that, object)
-    }
-  }
-
-  if (object.length) return fromArrayLike(that, object)
-
-  return fromJsonObject(that, object)
-}
-
-function fromBuffer (that, buffer) {
-  var length = checked(buffer.length) | 0
-  that = allocate(that, length)
-  buffer.copy(that, 0, 0, length)
-  return that
-}
-
-function fromArray (that, array) {
-  var length = checked(array.length) | 0
-  that = allocate(that, length)
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
-  }
-  return that
-}
-
-// Duplicate of fromArray() to keep fromArray() monomorphic.
-function fromTypedArray (that, array) {
-  var length = checked(array.length) | 0
-  that = allocate(that, length)
-  // Truncating the elements is probably not what people expect from typed
-  // arrays with BYTES_PER_ELEMENT > 1 but it's compatible with the behavior
-  // of the old Buffer constructor.
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
-  }
-  return that
-}
-
-function fromArrayBuffer (that, array) {
-  array.byteLength // this throws if `array` is not a valid ArrayBuffer
-
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    // Return an augmented `Uint8Array` instance, for best performance
-    that = new Uint8Array(array)
-    that.__proto__ = Buffer.prototype
-  } else {
-    // Fallback: Return an object instance of the Buffer class
-    that = fromTypedArray(that, new Uint8Array(array))
-  }
-  return that
-}
-
-function fromArrayLike (that, array) {
-  var length = checked(array.length) | 0
-  that = allocate(that, length)
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
-  }
-  return that
-}
-
-// Deserialize { type: 'Buffer', data: [1,2,3,...] } into a Buffer object.
-// Returns a zero-length buffer for inputs that don't conform to the spec.
-function fromJsonObject (that, object) {
-  var array
-  var length = 0
-
-  if (object.type === 'Buffer' && isArray(object.data)) {
-    array = object.data
-    length = checked(array.length) | 0
-  }
-  that = allocate(that, length)
-
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
-  }
-  return that
+/**
+ * Functionally equivalent to Buffer(arg, encoding) but throws a TypeError
+ * if value is a number.
+ * Buffer.from(str[, encoding])
+ * Buffer.from(array)
+ * Buffer.from(buffer)
+ * Buffer.from(arrayBuffer[, byteOffset[, length]])
+ **/
+Buffer.from = function (value, encodingOrOffset, length) {
+  return from(null, value, encodingOrOffset, length)
 }
 
 if (Buffer.TYPED_ARRAY_SUPPORT) {
@@ -344,26 +273,143 @@ if (Buffer.TYPED_ARRAY_SUPPORT) {
       configurable: true
     })
   }
-} else {
-  // pre-set for values that may exist in the future
-  Buffer.prototype.length = undefined
-  Buffer.prototype.parent = undefined
 }
 
-function allocate (that, length) {
+function assertSize (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('"size" argument must be a number')
+  }
+}
+
+function alloc (that, size, fill, encoding) {
+  assertSize(size)
+  if (size <= 0) {
+    return createBuffer(that, size)
+  }
+  if (fill !== undefined) {
+    // Only pay attention to encoding if it's a string. This
+    // prevents accidentally sending in a number that would
+    // be interpretted as a start offset.
+    return typeof encoding === 'string'
+      ? createBuffer(that, size).fill(fill, encoding)
+      : createBuffer(that, size).fill(fill)
+  }
+  return createBuffer(that, size)
+}
+
+/**
+ * Creates a new filled Buffer instance.
+ * alloc(size[, fill[, encoding]])
+ **/
+Buffer.alloc = function (size, fill, encoding) {
+  return alloc(null, size, fill, encoding)
+}
+
+function allocUnsafe (that, size) {
+  assertSize(size)
+  that = createBuffer(that, size < 0 ? 0 : checked(size) | 0)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) {
+    for (var i = 0; i < size; i++) {
+      that[i] = 0
+    }
+  }
+  return that
+}
+
+/**
+ * Equivalent to Buffer(num), by default creates a non-zero-filled Buffer instance.
+ * */
+Buffer.allocUnsafe = function (size) {
+  return allocUnsafe(null, size)
+}
+/**
+ * Equivalent to SlowBuffer(num), by default creates a non-zero-filled Buffer instance.
+ */
+Buffer.allocUnsafeSlow = function (size) {
+  return allocUnsafe(null, size)
+}
+
+function fromString (that, string, encoding) {
+  if (typeof encoding !== 'string' || encoding === '') {
+    encoding = 'utf8'
+  }
+
+  if (!Buffer.isEncoding(encoding)) {
+    throw new TypeError('"encoding" must be a valid string encoding')
+  }
+
+  var length = byteLength(string, encoding) | 0
+  that = createBuffer(that, length)
+
+  that.write(string, encoding)
+  return that
+}
+
+function fromArrayLike (that, array) {
+  var length = checked(array.length) | 0
+  that = createBuffer(that, length)
+  for (var i = 0; i < length; i += 1) {
+    that[i] = array[i] & 255
+  }
+  return that
+}
+
+function fromArrayBuffer (that, array, byteOffset, length) {
+  array.byteLength // this throws if `array` is not a valid ArrayBuffer
+
+  if (byteOffset < 0 || array.byteLength < byteOffset) {
+    throw new RangeError('\'offset\' is out of bounds')
+  }
+
+  if (array.byteLength < byteOffset + (length || 0)) {
+    throw new RangeError('\'length\' is out of bounds')
+  }
+
+  if (length === undefined) {
+    array = new Uint8Array(array, byteOffset)
+  } else {
+    array = new Uint8Array(array, byteOffset, length)
+  }
+
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     // Return an augmented `Uint8Array` instance, for best performance
-    that = new Uint8Array(length)
+    that = array
     that.__proto__ = Buffer.prototype
   } else {
     // Fallback: Return an object instance of the Buffer class
-    that.length = length
+    that = fromArrayLike(that, array)
+  }
+  return that
+}
+
+function fromObject (that, obj) {
+  if (Buffer.isBuffer(obj)) {
+    var len = checked(obj.length) | 0
+    that = createBuffer(that, len)
+
+    if (that.length === 0) {
+      return that
+    }
+
+    obj.copy(that, 0, 0, len)
+    return that
   }
 
-  var fromPool = length !== 0 && length <= Buffer.poolSize >>> 1
-  if (fromPool) that.parent = rootParent
+  if (obj) {
+    if ((typeof ArrayBuffer !== 'undefined' &&
+        obj.buffer instanceof ArrayBuffer) || 'length' in obj) {
+      if (typeof obj.length !== 'number' || isnan(obj.length)) {
+        return createBuffer(that, 0)
+      }
+      return fromArrayLike(that, obj)
+    }
 
-  return that
+    if (obj.type === 'Buffer' && isArray(obj.data)) {
+      return fromArrayLike(that, obj.data)
+    }
+  }
+
+  throw new TypeError('First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.')
 }
 
 function checked (length) {
@@ -376,12 +422,11 @@ function checked (length) {
   return length | 0
 }
 
-function SlowBuffer (subject, encoding) {
-  if (!(this instanceof SlowBuffer)) return new SlowBuffer(subject, encoding)
-
-  var buf = new Buffer(subject, encoding)
-  delete buf.parent
-  return buf
+function SlowBuffer (length) {
+  if (+length != length) { // eslint-disable-line eqeqeq
+    length = 0
+  }
+  return Buffer.alloc(+length)
 }
 
 Buffer.isBuffer = function isBuffer (b) {
@@ -431,10 +476,12 @@ Buffer.isEncoding = function isEncoding (encoding) {
 }
 
 Buffer.concat = function concat (list, length) {
-  if (!isArray(list)) throw new TypeError('list argument must be an Array of Buffers.')
+  if (!isArray(list)) {
+    throw new TypeError('"list" argument must be an Array of Buffers')
+  }
 
   if (list.length === 0) {
-    return new Buffer(0)
+    return Buffer.alloc(0)
   }
 
   var i
@@ -445,18 +492,30 @@ Buffer.concat = function concat (list, length) {
     }
   }
 
-  var buf = new Buffer(length)
+  var buffer = Buffer.allocUnsafe(length)
   var pos = 0
   for (i = 0; i < list.length; i++) {
-    var item = list[i]
-    item.copy(buf, pos)
-    pos += item.length
+    var buf = list[i]
+    if (!Buffer.isBuffer(buf)) {
+      throw new TypeError('"list" argument must be an Array of Buffers')
+    }
+    buf.copy(buffer, pos)
+    pos += buf.length
   }
-  return buf
+  return buffer
 }
 
 function byteLength (string, encoding) {
-  if (typeof string !== 'string') string = '' + string
+  if (Buffer.isBuffer(string)) {
+    return string.length
+  }
+  if (typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function' &&
+      (ArrayBuffer.isView(string) || string instanceof ArrayBuffer)) {
+    return string.byteLength
+  }
+  if (typeof string !== 'string') {
+    string = '' + string
+  }
 
   var len = string.length
   if (len === 0) return 0
@@ -473,6 +532,7 @@ function byteLength (string, encoding) {
         return len
       case 'utf8':
       case 'utf-8':
+      case undefined:
         return utf8ToBytes(string).length
       case 'ucs2':
       case 'ucs-2':
@@ -495,13 +555,39 @@ Buffer.byteLength = byteLength
 function slowToString (encoding, start, end) {
   var loweredCase = false
 
-  start = start | 0
-  end = end === undefined || end === Infinity ? this.length : end | 0
+  // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
+  // property of a typed array.
+
+  // This behaves neither like String nor Uint8Array in that we set start/end
+  // to their upper/lower bounds if the value passed is out of range.
+  // undefined is handled specially as per ECMA-262 6th Edition,
+  // Section 13.3.3.7 Runtime Semantics: KeyedBindingInitialization.
+  if (start === undefined || start < 0) {
+    start = 0
+  }
+  // Return early if start > this.length. Done here to prevent potential uint32
+  // coercion fail below.
+  if (start > this.length) {
+    return ''
+  }
+
+  if (end === undefined || end > this.length) {
+    end = this.length
+  }
+
+  if (end <= 0) {
+    return ''
+  }
+
+  // Force coersion to uint32. This will also coerce falsey/NaN values to 0.
+  end >>>= 0
+  start >>>= 0
+
+  if (end <= start) {
+    return ''
+  }
 
   if (!encoding) encoding = 'utf8'
-  if (start < 0) start = 0
-  if (end > this.length) end = this.length
-  if (end <= start) return ''
 
   while (true) {
     switch (encoding) {
@@ -539,6 +625,35 @@ function slowToString (encoding, start, end) {
 // Buffer instances.
 Buffer.prototype._isBuffer = true
 
+function swap (b, n, m) {
+  var i = b[n]
+  b[n] = b[m]
+  b[m] = i
+}
+
+Buffer.prototype.swap16 = function swap16 () {
+  var len = this.length
+  if (len % 2 !== 0) {
+    throw new RangeError('Buffer size must be a multiple of 16-bits')
+  }
+  for (var i = 0; i < len; i += 2) {
+    swap(this, i, i + 1)
+  }
+  return this
+}
+
+Buffer.prototype.swap32 = function swap32 () {
+  var len = this.length
+  if (len % 4 !== 0) {
+    throw new RangeError('Buffer size must be a multiple of 32-bits')
+  }
+  for (var i = 0; i < len; i += 4) {
+    swap(this, i, i + 3)
+    swap(this, i + 1, i + 2)
+  }
+  return this
+}
+
 Buffer.prototype.toString = function toString () {
   var length = this.length | 0
   if (length === 0) return ''
@@ -562,14 +677,114 @@ Buffer.prototype.inspect = function inspect () {
   return '<Buffer ' + str + '>'
 }
 
-Buffer.prototype.compare = function compare (b) {
-  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  return Buffer.compare(this, b)
+Buffer.prototype.compare = function compare (target, start, end, thisStart, thisEnd) {
+  if (!Buffer.isBuffer(target)) {
+    throw new TypeError('Argument must be a Buffer')
+  }
+
+  if (start === undefined) {
+    start = 0
+  }
+  if (end === undefined) {
+    end = target ? target.length : 0
+  }
+  if (thisStart === undefined) {
+    thisStart = 0
+  }
+  if (thisEnd === undefined) {
+    thisEnd = this.length
+  }
+
+  if (start < 0 || end > target.length || thisStart < 0 || thisEnd > this.length) {
+    throw new RangeError('out of range index')
+  }
+
+  if (thisStart >= thisEnd && start >= end) {
+    return 0
+  }
+  if (thisStart >= thisEnd) {
+    return -1
+  }
+  if (start >= end) {
+    return 1
+  }
+
+  start >>>= 0
+  end >>>= 0
+  thisStart >>>= 0
+  thisEnd >>>= 0
+
+  if (this === target) return 0
+
+  var x = thisEnd - thisStart
+  var y = end - start
+  var len = Math.min(x, y)
+
+  var thisCopy = this.slice(thisStart, thisEnd)
+  var targetCopy = target.slice(start, end)
+
+  for (var i = 0; i < len; ++i) {
+    if (thisCopy[i] !== targetCopy[i]) {
+      x = thisCopy[i]
+      y = targetCopy[i]
+      break
+    }
+  }
+
+  if (x < y) return -1
+  if (y < x) return 1
+  return 0
 }
 
-Buffer.prototype.indexOf = function indexOf (val, byteOffset) {
-  if (byteOffset > 0x7fffffff) byteOffset = 0x7fffffff
-  else if (byteOffset < -0x80000000) byteOffset = -0x80000000
+function arrayIndexOf (arr, val, byteOffset, encoding) {
+  var indexSize = 1
+  var arrLength = arr.length
+  var valLength = val.length
+
+  if (encoding !== undefined) {
+    encoding = String(encoding).toLowerCase()
+    if (encoding === 'ucs2' || encoding === 'ucs-2' ||
+        encoding === 'utf16le' || encoding === 'utf-16le') {
+      if (arr.length < 2 || val.length < 2) {
+        return -1
+      }
+      indexSize = 2
+      arrLength /= 2
+      valLength /= 2
+      byteOffset /= 2
+    }
+  }
+
+  function read (buf, i) {
+    if (indexSize === 1) {
+      return buf[i]
+    } else {
+      return buf.readUInt16BE(i * indexSize)
+    }
+  }
+
+  var foundIndex = -1
+  for (var i = 0; byteOffset + i < arrLength; i++) {
+    if (read(arr, byteOffset + i) === read(val, foundIndex === -1 ? 0 : i - foundIndex)) {
+      if (foundIndex === -1) foundIndex = i
+      if (i - foundIndex + 1 === valLength) return (byteOffset + foundIndex) * indexSize
+    } else {
+      if (foundIndex !== -1) i -= i - foundIndex
+      foundIndex = -1
+    }
+  }
+  return -1
+}
+
+Buffer.prototype.indexOf = function indexOf (val, byteOffset, encoding) {
+  if (typeof byteOffset === 'string') {
+    encoding = byteOffset
+    byteOffset = 0
+  } else if (byteOffset > 0x7fffffff) {
+    byteOffset = 0x7fffffff
+  } else if (byteOffset < -0x80000000) {
+    byteOffset = -0x80000000
+  }
   byteOffset >>= 0
 
   if (this.length === 0) return -1
@@ -579,33 +794,28 @@ Buffer.prototype.indexOf = function indexOf (val, byteOffset) {
   if (byteOffset < 0) byteOffset = Math.max(this.length + byteOffset, 0)
 
   if (typeof val === 'string') {
-    if (val.length === 0) return -1 // special case: looking for empty string always fails
-    return String.prototype.indexOf.call(this, val, byteOffset)
+    val = Buffer.from(val, encoding)
   }
+
   if (Buffer.isBuffer(val)) {
-    return arrayIndexOf(this, val, byteOffset)
+    // special case: looking for empty string/buffer always fails
+    if (val.length === 0) {
+      return -1
+    }
+    return arrayIndexOf(this, val, byteOffset, encoding)
   }
   if (typeof val === 'number') {
     if (Buffer.TYPED_ARRAY_SUPPORT && Uint8Array.prototype.indexOf === 'function') {
       return Uint8Array.prototype.indexOf.call(this, val, byteOffset)
     }
-    return arrayIndexOf(this, [ val ], byteOffset)
-  }
-
-  function arrayIndexOf (arr, val, byteOffset) {
-    var foundIndex = -1
-    for (var i = 0; byteOffset + i < arr.length; i++) {
-      if (arr[byteOffset + i] === val[foundIndex === -1 ? 0 : i - foundIndex]) {
-        if (foundIndex === -1) foundIndex = i
-        if (i - foundIndex + 1 === val.length) return byteOffset + foundIndex
-      } else {
-        foundIndex = -1
-      }
-    }
-    return -1
+    return arrayIndexOf(this, [ val ], byteOffset, encoding)
   }
 
   throw new TypeError('val must be string, number or Buffer')
+}
+
+Buffer.prototype.includes = function includes (val, byteOffset, encoding) {
+  return this.indexOf(val, byteOffset, encoding) !== -1
 }
 
 function hexWrite (buf, string, offset, length) {
@@ -629,7 +839,7 @@ function hexWrite (buf, string, offset, length) {
   }
   for (var i = 0; i < length; i++) {
     var parsed = parseInt(string.substr(i * 2, 2), 16)
-    if (isNaN(parsed)) throw new Error('Invalid hex string')
+    if (isNaN(parsed)) return i
     buf[offset + i] = parsed
   }
   return i
@@ -678,17 +888,16 @@ Buffer.prototype.write = function write (string, offset, length, encoding) {
     }
   // legacy write(string, encoding, offset, length) - remove in v0.13
   } else {
-    var swap = encoding
-    encoding = offset
-    offset = length | 0
-    length = swap
+    throw new Error(
+      'Buffer.write(string, encoding, offset[, length]) is no longer supported'
+    )
   }
 
   var remaining = this.length - offset
   if (length === undefined || length > remaining) length = remaining
 
   if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
-    throw new RangeError('attempt to write outside buffer bounds')
+    throw new RangeError('Attempt to write outside buffer bounds')
   }
 
   if (!encoding) encoding = 'utf8'
@@ -913,8 +1122,6 @@ Buffer.prototype.slice = function slice (start, end) {
     }
   }
 
-  if (newBuf.length) newBuf.parent = this.parent || this
-
   return newBuf
 }
 
@@ -1083,16 +1290,19 @@ Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
 }
 
 function checkInt (buf, value, offset, ext, max, min) {
-  if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
-  if (value > max || value < min) throw new RangeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new RangeError('index out of range')
+  if (!Buffer.isBuffer(buf)) throw new TypeError('"buffer" argument must be a Buffer instance')
+  if (value > max || value < min) throw new RangeError('"value" argument is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('Index out of range')
 }
 
 Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
   value = +value
   offset = offset | 0
   byteLength = byteLength | 0
-  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+  if (!noAssert) {
+    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+    checkInt(this, value, offset, byteLength, maxBytes, 0)
+  }
 
   var mul = 1
   var i = 0
@@ -1108,7 +1318,10 @@ Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, 
   value = +value
   offset = offset | 0
   byteLength = byteLength | 0
-  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+  if (!noAssert) {
+    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+    checkInt(this, value, offset, byteLength, maxBytes, 0)
+  }
 
   var i = byteLength - 1
   var mul = 1
@@ -1211,9 +1424,12 @@ Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, no
 
   var i = 0
   var mul = 1
-  var sub = value < 0 ? 1 : 0
+  var sub = 0
   this[offset] = value & 0xFF
   while (++i < byteLength && (mul *= 0x100)) {
+    if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) {
+      sub = 1
+    }
     this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
   }
 
@@ -1231,9 +1447,12 @@ Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, no
 
   var i = byteLength - 1
   var mul = 1
-  var sub = value < 0 ? 1 : 0
+  var sub = 0
   this[offset + i] = value & 0xFF
   while (--i >= 0 && (mul *= 0x100)) {
+    if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) {
+      sub = 1
+    }
     this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
   }
 
@@ -1308,8 +1527,8 @@ Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) 
 }
 
 function checkIEEE754 (buf, value, offset, ext, max, min) {
-  if (offset + ext > buf.length) throw new RangeError('index out of range')
-  if (offset < 0) throw new RangeError('index out of range')
+  if (offset + ext > buf.length) throw new RangeError('Index out of range')
+  if (offset < 0) throw new RangeError('Index out of range')
 }
 
 function writeFloat (buf, value, offset, littleEndian, noAssert) {
@@ -1393,31 +1612,63 @@ Buffer.prototype.copy = function copy (target, targetStart, start, end) {
   return len
 }
 
-// fill(value, start=0, end=buffer.length)
-Buffer.prototype.fill = function fill (value, start, end) {
-  if (!value) value = 0
-  if (!start) start = 0
-  if (!end) end = this.length
+// Usage:
+//    buffer.fill(number[, offset[, end]])
+//    buffer.fill(buffer[, offset[, end]])
+//    buffer.fill(string[, offset[, end]][, encoding])
+Buffer.prototype.fill = function fill (val, start, end, encoding) {
+  // Handle string cases:
+  if (typeof val === 'string') {
+    if (typeof start === 'string') {
+      encoding = start
+      start = 0
+      end = this.length
+    } else if (typeof end === 'string') {
+      encoding = end
+      end = this.length
+    }
+    if (val.length === 1) {
+      var code = val.charCodeAt(0)
+      if (code < 256) {
+        val = code
+      }
+    }
+    if (encoding !== undefined && typeof encoding !== 'string') {
+      throw new TypeError('encoding must be a string')
+    }
+    if (typeof encoding === 'string' && !Buffer.isEncoding(encoding)) {
+      throw new TypeError('Unknown encoding: ' + encoding)
+    }
+  } else if (typeof val === 'number') {
+    val = val & 255
+  }
 
-  if (end < start) throw new RangeError('end < start')
+  // Invalid ranges are not set to a default, so can range check early.
+  if (start < 0 || this.length < start || this.length < end) {
+    throw new RangeError('Out of range index')
+  }
 
-  // Fill 0 bytes; we're done
-  if (end === start) return
-  if (this.length === 0) return
+  if (end <= start) {
+    return this
+  }
 
-  if (start < 0 || start >= this.length) throw new RangeError('start out of bounds')
-  if (end < 0 || end > this.length) throw new RangeError('end out of bounds')
+  start = start >>> 0
+  end = end === undefined ? this.length : end >>> 0
+
+  if (!val) val = 0
 
   var i
-  if (typeof value === 'number') {
+  if (typeof val === 'number') {
     for (i = start; i < end; i++) {
-      this[i] = value
+      this[i] = val
     }
   } else {
-    var bytes = utf8ToBytes(value.toString())
+    var bytes = Buffer.isBuffer(val)
+      ? val
+      : utf8ToBytes(new Buffer(val, encoding).toString())
     var len = bytes.length
-    for (i = start; i < end; i++) {
-      this[i] = bytes[i % len]
+    for (i = 0; i < end - start; i++) {
+      this[i + start] = bytes[i % len]
     }
   }
 
@@ -1568,15 +1819,12 @@ function blitBuffer (src, dst, offset, length) {
   return i
 }
 
+function isnan (val) {
+  return val !== val // eslint-disable-line no-self-compare
+}
+
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":1,"ieee754":4,"isarray":3}],3:[function(require,module,exports){
-var toString = {}.toString;
-
-module.exports = Array.isArray || function (arr) {
-  return toString.call(arr) == '[object Array]';
-};
-
-},{}],4:[function(require,module,exports){
+},{"base64-js":1,"ieee754":3,"isarray":4}],3:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -1662,10 +1910,113 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
+},{}],4:[function(require,module,exports){
+var toString = {}.toString;
+
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
+};
+
 },{}],5:[function(require,module,exports){
 module.exports=function(x){return typeof x==='undefined'}
 
 },{}],6:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],7:[function(require,module,exports){
 module.exports = function format(msg) {
   var args = arguments;
   for(var i = 1, l = args.length; i < l; i++) {
@@ -1674,7 +2025,7 @@ module.exports = function format(msg) {
   return msg;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var getType = require('should-type');
 var format = require('./format');
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -2025,7 +2376,7 @@ module.exports = eq;
 
 eq.r = REASON;
 
-},{"./format":6,"should-type":10}],8:[function(require,module,exports){
+},{"./format":7,"should-type":11}],9:[function(require,module,exports){
 var getType = require('should-type');
 var util = require('./util');
 
@@ -2488,7 +2839,7 @@ function defaultFormat(value, opts) {
 defaultFormat.Formatter = Formatter;
 module.exports = defaultFormat;
 
-},{"./util":9,"should-type":10}],9:[function(require,module,exports){
+},{"./util":10,"should-type":11}],10:[function(require,module,exports){
 function addSpaces(v) {
   return v.split('\n').map(function(vv) { return '  ' + vv; }).join('\n');
 }
@@ -2518,7 +2869,7 @@ module.exports = {
   }
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (Buffer){
 var toString = Object.prototype.toString;
 
@@ -2681,7 +3032,7 @@ Object.keys(types).forEach(function(typeName) {
 module.exports = getGlobalType;
 
 }).call(this,require("buffer").Buffer)
-},{"./types":11,"buffer":2}],11:[function(require,module,exports){
+},{"./types":12,"buffer":2}],12:[function(require,module,exports){
 var types = {
   NUMBER: 'number',
   UNDEFINED: 'undefined',
@@ -2724,7 +3075,7 @@ var types = {
 
 module.exports = types;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var should = require('./lib/should');
 
 var defaultProto = Object.prototype;
@@ -2740,7 +3091,7 @@ try {
 
 module.exports = should;
 
-},{"./lib/should":29}],13:[function(require,module,exports){
+},{"./lib/should":30}],14:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -2835,7 +3186,7 @@ AssertionError.prototype = Object.create(Error.prototype, {
 
 module.exports = AssertionError;
 
-},{"./util":30}],14:[function(require,module,exports){
+},{"./util":31}],15:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3115,7 +3466,7 @@ Assertion.addChain('any', function() {
 module.exports = Assertion;
 module.exports.PromisedAssertion = PromisedAssertion;
 
-},{"./assertion-error":13}],15:[function(require,module,exports){
+},{"./assertion-error":14}],16:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3135,7 +3486,7 @@ var config = {
 
 module.exports = config;
 
-},{"should-format":8}],16:[function(require,module,exports){
+},{"should-format":9}],17:[function(require,module,exports){
 // implement assert interface using already written peaces of should.js
 
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
@@ -3420,7 +3771,7 @@ assert.ifError = function(err) {
   }
 };
 
-},{"./../assertion":14,"should-equal":7}],17:[function(require,module,exports){
+},{"./../assertion":15,"should-equal":8}],18:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3493,7 +3844,7 @@ module.exports = function(should) {
   };
 };
 
-},{"../assertion-error":13,"../util":30,"./_assert":16}],18:[function(require,module,exports){
+},{"../assertion-error":14,"../util":31,"./_assert":17}],19:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3565,7 +3916,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3598,7 +3949,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3759,7 +4110,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{"../util":30,"should-equal":7}],21:[function(require,module,exports){
+},{"../util":31,"should-equal":8}],22:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -3898,7 +4249,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{"../util":30,"should-equal":7,"should-type":10}],22:[function(require,module,exports){
+},{"../util":31,"should-equal":8,"should-type":11}],23:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -4010,7 +4361,7 @@ module.exports = function(should, Assertion) {
   Assertion.alias('throw', 'throwError');
 };
 
-},{"../util":30}],23:[function(require,module,exports){
+},{"../util":31}],24:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -4221,7 +4572,7 @@ module.exports = function(should, Assertion) {
   Assertion.alias('matchEach', 'matchEvery');
 };
 
-},{"../util":30,"should-equal":7}],24:[function(require,module,exports){
+},{"../util":31,"should-equal":8}],25:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -4390,7 +4741,7 @@ module.exports = function(should, Assertion) {
 
 };
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -4677,7 +5028,7 @@ module.exports = function(should) {
   Assertion.alias('finally', 'eventually');
 };
 
-},{"../assertion":14,"../util":30}],26:[function(require,module,exports){
+},{"../assertion":15,"../util":31}],27:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -5051,7 +5402,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{"../util":30,"should-equal":7}],27:[function(require,module,exports){
+},{"../util":31,"should-equal":8}],28:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -5095,7 +5446,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -5334,7 +5685,7 @@ module.exports = function(should, Assertion) {
   });
 };
 
-},{"../util":30}],29:[function(require,module,exports){
+},{"../util":31}],30:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -5499,7 +5850,7 @@ should
   .use(require('./ext/contain'))
   .use(require('./ext/promise'));
 
-},{"./assertion":14,"./assertion-error":13,"./config":15,"./ext/assert":17,"./ext/bool":18,"./ext/chain":19,"./ext/contain":20,"./ext/eql":21,"./ext/error":22,"./ext/match":23,"./ext/number":24,"./ext/promise":25,"./ext/property":26,"./ext/string":27,"./ext/type":28,"./util":30,"should-type":10}],30:[function(require,module,exports){
+},{"./assertion":15,"./assertion-error":14,"./config":16,"./ext/assert":18,"./ext/bool":19,"./ext/chain":20,"./ext/contain":21,"./ext/eql":22,"./ext/error":23,"./ext/match":24,"./ext/number":25,"./ext/promise":26,"./ext/property":27,"./ext/string":28,"./ext/type":29,"./util":31,"should-type":11}],31:[function(require,module,exports){
 /*
  * should.js - assertion library
  * Copyright(c) 2010-2013 TJ Holowaychuk <tj@vision-media.ca>
@@ -5637,377 +5988,7 @@ exports.formatProp = function(value) {
   return config.getFormatter().formatPropertyName(String(value));
 };
 
-},{"./config":15,"should-format":8,"should-type":10}],31:[function(require,module,exports){
-/**
- * @license MIT <Gianluca Casati> http://g14n.info/flow-view
- */
-
-var windowFunctions = require('../functions/window')
-var fun = require('../fun')
-
-function funBrowser (graph) {
-  var additionalFunctions = arguments[1] || {}
-
-  function inject (key) {
-    additionalFunctions[key] = windowFunctions[key]
-  }
-
-  Object.keys(windowFunctions).forEach(inject)
-
-  return fun(graph, additionalFunctions)
-}
-
-exports.fun = funBrowser
-
-},{"../fun":33,"../functions/window":35}],32:[function(require,module,exports){
-module.exports={
-  "data": {},
-  "pipe": {},
-  "task": {},
-  "view": {
-    "node": {},
-    "link": {}
-  }
-}
-
-},{}],33:[function(require,module,exports){
-var builtinFunctions = require('./functions/builtin')
-var injectAdditionalFunctions = require('./inject/additionalFunctions')
-var injectArguments = require('./inject/arguments')
-var injectAccessors = require('./inject/accessors')
-var injectDotOperators = require('./inject/dotOperators')
-var injectGlobals = require('./inject/globals')
-var injectNumbers = require('./inject/numbers')
-var injectReferences = require('./inject/references')
-var injectStrings = require('./inject/strings')
-var inputArgs = require('./inputArgs')
-var isDflowFun = require('./isDflowFun')
-var level = require('./level')
-var notDefined = require('not-defined')
-var regexArgument = require('./regex/argument')
-var regexComment = require('./regex/comment')
-var regexSubgraph = require('./regex/subgraph')
-var reservedKeys = require('./reservedKeys')
-var validate = require('./validate')
-var walkGlobal = require('./walkGlobal')
-
-var defined = function (x) { return !notDefined(x) }
-
-/**
- * Create a dflow function.
- *
- * @param {Object} graph to be executed
- * @param {Object} [additionalFunctions] is a collection of functions
- *
- * @returns {Function} dflowFun that executes the given graph.
- */
-
-function fun (graph, additionalFunctions) {
-  // First of all, check if graph is valid.
-  try {
-    validate(graph, additionalFunctions)
-  } catch (err) {
-    throw err
-  }
-
-  var func = graph.func || {}
-  var pipe = graph.pipe
-  var task = graph.task
-
-  var cachedLevelOf = {}
-  var computeLevelOf = level.bind(null, pipe, cachedLevelOf)
-  var funcs = builtinFunctions
-
-  // Inject compile-time builtin tasks.
-
-  funcs['dflow.fun'] = fun
-  funcs['dflow.isDflowFun'] = isDflowFun
-  funcs['dflow.validate'] = validate
-
-  injectAccessors(funcs, graph)
-  injectAdditionalFunctions(funcs, additionalFunctions)
-  injectDotOperators(funcs, task)
-  injectGlobals(funcs, task)
-  injectReferences(funcs, task)
-  injectNumbers(funcs, task)
-  injectStrings(funcs, task)
-
-  /**
-   * Compiles a sub graph.
-   */
-
-  function compileSubgraph (key) {
-    var subGraph = graph.func[key]
-
-    var funcName = '/' + key
-
-    funcs[funcName] = fun(subGraph, additionalFunctions)
-  }
-
-  /**
-   * Sorts tasks by their level.
-   */
-
-  function byLevel (a, b) {
-    if (typeof cachedLevelOf[a] === 'undefined') {
-      cachedLevelOf[a] = computeLevelOf(a)
-    }
-
-    if (typeof cachedLevelOf[b] === 'undefined') {
-      cachedLevelOf[b] = computeLevelOf(b)
-    }
-
-    return cachedLevelOf[a] - cachedLevelOf[b]
-  }
-
-  /**
-   * Ignores comments.
-   */
-
-  function comments (key) {
-    return !regexComment.test(task[key])
-  }
-
-  // Compile each subgraph.
-  Object.keys(func)
-        .forEach(compileSubgraph)
-
-  /**
-   * Throw if a task is not defined.
-   */
-
-  function checkTaskIsDefined (taskKey) {
-    var taskName = task[taskKey]
-
-    // Ignore tasks injected at run time.
-    if (reservedKeys.indexOf(taskName) > -1) return
-
-    var msg = 'Task not found: ' + taskName + ' [' + taskKey + ']'
-
-    // Check subgraphs.
-    if (regexSubgraph.test(taskName)) {
-      var subgraphKey = taskName.substring(1)
-
-      if (notDefined(graph.func[subgraphKey])) throw new Error(msg)
-      else return
-    }
-
-    // Skip arguments[0] ... arguments[N].
-    if (regexArgument.exec(taskName)) return
-
-    // Skip globals.
-    if (defined(walkGlobal(taskName))) return
-
-    if (notDefined(funcs[taskName])) throw new Error(msg)
-  }
-
-  // Check if there is some missing task.
-  Object.keys(task)
-        .filter(comments)
-        .forEach(checkTaskIsDefined)
-
-  /**
-   * Here we are, this is the ❤ of dflow.
-   */
-
-  function dflowFun () {
-    var gotReturn = false
-    var outs = {}
-    var returnValue
-
-    var inputArgsOf = inputArgs.bind(null, outs, pipe)
-
-    // Inject run-time builtin tasks.
-
-    funcs['this'] = function () { return dflowFun }
-    funcs['this.graph'] = function () { return graph }
-    injectArguments(funcs, task, arguments)
-
-    /**
-     * Execute task.
-     */
-
-    function run (taskKey) {
-      var args = inputArgsOf(taskKey)
-      var taskName = task[taskKey]
-      var f = funcs[taskName]
-
-      // Behave like a JavaScript function:
-      // if found a return, skip all other tasks.
-      if (gotReturn) {
-        return
-      }
-
-      if ((taskName === 'return') && (!gotReturn)) {
-        returnValue = args[0]
-        gotReturn = true
-        return
-      }
-
-      // If task is not defined at run time, throw an error.
-      if (typeof f === 'undefined') {
-        throw new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
-      }
-
-      // Try to execute task.
-      try {
-        outs[taskKey] = f.apply(null, args)
-      } catch (err) {
-        throw err
-      }
-    }
-
-    // Run every graph task, sorted by level.
-    Object.keys(task)
-          .filter(comments)
-          .sort(byLevel)
-          .forEach(run)
-
-    return returnValue
-  }
-
-  // Remember function was created from a dflow graph.
-  dflowFun.graph = graph
-
-  return dflowFun
-}
-
-module.exports = fun
-
-},{"./functions/builtin":34,"./inject/accessors":36,"./inject/additionalFunctions":37,"./inject/arguments":38,"./inject/dotOperators":39,"./inject/globals":40,"./inject/numbers":41,"./inject/references":42,"./inject/strings":43,"./inputArgs":44,"./isDflowFun":46,"./level":47,"./regex/argument":50,"./regex/comment":51,"./regex/subgraph":55,"./reservedKeys":56,"./validate":57,"./walkGlobal":58,"not-defined":5}],34:[function(require,module,exports){
-// Arithmetic operators
-
-exports['+'] = function (a, b) { return a + b }
-
-exports['*'] = function (a, b) { return a * b }
-
-exports['-'] = function (a, b) { return a - b }
-
-exports['/'] = function (a, b) { return a / b }
-
-exports['%'] = function (a, b) { return a % b }
-
-// Logical operators
-
-exports['&&'] = function (a, b) { return a && b }
-
-exports['||'] = function (a, b) { return a || b }
-
-exports['!'] = function (a) { return !a }
-
-// Comparison operators
-
-exports['==='] = function (a, b) { return a === b }
-
-exports['!=='] = function (a, b) { return a !== b }
-
-exports['>'] = function (a, b) { return a > b }
-
-exports['<'] = function (a, b) { return a < b }
-
-exports['>='] = function (a, b) { return a >= b }
-
-exports['<='] = function (a, b) { return a <= b }
-
-// Other operators
-
-exports.apply = function (fun, thisArg, argsArray) {
-  return fun.apply(thisArg, argsArray)
-}
-
-exports['.'] = function (obj, prop) { return obj[prop] }
-
-exports['='] = function (a, b) { return a = b }
-
-exports['typeof'] = function (a) { return typeof a }
-
-exports['new'] = function () {
-  var Obj = arguments[0]
-  var arg1 = arguments[1]
-  var arg2 = arguments[2]
-  var arg3 = arguments[3]
-  var arg4 = arguments[4]
-  var arg5 = arguments[5]
-  var argN = arguments.length - 1
-
-  if (argN === 0) return new Obj()
-  if (argN === 1) return new Obj(arg1)
-  if (argN === 2) return new Obj(arg1, arg2)
-  if (argN === 3) return new Obj(arg1, arg2, arg3)
-  if (argN === 4) return new Obj(arg1, arg2, arg3, arg4)
-  if (argN === 5) return new Obj(arg1, arg2, arg3, arg4, arg5)
-  // If you have a constructor with more than 5 arguments ... think about refactoring or redesign it.
-}
-
-// Array
-
-exports['[]'] = function () { return [] }
-
-exports.indexOf = function (a, b) { return a.indexOf(b) }
-
-exports.push = function (a, b) { return a.push(b) }
-
-exports.pop = function (a, b) { return a.pop(b) }
-
-// console
-
-exports['console.error'] = console.error.bind(console)
-exports['console.log'] = console.log.bind(console)
-
-// Global
-
-exports['Infinity'] = function () { return Infinity }
-
-exports.NaN = function () { return NaN }
-
-exports['null'] = function () { return null }
-
-// Object
-
-exports['{}'] = function () { return {} }
-
-// Boolean
-
-exports.false = function () { return false }
-
-exports.true = function () { return true }
-
-// Date
-
-exports.now = function () { return new Date() }
-
-},{}],35:[function(require,module,exports){
-exports.document = function () {
-  return document
-}
-
-exports.body = function () {
-  return document.body
-}
-
-exports.head = function () {
-  return document.head
-}
-
-exports.window = function () {
-  return window
-}
-
-exports.AudioContext = function () {
-  return window.AudioContext || window.webkitAudioContext
-}
-
-exports.getElementById = function (id) {
-  return window.document.getElementById(id)
-}
-
-exports.innerHTML = function (node, content) {
-  node.innerHTML = content
-
-  return node
-}
-
-},{}],36:[function(require,module,exports){
+},{"./config":16,"should-format":9,"should-type":11}],32:[function(require,module,exports){
 var accessorRegex = require('../regex/accessor')
 
 /**
@@ -6062,7 +6043,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":49}],37:[function(require,module,exports){
+},{"../regex/accessor":40}],33:[function(require,module,exports){
 /**
  * Optionally add custom functions.
  *
@@ -6098,7 +6079,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{}],38:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var argumentRegex = require('../regex/argument')
 
 /**
@@ -6142,7 +6123,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":50}],39:[function(require,module,exports){
+},{"../regex/argument":41}],35:[function(require,module,exports){
 var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
@@ -6233,7 +6214,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":52}],40:[function(require,module,exports){
+},{"../regex/dotOperator":42}],36:[function(require,module,exports){
 var notDefined = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
@@ -6283,7 +6264,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../reservedKeys":56,"../walkGlobal":58,"not-defined":5}],41:[function(require,module,exports){
+},{"../reservedKeys":45,"../walkGlobal":46,"not-defined":5}],37:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -6318,7 +6299,7 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],42:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var referenceRegex = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
@@ -6373,7 +6354,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":54,"../walkGlobal":58}],43:[function(require,module,exports){
+},{"../regex/reference":44,"../walkGlobal":46}],39:[function(require,module,exports){
 var quotedRegex = require('../regex/quoted')
 
 /**
@@ -6408,181 +6389,25 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":53}],44:[function(require,module,exports){
-var inputPipes = require('./inputPipes')
-
-/**
- * Retrieve input arguments of a task.
- *
- * @param {Object} outs
- * @param {Object} pipe
- * @param {String} taskKey
- *
- * @returns {Array} args
- */
-
-function inputArgs (outs, pipe, taskKey) {
-  var args = []
-  var inputPipesOf = inputPipes.bind(null, pipe)
-
-  function populateArg (inputPipe) {
-    var index = inputPipe[2] || 0
-    var value = outs[inputPipe[0]]
-
-    args[index] = value
-  }
-
-  inputPipesOf(taskKey).forEach(populateArg)
-
-  return args
-}
-
-module.exports = inputArgs
-
-},{"./inputPipes":45}],45:[function(require,module,exports){
-/**
- * Compute pipes that feed a task.
- *
- * @param {Object} pipe
- * @param {String} taskKey
- *
- * @returns {Array} pipes
- */
-
-function inputPipes (pipe, taskKey) {
-  var pipes = []
-
-  function pushPipe (key) {
-    pipes.push(pipe[key])
-  }
-
-  function ifIsInputPipe (key) {
-    return pipe[key][1] === taskKey
-  }
-
-  Object.keys(pipe).filter(ifIsInputPipe).forEach(pushPipe)
-
-  return pipes
-}
-
-module.exports = inputPipes
-
-},{}],46:[function(require,module,exports){
-var validate = require('./validate')
-
-/**
- * Duct tape for dflow functions.
- *
- * @param {Function} f
- *
- * @returns {Boolean} ok, it looks like a dflowFun
- */
-
-function isDflowFun (f) {
-  var isFunction = typeof f === 'function'
-  var hasGraphObject = typeof f.graph === 'object'
-  var hasFuncsObject = typeof f.funcs === 'object'
-  var hasValidGraph = true
-
-  if (isFunction && hasGraphObject && hasFuncsObject) {
-    try {
-      validate(f.graph, f.funcs)
-    } catch (ignore) {
-      hasValidGraph = false
-    }
-  }
-
-  return hasValidGraph
-}
-
-module.exports = isDflowFun
-
-},{"./validate":57}],47:[function(require,module,exports){
-var parents = require('./parents')
-
-/**
- * Compute level of task.
- *
- * @param {Object} pipe
- * @param {Object} cachedLevelOf
- * @param {String} taskKey
- *
- * @returns {Number} taskLevel
- */
-
-function level (pipe, cachedLevelOf, taskKey) {
-  var taskLevel = 0
-  var parentsOf = parents.bind(null, pipe)
-
-  if (typeof cachedLevelOf[taskKey] === 'number') {
-    return cachedLevelOf[taskKey]
-  }
-
-  function computeLevel (parentTaskKey) {
-                                 // ↓ Recursion here: the level of a task is the max level of its parents + 1.
-    taskLevel = Math.max(taskLevel, level(pipe, cachedLevelOf, parentTaskKey) + 1)
-  }
-
-  parentsOf(taskKey).forEach(computeLevel)
-
-  cachedLevelOf[taskKey] = taskLevel
-
-  return taskLevel
-}
-
-module.exports = level
-
-},{"./parents":48}],48:[function(require,module,exports){
-var inputPipes = require('./inputPipes')
-
-/**
- * Compute parent tasks.
- *
- * @param {Array} pipes of graph
- * @param {String} taskKey
- *
- * @returns {Array} parentTaskIds
- */
-
-function parents (pipe, taskKey) {
-  var inputPipesOf = inputPipes.bind(null, pipe)
-  var parentTaskIds = []
-
-  function pushParentTaskId (pipe) {
-    parentTaskIds.push(pipe[0])
-  }
-
-  inputPipesOf(taskKey).forEach(pushParentTaskId)
-
-  return parentTaskIds
-}
-
-module.exports = parents
-
-},{"./inputPipes":45}],49:[function(require,module,exports){
+},{"../regex/quoted":43}],40:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
-},{}],50:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)\]$/
 
-},{}],51:[function(require,module,exports){
-module.exports = /^\/\/.+$/
-
-},{}],52:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],53:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],54:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 module.exports = /^\&(.+)$/
 
-},{}],55:[function(require,module,exports){
-module.exports = /^\/[\w][\w\d]+$/
-
-},{}],56:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
+// Also arguments[0] ... arguments[N] are reserved.
 module.exports = [
   'arguments',
   'dflow.fun',
@@ -6593,185 +6418,7 @@ module.exports = [
   'this.graph'
 ]
 
-},{}],57:[function(require,module,exports){
-var accessorRegex = require('./regex/accessor')
-var argumentRegex = require('./regex/argument')
-var dotOperatorRegex = require('./regex/dotOperator')
-var referenceRegex = require('./regex/reference')
-var reservedKeys = require('./reservedKeys')
-var subgraphRegex = require('./regex/subgraph')
-
-/**
- * Check graph consistency.
- *
- * @param {Object} graph
- * @param {Object} [additionalFunctions]
- *
- * @returns {Boolean} ok if no exception is thrown
- */
-
-function validate (graph, additionalFunctions) {
-  // Required properties.
-  var pipe = graph.pipe
-  var task = graph.task
-
-  // Optional properties.
-  var data = graph.data || {}
-  var func = graph.func || {}
-  var info = graph.info || {}
-
-  var seenPipe = {}
-
-  // Validate addition functions, if any.
-  // Check there are no reserved keys.
-
-  function throwIfEquals (taskName, reservedKey) {
-    if (taskName === reservedKey) {
-      throw new TypeError('Reserved function name: ' + taskName)
-    }
-  }
-
-  if (typeof additionalFunctions === 'object') {
-    for (var taskName in additionalFunctions) {
-      var reservedKeys = ['return', 'arguments', 'this', 'this.graph']
-      var throwIfEqualsTaskName = throwIfEquals.bind(null, taskName)
-
-      reservedKeys.forEach(throwIfEqualsTaskName)
-
-      if (argumentRegex.test(taskName)) {
-        throw new TypeError('Reserved function name: ' + taskName)
-      }
-
-      if (accessorRegex.test(taskName)) {
-        throw new TypeError('Function name cannot start with "@": ' + taskName)
-      }
-
-      if (dotOperatorRegex.attr.test(taskName)) {
-        throw new TypeError('Function name cannot start with ".":' + taskName)
-      }
-
-      if (dotOperatorRegex.func.test(taskName)) {
-        throw new TypeError('Function name cannot start with "." and end with "()":' + taskName)
-      }
-
-      if (referenceRegex.test(taskName)) {
-        throw new TypeError('Function name cannot start with "&": ' + taskName)
-      }
-    }
-  }
-
-  // Check pipe and task are objects.
-
-  if (typeof pipe !== 'object') {
-    throw new TypeError('Not an object: pipe ' + pipe)
-  }
-
-  if (typeof task !== 'object') {
-    throw new TypeError('Not an object: task ' + task)
-  }
-
-  // Check optional data, func, info and view are objects.
-
-  if (typeof data !== 'object') {
-    throw new TypeError('Not an object: data ' + data)
-  }
-
-  if (typeof func !== 'object') {
-    throw new TypeError('Not an object: func ' + func)
-  }
-
-  if (typeof info !== 'object') {
-    throw new TypeError('Not an object: info ' + info)
-  }
-
-  function checkPipe (key) {
-    var arg = pipe[key][2] || 0
-    var from = pipe[key][0]
-    var to = pipe[key][1]
-
-    // Check types.
-
-    if (typeof arg !== 'number') {
-      throw new TypeError('Invalid pipe: ' + pipe[key])
-    }
-
-    if (typeof from !== 'string') {
-      throw new TypeError('Invalid pipe: ' + pipe[key])
-    }
-
-    if (typeof to !== 'string') {
-      throw new TypeError('Invalid pipe: ' + pipe[key])
-    }
-
-    // Check for orphan pipes.
-
-    if (typeof task[from] === 'undefined') {
-      throw new Error('Orphan pipe: ' + pipe[key])
-    }
-
-    if (typeof task[to] === 'undefined') {
-      throw new Error('Orphan pipe: ' + pipe[key])
-    }
-
-    // Remember pipes, avoid duplicates.
-
-    if (typeof seenPipe[from] === 'undefined') {
-      seenPipe[from] = {}
-    }
-
-    if (typeof seenPipe[from][to] === 'undefined') {
-      seenPipe[from][to] = []
-    }
-
-    if (typeof seenPipe[from][to][arg] === 'undefined') {
-      seenPipe[from][to][arg] = true
-    } else {
-      throw new Error('Duplicated pipe: ' + pipe[key])
-    }
-  }
-
-  Object.keys(pipe)
-        .forEach(checkPipe)
-
-  // Check that every subgraph referenced are defined.
-
-  function onlySubgraphs (key) {
-    var taskName = task[key]
-
-    return subgraphRegex.test(taskName)
-  }
-
-  function checkSubgraph (key) {
-    var taskName = task[key]
-
-    var funcName = taskName.substring(1)
-
-    if (typeof func[funcName] === 'undefined') {
-      throw new Error('Undefined subgraph: ' + funcName)
-    }
-  }
-
-  Object.keys(task)
-        .filter(onlySubgraphs)
-        .forEach(checkSubgraph)
-
-  // Recursively check subgraphs in func property.
-
-  function checkFunc (key) {
-    validate(func[key], additionalFunctions)
-  }
-
-  if (typeof func === 'object') {
-    Object.keys(func)
-          .forEach(checkFunc)
-  }
-
-  return true
-}
-
-module.exports = validate
-
-},{"./regex/accessor":49,"./regex/argument":50,"./regex/dotOperator":52,"./regex/reference":54,"./regex/subgraph":55,"./reservedKeys":56}],58:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 (function (global){
 var globalContext
 
@@ -6804,1276 +6451,286 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],59:[function(require,module,exports){
-module.exports={
-  "data": {
-    "results": [
-      {
-        "args": [0],
-        "expected": true
-      }
-    ]
-  },
-  "pipe": {
-    "6": [
-      "1",
-      "4"
-    ],
-    "7": [
-      "2",
-      "4",
-      1
-    ],
-    "8": [
-      "3",
-      "4",
-      2
-    ],
-    "9": [
-      "4",
-      "5"
-    ]
-  },
-  "task": {
-    "1": "&isFinite",
-    "2": "null",
-    "3": "arguments",
-    "4": "apply",
-    "5": "return"
-  },
-  "view": {
-    "node": {
-      "1": {
-        "text": "&isFinite",
-        "x": 381,
-        "y": 56,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "1"
-      },
-      "2": {
-        "text": "null",
-        "x": 507,
-        "y": 58,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "2"
-      },
-      "3": {
-        "text": "arguments",
-        "x": 588,
-        "y": 57,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "3"
-      },
-      "4": {
-        "text": "apply",
-        "x": 479,
-        "y": 143,
-        "ins": [
-          {
-            "name": "in0"
-          },
-          {
-            "name": "in1"
-          },
-          {
-            "name": "in2"
-          }
-        ],
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "4"
-      },
-      "5": {
-        "text": "return",
-        "x": 478,
-        "y": 223,
-        "ins": [
-          {
-            "name": "in"
-          }
-        ],
-        "task": "5"
-      }
-    },
-    "link": {
-      "6": {
-        "from": [
-          "1",
-          0
-        ],
-        "to": [
-          "4",
-          0
-        ],
-        "id": "6"
-      },
-      "7": {
-        "from": [
-          "2",
-          0
-        ],
-        "to": [
-          "4",
-          1
-        ],
-        "id": "7"
-      },
-      "8": {
-        "from": [
-          "3",
-          0
-        ],
-        "to": [
-          "4",
-          2
-        ],
-        "id": "8"
-      },
-      "9": {
-        "from": [
-          "4",
-          0
-        ],
-        "to": [
-          "5",
-          0
-        ],
-        "id": "9"
-      }
-    }
-  }
-}
-
-},{}],60:[function(require,module,exports){
-module.exports={
-  "info": {
-    "context": "client"
-  },
-  "data": {
-    "results": []
-  },
-  "pipe": {
-    "7": [
-      "6",
-      "4",
-      1
-    ],
-    "10": [
-      "8",
-      "9"
-    ],
-    "13": [
-      "4",
-      "9",
-      1
-    ],
-    "15": [
-      "12",
-      "14"
-    ],
-    "17": [
-      "14",
-      "4"
-    ]
-  },
-  "task": {
-    "4": "innerHTML",
-    "6": "'This is a paragraph'",
-    "8": "body",
-    "9": ".appendChild()",
-    "12": "document",
-    "14": ".createElement()"
-  },
-  "view": {
-    "node": {
-      "4": {
-        "text": "innerHTML",
-        "x": 293,
-        "y": 338,
-        "ins": [
-          {
-            "name": "in0"
-          },
-          {
-            "name": "in1"
-          }
-        ],
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "4"
-      },
-      "6": {
-        "text": "'This is a paragraph'",
-        "x": 394,
-        "y": 227,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "6"
-      },
-      "8": {
-        "text": "body",
-        "x": 144,
-        "y": 379,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "8"
-      },
-      "9": {
-        "text": ".appendChild()",
-        "x": 145,
-        "y": 476,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "9",
-        "ins": [
-          {},
-          {}
-        ]
-      },
-      "12": {
-        "text": "document",
-        "x": 295,
-        "y": 69,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "12"
-      },
-      "14": {
-        "text": ".createElement()",
-        "x": 294,
-        "y": 173,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "14",
-        "ins": [
-          {},
-          {}
-        ]
-      }
-    },
-    "link": {
-      "7": {
-        "from": [
-          "6",
-          0
-        ],
-        "to": [
-          "4",
-          1
-        ],
-        "id": "7"
-      },
-      "10": {
-        "from": [
-          "8",
-          0
-        ],
-        "to": [
-          "9",
-          0
-        ],
-        "id": "10"
-      },
-      "13": {
-        "from": [
-          "4",
-          0
-        ],
-        "to": [
-          "9",
-          1
-        ],
-        "id": "13"
-      },
-      "15": {
-        "from": [
-          "12",
-          0
-        ],
-        "to": [
-          "14",
-          0
-        ],
-        "id": "15"
-      },
-      "17": {
-        "from": [
-          "14",
-          0
-        ],
-        "to": [
-          "4",
-          0
-        ],
-        "id": "17"
-      }
-    }
-  }
-}
-
-},{}],61:[function(require,module,exports){
-module.exports={
-  "task": {
-    "a": "arguments[0]",
-    "b": "Date.parse",
-    "c": "return"
-  },
-  "pipe": {
-    "1": [ "a", "b", 0 ],
-    "3": [ "b", "c" ]
-  },
-  "data": {
-    "results": [
-      {
-        "args": [ "Wed, 09 Aug 1995 00:00:00 GMT" ],
-        "expected": 807926400000
-      }
-    ]
-  }
-}
-
-},{}],62:[function(require,module,exports){
-module.exports={
-  "task": {
-    "a": "arguments[0]",
-    "b": "arguments[1]",
-    "c": ".",
-    "d": "return"
-  },
-  "pipe": {
-    "1": [ "a", "c", 0 ],
-    "2": [ "b", "c", 1 ],
-    "3": [ "c", "d" ]
-  },
-  "data": {
-    "results": [
-      {
-        "args": [ { "foo": "bar" }, "foo" ],
-        "expected": "bar"
-      }
-    ]
-  }
-}
-
-},{}],63:[function(require,module,exports){
-module.exports={
-  "task": {
-    "1": "@message",
-    "2": "console.log"
-  },
-  "pipe": {
-    "3": [ "1", "2" ]
-  },
-  "data": {
-    "message": "Hello World, by dflow",
-    "results": []
-  },
-  "view": {
-    "node": {
-      "1": {
-        "x": 80,
-        "y": 20,
-        "w": 15,
-        "task": "1",
-        "text": "@message",
-        "outs": [{"name": "out0"}]
-      },
-      "2": {
-        "x": 80,
-        "y": 150,
-        "w": 15,
-        "task": "2",
-        "text": "console.log",
-        "ins": [{"name": "in0"}]
-      }
-    },
-    "link": {
-      "3": {
-        "from": ["1", 0],
-        "to": ["2", 0]
-      }
-    }
-  }
-}
-
-},{}],64:[function(require,module,exports){
-module.exports={
-  "task": {
-    "a": "arguments[0]",
-    "b": "arguments[1]",
-    "c": "indexOf",
-    "d": "return"
-  },
-  "pipe": {
-    "1": [ "a", "c", 0 ],
-    "2": [ "b", "c", 1 ],
-    "3": [ "c", "d" ]
-  },
-  "data": {
-    "results": [
-      {
-        "args": [ "abcd", "b" ],
-        "expected": 1
-      },
-      {
-        "args": [ [7, 8, 9], 9 ],
-        "expected": 2
-      }
-    ]
-  }
-}
-
-},{}],65:[function(require,module,exports){
-module.exports={
-  "data": {
-    "results": []
-  },
-  "pipe": {
-    "7": [
-      "6",
-      "1"
-    ],
-    "9": [
-      "2",
-      "1",
-      1
-    ],
-    "10": [
-      "3",
-      "1",
-      2
-    ],
-    "11": [
-      "8",
-      "1",
-      3
-    ],
-    "13": [
-      "1",
-      "12"
-    ]
-  },
-  "task": {
-    "1": "new",
-    "2": "arguments[0]",
-    "3": "arguments[1]",
-    "6": "&Date",
-    "8": "arguments[2]",
-    "12": "return"
-  },
-  "view": {
-    "node": {
-      "1": {
-        "text": "new",
-        "x": 90,
-        "y": 126,
-        "task": "1",
-        "outs": [
-          {}
-        ],
-        "ins": [
-          {},
-          {},
-          {},
-          {}
-        ]
-      },
-      "2": {
-        "text": "arguments[0]",
-        "x": 196,
-        "y": 42,
-        "task": "2",
-        "outs": [
-          {}
-        ]
-      },
-      "3": {
-        "text": "arguments[1]",
-        "x": 372,
-        "y": 41,
-        "task": "3",
-        "outs": [
-          {}
-        ]
-      },
-      "6": {
-        "text": "&Date",
-        "x": 90,
-        "y": 41,
-        "task": "6",
-        "outs": [
-          {}
-        ]
-      },
-      "8": {
-        "text": "arguments[2]",
-        "x": 554,
-        "y": 41,
-        "task": "8",
-        "outs": [
-          {}
-        ]
-      },
-      "12": {
-        "text": "return",
-        "x": 92,
-        "y": 232,
-        "task": "12",
-        "ins": [
-          {}
-        ]
-      }
-    },
-    "link": {
-      "7": {
-        "from": [
-          "6",
-          0
-        ],
-        "to": [
-          "1",
-          0
-        ],
-        "id": "7"
-      },
-      "9": {
-        "from": [
-          "2",
-          0
-        ],
-        "to": [
-          "1",
-          1
-        ],
-        "id": "9"
-      },
-      "10": {
-        "from": [
-          "3",
-          0
-        ],
-        "to": [
-          "1",
-          2
-        ],
-        "id": "10"
-      },
-      "11": {
-        "from": [
-          "8",
-          0
-        ],
-        "to": [
-          "1",
-          3
-        ],
-        "id": "11"
-      },
-      "13": {
-        "from": [
-          "1",
-          0
-        ],
-        "to": [
-          "12",
-          0
-        ],
-        "id": "13"
-      }
-    }
-  }
-}
-
-},{}],66:[function(require,module,exports){
-module.exports={
-  "task": {
-    "1": "arguments[0]",
-    "2": "arguments[1]",
-    "3": "||",
-    "4": "return"
-  },
-  "pipe": {
-    "5": [ "1", "3", 0 ],
-    "6": [ "2", "3", 1 ],
-    "7": [ "3", "4" ]
-  },
-  "data": {
-    "results": [
-      {
-        "args": [true, false],
-        "expected": true
-      }
-    ]
-  }
-}
-
-},{}],67:[function(require,module,exports){
-module.exports={
-  "task": {
-    "1": "arguments[0]",
-    "2": "arguments[1]",
-    "3": "+",
-    "4": "return"
-  },
-  "pipe": {
-    "5": [ "1", "3", 0 ],
-    "6": [ "2", "3", 1 ],
-    "7": [ "3", "4" ]
-  },
-  "data": {
-    "results": [
-      {
-        "args": [1, 2],
-        "expected": 3
-      }
-    ]
-  }
-}
-
-},{}],68:[function(require,module,exports){
-module.exports={
-  "data": {
-    "results": []
-  },
-  "pipe": {
-    "4": [
-      "2",
-      "3"
-    ]
-  },
-  "task": {
-    "2": "arguments",
-    "3": "return"
-  },
-  "view": {
-    "node": {
-      "2": {
-        "text": "arguments",
-        "x": 456,
-        "y": 129,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "2"
-      },
-      "3": {
-        "text": "return",
-        "x": 457,
-        "y": 219,
-        "ins": [
-          {
-            "name": "in"
-          }
-        ],
-        "task": "3"
-      }
-    },
-    "link": {
-      "4": {
-        "from": [
-          "2",
-          0
-        ],
-        "to": [
-          "3",
-          0
-        ],
-        "id": "4"
-      }
-    }
-  }
-}
-
-},{}],69:[function(require,module,exports){
-// Do not use dynamic imports, for example importing the whole graph folder;
-// use explicit imports instead, otherwise browserify will not include graphs.
-exports['apply'] = require('./graph/apply.json')
-exports.createParagraph = require('./graph/createParagraph.json')
-exports.dateParse = require('./graph/dateParse.json')
-exports.dotOperator = require('./graph/dotOperator.json')
-exports['hello-world'] = require('./graph/hello-world.json')
-exports.indexOf = require('./graph/indexOf.json')
-exports['new'] = require('./graph/new.json')
-exports.or = require('./graph/or.json')
-exports.sum = require('./graph/sum.json')
-exports.welcome = require('./graph/welcome.json')
-
-},{"./graph/apply.json":59,"./graph/createParagraph.json":60,"./graph/dateParse.json":61,"./graph/dotOperator.json":62,"./graph/hello-world.json":63,"./graph/indexOf.json":64,"./graph/new.json":65,"./graph/or.json":66,"./graph/sum.json":67,"./graph/welcome.json":68}],70:[function(require,module,exports){
-module.exports={
-  "task": {
-    "1": "arguments[0]",
-    "2": "arguments[1]",
-    "3": "+",
-    "4": "return"
-  },
-  "pipe": {
-    "5": [ "1", "3", 0 ],
-    "6": [ "2", "3", 1 ],
-    "7": [ "3", "4" ]
-  },
-  "info": {
-    "doc": {}
-  },
-  "view": {}
-}
-
-},{}],71:[function(require,module,exports){
-// TODO
-// check '='
-// var builtin = require('../src/engine/functions/builtin')
-
-},{}],72:[function(require,module,exports){
-var emptyGraph = require('../src/engine/emptyGraph.json')
-var validate = require('../src/engine/validate')
-
-describe('emptyGraph', function () {
-  it('is a valid graph', function () {
-    validate(emptyGraph).should.be.ok
-  })
-})
-
-},{"../src/engine/emptyGraph.json":32,"../src/engine/validate":57}],73:[function(require,module,exports){
-var dflow = require('dflow')
+},{}],47:[function(require,module,exports){
+var injectAccessors = require('engine/inject/accessors')
 var should = require('should')
 
-var examples = require('../src/examples')
-
-var context = (typeof window === 'object') ? 'client' : 'server'
-
-describe('example', function () {
-  function testExample (name, graph) {
-    describe(name, function () {
-      var f = dflow.fun(graph)
-
-      it('works', function () {
-        f.should.be.instanceOf(Function)
-      })
-
-      it('returns expected results', function () {
-        graph.data.results.forEach(function (test) {
-          var result = f.apply(null, test.args)
-
-          should.deepEqual(result, test.expected)
-        })
-      })
-    })
-  }
-
-  for (var exampleName in examples) {
-    var exampleGraph = examples[exampleName]
-
-    var graphInfo = exampleGraph.info || {}
-    var graphContext = graphInfo.context || 'universal'
-
-    if (graphContext === context) {
-      testExample(exampleName, exampleGraph)
-    }
-  }
-
-  describe('packagedGraph', function () {
-    it('is a dflow graph packages with npm', function () {
-      var graph = require('../src/examples/packagedGraph')
-
-      var sum = dflow.fun(graph)
-
-      sum(2, 2).should.be.eql(4)
-    })
-  })
-})
-
-},{"../src/examples":69,"../src/examples/packagedGraph":70,"dflow":77,"should":12}],74:[function(require,module,exports){
-
-var should = require('should')
-var fun = require('../src/engine/fun')
-
-describe('fun', function () {
-  it('returns a function', function () {
+describe('injectAccessors', function () {
+  it('modifies funcs object with accessors injected', function () {
+    var funcs = {}
     var graph = {
       task: {
-        '0': 'arguments[0]',
-        '1': 'arguments[1]',
-        '2': '/sum',
-        '3': '@three',
-        '4': '*',
-        '5': '@result',
-        '6': 'return',
-        '7': '// this is a comment'
-      },
-      pipe: {
-        'a': [ '0', '2', 0 ],
-        'b': [ '1', '2', 1 ],
-        'c': [ '2', '4', 0 ],
-        'd': [ '3', '4', 1 ],
-        'e': [ '4', '5' ],
-        'f': [ '5', '6' ]
-      },
-      func: {
-        sum: {
-          pipe: {
-            'a': [ '0', '2', 0 ],
-            'b': [ '1', '2', 1 ],
-            'c': [ '2', '3' ]
-          },
-          task: {
-            '0': 'arguments[0]',
-            '1': 'arguments[1]',
-            '2': 'custom + operator',
-            '3': 'return'
-          }
-        }
+        a: '@foo',
+        b: '@bar'
       },
       data: {
-        three: 3
-      },
-      view: {}
+        foo: 1,
+        bar: [2]
+      }
     }
 
-    var funcs = {
-      'custom + operator': function (a, b) { return a + b }
-    }
+    injectAccessors(funcs, graph)
 
-    var f = fun(graph, funcs)
+    var bar = funcs['@bar']
+    var foo = funcs['@foo']
 
-    f.should.be.instanceOf(Function)
-    f(1, 2).should.eql(9)
-    f.graph.should.eql(graph)
-    f.graph.data.result.should.eql(9)
+    foo.should.be.instanceOf(Function)
+    bar.should.be.instanceOf(Function)
+
+    foo().should.be.eql(graph.data.foo)
+    bar().should.be.eql(graph.data.bar)
+
+    var data = { a: [2, 3] }
+    foo(data)
+    foo().should.be.eql(graph.data.foo)
+    foo().should.be.eql(data)
   })
 
-  it('accepts an empty graph', function () {
-    var emptyGraph = {
-      task: {},
-      pipe: {}
-    }
-
-    var empty = fun(emptyGraph)
-
-    should.deepEqual(empty.graph, emptyGraph)
-  })
-
-  it('can use dflow functions as tasks', function () {
+  it('injects accessor this.graph.data', function () {
+    var funcs = {}
     var graph = {
       task: {
-        '1': 'dflow.fun',
-        '2': 'dflow.isDflowFun',
-        '3': 'dflow.validate'
+        a: 'data'
       },
-      pipe: {}
+      data: {
+        foo: 1,
+        bar: [2]
+      }
     }
 
-    fun(graph)
-  })
+    injectAccessors(funcs, graph)
 
-  it('throws if graph is not valid', function () {
-    ;(function () {
-      var graphWithOrphanPipe = {
-        task: {
-          '3': 'return'
-        },
-        pipe: {
-          '1': [ '2', '3' ]
-        }
-      }
+    var data = funcs['this.graph.data']
 
-      fun(graphWithOrphanPipe)
-    }).should.throwError(/Orphan pipe:/)
-  })
+    should.deepEqual(data(), graph.data)
 
-  it('throws if a task is not found', function () {
-    ;(function () {
-      var graphWithTaskNotFound = {
-        task: {
-          '2': 'available task',
-          '3': 'foo'
-        },
-        pipe: {
-          '1': [ '2', '3' ]
-        }
-      }
-
-      var funcs = {
-        'available task': function () { return 'ok' }
-      }
-
-      fun(graphWithTaskNotFound, funcs)
-    }).should.throwError(/Task not found:/)
+    graph.data.quz = false
+    should.deepEqual(data(), {
+      foo: 1,
+      bar: [2],
+      quz: false
+    })
   })
 })
 
-},{"../src/engine/fun":33,"should":12}],75:[function(require,module,exports){
-var inputPipes = require('../src/engine/inputPipes')
+},{"engine/inject/accessors":32,"should":13}],48:[function(require,module,exports){
+var injectAdditionalFunctions = require('engine/inject/additionalFunctions')
 
-var pipe = {
-  'a': [ '0', '1' ],
-  'b': [ '1', '2' ],
-  'c': [ '1', '3' ],
-  'd': [ '2', '3' ]
+describe('injectAdditionalFunctions', function () {
+  it('modifies funcs object with additional functions', function () {
+    var additionalFunctions = {
+      foo: Function.prototype
+    }
+    var funcs = {
+      bar: Function.prototype
+    }
+
+    injectAdditionalFunctions(funcs, additionalFunctions)
+
+    funcs.foo.should.be.type('function')
+  })
+})
+
+},{"engine/inject/additionalFunctions":33}],49:[function(require,module,exports){
+var injectArguments = require('engine/inject/arguments')
+
+var funcs = {}
+var task = {
+  '1': 'arguments',
+  '2': 'arguments[0]',
+  '3': 'arguments[1]'
 }
 
-var inputPipesOf = inputPipes.bind(null, pipe)
+describe('injectArguments', function () {
+  it('modifies funcs object with arguments[N] injected', function () {
+    ;(function () {
+      injectArguments(funcs, task, arguments)
 
-describe('inputPipes', function () {
-  it('returns input pipes of task', function () {
-    inputPipesOf('0').should.eql([])
+      funcs['arguments[0]'].should.be.instanceOf(Function)
+      funcs['arguments[1]'].should.be.instanceOf(Function)
 
-    inputPipesOf('1').should.eql([pipe.a])
+      funcs['arguments[0]']().should.be.eql('foo')
+      funcs['arguments[1]']().should.be.eql('bar')
+    })('foo', 'bar', 'quz')
+  })
 
-    inputPipesOf('2').should.eql([pipe.b])
+  it('returns funcs object with arguments injected', function () {
+    ;(function () {
+      injectArguments(funcs, task, arguments)
 
-    inputPipesOf('3').should.eql([pipe.c, pipe.d])
+      funcs['arguments'].should.be.instanceOf(Function)
+
+      funcs['arguments']().should.be.eql(arguments)
+    })('foo', 'bar', 'quz')
   })
 })
 
-},{"../src/engine/inputPipes":45}],76:[function(require,module,exports){
-var level = require('../src/engine/level')
+},{"engine/inject/arguments":34}],50:[function(require,module,exports){
+(function (process){
+var injectDotOperators = require('engine/inject/dotOperators')
 
-var pipe = {
-  'a': [ '0', '1' ],
-  'b': [ '1', '2' ],
-  'c': [ '1', '3' ],
-  'd': [ '2', '3' ]
-}
-
-var cachedLevelOf = {}
-var computeLevelOf = level.bind(null, pipe, cachedLevelOf)
-
-describe('level', function () {
-  it('returns level of task', function () {
-    computeLevelOf('0').should.eql(0)
-    computeLevelOf('1').should.eql(1)
-    computeLevelOf('2').should.eql(2)
-    computeLevelOf('3').should.eql(3)
-  })
-})
-
-},{"../src/engine/level":47}],77:[function(require,module,exports){
-
-// Cheating npm require.
-module.exports = require('../../..')
-
-
-},{"../../..":31}],78:[function(require,module,exports){
-
-var accessor = require('../src/engine/regex/accessor')
-var argument = require('../src/engine/regex/argument')
-var comment = require('../src/engine/regex/comment')
-var dotOperator = require('../src/engine/regex/dotOperator')
-var reference = require('../src/engine/regex/reference')
-var subgraph = require('../src/engine/regex/subgraph')
-
-describe('regex', function () {
-  describe('accessor', function () {
-    it('matches @attributeName', function () {
-      accessor.test('@foo').should.be.true
-    })
-  })
-
-  describe('argument', function () {
-    it('matches arguments[N]', function () {
-      argument.test('arguments[0]').should.be.true
-      argument.test('arguments[1]').should.be.true
-      argument.test('arguments[2]').should.be.true
-      argument.test('arguments[3]').should.be.true
-    })
-  })
-
-  describe('dotOperator.attr', function () {
-    it('matches .validJavaScriptVariableName', function () {
-      dotOperator.func.test('.foo').should.be.true
-      dotOperator.func.test('.1foo').should.be.false
-    })
-  })
-
-  describe('dotOperator.func', function () {
-    it('matches .validJavaScriptFunctionName()', function () {
-      dotOperator.func.test('.foo()').should.be.true
-      dotOperator.func.test('.1foo()').should.be.false
-    })
-  })
-
-  describe('reference', function () {
-    it('matches &functionName', function () {
-      reference.test('&foo').should.be.true
-    })
-  })
-
-  describe('subgraph', function () {
-    it('matches /functionName', function () {
-      subgraph.test('/foo').should.be.true
-      subgraph.test('//comment').should.be.false
-      subgraph.test('notStartingWithSlash').should.be.false
-    })
-  })
-
-  describe('comment', function () {
-    it('matches //comment', function () {
-      comment.test('//foo').should.be.true
-    })
-  })
-})
-
-
-},{"../src/engine/regex/accessor":49,"../src/engine/regex/argument":50,"../src/engine/regex/comment":51,"../src/engine/regex/dotOperator":52,"../src/engine/regex/reference":54,"../src/engine/regex/subgraph":55}],79:[function(require,module,exports){
-var should = require('should')
-var fun = require('../src/engine/fun')
-
-describe('this', function () {
-  var graph = {
-    task: {
-      '1': 'this.graph',
-      '2': 'return'
-    },
-    pipe: {
-      'a': [ '1', '2' ]
-    }
-  }
-
-  var f = fun(graph)
-
-  it('is a dflow builtin that returns the function itself', function () {
-    should.deepEqual(f(), graph)
-  })
-})
-
-describe('this.graph', function () {
-  var graph = {
-    task: {
-      '1': 'this',
-      '2': 'return'
-    },
-    pipe: {
-      'a': [ '1', '2' ]
-    }
-  }
-
-  var f = fun(graph)
-
-  it('is a dflow builtin that returns the graph', function () {
-    f().should.be.a.Function
-
-    // Yep, f is a function that returns itself
-    should.deepEqual(f()(), f()()())
-  })
-})
-
-},{"../src/engine/fun":33,"should":12}],80:[function(require,module,exports){
-var validate = require('../src/engine/validate')
-
-describe('validate', function () {
-  it('is aware that undefined argIndex means 0', function () {
+describe('injectDotOperators', function () {
+  it('modifies funcs object with dot operators attribute-like injected', function () {
+    var funcs = {}
     var graph = {
-      task: { '1': 'x', '2': 'x' },
-      pipe: {
-        'a': [ '1', '2' ] // pipe['a'][2] here defaults to 0
+      task: {
+        '1': '.version',
+        '2': '.exit'
       }
     }
 
-    validate(graph).should.be.ok
+    injectDotOperators(funcs, graph.task)
+
+    var getVersion = funcs['.version']
+    var exit = funcs['.exit']
+
+    getVersion.should.be.a.Function
+    exit.should.be.a.Function
+
+    getVersion(process).should.be.eql(process.version)
+
+    // This will return a reference to process.exit, it should not call it.
+    exit(process).should.be.a.Function
   })
 
-  it('throws if an additional function name is "return"', function () {
-    ;(function () {
-      var graph = {
-        task: {}, pipe: {}
+  it('modifies funcs object with dot operators function-like injected', function () {
+    var funcs = {}
+    var graph = {
+      task: {
+        '1': '.foo()',
+        '2': '.sum()'
       }
-      var func = {
-        'return': Function.prototype
-      }
+    }
 
-      validate(graph, func)
-    }).should.throwError(/Reserved function name/)
-  })
+    injectDotOperators(funcs, graph.task)
 
-  it('throws if an additional function name is "arguments"', function () {
-    ;(function () {
-      var graph = {
-        task: {},
-        pipe: {}
-      }
-      var func = {
-        'arguments': Function.prototype
-      }
+    var foo = funcs['.foo()']
+    var sum = funcs['.sum()']
 
-      validate(graph, func)
-    }).should.throwError(/Reserved function name/)
-  })
+    foo.should.be.a.Function
 
-  it('throws if an additional function name is "argument[N]"', function () {
-    ;(function () {
-      validate({ task: {}, pipe: {} }, { 'arguments[0]': Function.prototype })
-    }).should.throwError(/Reserved function name/)
+    var Obj = {
+      foo: function () { return 1 },
+      sum: function (a) { return a + this.one },
+      one: 1
+    }
 
-    ;(function () {
-      validate({ task: {}, pipe: {} }, { 'arguments[1]': Function.prototype })
-    }).should.throwError(/Reserved function name/)
-  })
-
-  it('throws if an additional function name is "this"', function () {
-    ;(function () {
-      validate({ task: {}, pipe: {} }, { 'this': Function.prototype })
-    }).should.throwError(/Reserved function name/)
-  })
-
-  it('throws if an additional function name is "this.graph"', function () {
-    ;(function () {
-      validate({ task: {}, pipe: {} }, { 'this.graph': Function.prototype })
-    }).should.throwError(/Reserved function name/)
-  })
-
-  it('throws if an additional function name starts with a "@"', function () {
-    ;(function () {
-      validate({ task: {}, pipe: {} }, { '@foo': Function.prototype })
-    }).should.throwError(/Function name cannot start with "@"/)
-  })
-
-  it('throws if an additional function name starts with a "&"', function () {
-    ;(function () {
-      validate({ task: {}, pipe: {} }, { '&bar': Function.prototype })
-    }).should.throwError(/Function name cannot start with "&"/)
-  })
-
-  it('throws if an additional function name starts with a "."', function () {
-    ;(function () {
-      validate({ task: {}, pipe: {} }, { '.quz': Function.prototype })
-    }).should.throwError(/Function name cannot start with "\."/)
-
-    ;(function () {
-      validate({ task: {}, pipe: {} }, { '.quz()': Function.prototype })
-    }).should.throwError(/Function name cannot start with "\."/)
-  })
-
-  it('throws if pipe or task is not an object', function () {
-    ;(function () {
-      validate({ task: 'not an object', pipe: {} })
-    }).should.throwError(/Not an object: task/)
-
-    ;(function () {
-      validate({ pipe: 'not an object', task: {} })
-    }).should.throwError(/Not an object: pipe/)
-  })
-
-  it('throws if optional data, func or info is not an object', function () {
-    ;(function () {
-      validate({ task: {}, pipe: {}, data: 'not an object' })
-    }).should.throwError(/Not an object: data/)
-
-    ;(function () {
-      validate({ task: {}, pipe: {}, func: 'not an object' })
-    }).should.throwError(/Not an object: func/)
-
-    ;(function () {
-      validate({ task: {}, pipe: {}, info: 'not an object' })
-    }).should.throwError(/Not an object: info/)
-  })
-
-  it('throws if some pipe has invalid type', function () {
-    ;(function () {
-      validate({ task: {}, pipe: { '1': [ '1', '2', 'zero' ] } })
-    }).should.throwError(/Invalid pipe:/)
-
-    ;(function () {
-      validate({ task: {}, pipe: { '1': [ '1', 2, 0 ] } })
-    }).should.throwError(/Invalid pipe:/)
-
-    ;(function () {
-      validate({ task: {}, pipe: { '1': [ 1, '2', 0 ] } })
-    }).should.throwError(/Invalid pipe:/)
-  })
-
-  it('throws if pipe has duplicates', function () {
-    ;(function () {
-      validate({
-        task: { '1': 'foo', '2': 'bar' },
-        pipe: {
-          a: [ '1', '2', 1 ],
-          b: [ '1', '2', 1 ]
-        }
-      })
-    }).should.throwError(/Duplicated pipe:/)
-
-    ;(function () {
-      validate({
-        task: { '1': 'foo', '2': 'bar' },
-        pipe: {
-          a: [ '1', '2', 0 ],
-          b: [ '1', '2' ] // Since pipe['b'][2] defaults to 0, pipe['b'] is a duplicate.
-        }
-      })
-    }).should.throwError(/Duplicated pipe:/)
-  })
-
-  it('throws if some pipe is orphan', function () {
-    ;(function () {
-      validate({
-        task: {},
-        pipe: {
-          a: [ '1', '2', 0 ]
-        }
-      })
-    }).should.throwError(/Orphan pipe:/)
-  })
-
-  it('throws if some func is not a valid (sub)graph', function () {
-    ;(function () {
-      validate({
-        task: {},
-        pipe: {},
-        func: {
-          a: {
-            task: {},
-            pipe: {
-              b: [ '1', '2', 0 ]
-            }
-          }
-        }
-      })
-    }).should.throwError(/Orphan pipe:/)
-  })
-
-  it('throws if subgraph is not defined', function () {
-    ;(function () {
-      validate({
-        task: { '1': '/foo' },
-        pipe: {},
-        func: {}
-      })
-    }).should.throwError(/Undefined subgraph:/)
+    foo(Obj).should.be.eql(1)
+    sum(Obj, 2).should.be.eql(3) // 1 + 2 = 3, executed in Obj context.
   })
 })
 
-},{"../src/engine/validate":57}]},{},[71,72,73,74,75,76,78,79,80]);
+}).call(this,require('_process'))
+},{"_process":6,"engine/inject/dotOperators":35}],51:[function(require,module,exports){
+(function (process){
+var injectGlobals = require('engine/inject/globals')
+
+describe('injectGlobals', function () {
+  it('modifies funcs object with globals injected', function () {
+    var funcs = {}
+    var task = { '1': 'setTimeout' }
+
+    injectGlobals(funcs, task)
+
+    funcs.setTimeout.should.be.instanceOf(Function)
+  })
+
+  it('walks through taskName using dot operator syntax', function () {
+    var funcs = {}
+    var task = { '1': 'process.version' }
+
+    injectGlobals(funcs, task)
+
+    funcs['process.version']().should.be.eql(process.version)
+  })
+
+  it('works with global constants', function () {
+    var funcs = {}
+    var task = { '1': 'Math.E' }
+
+    injectGlobals(funcs, task)
+
+    funcs['Math.E']().should.be.eql(Math.E)
+  })
+})
+
+}).call(this,require('_process'))
+},{"_process":6,"engine/inject/globals":36}],52:[function(require,module,exports){
+var injectNumbers = require('engine/inject/numbers')
+
+describe('injectNumbers', function () {
+  it('turns a task with a name that looks like a number into a function that returns that number', function () {
+    var funcs = {}
+    var task = {
+      'a': '1',
+      'b': '-0.5'
+    }
+
+    injectNumbers(funcs, task)
+
+    var a = funcs['1']
+    var b = funcs['-0.5']
+
+    a.should.be.instanceOf(Function)
+    b.should.be.instanceOf(Function)
+
+    a().should.be.eql(1)
+    b().should.be.eql(-0.5)
+  })
+})
+
+},{"engine/inject/numbers":37}],53:[function(require,module,exports){
+var injectReferences = require('engine/inject/references')
+
+describe('injectReferences', function () {
+  it('modifies funcs object with references injected', function () {
+    var funcs = { 'Math.cos': Math.cos }
+    var task = { '1': '&Math.cos' }
+
+    injectReferences(funcs, task)
+
+    var fun = funcs['Math.cos']
+    var ref = funcs['&Math.cos']
+
+    fun.should.be.instanceOf(Function)
+    ref.should.be.instanceOf(Function)
+
+    ref().should.be.eql(fun)
+    ref()(1.5).should.be.eql(fun(1.5))
+  })
+
+  it('injects references to globals', function () {
+    var funcs = {}
+    var task = { '1': '&isFinite' }
+
+    injectReferences(funcs, task)
+
+    var ref = funcs['&isFinite']
+
+    ref.should.be.instanceOf(Function)
+
+    ref()(10).should.be.true
+  })
+})
+
+},{"engine/inject/references":38}],54:[function(require,module,exports){
+var injectStrings = require('engine/inject/strings')
+
+describe('injectStrings', function () {
+  it('modifies funcs object with strings injected', function () {
+    var funcs = {}
+    var task = {
+      'a': "'string'"
+    }
+
+    injectStrings(funcs, task)
+
+    var a = funcs["'string'"]
+
+    a.should.be.instanceOf(Function)
+
+    a().should.be.eql('string')
+  })
+})
+
+},{"engine/inject/strings":39}]},{},[47,48,49,50,51,52,53,54]);
