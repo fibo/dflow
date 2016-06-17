@@ -1,9 +1,8 @@
-var app = require('../../../server/app')
 var createEmptyGraph = require('../../../engine/createEmptyGraph')
 var fs = require('fs')
 var nopt = require('nopt')
 var usage = require('./usage')
-var http = require('http')
+var server = require('../../../editor/server')
 var utils = require('../../utils')
 
 var dotJson = utils.dotJson
@@ -15,14 +14,6 @@ var knownOpts = {
 
 var shortHandOpts = {
   h: '--help'
-}
-
-function startServer () {
-  var port = 3000
-
-  var server = http.Server(app)
-
-  server.listen(port)
 }
 
 module.exports = (args) => {
@@ -47,11 +38,11 @@ module.exports = (args) => {
   fs.stat(graphPath, (err, stats) => {
     if (err && err.code === 'ENOENT') {
       createEmptyGraph(graphPath, () => {
-        startServer()
+        server.start()
       })
     } else {
       if (stats.isFile()) {
-        startServer()
+        server.start()
       }
     }
   })
