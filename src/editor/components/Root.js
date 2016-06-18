@@ -3,7 +3,9 @@ import React, { PropTypes } from 'react'
 const Root = ({
   title
 }) => (
-  <span>{title}</span>
+  <div>
+    <span>{title}</span>
+  </div>
 )
 
 Root.propTypes = {
