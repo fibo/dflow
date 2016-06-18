@@ -13,16 +13,21 @@ var knownOpts = {
 }
 
 var shortHandOpts = {
-  h: '--help'
+  h: '--help',
+  o: '--open'
+}
+
+const showUsage = () => {
+  console.log(usage)
+  process.exit(0)
 }
 
 module.exports = (args) => {
   var opt = nopt(knownOpts, shortHandOpts, args, 3)
 
-  if (opt.help) {
-    console.log(usage)
-    process.exit(0)
-  }
+  if (opt.help) showUsage()
+
+  var open = opt.open
 
   var graphPath = null
   var remain = opt.argv.remain
@@ -38,11 +43,13 @@ module.exports = (args) => {
   fs.stat(graphPath, (err, stats) => {
     if (err && err.code === 'ENOENT') {
       createEmptyGraph(graphPath, () => {
-        server.start()
+        server.start({ open })
       })
     } else {
       if (stats.isFile()) {
-        server.start()
+        server.start({ open })
+      } else {
+        showUsage()
       }
     }
   })

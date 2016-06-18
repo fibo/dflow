@@ -3,11 +3,15 @@ var path = require('path')
 var babelify = require('babelify')
 var getInfo = require('./middleware/getInfo').handler
 var livereactload = require('livereactload')
+var no = require('not-defined')
 
-function start () {
+function start (opt) {
+  if (no(opt)) opt = {}
+
   budo(path.join(__dirname, 'index.js'), {
-    stream: process.stdout,
+    open: opt.open,
     debug: true,
+    stream: process.stdout,
     browserify: {
       transform: babelify,
       plugin: livereactload

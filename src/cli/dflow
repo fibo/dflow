@@ -24,11 +24,6 @@ var args = process.argv
 
 var opt = nopt(knownOpts, shortHandOpts, args, 2)
 
-if (opt.help) {
-  console.log(usage)
-  process.exit(0)
-}
-
 if (opt.version) {
   console.log(pkg.version)
   process.exit(0)
@@ -36,8 +31,16 @@ if (opt.version) {
 
 var remain = opt.argv.remain
 
-// Default action is *edit*
-if (remain.length === 0) edit(args)
+if (remain.length === 0) {
+  // Show help.
+  if (opt.help) {
+    console.log(usage)
+    process.exit(0)
+  }
+
+  // Default action is *edit*
+  edit(args)
+}
 
 if (remain[0] === 'edit') edit(args)
 
