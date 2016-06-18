@@ -11,6 +11,7 @@ function start (opt) {
   budo(path.join(__dirname, 'index.js'), {
     open: opt.open,
     debug: true,
+    title: 'dflow',
     stream: process.stdout,
     browserify: {
       transform: babelify,
