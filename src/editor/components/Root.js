@@ -1,12 +1,20 @@
-import React, { PropTypes } from 'react'
+import React, { PropTypes, Component } from 'react'
 
-const Root = ({
-  title
-}) => (
-  <div>
-    <span>{title}</span>
-  </div>
-)
+class Root extends Component {
+  componentDidMount () {
+    this.props.onMountRoot()
+  }
+
+  render () {
+    const { title } = this.props
+
+    return (
+      <div>
+        <span>{title}</span>
+      </div>
+    )
+  }
+}
 
 Root.propTypes = {
   title: PropTypes.string
