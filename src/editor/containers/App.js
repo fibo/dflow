@@ -11,9 +11,9 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  onMountRoot() { dispatch(fetchGraphIfNeeded()) },
-  onAddTask() { dispatch(addTask()) },
-  onAddPipe() { dispatch(addPipe()) }
+  onMountRoot () { dispatch(fetchGraphIfNeeded()) },
+  onAddTask () { dispatch(addTask()) },
+  onAddPipe () { dispatch(addPipe()) }
 })
 
 export default connect(
