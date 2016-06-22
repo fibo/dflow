@@ -1,4 +1,6 @@
 import React, { PropTypes, Component } from 'react'
+import { components } from 'flow-view'
+console.log(components)
 
 class Root extends Component {
   componentDidMount () {
