@@ -5,6 +5,7 @@ module.exports=function(x){return typeof x==='undefined'}
 var builtinFunctions = require('./functions/builtin')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
 var injectArguments = require('./inject/arguments')
+var injectArrowFunctions = require('./inject/arrowFunctions')
 var injectAccessors = require('./inject/accessors')
 var injectDotOperators = require('./inject/dotOperators')
 var injectGlobals = require('./inject/globals')
@@ -62,6 +63,7 @@ function fun (graph, additionalFunctions) {
   injectReferences(funcs, task)
   injectNumbers(funcs, task)
   injectStrings(funcs, task)
+  injectArrowFunctions(funcs, task)
 
   /**
    * Compiles a sub graph.
@@ -104,16 +106,16 @@ function fun (graph, additionalFunctions) {
         .forEach(compileSubgraph)
 
   /**
-   * Throw if a task is not defined.
+   * Throw if a task is not compiled.
    */
 
-  function checkTaskIsDefined (taskKey) {
+  function checkTaskIsCompiled (taskKey) {
     var taskName = task[taskKey]
 
     // Ignore tasks injected at run time.
     if (reservedKeys.indexOf(taskName) > -1) return
 
-    var msg = 'Task not found: ' + taskName + ' [' + taskKey + ']'
+    var msg = 'Task not compiled: ' + taskName + ' [' + taskKey + ']'
 
     // Check subgraphs.
     if (regexSubgraph.test(taskName)) {
@@ -135,7 +137,7 @@ function fun (graph, additionalFunctions) {
   // Check if there is some missing task.
   Object.keys(task)
         .filter(comments)
-        .forEach(checkTaskIsDefined)
+        .forEach(checkTaskIsCompiled)
 
   /**
    * Here we are, this is the ❤ of dflow.
@@ -205,7 +207,7 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./functions/builtin":3,"./inject/accessors":5,"./inject/additionalFunctions":6,"./inject/arguments":7,"./inject/dotOperators":8,"./inject/globals":9,"./inject/numbers":10,"./inject/references":11,"./inject/strings":12,"./inputArgs":13,"./isDflowFun":15,"./level":16,"./regex/argument":19,"./regex/comment":20,"./regex/subgraph":24,"./reservedKeys":25,"./validate":26,"./walkGlobal":27,"not-defined":1}],3:[function(require,module,exports){
+},{"./functions/builtin":3,"./inject/accessors":5,"./inject/additionalFunctions":6,"./inject/arguments":7,"./inject/arrowFunctions":8,"./inject/dotOperators":9,"./inject/globals":10,"./inject/numbers":11,"./inject/references":12,"./inject/strings":13,"./inputArgs":14,"./isDflowFun":16,"./level":17,"./regex/argument":20,"./regex/comment":21,"./regex/subgraph":25,"./reservedKeys":26,"./validate":27,"./walkGlobal":28,"not-defined":1}],3:[function(require,module,exports){
 // Arithmetic operators
 
 exports['+'] = function (a, b) { return a + b }
@@ -344,8 +346,6 @@ var accessorRegex = require('../regex/accessor')
 /**
  * Inject functions to set or get graph data.
  *
- * @api private
- *
  * @param {Object} funcs reference
  * @param {Object} graph
  */
@@ -359,8 +359,6 @@ function injectAccessors (funcs, graph) {
 
   /**
    * Inject accessor.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -369,8 +367,6 @@ function injectAccessors (funcs, graph) {
 
     /**
      * Accessor-like function.
-     *
-     * @api private
      */
 
     function accessor () {
@@ -393,11 +389,9 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":18}],6:[function(require,module,exports){
+},{"../regex/accessor":19}],6:[function(require,module,exports){
 /**
  * Optionally add custom functions.
- *
- * @api private
  *
  * @params {Object} funcs
  * @params {Object} additionalFunctions
@@ -411,8 +405,6 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
   /**
    * Validate and insert an additional function.
-   *
-   * @api private
    */
 
   function injectAdditionalFunction (key) {
@@ -435,8 +427,6 @@ var argumentRegex = require('../regex/argument')
 /**
  * Inject functions to retrieve arguments.
  *
- * @api private
- *
  * @param {Object} funcs reference
  * @param {Object} task
  * @param {Object} args
@@ -449,8 +439,6 @@ function injectArguments (funcs, task, args) {
 
   /**
    * Inject arguments.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -473,13 +461,48 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":19}],8:[function(require,module,exports){
+},{"../regex/argument":20}],8:[function(require,module,exports){
+/**
+ * If it contains an `=>`, escape single quotes and eval it.
+ *
+ * @param {Object} funcs reference
+ * @param {Object} task collection
+ */
+
+function arrowFunctions (funcs, task) {
+  /**
+   * Filter tasks that contain an `=>`
+   */
+
+  function arrows (taskKey) {
+    return (task[taskKey].indexOf('=>') > -1)
+  }
+
+  /**
+   * Evaluate a task
+   */
+
+  function evalTask (taskKey) {
+    var taskName = task[taskKey]
+
+    try {
+      var f = eval(taskName) // eslint-disable-line
+      funcs[taskName] = f
+    } catch (ignore) {}
+  }
+
+  Object.keys(task)
+        .filter(arrows)
+        .forEach(evalTask)
+}
+
+module.exports = arrowFunctions
+
+},{}],9:[function(require,module,exports){
 var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
  * Inject functions that emulate dot operator.
- *
- * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
@@ -488,8 +511,6 @@ var dotOperatorRegex = require('../regex/dotOperator')
 function injectDotOperators (funcs, task) {
   /**
    * Inject dot operator.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -497,8 +518,6 @@ function injectDotOperators (funcs, task) {
 
     /**
      * Dot operator function.
-     *
-     * @api private
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -528,8 +547,6 @@ function injectDotOperators (funcs, task) {
 
     /**
      * Dot operator attribute.
-     *
-     * @api private
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -564,15 +581,13 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":21}],9:[function(require,module,exports){
+},{"../regex/dotOperator":22}],10:[function(require,module,exports){
 var notDefined = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
 
 /**
  * Inject globals.
- *
- * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
@@ -581,8 +596,6 @@ var walkGlobal = require('../walkGlobal')
 function injectGlobals (funcs, task) {
   /**
    * Inject task
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -614,11 +627,9 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../reservedKeys":25,"../walkGlobal":27,"not-defined":1}],10:[function(require,module,exports){
+},{"../reservedKeys":26,"../walkGlobal":28,"not-defined":1}],11:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
- *
- * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task collection
@@ -627,8 +638,6 @@ module.exports = injectGlobals
 function injectNumbers (funcs, task) {
   /**
    * Inject a function that returns a number.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -649,24 +658,20 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],11:[function(require,module,exports){
-var referenceRegex = require('../regex/reference')
-var walkGlobal = require('../walkGlobal')
+},{}],12:[function(require,module,exports){
+  var referenceRegex = require('../regex/reference')
+  var walkGlobal = require('../walkGlobal')
 
-/**
- * Inject references to functions.
- *
- * @api private
- *
- * @param {Object} funcs reference
- * @param {Object} task
- */
+  /**
+  * Inject references to functions.
+  *
+  * @param {Object} funcs reference
+  * @param {Object} task
+  */
 
 function injectReferences (funcs, task) {
   /**
    * Inject task.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -676,8 +681,6 @@ function injectReferences (funcs, task) {
 
     /**
      * Inject reference.
-     *
-     * @api private
      */
 
     function reference () {
@@ -704,13 +707,11 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":23,"../walkGlobal":27}],12:[function(require,module,exports){
+},{"../regex/reference":24,"../walkGlobal":28}],13:[function(require,module,exports){
 var quotedRegex = require('../regex/quoted')
 
 /**
  * Inject functions that return strings.
- *
- * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task collection
@@ -719,8 +720,6 @@ var quotedRegex = require('../regex/quoted')
 function injectStrings (funcs, task) {
   /**
    * Inject a function that returns a string.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -739,7 +738,7 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":22}],13:[function(require,module,exports){
+},{"../regex/quoted":23}],14:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -770,7 +769,7 @@ function inputArgs (outs, pipe, taskKey) {
 
 module.exports = inputArgs
 
-},{"./inputPipes":14}],14:[function(require,module,exports){
+},{"./inputPipes":15}],15:[function(require,module,exports){
 /**
  * Compute pipes that feed a task.
  *
@@ -798,7 +797,7 @@ function inputPipes (pipe, taskKey) {
 
 module.exports = inputPipes
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var validate = require('./validate')
 
 /**
@@ -828,7 +827,7 @@ function isDflowFun (f) {
 
 module.exports = isDflowFun
 
-},{"./validate":26}],16:[function(require,module,exports){
+},{"./validate":27}],17:[function(require,module,exports){
 var parents = require('./parents')
 
 /**
@@ -863,7 +862,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 
 module.exports = level
 
-},{"./parents":17}],17:[function(require,module,exports){
+},{"./parents":18}],18:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -890,30 +889,30 @@ function parents (pipe, taskKey) {
 
 module.exports = parents
 
-},{"./inputPipes":14}],18:[function(require,module,exports){
+},{"./inputPipes":15}],19:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)\]$/
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = /^\/\/.+$/
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = /^&(.+)$/
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports = /^\/[\w][\w\d]+$/
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = [
   'arguments',
@@ -925,7 +924,7 @@ module.exports = [
   'this.graph'
 ]
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var accessorRegex = require('./regex/accessor')
 var argumentRegex = require('./regex/argument')
 var dotOperatorRegex = require('./regex/dotOperator')
@@ -1102,7 +1101,7 @@ function validate (graph, additionalFunctions) {
 
 module.exports = validate
 
-},{"./regex/accessor":18,"./regex/argument":19,"./regex/dotOperator":21,"./regex/reference":23,"./regex/subgraph":24,"./reservedKeys":25}],27:[function(require,module,exports){
+},{"./regex/accessor":19,"./regex/argument":20,"./regex/dotOperator":22,"./regex/reference":24,"./regex/subgraph":25,"./reservedKeys":26}],28:[function(require,module,exports){
 (function (global){
 var globalContext
 
