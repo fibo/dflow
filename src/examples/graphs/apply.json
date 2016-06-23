@@ -1,11 +1,9 @@
 {
   "data": {
-    "results": [
-      {
+    "results": [ {
         "args": [0],
         "expected": true
-      }
-    ]
+    } ]
   },
   "pipe": {
     "6": [
