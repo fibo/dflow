@@ -5,8 +5,6 @@ var walkGlobal = require('../walkGlobal')
 /**
  * Inject globals.
  *
- * @api private
- *
  * @param {Object} funcs reference
  * @param {Object} task
  */
@@ -14,8 +12,6 @@ var walkGlobal = require('../walkGlobal')
 function injectGlobals (funcs, task) {
   /**
    * Inject task
-   *
-   * @api private
    */
 
   function inject (taskKey) {

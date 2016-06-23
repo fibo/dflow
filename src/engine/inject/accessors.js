@@ -3,8 +3,6 @@ var accessorRegex = require('../regex/accessor')
 /**
  * Inject functions to set or get graph data.
  *
- * @api private
- *
  * @param {Object} funcs reference
  * @param {Object} graph
  */
@@ -18,8 +16,6 @@ function injectAccessors (funcs, graph) {
 
   /**
    * Inject accessor.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -28,8 +24,6 @@ function injectAccessors (funcs, graph) {
 
     /**
      * Accessor-like function.
-     *
-     * @api private
      */
 
     function accessor () {

@@ -3,8 +3,6 @@ var argumentRegex = require('../regex/argument')
 /**
  * Inject functions to retrieve arguments.
  *
- * @api private
- *
  * @param {Object} funcs reference
  * @param {Object} task
  * @param {Object} args
@@ -17,8 +15,6 @@ function injectArguments (funcs, task, args) {
 
   /**
    * Inject arguments.
-   *
-   * @api private
    */
 
   function inject (taskKey) {

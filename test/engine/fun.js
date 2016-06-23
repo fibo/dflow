@@ -95,7 +95,7 @@ describe('fun', function () {
     }).should.throwError(/Orphan pipe:/)
   })
 
-  it('throws if a task is not found', function () {
+  it('throws if a task is not compiled', function () {
     ;(function () {
       var graphWithTaskNotFound = {
         task: {
@@ -112,6 +112,6 @@ describe('fun', function () {
       }
 
       fun(graphWithTaskNotFound, funcs)
-    }).should.throwError(/Task not found:/)
+    }).should.throwError(/Task not compiled:/)
   })
 })

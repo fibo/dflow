@@ -22,7 +22,7 @@
     "browserify_dist": "browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
     "browserify_editor": "browserify src/editor/index.js -t babelify -o src/editor/static/bundle.js",
     "browserify_examples": "echo ***TODO*** browserify -r ./src/examples/renderer/client-side.js:examples-renderer -o gh-pages/js/examples-renderer.js",
-    "browserify_test_engine": "NODE_PATH=src browserify test/engine/**/*.js -o gh-pages/test/bundle.js",
+    "browserify_test_engine": "NODE_ENV=production NODE_PATH=src browserify test/engine/**/*.js -o gh-pages/test/bundle.js",
     "check-deps": "npm outdated",
     "coverage": "npm run istanbul && npm run coveralls",
     "coveralls": "cat ./coverage/lcov.info | coveralls --verbose",
