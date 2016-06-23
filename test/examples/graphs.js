@@ -1,4 +1,4 @@
-var dflow = require('dflow')
+var fun = require('engine/fun')
 var should = require('should')
 
 var examples = require('examples/graphs')
@@ -8,7 +8,7 @@ var context = (typeof window === 'object') ? 'client' : 'server'
 describe('example graph', function () {
   function testExample (name, graph) {
     describe(name, function () {
-      var f = dflow.fun(graph)
+      var f = fun(graph)
 
       it('works', function () {
         f.should.be.instanceOf(Function)
