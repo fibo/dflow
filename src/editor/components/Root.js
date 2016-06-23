@@ -1,6 +1,5 @@
 import React, { PropTypes, Component } from 'react'
-import { components } from 'flow-view'
-console.log(components)
+import { Canvas } from 'flow-view/components'
 
 class Root extends Component {
   componentDidMount () {
@@ -13,6 +12,12 @@ class Root extends Component {
     return (
       <div>
         <span>{title}</span>
+        <Canvas
+          width={100}
+          height={100}
+          links={[]}
+          nodes={[]}
+        />
       </div>
     )
   }
