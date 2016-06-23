@@ -30,7 +30,7 @@ describe('example graph', function () {
     var graphInfo = exampleGraph.info || {}
     var graphContext = graphInfo.context || 'universal'
 
-    if (graphContext === context) {
+    if ((graphContext === context) || (graphContext === 'universal')) {
       testExample(exampleName, exampleGraph)
     }
   }
