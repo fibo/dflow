@@ -61,7 +61,7 @@
     "brfs": "^1.4.3",
     "browserify": "^13.0.0",
     "budo": "^8.3.0",
-    "flow-view": "^2.1.0",
+    "flow-view": "^2.2.0",
     "isomorphic-fetch": "^2.2.1",
     "istanbul": "^0.4.4",
     "livereactload": "^2.2.4",
@@ -70,7 +70,7 @@
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
     "react-redux": "^4.4.5",
-    "react-router": "^2.4.1",
+    "react-router": "^2.5.0",
     "redux": "^3.5.2",
     "redux-thunk": "^2.1.0",
     "write-file-utf8": "^1.1.0"
