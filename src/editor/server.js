@@ -1,9 +1,11 @@
 var budo = require('budo')
 var path = require('path')
 var babelify = require('babelify')
-var getInfo = require('./middleware/getInfo').handler
 var livereactload = require('livereactload')
 var no = require('not-defined')
+
+var getGraph = require('./middleware/getGraph').handler
+var getInfo = require('./middleware/getInfo').handler
 
 function start (opt) {
   if (no(opt)) opt = {}
@@ -18,6 +20,7 @@ function start (opt) {
       plugin: livereactload
     },
     middleware: [
+      getGraph,
       getInfo
     ]
   })

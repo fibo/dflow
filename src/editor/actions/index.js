@@ -1,3 +1,6 @@
+import fetch from 'isomorphic-fetch'
+import notDefined from 'not-defined'
+
 export const ADD_TASK = 'ADD_TASK'
 
 export function addTask (id) {
@@ -16,19 +19,45 @@ export function addPipe (id) {
   }
 }
 
+export const FETCH_GRAPH_FAILURE = 'FETCH_GRAPH_FAILURE'
+
+export const FETCH_GRAPH_REQUEST = 'FETCH_GRAPH_REQUEST'
+
+export const FETCH_GRAPH_SUCCESS = 'FETCH_GRAPH_SUCCESS'
+
 function fetchGraph () {
+  return (dispatch) => {
+    dispatch({
+      type: FETCH_GRAPH_REQUEST
+    })
 
-}
-
-function shouldFetchGraph () {
-  console.log('TODO fetch graph')
-  return false
+    return fetch('/graph')
+      .then((response) => response.json())
+      .catch((error) => {
+        dispatch({
+          type: FETCH_GRAPH_FAILURE,
+          error
+        })
+      })
+      .then((json) => dispatch(receiveGraph(json)))
+  }
 }
 
 export function fetchGraphIfNeeded () {
-   return (dispatch, getState) => {
+  return (dispatch, getState) => {
     if (shouldFetchGraph(getState())) {
       return dispatch(fetchGraph())
     }
+  }
+}
+
+function shouldFetchGraph (state) {
+  return notDefined(state)
+}
+
+function receiveGraph (graph) {
+  return {
+    type: FETCH_GRAPH_SUCCESS,
+    graph
   }
 }

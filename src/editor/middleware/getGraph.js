@@ -1,7 +1,6 @@
 var url = require('url')
-var pkg = require('../../../package.json')
 
-var endpoint = '/info'
+var endpoint = '/graph'
 
 function handler (req, res, next) {
   if ((req.method === 'GET') && (url.parse(req.url).pathname === endpoint)) {
@@ -9,9 +8,10 @@ function handler (req, res, next) {
 
     res.statusCode = 200
 
+    // TODO send graph from file
     res.end(JSON.stringify({
-      name: pkg.name,
-      version: pkg.version
+      task: {},
+      pipe: {}
     }))
   } else {
     next()

@@ -1,12 +1,12 @@
-  var referenceRegex = require('../regex/reference')
-  var walkGlobal = require('../walkGlobal')
+var referenceRegex = require('../regex/reference')
+var walkGlobal = require('../walkGlobal')
 
-  /**
-  * Inject references to functions.
-  *
-  * @param {Object} funcs reference
-  * @param {Object} task
-  */
+/**
+* Inject references to functions.
+*
+* @param {Object} funcs reference
+* @param {Object} task
+*/
 
 function injectReferences (funcs, task) {
   /**
