@@ -5887,8 +5887,6 @@ var accessorRegex = require('../regex/accessor')
 /**
  * Inject functions to set or get graph data.
  *
- * @api private
- *
  * @param {Object} funcs reference
  * @param {Object} graph
  */
@@ -5902,8 +5900,6 @@ function injectAccessors (funcs, graph) {
 
   /**
    * Inject accessor.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -5912,8 +5908,6 @@ function injectAccessors (funcs, graph) {
 
     /**
      * Accessor-like function.
-     *
-     * @api private
      */
 
     function accessor () {
@@ -5936,11 +5930,9 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":20}],13:[function(require,module,exports){
+},{"../regex/accessor":21}],13:[function(require,module,exports){
 /**
  * Optionally add custom functions.
- *
- * @api private
  *
  * @params {Object} funcs
  * @params {Object} additionalFunctions
@@ -5954,8 +5946,6 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
   /**
    * Validate and insert an additional function.
-   *
-   * @api private
    */
 
   function injectAdditionalFunction (key) {
@@ -5978,8 +5968,6 @@ var argumentRegex = require('../regex/argument')
 /**
  * Inject functions to retrieve arguments.
  *
- * @api private
- *
  * @param {Object} funcs reference
  * @param {Object} task
  * @param {Object} args
@@ -5992,8 +5980,6 @@ function injectArguments (funcs, task, args) {
 
   /**
    * Inject arguments.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -6016,13 +6002,48 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":21}],15:[function(require,module,exports){
+},{"../regex/argument":22}],15:[function(require,module,exports){
+/**
+ * If it contains an `=>`, escape single quotes and eval it.
+ *
+ * @param {Object} funcs reference
+ * @param {Object} task collection
+ */
+
+function arrowFunctions (funcs, task) {
+  /**
+   * Filter tasks that contain an `=>`
+   */
+
+  function arrows (taskKey) {
+    return (task[taskKey].indexOf('=>') > -1)
+  }
+
+  /**
+   * Evaluate a task
+   */
+
+  function evalTask (taskKey) {
+    var taskName = task[taskKey]
+
+    try {
+      var f = eval(taskName) // eslint-disable-line
+      funcs[taskName] = f
+    } catch (ignore) {}
+  }
+
+  Object.keys(task)
+        .filter(arrows)
+        .forEach(evalTask)
+}
+
+module.exports = arrowFunctions
+
+},{}],16:[function(require,module,exports){
 var dotOperatorRegex = require('../regex/dotOperator')
 
 /**
  * Inject functions that emulate dot operator.
- *
- * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
@@ -6031,8 +6052,6 @@ var dotOperatorRegex = require('../regex/dotOperator')
 function injectDotOperators (funcs, task) {
   /**
    * Inject dot operator.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -6040,8 +6059,6 @@ function injectDotOperators (funcs, task) {
 
     /**
      * Dot operator function.
-     *
-     * @api private
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -6071,8 +6088,6 @@ function injectDotOperators (funcs, task) {
 
     /**
      * Dot operator attribute.
-     *
-     * @api private
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -6107,15 +6122,13 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":22}],16:[function(require,module,exports){
+},{"../regex/dotOperator":23}],17:[function(require,module,exports){
 var notDefined = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
 
 /**
  * Inject globals.
- *
- * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task
@@ -6124,8 +6137,6 @@ var walkGlobal = require('../walkGlobal')
 function injectGlobals (funcs, task) {
   /**
    * Inject task
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -6157,11 +6168,9 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../reservedKeys":25,"../walkGlobal":26,"not-defined":5}],17:[function(require,module,exports){
+},{"../reservedKeys":26,"../walkGlobal":27,"not-defined":5}],18:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
- *
- * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task collection
@@ -6170,8 +6179,6 @@ module.exports = injectGlobals
 function injectNumbers (funcs, task) {
   /**
    * Inject a function that returns a number.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -6192,24 +6199,20 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],18:[function(require,module,exports){
-var referenceRegex = require('../regex/reference')
-var walkGlobal = require('../walkGlobal')
+},{}],19:[function(require,module,exports){
+  var referenceRegex = require('../regex/reference')
+  var walkGlobal = require('../walkGlobal')
 
-/**
- * Inject references to functions.
- *
- * @api private
- *
- * @param {Object} funcs reference
- * @param {Object} task
- */
+  /**
+  * Inject references to functions.
+  *
+  * @param {Object} funcs reference
+  * @param {Object} task
+  */
 
 function injectReferences (funcs, task) {
   /**
    * Inject task.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -6219,8 +6222,6 @@ function injectReferences (funcs, task) {
 
     /**
      * Inject reference.
-     *
-     * @api private
      */
 
     function reference () {
@@ -6247,13 +6248,11 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":24,"../walkGlobal":26}],19:[function(require,module,exports){
+},{"../regex/reference":25,"../walkGlobal":27}],20:[function(require,module,exports){
 var quotedRegex = require('../regex/quoted')
 
 /**
  * Inject functions that return strings.
- *
- * @api private
  *
  * @param {Object} funcs reference
  * @param {Object} task collection
@@ -6262,8 +6261,6 @@ var quotedRegex = require('../regex/quoted')
 function injectStrings (funcs, task) {
   /**
    * Inject a function that returns a string.
-   *
-   * @api private
    */
 
   function inject (taskKey) {
@@ -6282,24 +6279,24 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":23}],20:[function(require,module,exports){
+},{"../regex/quoted":24}],21:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)\]$/
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports = /^&(.+)$/
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = [
   'arguments',
@@ -6311,7 +6308,7 @@ module.exports = [
   'this.graph'
 ]
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function (global){
 var globalContext
 
@@ -6344,7 +6341,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var injectAccessors = require('engine/inject/accessors')
 var should = require('should')
 
@@ -6406,7 +6403,7 @@ describe('injectAccessors', function () {
   })
 })
 
-},{"engine/inject/accessors":12,"should":11}],28:[function(require,module,exports){
+},{"engine/inject/accessors":12,"should":11}],29:[function(require,module,exports){
 var injectAdditionalFunctions = require('engine/inject/additionalFunctions')
 
 describe('injectAdditionalFunctions', function () {
@@ -6424,7 +6421,7 @@ describe('injectAdditionalFunctions', function () {
   })
 })
 
-},{"engine/inject/additionalFunctions":13}],29:[function(require,module,exports){
+},{"engine/inject/additionalFunctions":13}],30:[function(require,module,exports){
 var injectArguments = require('engine/inject/arguments')
 
 var funcs = {}
@@ -6458,7 +6455,31 @@ describe('injectArguments', function () {
   })
 })
 
-},{"engine/inject/arguments":14}],30:[function(require,module,exports){
+},{"engine/inject/arguments":14}],31:[function(require,module,exports){
+var injectArrowFunctions = require('engine/inject/arrowFunctions')
+
+describe('injectArrowFunctions', function () {
+  it('modifies funcs object by injecting evaluated arrow functions', function () {
+    var funcs = {}
+    var task = {
+      a: 'x => x * 2',
+      b: "(str) => ( str + 'bbb' )"
+    }
+
+    injectArrowFunctions(funcs, task)
+
+    var a = funcs['x => x * 2']
+    var b = funcs[task.b]
+
+    a.should.be.instanceOf(Function)
+    a(2).should.be.eql(4)
+
+    b.should.be.instanceOf(Function)
+    b('aaa').should.be.eql('aaabbb')
+  })
+})
+
+},{"engine/inject/arrowFunctions":15}],32:[function(require,module,exports){
 (function (process){
 var injectDotOperators = require('engine/inject/dotOperators')
 
@@ -6514,7 +6535,7 @@ describe('injectDotOperators', function () {
 })
 
 }).call(this,require('_process'))
-},{"_process":6,"engine/inject/dotOperators":15}],31:[function(require,module,exports){
+},{"_process":6,"engine/inject/dotOperators":16}],33:[function(require,module,exports){
 (function (process){
 var injectGlobals = require('engine/inject/globals')
 
@@ -6548,7 +6569,7 @@ describe('injectGlobals', function () {
 })
 
 }).call(this,require('_process'))
-},{"_process":6,"engine/inject/globals":16}],32:[function(require,module,exports){
+},{"_process":6,"engine/inject/globals":17}],34:[function(require,module,exports){
 var injectNumbers = require('engine/inject/numbers')
 
 describe('injectNumbers', function () {
@@ -6572,7 +6593,7 @@ describe('injectNumbers', function () {
   })
 })
 
-},{"engine/inject/numbers":17}],33:[function(require,module,exports){
+},{"engine/inject/numbers":18}],35:[function(require,module,exports){
 var injectReferences = require('engine/inject/references')
 
 describe('injectReferences', function () {
@@ -6606,7 +6627,7 @@ describe('injectReferences', function () {
   })
 })
 
-},{"engine/inject/references":18}],34:[function(require,module,exports){
+},{"engine/inject/references":19}],36:[function(require,module,exports){
 var injectStrings = require('engine/inject/strings')
 
 describe('injectStrings', function () {
@@ -6626,4 +6647,4 @@ describe('injectStrings', function () {
   })
 })
 
-},{"engine/inject/strings":19}]},{},[27,28,29,30,31,32,33,34]);
+},{"engine/inject/strings":20}]},{},[28,29,30,31,32,33,34,35,36]);
