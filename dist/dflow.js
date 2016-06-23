@@ -908,7 +908,7 @@ exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 module.exports = /^'.+'$/
 
 },{}],23:[function(require,module,exports){
-module.exports = /^\&(.+)$/
+module.exports = /^&(.+)$/
 
 },{}],24:[function(require,module,exports){
 module.exports = /^\/[\w][\w\d]+$/
