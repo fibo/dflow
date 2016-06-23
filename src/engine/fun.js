@@ -1,6 +1,7 @@
 var builtinFunctions = require('./functions/builtin')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
 var injectArguments = require('./inject/arguments')
+var injectArrowFunctions = require('./inject/arrowFunctions')
 var injectAccessors = require('./inject/accessors')
 var injectDotOperators = require('./inject/dotOperators')
 var injectGlobals = require('./inject/globals')
@@ -58,6 +59,7 @@ function fun (graph, additionalFunctions) {
   injectReferences(funcs, task)
   injectNumbers(funcs, task)
   injectStrings(funcs, task)
+  injectArrowFunctions(funcs, task)
 
   /**
    * Compiles a sub graph.
@@ -100,16 +102,16 @@ function fun (graph, additionalFunctions) {
         .forEach(compileSubgraph)
 
   /**
-   * Throw if a task is not defined.
+   * Throw if a task is not compiled.
    */
 
-  function checkTaskIsDefined (taskKey) {
+  function checkTaskIsCompiled (taskKey) {
     var taskName = task[taskKey]
 
     // Ignore tasks injected at run time.
     if (reservedKeys.indexOf(taskName) > -1) return
 
-    var msg = 'Task not found: ' + taskName + ' [' + taskKey + ']'
+    var msg = 'Task not compiled: ' + taskName + ' [' + taskKey + ']'
 
     // Check subgraphs.
     if (regexSubgraph.test(taskName)) {
@@ -131,7 +133,7 @@ function fun (graph, additionalFunctions) {
   // Check if there is some missing task.
   Object.keys(task)
         .filter(comments)
-        .forEach(checkTaskIsDefined)
+        .forEach(checkTaskIsCompiled)
 
   /**
    * Here we are, this is the ❤ of dflow.

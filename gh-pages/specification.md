@@ -17,7 +17,9 @@ A *graph* has the following properties
   * **view**: (ignored) object containing information used by [flow-view][flow-view] to render a graphic representation of the graph.
   * **info**: (to be defined) meta data, like *author*, *version* and, above all, *doc* which is a dflow graph itself. See [info draft](#info)
 
-## Builtin functions
+## Task resolution
+
+### Builtin functions
 
 *dflow* provides few [builtin functions][builtin-functions] and injects the following ones
 
@@ -29,7 +31,7 @@ A *graph* has the following properties
   * `this.graph.data`: returns the graph data content.
   * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
-  * `.quz`, `.quz()`: returns a dot-operator-like function.
+  * `.quz`, `.quuz()`: returns a dot-operator-like function.
   * any task found in global context, for example
     - `isFunction`
     - `Math.cos`
@@ -38,11 +40,29 @@ A *graph* has the following properties
   * `'string'`: a quoted string will resolve to a function that returns that string.
   * `123`: any number or float will resolve to a function that returns that number.
   * `// comment`: every task starting with `//` is ignored.
+  * `dflow.fun`
+  * `dflow.isDflowFun`
+  * `dflow.validate`
 
-Note that optional collection of *additionalFunctions*, in order to avoid conflicts with *injected* functions, must contain function names validated by the following rules:
+### Additional functions
+
+You can pass a second optional argument to `dflow.fun()` containing a collection
+of additional functions that will be used in the task resolution.
+
+In order to avoid conflicts with *injected* functions, the optional collection of *additionalFunctions* must contain function names validated by the following rules:
 
   * cannot be the name of an injected function: `arguments[0]` ... `arguments[N]`, [reserver keys][reserved-keys] like `this` and `return` are not allowed.
-  * cannot start with a *dot*, *ampersand* or *at sign*: names `@foo`, `&bar`, `.quz` and `.quz()` for an additional function are not allowed.
+  * cannot start with a *dot*, *ampersand* or *at sign*: names `@foo`, `&bar`, `.quz` and `.quuz()` for an additional function are not allowed.
+
+### Arrow functions
+
+If a task string does not match with some of the builtin functions above and
+neither some addition function provided, but it contains an arrow `=>` *dflow*
+engine will try to eval it.
+Yes, I know, *eval is evil* but think about using an arrow function. By adding
+this feature to the specification, you can create a task like `x => x * 2`.
+
+Note that the evaluation is performed on compile time.
 
 ## Info
 

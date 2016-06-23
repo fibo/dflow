@@ -1,8 +1,6 @@
 /**
  * Inject functions that return numbers.
  *
- * @api private
- *
  * @param {Object} funcs reference
  * @param {Object} task collection
  */
@@ -10,8 +8,6 @@
 function injectNumbers (funcs, task) {
   /**
    * Inject a function that returns a number.
-   *
-   * @api private
    */
 
   function inject (taskKey) {

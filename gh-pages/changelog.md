@@ -22,6 +22,7 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - removed semantic ui
 - budo dev server
 - cli actions
+- arrow functions
 
 [Unreleased]: https://github.com/fibo/{{ package.name }}/compare/v{{ package.version }}...HEAD
 [0.16.0]: https://github.com/fibo/{{ package.name }}/compare/v0.15.0...v0.16.0
