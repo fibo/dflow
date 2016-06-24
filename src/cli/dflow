@@ -8,8 +8,9 @@ var pkg = require('../../package.json')
 var usage = require('./usage')
 var actions = require('./actions')
 
-var edit = actions.edit
-var validate = actions.validate
+const edit = actions.edit
+const run = actions.run
+const validate = actions.validate
 
 var knownOpts = {
   help: Boolean,
@@ -43,5 +44,7 @@ if (remain.length === 0) {
 }
 
 if (remain[0] === 'edit') edit(args)
+
+if (remain[0] === 'run') run(args)
 
 if (remain[0] === 'validate') validate(args)
