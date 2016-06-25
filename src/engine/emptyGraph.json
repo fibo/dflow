@@ -1,9 +1,6 @@
 {
   "data": {},
+  "info": {},
   "pipe": {},
-  "task": {},
-  "view": {
-    "node": {},
-    "link": {}
-  }
+  "task": {}
 }
