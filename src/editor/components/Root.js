@@ -7,17 +7,14 @@ class Root extends Component {
   }
 
   render () {
-    const { title } = this.props
+    const { view, title } = this.props
+
+    console.log(view)
 
     return (
       <div>
         <span>{title}</span>
-        <Canvas
-          width={100}
-          height={100}
-          links={[]}
-          nodes={[]}
-        />
+        <Canvas {...view} />
       </div>
     )
   }
