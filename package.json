@@ -60,7 +60,7 @@
     "brfs": "^1.4.3",
     "browserify": "^13.0.0",
     "budo": "^8.3.0",
-    "flow-view": "^2.2.0",
+    "flow-view": "^2.3.0",
     "isomorphic-fetch": "^2.2.1",
     "istanbul": "^0.4.4",
     "livereactload": "^2.2.4",
