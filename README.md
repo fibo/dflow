@@ -56,7 +56,7 @@ or use a CDN adding this to your HTML page
 <script src="https://cdn.rawgit.com/fibo/dflow/master/dist/dflow.min.js"></script>
 ```
 
-Client distribution contains just the engine and minified version is around **10k**.
+Client distribution contains just the engine and minified version is around **12KB**.
 
 ### Server side
 
