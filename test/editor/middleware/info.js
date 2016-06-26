@@ -1,15 +1,15 @@
 var request = require('supertest')
 var connect = require('connect')
 
-var getInfo = require('editor/middleware/getInfo')
+var info = require('editor/middleware/info')
 var app = connect()
 
-app.use(getInfo.handler)
+app.use(info.handler)
 
 var pkg = require('../../../package.json')
 
-describe('GET /info', function () {
-  it('returns package info', function (done) {
+describe('GET /info', () => {
+  it('returns package info', (done) => {
     request(app)
       .get('/info')
       .set('Accept', 'application/json')

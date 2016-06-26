@@ -43,11 +43,17 @@ module.exports = (args) => {
   fs.stat(graphPath, (err, stats) => {
     if (err && err.code === 'ENOENT') {
       createEmptyGraph(graphPath, () => {
-        server.start({ open })
+        server.start({
+          graphPath,
+          open
+        })
       })
     } else {
       if (stats.isFile()) {
-        server.start({ open })
+        server.start({
+          graphPath,
+          open
+        })
       } else {
         showUsage()
       }

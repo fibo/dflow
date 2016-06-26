@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch'
-import notDefined from 'not-defined'
+import no from 'not-defined'
 
 export const ADD_TASK = 'ADD_TASK'
 
@@ -52,7 +52,7 @@ export function fetchGraphIfNeeded () {
 }
 
 function shouldFetchGraph (state) {
-  return notDefined(state)
+  return no(state.when_downloaded)
 }
 
 function receiveGraph (graph) {

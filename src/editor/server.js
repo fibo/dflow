@@ -4,8 +4,8 @@ var babelify = require('babelify')
 var livereactload = require('livereactload')
 var no = require('not-defined')
 
-var getGraph = require('./middleware/getGraph').handler
-var getInfo = require('./middleware/getInfo').handler
+var graph = require('./middleware/graph').handler
+var info = require('./middleware/info').handler
 
 function start (opt) {
   if (no(opt)) opt = {}
@@ -20,8 +20,8 @@ function start (opt) {
       plugin: livereactload
     },
     middleware: [
-      getGraph,
-      getInfo
+      graph(opt.graphPath),
+      info
     ]
   })
 }

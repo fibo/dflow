@@ -23,19 +23,18 @@ export default function (state = initialState, action) {
 
   switch (action.type) {
     case viewActions.ADD_NODE:
-      console.log('TODO: create a task')
       return state
 
     case FETCH_GRAPH_FAILURE:
-      return Object.assign({}, state, { view })
+      return state
 
     case FETCH_GRAPH_REQUEST:
-      return Object.assign({}, state, { view })
+      return state
 
     case FETCH_GRAPH_SUCCESS:
-      return Object.assign({}, state, { view })
+      return Object.assign({}, state, action.graph)
 
     default:
-      return state
+      return Object.assign({}, state, { view })
   }
 }
