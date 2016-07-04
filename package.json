@@ -10,9 +10,6 @@
   "license": "MIT",
   "bin": "src/cli/dflow",
   "main": "index.js",
-  "engines": {
-    "node": ">=4"
-  },
   "browser": "./src/engine/context/client-window.js",
   "scripts": {
     "build": "npm test && npm run browserify && npm run minify && npm run jekyll; npm run git_add-f; git status",
