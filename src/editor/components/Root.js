@@ -7,8 +7,9 @@ class Root extends Component {
   }
 
   render () {
-    const { view, title } = this.props
+    const { onView, view, title } = this.props
 
+    Object.assign(view, onView)
     console.log(view)
 
     return (
