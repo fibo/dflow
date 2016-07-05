@@ -10,9 +10,6 @@
   "license": "MIT",
   "bin": "src/cli/dflow",
   "main": "index.js",
-  "engines": {
-    "node": ">=4"
-  },
   "browser": "./src/engine/context/client-window.js",
   "scripts": {
     "build": "npm test && npm run browserify && npm run minify && npm run jekyll; npm run git_add-f; git status",
@@ -35,8 +32,10 @@
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
     "istanbul": "istanbul cover _mocha -- --recursive",
     "jekyll": "npm run homepage; npm run cp_package.json; cd gh-pages; jekyll build; cd ..",
-    "lint": "for x in src test; do npm run lint_$x; done",
-    "lint_src": "cd src; standard; cd -",
+    "lint": "for x in cli engine editor test; do npm run lint_$x; done",
+    "lint_cli": "cd src/cli; standard; cd -",
+    "lint_engine": "cd src/engine; standard; cd -",
+    "lint_editor": "cd src/editor; standard; cd -",
     "lint_test": "cd test; standard --global describe --global it; cd -",
     "minify": "cd dist; uglifyjs ${npm_package_name}.js --source-map ${npm_package_name}.map --output ${npm_package_name}.min.js --compress --mangle --preamble \"// Software: ${npm_package_name}\n// Homepage: ${npm_package_homepage}\n// License: ${npm_package_license}\"; cd -",
     "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push",
