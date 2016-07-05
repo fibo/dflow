@@ -12,9 +12,6 @@ import {
 } from 'flow-view/containers/App'
 
 const mapStateToProps = (state, ownProps) => {
-  console.log(ownProps)
-  console.log(state)
-
   return {
     view: flowViewMapStateToProps(state.view, ownProps.view)
   }
@@ -22,30 +19,14 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    view: flowViewMapDispatchToProps(dispatch, ownProps.view),
+    onView: flowViewMapDispatchToProps(dispatch, ownProps.view),
     onMountRoot: () => { dispatch(fetchGraphIfNeeded()) },
     onAddTask: () => { dispatch(addTask()) },
     onAddPipe: () => { dispatch(addPipe()) }
   }
 }
 
-const mergeProps = (stateProps, dispatchProps, ownProps) => {
-  const stateView = stateProps.view
-  const dispatchView = dispatchProps.view
-
-  delete stateProps.view
-  delete dispatchProps.view
-
-  return Object.assign({},
-    ownProps,
-    stateProps,
-    dispatchProps,
-    { view: Object.assign({}, stateView, dispatchView) }
-  )
-}
-
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
-  mergeProps
+  mapDispatchToProps
 )(Root)
