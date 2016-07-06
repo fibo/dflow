@@ -3,6 +3,8 @@ var url = require('url')
 var endpoint = '/graph'
 
 function handler (graphPath) {
+  var graph = require(graphPath)
+
   return function (req, res, next) {
     var pathname = url.parse(req.url).pathname
     var method = req.method
@@ -15,12 +17,13 @@ function handler (graphPath) {
     if (method === 'GET') {
       res.setHeader('Content-Type', 'application/json')
       res.statusCode = 200
-      res.end(JSON.stringify(require(graphPath)))
+      res.end(JSON.stringify(graph))
       return
     }
 
     if (method === 'PUT') {
-      // TODO
+      graph = req.body
+      res.end(JSON.stringify({ ok: true }))
       return
     }
 

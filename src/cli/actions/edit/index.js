@@ -33,7 +33,8 @@ module.exports = (args) => {
   var remain = opt.argv.remain
 
   if (remain.length === 0) {
-    graphPath = 'graph.json'
+    graphPath = ['graph.json'].map(appendCwd)
+                              .shift()
   } else {
     graphPath = remain.filter(dotJson)
                       .map(appendCwd)
