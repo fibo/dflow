@@ -1,21 +1,13 @@
 import React, { PropTypes, Component } from 'react'
-import { Canvas } from 'flow-view/components'
 
 class Root extends Component {
-  componentDidMount () {
-    this.props.onMountRoot()
-  }
-
   render () {
-    const { onView, view, title } = this.props
-
-    Object.assign(view, onView)
-    console.log(view)
+    const { title } = this.props
 
     return (
       <div>
+        dfloooooooooooow
         <span>{title}</span>
-        <Canvas {...view} />
       </div>
     )
   }
