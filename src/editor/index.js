@@ -3,22 +3,26 @@ import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import App from './containers/App'
 import configureStore from './store/configureStore'
+import { Canvas } from 'flow-view'
 
 const store = configureStore()
 
 const containerId = 'dflow'
+const container = document.createElement('div')
+container.id = containerId
+document.body.appendChild(container)
 
-let container = document.getElementById(containerId)
+const canvasContainerId = 'dflow-canvas'
+const canvasContainer = document.createElement('div')
+canvasContainer.id = canvasContainerId
+document.body.appendChild(canvasContainer)
 
-if (!container) {
-  container = document.createElement('div')
-  container.id = containerId
-  document.body.appendChild(container)
-}
+const canvas = new Canvas(canvasContainerId)
+canvas.render()
 
 render(
   <Provider store={store}>
-    <App view={{ container }} />
+    <App />
   </Provider>,
   container
 )
