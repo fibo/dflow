@@ -4,6 +4,7 @@ permalink: /changelog
 ---
 
 {% assign package = site.data.package %}
+{% assign tags = site.data.tags %}
 
 # Change Log
 
@@ -25,4 +26,8 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - arrow functions
 
 [Unreleased]: https://github.com/fibo/{{ package.name }}/compare/v{{ package.version }}...HEAD
-[0.16.0]: https://github.com/fibo/{{ package.name }}/compare/v0.15.0...v0.16.0
+{% for tag in tags offset:2 %}
+  {% assign current = tags[forloop.index0].name %}
+  {% assign previous = tags[forloop.index].name %}
+  [{{ current }}]: https://github.com/fibo/{{ package.name }}/compare/{{ previous }}...{{ current }}
+{% endfor %}
