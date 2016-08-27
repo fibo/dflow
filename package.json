@@ -17,7 +17,7 @@
     "bower_install": "cd src/editor; bower --silent --config.analytics=false install; cd -",
     "browserify": "for x in dist examples test_engine; do npm run browserify_$x; done",
     "browserify_dist": "browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
-    "browserify_examples": "echo ***TODO*** browserify -r ./src/examples/renderer/client-side.js:examples-renderer -o gh-pages/js/examples-renderer.js",
+    "browserify_examples": "browserify -r ./src/examples/renderer/client-side.js:examples-renderer -o gh-pages/js/examples-renderer.js",
     "browserify_test_engine": "NODE_ENV=production NODE_PATH=src browserify test/engine/**/*.js -o gh-pages/test/bundle.js",
     "check-deps": "npm outdated",
     "coverage": "npm run istanbul && npm run coveralls",

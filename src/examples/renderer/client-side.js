@@ -1,6 +1,6 @@
 var Canvas = require('flow-view').Canvas
-var dflow = require('../../index')
-var graphs = require('./graphs')
+var dflow = require('dflow')
+var graphs = require('../graphs')
 
 /**
  * Render example into given div and execute dflow graph.
