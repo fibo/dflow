@@ -1,0 +1,173 @@
+[
+  {
+    "name": "v0.15.0",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.15.0",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.15.0",
+    "commit": {
+      "sha": "0f0affcbef701c06742fe4f3cddedcbe9b04a522",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/0f0affcbef701c06742fe4f3cddedcbe9b04a522"
+    }
+  },
+  {
+    "name": "v0.14.2",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.14.2",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.14.2",
+    "commit": {
+      "sha": "89fa07b9fd95755ec1a6f2e3d81b1715648a2883",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/89fa07b9fd95755ec1a6f2e3d81b1715648a2883"
+    }
+  },
+  {
+    "name": "v0.14.1",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.14.1",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.14.1",
+    "commit": {
+      "sha": "e647b4ea8d2d9f708eff512bb41abfe42ab18b83",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/e647b4ea8d2d9f708eff512bb41abfe42ab18b83"
+    }
+  },
+  {
+    "name": "v0.14.0",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.14.0",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.14.0",
+    "commit": {
+      "sha": "b7d6aac247d2e877e18cb1e888cb8f7f6715d2d6",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/b7d6aac247d2e877e18cb1e888cb8f7f6715d2d6"
+    }
+  },
+  {
+    "name": "v0.12.7",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.12.7",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.12.7",
+    "commit": {
+      "sha": "63007097f1a2d204b2152aef33e7b8bd46db2ecb",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/63007097f1a2d204b2152aef33e7b8bd46db2ecb"
+    }
+  },
+  {
+    "name": "v0.12.6",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.12.6",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.12.6",
+    "commit": {
+      "sha": "84765c84ee6c2a3034d1f2a477b28ee7a121a20a",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/84765c84ee6c2a3034d1f2a477b28ee7a121a20a"
+    }
+  },
+  {
+    "name": "v0.12.5",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.12.5",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.12.5",
+    "commit": {
+      "sha": "d3d9f7b9ea6d58a3b7e4d67a0e5d190cc9001eec",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/d3d9f7b9ea6d58a3b7e4d67a0e5d190cc9001eec"
+    }
+  },
+  {
+    "name": "v0.12.4",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.12.4",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.12.4",
+    "commit": {
+      "sha": "e7c48410f21782e93e7f63051c3d2d9eb8be9c8f",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/e7c48410f21782e93e7f63051c3d2d9eb8be9c8f"
+    }
+  },
+  {
+    "name": "v0.12.3",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.12.3",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.12.3",
+    "commit": {
+      "sha": "27d171b48005d93a7c33fea4a3291db55b41b58f",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/27d171b48005d93a7c33fea4a3291db55b41b58f"
+    }
+  },
+  {
+    "name": "v0.12.2",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.12.2",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.12.2",
+    "commit": {
+      "sha": "0bdf40760d7cebb1f305d98f9254d98439691078",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/0bdf40760d7cebb1f305d98f9254d98439691078"
+    }
+  },
+  {
+    "name": "v0.12.1",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.12.1",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.12.1",
+    "commit": {
+      "sha": "2cbee7e793a9ddeb7091cddcf61becdf10b63ae0",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/2cbee7e793a9ddeb7091cddcf61becdf10b63ae0"
+    }
+  },
+  {
+    "name": "v0.12.0",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.12.0",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.12.0",
+    "commit": {
+      "sha": "a56dc6375b278602a831a1a946ae842c3602a8ca",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/a56dc6375b278602a831a1a946ae842c3602a8ca"
+    }
+  },
+  {
+    "name": "v0.11.0",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.11.0",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.11.0",
+    "commit": {
+      "sha": "185271e325479b72a230e767ed7a507361caed1a",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/185271e325479b72a230e767ed7a507361caed1a"
+    }
+  },
+  {
+    "name": "v0.10.0",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.10.0",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.10.0",
+    "commit": {
+      "sha": "e9480d1173c327809132778553a45cddfe7991ad",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/e9480d1173c327809132778553a45cddfe7991ad"
+    }
+  },
+  {
+    "name": "v0.8.9",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.8.9",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.8.9",
+    "commit": {
+      "sha": "1bbe41dd094ec4fee9f8538c6d06b35608011c35",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/1bbe41dd094ec4fee9f8538c6d06b35608011c35"
+    }
+  },
+  {
+    "name": "v0.8.8",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.8.8",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.8.8",
+    "commit": {
+      "sha": "a4c8b50be6ae14debd07457489ba4f5a16a4c818",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/a4c8b50be6ae14debd07457489ba4f5a16a4c818"
+    }
+  },
+  {
+    "name": "v0.8.7",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.8.7",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.8.7",
+    "commit": {
+      "sha": "9e69bc3839d085a21878113a9f085b60188a7273",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/9e69bc3839d085a21878113a9f085b60188a7273"
+    }
+  },
+  {
+    "name": "v0.8.6",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.8.6",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.8.6",
+    "commit": {
+      "sha": "306e7d7184b5841c3e88a24e2552d09a9518a20b",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/306e7d7184b5841c3e88a24e2552d09a9518a20b"
+    }
+  },
+  {
+    "name": "v0.8.4",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.8.4",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.8.4",
+    "commit": {
+      "sha": "e16e1403941870e1265538005ca1c78424c6cdb1",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/e16e1403941870e1265538005ca1c78424c6cdb1"
+    }
+  }
+]
