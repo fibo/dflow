@@ -17,13 +17,15 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [0.16.0] - 
 
+### Fixed
+
+- examples renderer
+
 ### Added
 
-- CHANGELOG.md
-- removed semantic ui
-- budo dev server
+- Dynamic changelog.
 - cli actions
-- arrow functions
+- arrow functions support
 
 [Unreleased]: https://github.com/fibo/{{ package.name }}/compare/v{{ package.version }}...HEAD
 {% for tag in tags offset:2 %}
