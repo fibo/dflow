@@ -1,31 +1,44 @@
-var babelify = require('babelify')
-var bodyParser = require('body-parser')
-var budo = require('budo')
-var livereactload = require('livereactload')
-var no = require('not-defined')
-var path = require('path')
+const no = require('not-defined')
+const path = require('path')
+const express = require('express')
 
-var graph = require('./middleware/graph').handler
-var info = require('./middleware/info').handler
+const debug = require('debug')('dflow')
+
+const app = express()
+const http = require('http').Server(app)
+const io = require('socket.io')(http)
+
+app.use(express.static('public'))
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'))
+})
+
+app.all('/*', (req, res) => {
+  res.redirect('/')
+})
+
+// Socket.io events.
+
+io.on('connection', (socket) => {
+  socket.emit('connection')
+
+  debug('user connected')
+
+  socket.on('disconnect', () => {
+    debug('user disconnected')
+  })
+})
 
 function start (opt) {
   if (no(opt)) opt = {}
 
-  budo(path.join(__dirname, 'index.js'), {
-    browserify: {
-      transform: babelify,
-      plugin: livereactload
-    },
-    cors: true,
-    debug: true,
-    middleware: [
-      bodyParser.json(),
-      graph(opt.graphPath),
-      info
-    ],
-    open: opt.open,
-    stream: process.stdout,
-    title: 'dflow'
+  // TODO if (opt.open) open index.html
+  // TODO opt.port
+  const port = 3000
+
+  http.listen(port, () => {
+    debug('Listening on port %d', port)
   })
 }
 
