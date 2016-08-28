@@ -1,6 +1,6 @@
 const no = require('not-defined')
-const path = require('path')
 const express = require('express')
+const path = require('path')
 
 const debug = require('debug')('dflow')
 
@@ -8,14 +8,10 @@ const app = express()
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
 
-app.use(express.static('public'))
+app.use(express.static(path.join(__dirname, 'public')))
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
-})
-
-app.all('/*', (req, res) => {
-  res.redirect('/')
 })
 
 // Socket.io events.

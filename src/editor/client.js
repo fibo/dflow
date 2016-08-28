@@ -9,7 +9,10 @@ const store = configureStore()
 // TODO prova a rinominare flow-view/containers/App in flow-view/containers/Canvas o FlowView
 // fai che il container di flow view usa sempre lo store sotto "view"
 // e poi dovresti poter fare tipo
-// import FlowView from 'flow-view/containers/FlowView'
+import FlowView from 'flow-view/containers/FlowView'
+
+// TODO
+// import FlowView from 'flow-view/container'
 
 // render(
 //  <Provider store={store}>
@@ -19,9 +22,14 @@ const store = configureStore()
 //  document.getElementById('root')
 // )
 
+const container = document.getElementById('root')
+
 render(
   <Provider store={store}>
-    <App />
+    <div>
+      <App />
+      <FlowView documentElement={container} />
+    </div>
   </Provider>,
-  document.getElementById('root')
+  container
 )
