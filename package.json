@@ -65,9 +65,13 @@
   ],
   "dependencies": {
     "express": "^4.14.0",
+    "flow-view": "^2.5.0",
     "nopt": "^3.0.4",
     "not-defined": "^1.1.0",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
     "socket.io": "^1.4.8",
+    "standard": "^8.1.0",
     "write-file-utf8": "^1.1.0"
   },
   "devDependencies": {
