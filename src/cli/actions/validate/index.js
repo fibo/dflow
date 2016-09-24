@@ -1,37 +1,37 @@
-var nopt = require('nopt')
-var fs = require('fs')
-var no = require('not-defined')
-var usage = require('./usage')
-var validate = require('../../../engine/validate')
+const nopt = require('nopt')
+const fs = require('fs')
+const no = require('not-defined')
+const usage = require('./usage')
+const validate = require('../../../engine/validate')
 
-var utils = require('../../utils')
+const utils = require('../../utils')
 
-var dotJson = utils.dotJson
-var appendCwd = utils.appendCwd
+const dotJson = utils.dotJson
+const appendCwd = utils.appendCwd
 
-var knownOpts = {
+const knownOpts = {
   funcs: String,
   help: Boolean
 }
 
-var shortHandOpts = {
+const shortHandOpts = {
   f: '--funcs',
   h: '--help'
 }
 
 module.exports = (args) => {
-  var opt = nopt(knownOpts, shortHandOpts, args, 3)
+  const opt = nopt(knownOpts, shortHandOpts, args, 3)
 
   if (opt.help) {
     console.log(usage)
     process.exit(0)
   }
 
-  var graphPath = opt.argv
-                     .remain
-                     .filter(dotJson)
-                     .map(appendCwd)
-                     .shift()
+   const graphPath = opt.argv
+                        .remain
+                        .filter(dotJson)
+                        .map(appendCwd)
+                        .shift()
 
   if (no(graphPath)) {
     console.error('No path/to/graph.json provided')
@@ -48,7 +48,7 @@ module.exports = (args) => {
         var ok = false
 
         if (opt.funcs) {
-          var additionalFunctions = require(opt.funcs)
+          const additionalFunctions = require(opt.funcs)
 
           ok = validate(graph, additionalFunctions)
         } else {

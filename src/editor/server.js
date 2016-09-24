@@ -34,7 +34,7 @@ function start (opt) {
   const port = 3000
 
   http.listen(port, () => {
-    debug('Listening on port %d', port)
+    debug('editor server is listening on port %d', port)
   })
 }
 

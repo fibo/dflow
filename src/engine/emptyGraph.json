@@ -2,5 +2,9 @@
   "data": {},
   "info": {},
   "pipe": {},
-  "task": {}
+  "task": {},
+  "view": {
+    "link": {},
+    "node": {}
+  }
 }

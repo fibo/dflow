@@ -1,17 +1,17 @@
-var nopt = require('nopt')
-var usage = require('./usage')
-var utils = require('../../utils')
-var no = require('not-defined')
-var fun = require('../../../engine/fun')
+const fun = require('../../../engine/fun')
+const nopt = require('nopt')
+const no = require('not-defined')
+const usage = require('./usage')
+const utils = require('../../utils')
 
-var dotJson = utils.dotJson
-var appendCwd = utils.appendCwd
+const dotJson = utils.dotJson
+const appendCwd = utils.appendCwd
 
-var knownOpts = {
+const knownOpts = {
   help: Boolean
 }
 
-var shortHandOpts = {
+const shortHandOpts = {
   h: '--help'
 }
 
@@ -21,15 +21,15 @@ const showUsage = () => {
 }
 
 module.exports = (args) => {
-  var opt = nopt(knownOpts, shortHandOpts, args, 3)
+  const opt = nopt(knownOpts, shortHandOpts, args, 3)
 
-  var remain = opt.argv.remain
+  const remain = opt.argv.remain
 
   if ((opt.help) || (remain.length === 0)) showUsage()
 
-  var graphPath = remain.filter(dotJson)
-                        .map(appendCwd)
-                        .shift()
+  const graphPath = remain.filter(dotJson)
+                          .map(appendCwd)
+                          .shift()
 
   if (no(graphPath)) showUsage()
 
