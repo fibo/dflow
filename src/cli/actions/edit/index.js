@@ -1,18 +1,19 @@
-var createEmptyGraph = require('../../../engine/createEmptyGraph')
-var fs = require('fs')
-var nopt = require('nopt')
-var usage = require('./usage')
-var server = require('../../../editor/server')
-var utils = require('../../utils')
+const createEmptyGraph = require('../../../engine/createEmptyGraph')
+const debug = require('debug')('dflow')
+const fs = require('fs')
+const nopt = require('nopt')
+const server = require('../../../editor/server')
+const usage = require('./usage')
+const utils = require('../../utils')
 
 var dotJson = utils.dotJson
 var appendCwd = utils.appendCwd
 
-var knownOpts = {
+const knownOpts = {
   help: Boolean
 }
 
-var shortHandOpts = {
+const shortHandOpts = {
   h: '--help',
   o: '--open'
 }
@@ -23,14 +24,14 @@ const showUsage = () => {
 }
 
 module.exports = (args) => {
-  var opt = nopt(knownOpts, shortHandOpts, args, 3)
+  const opt = nopt(knownOpts, shortHandOpts, args, 3)
 
   if (opt.help) showUsage()
 
-  var open = opt.open
+  const open = opt.open
 
   var graphPath = null
-  var remain = opt.argv.remain
+  const remain = opt.argv.remain
 
   if (remain.length === 0) {
     graphPath = ['graph.json'].map(appendCwd)

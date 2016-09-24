@@ -1,41 +1,81 @@
 import fetch from 'isomorphic-fetch'
 import no from 'not-defined'
 
-export const ADD_TASK = 'ADD_TASK'
-
-export function addTask (id) {
+export function createNode (node, nodeId) {
   return {
-    type: ADD_TASK,
-    id
+    type: 'CREATE_NODE',
+    node,
+    nodeId
   }
 }
 
-export const ADD_PIPE = 'ADD_PIPE'
-
-export function addPipe (id) {
+export function createLink (link, linkId) {
   return {
-    type: ADD_PIPE,
-    id
+    type: 'CREATE_LINK',
+    link,
+    linkId
   }
 }
 
-export const FETCH_GRAPH_FAILURE = 'FETCH_GRAPH_FAILURE'
+export function createInputPin (nodeId, position, pin) {
+  return {
+    type: 'CREATE_INPUT_PIN',
+    nodeId,
+    position,
+    pin
+  }
+}
 
-export const FETCH_GRAPH_REQUEST = 'FETCH_GRAPH_REQUEST'
+export function createOutputPin (nodeId, position, pin) {
+  return {
+    type: 'CREATE_OUTPUT_PIN',
+    nodeId,
+    position,
+    pin
+  }
+}
 
-export const FETCH_GRAPH_SUCCESS = 'FETCH_GRAPH_SUCCESS'
+export function deleteLink (linkId) {
+  return {
+    type: 'DELETE_LINK',
+    linkId
+  }
+}
+
+export function deleteNode (nodeId) {
+  return {
+    type: 'DELETE_NODE',
+    nodeId
+  }
+}
+
+export function deleteInputPin (nodeId, position) {
+  return {
+    type: 'DELETE_INPUT_PIN',
+    nodeId,
+    position
+  }
+}
+
+export function deleteOutputPin (nodeId, position) {
+  return {
+    type: 'DELETE_OUTPUT_PIN',
+    nodeId,
+    position
+  }
+}
 
 function fetchGraph () {
   return (dispatch) => {
     dispatch({
-      type: FETCH_GRAPH_REQUEST
+      type: 'FETCH_GRAPH_REQUEST'
     })
 
     return fetch('/graph')
       .then((response) => response.json())
       .catch((error) => {
         dispatch({
-          type: FETCH_GRAPH_FAILURE,
+          type: 'FETCH_GRAPH_FAILURE',
           error
         })
       })
@@ -51,13 +91,20 @@ export function fetchGraphIfNeeded () {
   }
 }
 
-function shouldFetchGraph (state) {
-  return no(state.when_downloaded)
+export function initCanvas (canvasId) {
+  return {
+    type: 'INIT_CANVAS',
+    canvasId
+  }
 }
 
 function receiveGraph (graph) {
   return {
-    type: FETCH_GRAPH_SUCCESS,
+    type: 'FETCH_GRAPH_SUCCESS',
     graph
   }
+}
+
+function shouldFetchGraph (state) {
+  return no(state.when_downloaded)
 }

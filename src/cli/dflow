@@ -2,35 +2,35 @@
 
 process.title = 'dflow'
 
-var nopt = require('nopt')
-
-var pkg = require('../../package.json')
-var usage = require('./usage')
-var actions = require('./actions')
+const actions = require('./actions')
+const debug = require('debug')('dflow')
+const nopt = require('nopt')
+const pkg = require('../../package.json')
+const usage = require('./usage')
 
 const edit = actions.edit
 const run = actions.run
 const validate = actions.validate
 
-var knownOpts = {
+const knownOpts = {
   help: Boolean,
   version: Boolean
 }
 
-var shortHandOpts = {
+const shortHandOpts = {
   h: '--help'
 }
 
-var args = process.argv
+const args = process.argv
 
-var opt = nopt(knownOpts, shortHandOpts, args, 2)
+const opt = nopt(knownOpts, shortHandOpts, args, 2)
 
 if (opt.version) {
   console.log(pkg.version)
   process.exit(0)
 }
 
-var remain = opt.argv.remain
+const remain = opt.argv.remain
 
 if (remain.length === 0) {
   // Show help.
@@ -40,11 +40,27 @@ if (remain.length === 0) {
   }
 
   // Default action is *edit*
+  debug('action is edit')
   edit(args)
 }
 
-if (remain[0] === 'edit') edit(args)
+switch (remain[0]) {
+  case 'edit':
+    debug('action is edit')
+    edit(args)
+    break
 
-if (remain[0] === 'run') run(args)
+  case 'run':
+    debug('action is run')
+    run(args)
+    break
 
-if (remain[0] === 'validate') validate(args)
+  case 'validate':
+    debug('action is validate')
+    validate(args)
+    break
+
+  default:
+    debug('action is edit')
+    edit(args)
+}

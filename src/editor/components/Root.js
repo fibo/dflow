@@ -1,20 +1,24 @@
 import React, { PropTypes, Component } from 'react'
+import Canvas from './Canvas'
 
 class Root extends Component {
   render () {
-    const { title } = this.props
+    const { initCanvas } = this.props
 
     return (
       <div>
-        dfloooooooooooow
-        <span>{title}</span>
+        <Canvas
+          initCanvas={initCanvas}
+          height={window.innerHeight}
+          width={window.innerWidth}
+        />
       </div>
     )
   }
 }
 
 Root.propTypes = {
-  title: PropTypes.string
+  initCanvas: PropTypes.func.isRequired
 }
 
 Root.defaultProps = { title: 'foo' }
