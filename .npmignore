@@ -3,4 +3,3 @@ coverage
 dist/
 gh-pages
 npm-debug.log
-# bower.json cannot be ignored, otherwise `npm run bower` will fail on postinstall
