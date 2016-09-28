@@ -13,8 +13,6 @@
   "browser": "./src/engine/context/client-window.js",
   "scripts": {
     "build": "npm test && npm run browserify && npm run minify && npm run jekyll; npm run git_add-f; git status",
-    "bower": "npm run bower_install; npm run git_add-f_bower_components",
-    "bower_install": "cd src/editor; bower --silent --config.analytics=false install; cd -",
     "browserify": "for x in dist examples test_engine; do npm run browserify_$x; done",
     "browserify_dist": "NODE_ENV=production browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
     "browserify_editor": "NODE_ENV=production browserify -t babelify src/editor/client.js -o src/editor/public/bundle.js",
@@ -65,13 +63,9 @@
   ],
   "dependencies": {
     "express": "^4.14.0",
-    "flow-view": "^2.5.0",
     "nopt": "^3.0.4",
     "not-defined": "^1.1.0",
-    "react": "^15.3.2",
-    "react-dom": "^15.3.2",
     "socket.io": "^1.4.8",
-    "standard": "^8.1.0",
     "write-file-utf8": "^1.1.0"
   },
   "devDependencies": {
