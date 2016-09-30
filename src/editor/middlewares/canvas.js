@@ -20,7 +20,6 @@ export default function canvasMiddleware (store) {
     if (action.type === 'INIT_CANVAS') {
       flowViewCanvas = new Canvas(action.canvasId)
 
-      console.log(state)
       flowViewCanvas.render(state.view)
 
       flowViewCanvas.on('createNode', (node, nodeId) => {

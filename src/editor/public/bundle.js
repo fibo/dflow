@@ -8912,6 +8912,8 @@ module.exports = warning;
             });
           }),
           Object.keys(view.link).map(function (id, i) {
+            console.log(view)
+            console.log(id)
             var _view$link$id = view.link[id];
             var from = _view$link$id.from;
             var to = _view$link$id.to;
@@ -9081,6 +9083,7 @@ module.exports = warning;
   exports.default = Canvas;
   module.exports = exports['default'];
 });
+
 },{"../utils/computeNodeWidth":82,"../utils/ignoreEvent":83,"../utils/xOfPin":85,"./Inspector":75,"./Link":76,"./Node":77,"./Selector":78,"./theme":80,"react":277,"react-dom":123}],75:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
@@ -54309,7 +54312,6 @@ function canvasMiddleware(store) {
       if (action.type === 'INIT_CANVAS') {
         flowViewCanvas = new _flowView.Canvas(action.canvasId);
 
-        console.log(state);
         flowViewCanvas.render(state.view);
 
         flowViewCanvas.on('createNode', function (node, nodeId) {
@@ -54381,6 +54383,7 @@ exports.default = function () {
 
   switch (action.type) {
     case 'CREATE_INPUT_PIN':
+      return state;
 
     case 'CREATE_LINK':
       view.link[linkId] = link;
@@ -54388,9 +54391,10 @@ exports.default = function () {
       return Object.assign({}, state, { view: view });
 
     case 'CREATE_NODE':
+      task[nodeId] = node.text;
       view.node[nodeId] = node;
 
-      return Object.assign({}, state, { view: view });
+      return Object.assign({}, state, { task: task, view: view });
 
     case 'CREATE_OUTPUT_PIN':
       return state;
@@ -54402,10 +54406,21 @@ exports.default = function () {
       delete view.link[linkId];
       delete pipe[linkId];
 
-      return Object.assign({}, state, { view: view }, { pipe: pipe });
+      return Object.assign({}, state, { pipe: pipe, view: view });
 
     case 'DELETE_NODE':
-      return state;
+      delete task[nodeId];
+      delete view.node[nodeId];
+
+      Object.keys(view.link).map(function (linkId) {
+        var link = view.link[linkId];
+
+        if (link.from[0] === nodeId || link.to[0] === nodeId) {
+          delete view.link[linkId];
+        }
+      });
+
+      return Object.assign({}, state, { task: task, view: view });
 
     case 'DELETE_OUTPUT_PIN':
       return state;
