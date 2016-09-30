@@ -4,40 +4,68 @@ title: CLI
 
 # CLI
 
-## Editor
+The *dflow* cli is invoked with syntax
+
+```bash
+dflow [action] [options]
+```
+
+Available actions are:
+
+* [edit](#edit)
+* [run](#run)
+* [validate](#validate)
+
+Print current version with `dflow -v` or `dflow --version`.
+Display usage with `dflow [action] -h` or `dflow [action] --help` or action related usage
+
+Set `DEBUG=dflow` environment variable to enable [debug](https://www.npmjs.com/package/debug) messages.
+
+## Edit
 
 ### Usage
 
 Launch *dflow* from command line, and start editing your first graph using your favourite browser.
 
 ```
-Usage: dflow [options] [path/to/graph.json]
+Usage: dflow [edit] [options] [path/to/graph.json]
 
-  -h, --help          print this message and exit
-  --indentJSON        indent saved JSON graph
-  -p, --port          server port number, defaults to 3000 or PORT env var
-  --run-on-edit       execute graph while being edited
-  --version           print current version and exit
-
-For more info point your browser to http://g14n.info/dflow
+Available options:
+  -h, --help          print usage and exit
+  -o, --open          launch the browser once the server connects
 ```
 
 If no graph is given, an empty graph named *graph.json* will be created.
 
 Open your browser and go to `http://hostname-where-you-launched-dflow.example.org:3000`.
 
-Double click on the SVG canvas to open a text input where you can write the task name you want to create.
+### Example
 
-Click on a task to select it: addInput, addOutput and deleteTask buttons will appear.
+Start editing a *graph.json* in your localhost
 
-Drag an output into an input to create a pipe.
+```bash
+dflow -o
+```
 
-Click on a pipe to delete it.
+## Run
 
-### Environment
+### Usage
 
-Set `DEBUG=dflow` environment variable to enable [debug](https://www.npmjs.com/package/debug) messages.
+```
+Usage: dflow run [options] [path/to/graph.json]
 
-Set `PORT` env var to the port number you want the editor server binds to.
+Available options:
+  -h, --help          print usage and exit
+```
 
-Set `RUN_ON_EDIT=1` to enable *run on edit* editor option.
+## Validate
+
+### Usage
+
+```
+Usage: dflow validate [options] [path/to/graph.json]
+
+Available options:
+  -h, --help          print usage and exit
+```
+

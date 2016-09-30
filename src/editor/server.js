@@ -1,6 +1,7 @@
 const no = require('not-defined')
 const express = require('express')
 const path = require('path')
+const opn = require('opn')
 
 const debug = require('debug')('dflow')
 
@@ -34,7 +35,11 @@ function start (opt) {
   const port = 3000
 
   http.listen(port, () => {
+    const uri = `http://localhost:${port}`
+
     debug('editor server is listening on port %d', port)
+
+    if (opt.open) opn(uri)
   })
 }
 
