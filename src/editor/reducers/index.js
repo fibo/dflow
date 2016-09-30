@@ -14,6 +14,7 @@ export default function (state = initialState, action) {
 
   switch (action.type) {
     case 'CREATE_INPUT_PIN':
+      return state
 
     case 'CREATE_LINK':
       view.link[linkId] = link
@@ -21,9 +22,10 @@ export default function (state = initialState, action) {
       return Object.assign({}, state, { view })
 
     case 'CREATE_NODE':
+      task[nodeId] = node.text
       view.node[nodeId] = node
 
-      return Object.assign({}, state, { view })
+      return Object.assign({}, state, { task, view })
 
     case 'CREATE_OUTPUT_PIN':
       return state
@@ -35,10 +37,21 @@ export default function (state = initialState, action) {
       delete view.link[linkId]
       delete pipe[linkId]
 
-      return Object.assign({}, state, { view }, { pipe })
+      return Object.assign({}, state, { pipe, view })
 
     case 'DELETE_NODE':
-      return state
+      delete task[nodeId]
+      delete view.node[nodeId]
+
+      Object.keys(view.link).map((linkId) => {
+        const link = view.link[linkId]
+
+        if ((link.from[0] === nodeId) || (link.to[0] === nodeId)) {
+          delete view.link[linkId]
+        }
+      })
+
+      return Object.assign({}, state, { task, view })
 
     case 'DELETE_OUTPUT_PIN':
       return state
