@@ -38,10 +38,6 @@ if (remain.length === 0) {
     console.log(usage)
     process.exit(0)
   }
-
-  // Default action is *edit*
-  debug('action is edit')
-  edit(args)
 }
 
 switch (remain[0]) {
