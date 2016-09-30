@@ -27,11 +27,11 @@ module.exports = (args) => {
     process.exit(0)
   }
 
-   const graphPath = opt.argv
-                        .remain
-                        .filter(dotJson)
-                        .map(appendCwd)
-                        .shift()
+  const graphPath = opt.argv
+                       .remain
+                       .filter(dotJson)
+                       .map(appendCwd)
+                       .shift()
 
   if (no(graphPath)) {
     console.error('No path/to/graph.json provided')
@@ -52,7 +52,7 @@ module.exports = (args) => {
 
           ok = validate(graph, additionalFunctions)
         } else {
-          ok = validate(graph, additionalFunctions)
+          ok = validate(graph)
         }
 
         if (ok) console.log(`ok ${graphPath}`)

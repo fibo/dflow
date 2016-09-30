@@ -7,24 +7,11 @@ const debug = require('debug')('dflow')
 
 const app = express()
 const http = require('http').Server(app)
-const io = require('socket.io')(http)
 
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
-})
-
-// Socket.io events.
-
-io.on('connection', (socket) => {
-  socket.emit('connection')
-
-  debug('user connected')
-
-  socket.on('disconnect', () => {
-    debug('user disconnected')
-  })
 })
 
 function start (opt) {
