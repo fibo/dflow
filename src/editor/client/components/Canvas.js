@@ -18,8 +18,7 @@ class DflowCanvas extends Component {
     return (
       <div
         id={id}
-      >
-      </div>
+      />
     )
   }
 }

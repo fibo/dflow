@@ -1,0 +1,14 @@
+{
+  "use": [
+    "autoprefixer",
+    "postcss-import",
+    "precss"
+  ],
+  "input": "src/editor/client/styles/main.scss",
+  "output": "src/editor/public/style.css",
+  "from": "src/editor/client/styles",
+  "local-plugins": true,
+  "autoprefixer": {
+    "browsers": "> 5%"
+  }
+}
