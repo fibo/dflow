@@ -24,7 +24,9 @@ const showUsage = () => {
 }
 
 module.exports = (args) => {
-  const opt = nopt(knownOpts, shortHandOpts, args, 3)
+  const implicitEditAction = process.argv.indexOf('edit') === -1
+
+  const opt = nopt(knownOpts, shortHandOpts, args, implicitEditAction ? 2 : 3)
 
   if (opt.help) showUsage()
 
@@ -45,6 +47,8 @@ module.exports = (args) => {
   fs.stat(graphPath, (err, stats) => {
     if (err && err.code === 'ENOENT') {
       createEmptyGraph(graphPath, () => {
+        debug(`created ${graphPath}`)
+
         server.start({
           graphPath,
           open
@@ -52,6 +56,8 @@ module.exports = (args) => {
       })
     } else {
       if (stats.isFile()) {
+        debug(`found ${graphPath}`)
+
         server.start({
           graphPath,
           open
