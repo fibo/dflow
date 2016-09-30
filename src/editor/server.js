@@ -2,7 +2,7 @@ const no = require('not-defined')
 const express = require('express')
 const path = require('path')
 const opn = require('opn')
-
+const internalIp = require('internal-ip')
 const debug = require('debug')('dflow')
 
 const app = express()
@@ -30,16 +30,18 @@ io.on('connection', (socket) => {
 function start (opt) {
   if (no(opt)) opt = {}
 
-  // TODO if (opt.open) open index.html
   // TODO opt.port
   const port = 3000
 
   http.listen(port, () => {
-    const uri = `http://localhost:${port}`
-
     debug('editor server is listening on port %d', port)
 
-    if (opt.open) opn(uri)
+    if (opt.open) {
+      const myIp = internalIp()
+      const uri = `http://${myIp}:${port}`
+
+      opn(uri)
+    }
   })
 }
 
