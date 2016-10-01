@@ -54102,37 +54102,6 @@ function shouldFetchGraph(state) {
 },{"isomorphic-fetch":99,"not-defined":116}],306:[function(require,module,exports){
 'use strict';
 
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactDom = require('react-dom');
-
-var _reactRedux = require('react-redux');
-
-var _App = require('./containers/App');
-
-var _App2 = _interopRequireDefault(_App);
-
-var _configureStore = require('./store/configureStore');
-
-var _configureStore2 = _interopRequireDefault(_configureStore);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var store = (0, _configureStore2.default)();
-
-var container = document.getElementById('root');
-
-(0, _reactDom.render)(_react2.default.createElement(
-  _reactRedux.Provider,
-  { store: store },
-  _react2.default.createElement(_App2.default, null)
-), container);
-
-},{"./containers/App":309,"./store/configureStore":312,"react":277,"react-dom":123,"react-redux":127}],307:[function(require,module,exports){
-'use strict';
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -54195,7 +54164,7 @@ DflowCanvas.defaultProps = {
 
 exports.default = DflowCanvas;
 
-},{"react":277}],308:[function(require,module,exports){
+},{"react":277}],307:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54258,7 +54227,7 @@ Root.defaultProps = { title: 'foo' };
 
 exports.default = Root;
 
-},{"./Canvas":307,"react":277}],309:[function(require,module,exports){
+},{"./Canvas":306,"react":277}],308:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54289,7 +54258,38 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_Root2.default);
 
-},{"../actions":305,"../components/Root":308,"react-redux":127,"redux":295}],310:[function(require,module,exports){
+},{"../actions":305,"../components/Root":307,"react-redux":127,"redux":295}],309:[function(require,module,exports){
+'use strict';
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = require('react-dom');
+
+var _reactRedux = require('react-redux');
+
+var _App = require('./containers/App');
+
+var _App2 = _interopRequireDefault(_App);
+
+var _configureStore = require('./store/configureStore');
+
+var _configureStore2 = _interopRequireDefault(_configureStore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var store = (0, _configureStore2.default)();
+
+var container = document.getElementById('root');
+
+(0, _reactDom.render)(_react2.default.createElement(
+  _reactRedux.Provider,
+  { store: store },
+  _react2.default.createElement(_App2.default, null)
+), container);
+
+},{"./containers/App":308,"./store/configureStore":312,"react":277,"react-dom":123,"react-redux":127}],310:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54439,7 +54439,7 @@ exports.default = function () {
   }
 };
 
-var _emptyGraph = require('../../engine/emptyGraph.json');
+var _emptyGraph = require('engine/emptyGraph.json');
 
 var _emptyGraph2 = _interopRequireDefault(_emptyGraph);
 
@@ -54447,7 +54447,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var initialState = Object.assign({}, _emptyGraph2.default);
 
-},{"../../engine/emptyGraph.json":313}],312:[function(require,module,exports){
+},{"engine/emptyGraph.json":313}],312:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54490,4 +54490,4 @@ module.exports={
   }
 }
 
-},{}]},{},[306]);
+},{}]},{},[309]);
