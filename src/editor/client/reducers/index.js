@@ -1,4 +1,4 @@
-import emptyGraph from '../../engine/emptyGraph.json'
+import emptyGraph from 'engine/emptyGraph.json'
 
 const initialState = Object.assign({}, emptyGraph)
 

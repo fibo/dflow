@@ -15,7 +15,7 @@
     "build": "npm test && npm run postcss && npm run browserify && npm run minify && npm run jekyll; npm run git_add-f; git status",
     "browserify": "for x in dist examples test_engine; do npm run browserify_$x; done",
     "browserify_dist": "NODE_ENV=production browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
-    "browserify_editor": "NODE_ENV=production browserify -t babelify src/editor/client/index.js -o src/editor/public/bundle.js",
+    "browserify_editor": "NODE_PATH=src NODE_ENV=production browserify -t babelify src/editor/client/index.js -o src/editor/public/bundle.js",
     "browserify_examples": "NODE_ENV=production browserify -r ./src/examples/renderer/client-side.js:examples-renderer -o gh-pages/js/examples-renderer.js",
     "browserify_test_engine": "NODE_ENV=production NODE_PATH=src browserify test/engine/**/*.js -o gh-pages/test/bundle.js",
     "check-deps": "npm outdated",
@@ -48,13 +48,25 @@
     "push": "git push origin master && npm run gh-pages:push",
     "start": "DEBUG=dflow node src/cli/dflow --open",
     "test": "NODE_PATH=src mocha",
-    "update-deps": "npm update --save --dev"
+    "update-deps": "npm update --save --dev",
+    "watch": "npm-watch"
   },
   "pre-commit": [
     "lint",
     "test",
     "check-deps"
   ],
+  "watch": {
+    "browserify_editor": {
+      "ignore": "src/editor/client/styles/",
+      "patterns": "src/editor/client"
+    },
+    "homepage": "README.md",
+    "postcss": {
+      "extensions": "css,scss",
+      "patterns": "src/editor/client/styles/"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/fibo/dflow.git"
@@ -81,10 +93,12 @@
     "brfs": "1.x",
     "browserify": "13.x",
     "flow-view": "^2.6.1",
+    "isomorphic-fetch": "^2.2.1",
     "istanbul": "^0.4.3",
     "mocha": "3.x",
     "mocha-lcov-reporter": "1.x",
     "normalize.css": "^4.2.0",
+    "npm-watch": "^0.1.6",
     "postcss-cli": "^2.6.0",
     "postcss-import": "^8.1.2",
     "pre-commit": "1.x",
@@ -98,6 +112,7 @@
     "standard": "8.x",
     "stylelint": "^7.3.1",
     "stylelint-config-standard": "^13.0.2",
-    "uglify-js": "2.x"
+    "uglify-js": "2.x",
+    "watch": "^0.19.2"
   }
 }
