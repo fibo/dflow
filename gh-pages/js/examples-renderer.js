@@ -8172,17 +8172,17 @@ module.exports = warning;
 },{"./emptyFunction":55}],73:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react', 'react-dom', './components/Canvas', 'events', 'not-defined', './utils/randomString', 'svgx'], factory);
+    define(['module', 'exports', 'react', 'react-dom', './components/Canvas', 'events', 'not-defined', './utils/randomString', 'svgx', './components/Inspector', './components/Link', './components/Node'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('react-dom'), require('./components/Canvas'), require('events'), require('not-defined'), require('./utils/randomString'), require('svgx'));
+    factory(module, exports, require('react'), require('react-dom'), require('./components/Canvas'), require('events'), require('not-defined'), require('./utils/randomString'), require('svgx'), require('./components/Inspector'), require('./components/Link'), require('./components/Node'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod, mod.exports, global.react, global.reactDom, global.Canvas, global.events, global.notDefined, global.randomString, global.svgx);
+    factory(mod, mod.exports, global.react, global.reactDom, global.Canvas, global.events, global.notDefined, global.randomString, global.svgx, global.Inspector, global.Link, global.Node);
     global.Canvas = mod.exports;
   }
-})(this, function (module, exports, _react, _reactDom, _Canvas, _events, _notDefined, _randomString, _svgx) {
+})(this, function (module, exports, _react, _reactDom, _Canvas, _events, _notDefined, _randomString, _svgx, _Inspector, _Link, _Node) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -8200,6 +8200,12 @@ module.exports = warning;
   var _randomString2 = _interopRequireDefault(_randomString);
 
   var _svgx2 = _interopRequireDefault(_svgx);
+
+  var _Inspector2 = _interopRequireDefault(_Inspector);
+
+  var _Link2 = _interopRequireDefault(_Link);
+
+  var _Node2 = _interopRequireDefault(_Node);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -8281,6 +8287,9 @@ module.exports = warning;
         if (container === null) {
           container = document.createElement('div');
           container.id = containerId;
+
+          // Set height and width, including borders (400+1+1).
+          container.setAttribute('style', 'height: 402px; width: 402px;');
           document.body.appendChild(container);
         }
 
@@ -8304,15 +8313,27 @@ module.exports = warning;
       value: function render(view, callback) {
         var _this2 = this;
 
+        var container = this.container;
+        var item = Object.assign({}, { inspector: { DefaultInspector: _Inspector2.default } }, { link: { DefaultLink: _Link2.default } }, { node: { DefaultNode: _Node2.default } }, this.item);
+
+        // Default values for height and width.
+        var height = 400;
+        var width = 400;
+
+        // Try to get height and width from container.
+        if (container) {
+          var rect = container.getBoundingClientRect();
+
+          height = rect.height;
+          width = rect.width;
+        }
+
         view = Object.assign({}, {
-          height: 400,
+          height: height,
           link: {},
           node: {},
-          width: 400
+          width: width
         }, view);
-
-        var container = this.container;
-        var item = this.item;
 
         var createInputPin = function createInputPin(nodeId, pin) {
           var ins = view.node[nodeId].ins;
@@ -8494,20 +8515,20 @@ module.exports = warning;
   exports.default = FlowViewCanvas;
   module.exports = exports['default'];
 });
-},{"./components/Canvas":74,"./utils/randomString":84,"events":47,"not-defined":109,"react":263,"react-dom":116,"svgx":277}],74:[function(require,module,exports){
+},{"./components/Canvas":74,"./components/Inspector":75,"./components/Link":76,"./components/Node":77,"./utils/randomString":84,"events":47,"not-defined":109,"react":263,"react-dom":116,"svgx":277}],74:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react', 'react-dom', '../utils/computeNodeWidth', './Link', './Node', './theme', '../utils/ignoreEvent', './Inspector', '../utils/xOfPin', './Selector'], factory);
+    define(['module', 'exports', 'react', 'react-dom', '../utils/computeNodeWidth', './Inspector', './Link', './Node', './theme', '../utils/ignoreEvent', '../utils/xOfPin', './Selector'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('react-dom'), require('../utils/computeNodeWidth'), require('./Link'), require('./Node'), require('./theme'), require('../utils/ignoreEvent'), require('./Inspector'), require('../utils/xOfPin'), require('./Selector'));
+    factory(module, exports, require('react'), require('react-dom'), require('../utils/computeNodeWidth'), require('./Inspector'), require('./Link'), require('./Node'), require('./theme'), require('../utils/ignoreEvent'), require('../utils/xOfPin'), require('./Selector'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod, mod.exports, global.react, global.reactDom, global.computeNodeWidth, global.Link, global.Node, global.theme, global.ignoreEvent, global.Inspector, global.xOfPin, global.Selector);
+    factory(mod, mod.exports, global.react, global.reactDom, global.computeNodeWidth, global.Inspector, global.Link, global.Node, global.theme, global.ignoreEvent, global.xOfPin, global.Selector);
     global.Canvas = mod.exports;
   }
-})(this, function (module, exports, _react, _reactDom, _computeNodeWidth, _Link, _Node, _theme, _ignoreEvent, _Inspector, _xOfPin, _Selector) {
+})(this, function (module, exports, _react, _reactDom, _computeNodeWidth, _Inspector, _Link, _Node, _theme, _ignoreEvent, _xOfPin, _Selector) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -8518,6 +8539,8 @@ module.exports = warning;
 
   var _computeNodeWidth2 = _interopRequireDefault(_computeNodeWidth);
 
+  var _Inspector2 = _interopRequireDefault(_Inspector);
+
   var _Link2 = _interopRequireDefault(_Link);
 
   var _Node2 = _interopRequireDefault(_Node);
@@ -8525,8 +8548,6 @@ module.exports = warning;
   var _theme2 = _interopRequireDefault(_theme);
 
   var _ignoreEvent2 = _interopRequireDefault(_ignoreEvent);
-
-  var _Inspector2 = _interopRequireDefault(_Inspector);
 
   var _xOfPin2 = _interopRequireDefault(_xOfPin);
 
@@ -8652,6 +8673,7 @@ module.exports = warning;
         var height = view.height;
         var width = view.width;
 
+        var Inspector = item.inspector.DefaultInspector;
         var Link = item.link.DefaultLink;
         var Node = item.node.DefaultNode;
 
@@ -8715,7 +8737,7 @@ module.exports = warning;
           e.preventDefault();
           e.stopPropagation();
 
-          // TODO CTRL key for multiple selection.
+          // TODO Shift key for multiple selection.
 
           setState({
             selectedItems: []
@@ -8774,6 +8796,7 @@ module.exports = warning;
             });
           } else {
             setState({
+              draggedItems: [],
               selectedItems: [],
               pointer: null
             });
@@ -8820,8 +8843,9 @@ module.exports = warning;
             var index = selectedItems.indexOf(id);
 
             if (index === -1) {
-              // CTRL key allows multiple selection.
-              if (e.ctrlKey) {
+              // Shift key allows multiple selection.
+              if (e.shiftKey) {
+                // TODO it does not work.
                 selectedItems.push(id);
               } else {
                 selectedItems = [id];
@@ -8847,8 +8871,9 @@ module.exports = warning;
             var index = draggedItems.indexOf(id);
 
             if (index === -1) {
-              // CTRL key allows multiple selection.
-              if (e.ctrlKey) {
+              // Shift key allows multiple selection.
+              if (e.shiftKey) {
+                // TODO it does not work.
                 draggedItems.push(id);
               } else {
                 draggedItems = [id];
@@ -8912,8 +8937,6 @@ module.exports = warning;
             });
           }),
           Object.keys(view.link).map(function (id, i) {
-            console.log(view)
-            console.log(id)
             var _view$link$id = view.link[id];
             var from = _view$link$id.from;
             var to = _view$link$id.to;
@@ -8986,7 +9009,7 @@ module.exports = warning;
               y2: y2
             });
           }),
-          _react2.default.createElement(_Inspector2.default, {
+          _react2.default.createElement(Inspector, {
             createInputPin: createInputPin,
             createOutputPin: createOutputPin,
             deleteLink: deleteLink,
@@ -9033,6 +9056,7 @@ module.exports = warning;
     fontFamily: _react.PropTypes.string.isRequired,
     fontSize: _react.PropTypes.number.isRequired,
     item: _react.PropTypes.shape({
+      inspector: _react.PropTypes.object.isRequired,
       link: _react.PropTypes.object.isRequired,
       node: _react.PropTypes.object.isRequired
     }).isRequired,
@@ -9062,6 +9086,7 @@ module.exports = warning;
     fontFamily: _theme2.default.fontFamily,
     fontSize: 17, // FIXME fontSize seems to be ignored
     item: {
+      inspector: { DefaultInspector: _Inspector2.default },
       link: { DefaultLink: _Link2.default },
       node: { DefaultNode: _Node2.default }
     },
@@ -9083,7 +9108,6 @@ module.exports = warning;
   exports.default = Canvas;
   module.exports = exports['default'];
 });
-
 },{"../utils/computeNodeWidth":82,"../utils/ignoreEvent":83,"../utils/xOfPin":85,"./Inspector":75,"./Link":76,"./Node":77,"./Selector":78,"./theme":80,"react":263,"react-dom":116}],75:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
@@ -9175,12 +9199,6 @@ module.exports = warning;
       key: 'render',
       value: function render() {
         var _props = this.props;
-        var createInputPin = _props.createInputPin;
-        var createOutputPin = _props.createOutputPin;
-        var deleteLink = _props.deleteLink;
-        var deleteNode = _props.deleteNode;
-        var deleteInputPin = _props.deleteInputPin;
-        var deleteOutputPin = _props.deleteOutputPin;
         var items = _props.items;
         var view = _props.view;
         var width = _props.width;
@@ -9199,125 +9217,11 @@ module.exports = warning;
           var node = view.node[itemId];
 
           if (link) {
-            item = _react2.default.createElement(
-              'div',
-              null,
-              'link',
-              _react2.default.createElement(
-                'button',
-                {
-                  onClick: function onClick() {
-                    deleteLink(itemId);
-                  }
-                },
-                'delete link'
-              )
-            );
+            item = this.renderLink(itemId, link);
           }
 
           if (node) {
-            var lastInputIsConnected;
-            var lastOutputIsConnected;
-
-            (function () {
-              var ins = node.ins || [];
-              var outs = node.outs || [];
-
-              var lastInputPosition = ins.length - 1;
-              var lastOutputPosition = outs.length - 1;
-
-              lastInputIsConnected = false;
-              lastOutputIsConnected = false;
-
-
-              Object.keys(view.link).forEach(function (linkId) {
-                var link = view.link[linkId];
-
-                if (link.to && link.to[0] === itemId && link.to[1] === lastInputPosition) {
-                  lastInputIsConnected = true;
-                }
-
-                if (link.from[0] === itemId && link.from[1] === lastOutputPosition) {
-                  lastOutputIsConnected = true;
-                }
-              });
-
-              item = _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                  'label',
-                  {
-                    htmlFor: 'name'
-                  },
-                  'node'
-                ),
-                _react2.default.createElement('input', {
-                  type: 'text',
-                  id: 'name',
-                  disabled: true,
-                  style: { outline: 'none' },
-                  value: node.text
-                }),
-                _react2.default.createElement(
-                  'div',
-                  null,
-                  'ins',
-                  _react2.default.createElement(
-                    'button',
-                    {
-                      disabled: ins.length === 0 || lastInputIsConnected,
-                      onClick: function onClick() {
-                        deleteInputPin(itemId);
-                      }
-                    },
-                    '-'
-                  ),
-                  _react2.default.createElement(
-                    'button',
-                    {
-                      onClick: function onClick() {
-                        createInputPin(itemId);
-                      }
-                    },
-                    '+'
-                  )
-                ),
-                _react2.default.createElement(
-                  'div',
-                  null,
-                  'outs',
-                  _react2.default.createElement(
-                    'button',
-                    {
-                      disabled: outs.length === 0 || lastOutputIsConnected,
-                      onClick: function onClick() {
-                        deleteOutputPin(itemId);
-                      }
-                    },
-                    '-'
-                  ),
-                  _react2.default.createElement(
-                    'button',
-                    {
-                      onClick: function onClick() {
-                        createOutputPin(itemId);
-                      }
-                    },
-                    '+'
-                  )
-                ),
-                _react2.default.createElement(
-                  'button',
-                  {
-                    onClick: function onClick() {
-                      deleteNode(itemId);
-                    }
-                  },
-                  'delete node'
-                )
-              );
-            })();
+            item = this.renderNode(itemId, node);
           }
         }
 
@@ -9332,6 +9236,135 @@ module.exports = warning;
             y: y
           },
           item
+        );
+      }
+    }, {
+      key: 'renderLink',
+      value: function renderLink(linkId, link) {
+        var deleteLink = this.props.deleteLink;
+
+        return _react2.default.createElement(
+          'div',
+          null,
+          'link',
+          _react2.default.createElement(
+            'button',
+            {
+              onClick: function onClick() {
+                deleteLink(linkId);
+              }
+            },
+            'delete link'
+          )
+        );
+      }
+    }, {
+      key: 'renderNode',
+      value: function renderNode(nodeId, node) {
+        var _props2 = this.props;
+        var createInputPin = _props2.createInputPin;
+        var createOutputPin = _props2.createOutputPin;
+        var deleteNode = _props2.deleteNode;
+        var deleteInputPin = _props2.deleteInputPin;
+        var deleteOutputPin = _props2.deleteOutputPin;
+        var view = _props2.view;
+
+
+        var ins = node.ins || [];
+        var outs = node.outs || [];
+
+        var lastInputPosition = ins.length - 1;
+        var lastOutputPosition = outs.length - 1;
+
+        var lastInputIsConnected = false;
+        var lastOutputIsConnected = false;
+
+        Object.keys(view.link).forEach(function (linkId) {
+          var link = view.link[linkId];
+
+          if (link.to && link.to[0] === nodeId && link.to[1] === lastInputPosition) {
+            lastInputIsConnected = true;
+          }
+
+          if (link.from[0] === nodeId && link.from[1] === lastOutputPosition) {
+            lastOutputIsConnected = true;
+          }
+        });
+
+        return _react2.default.createElement(
+          'div',
+          null,
+          _react2.default.createElement(
+            'label',
+            {
+              htmlFor: 'name'
+            },
+            'node'
+          ),
+          _react2.default.createElement('input', {
+            type: 'text',
+            id: 'name',
+            disabled: true,
+            style: { outline: 'none' },
+            value: node.text
+          }),
+          _react2.default.createElement(
+            'div',
+            null,
+            'ins',
+            _react2.default.createElement(
+              'button',
+              {
+                disabled: ins.length === 0 || lastInputIsConnected,
+                onClick: function onClick() {
+                  deleteInputPin(nodeId);
+                }
+              },
+              '-'
+            ),
+            _react2.default.createElement(
+              'button',
+              {
+                onClick: function onClick() {
+                  createInputPin(nodeId);
+                }
+              },
+              '+'
+            )
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'outs',
+            _react2.default.createElement(
+              'button',
+              {
+                disabled: outs.length === 0 || lastOutputIsConnected,
+                onClick: function onClick() {
+                  deleteOutputPin(nodeId);
+                }
+              },
+              '-'
+            ),
+            _react2.default.createElement(
+              'button',
+              {
+                onClick: function onClick() {
+                  createOutputPin(nodeId);
+                }
+              },
+              '+'
+            )
+          ),
+          _react2.default.createElement(
+            'button',
+            {
+              onClick: function onClick() {
+                deleteNode(nodeId);
+              }
+            },
+            'delete node'
+          )
         );
       }
     }]);
@@ -9777,6 +9810,13 @@ module.exports = warning;
             // TODO const name = (typeof pin === 'string' ? { name: pin } : pin)
             var x = (0, _xOfPin2.default)(pinSize, computedWidth, array.length, i);
 
+            // TODO
+            // const onMouseDown = (e) => {
+            //   e.preventDefault()
+            //   e.stopPropagation()
+            //   onCreateLink({ from: null, to: [ id, i ] })
+            // }
+
             var onMouseUp = function onMouseUp(e) {
               e.preventDefault();
               e.stopPropagation();
@@ -9790,6 +9830,7 @@ module.exports = warning;
               key: i,
               fill: color.pin,
               height: pinSize,
+              onMouseDown: _ignoreEvent2.default,
               onMouseUp: onMouseUp,
               transform: 'translate(' + x + ',0)',
               width: pinSize
