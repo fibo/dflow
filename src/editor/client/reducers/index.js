@@ -1,4 +1,4 @@
-import emptyGraph from 'engine/emptyGraph.json'
+import emptyGraph from '../../../engine/emptyGraph.json'
 
 const initialState = Object.assign({}, emptyGraph)
 
@@ -14,47 +14,41 @@ export default function (state = initialState, action) {
 
   switch (action.type) {
     case 'CREATE_INPUT_PIN':
-      return state
-
-    case 'CREATE_LINK':
-      view.link[linkId] = link
-
       return Object.assign({}, state, { view })
 
+    case 'CREATE_LINK':
+      // Create dflow pipe.
+      pipe[linkId] = [ link.from, link.to ]
+
+      return Object.assign({}, state, { pipe })
+
     case 'CREATE_NODE':
+      // Create dflow task.
       task[nodeId] = node.text
-      view.node[nodeId] = node
 
-      return Object.assign({}, state, { task, view })
+      // Every dflow task has an output.
+      view.node[nodeId].outs = ['out']
 
-    case 'CREATE_OUTPUT_PIN':
-      return state
-
-    case 'DELETE_INPUT_PIN':
-      return state
+      return Object.assign({}, state, { task })
 
     case 'DELETE_LINK':
-      delete view.link[linkId]
       delete pipe[linkId]
 
-      return Object.assign({}, state, { pipe, view })
+      return Object.assign({}, state, { pipe })
 
     case 'DELETE_NODE':
       delete task[nodeId]
-      delete view.node[nodeId]
 
-      Object.keys(view.link).map((linkId) => {
-        const link = view.link[linkId]
+      Object.keys(pipe).map((pipeId) => {
+        const isSource = (pipe[pipeId][0] === nodeId)
+        const isTarget = (pipe[pipeId][1] === nodeId)
 
-        if ((link.from[0] === nodeId) || (link.to[0] === nodeId)) {
+        if (isSource || isTarget) {
           delete view.link[linkId]
         }
       })
 
-      return Object.assign({}, state, { task, view })
-
-    case 'DELETE_OUTPUT_PIN':
-      return state
+      return Object.assign({}, state, { task, pipe })
 
     case 'FETCH_GRAPH_FAILURE':
       return state

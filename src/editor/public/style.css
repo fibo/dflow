@@ -385,5 +385,16 @@ textarea {
 
 body {
   background: #fdfdfd;
+  height: 100%;
+  width: 100%;
 }
 
+#dflow-root {
+  height: 600px;
+  width: 600px;
+}
+
+#dflow-canvas {
+  height: 100%;
+  width: 100%;
+}
