@@ -26,20 +26,6 @@ The following simple graph is executed client side by *dflow* engine.
 
 [![Hello World](http://g14n.info/dflow/svg/hello-world.svg)][hello-world]
 
-## Status
-
-*dflow* is **beta** software.
-The engine is almost stable.
-The [editor][dflow-editor] is usable but with no css (help me!): I have just started using React to implement the editor view.
-Collaborative editing feature is working but buggy (I am proud of my bugs and they will be fixed in version **1.0** :)).
-
-Next steps:
-
-* start using *dflow*,
-* improve editor's look&feel,
-* add more examples using the editor
-* and go for a stable version!
-
 ## Installation
 
 ### Client side
