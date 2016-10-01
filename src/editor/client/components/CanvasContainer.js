@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 
-class DflowCanvas extends Component {
+class CanvasContainer extends Component {
   componentDidMount () {
     const {
       initCanvas,
@@ -23,12 +23,12 @@ class DflowCanvas extends Component {
   }
 }
 
-DflowCanvas.propTypes = {
+CanvasContainer.propTypes = {
   id: PropTypes.string.isRequired
 }
 
-DflowCanvas.defaultProps = {
+CanvasContainer.defaultProps = {
   id: 'dflow-canvas'
 }
 
-export default DflowCanvas
+export default CanvasContainer

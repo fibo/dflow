@@ -1,4 +1,5 @@
 import { Canvas } from 'flow-view'
+import Inspector from '../components/Inspector'
 import {
   createLink,
   createNode,
@@ -14,7 +15,11 @@ export default function canvasMiddleware (store) {
     const state = store.getState()
 
     if (action.type === 'INIT_CANVAS') {
-      flowViewCanvas = new Canvas(action.canvasId)
+      flowViewCanvas = new Canvas(action.canvasId, {
+        inspector: {
+          DefaultInspector: Inspector
+        }
+      })
 
       flowViewCanvas.render(state.view)
 
