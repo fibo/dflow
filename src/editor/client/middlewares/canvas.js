@@ -2,10 +2,6 @@ import { Canvas } from 'flow-view'
 import {
   createLink,
   createNode,
-  createInputPin,
-  createOutputPin,
-  deleteInputPin,
-  deleteOutputPin,
   deleteLink,
   deleteNode
 } from '../actions'
@@ -30,28 +26,12 @@ export default function canvasMiddleware (store) {
         store.dispatch(createLink(link, linkId))
       })
 
-      flowViewCanvas.on('createInputPin', (nodeId, position, pin) => {
-        store.dispatch(createInputPin(nodeId, position, pin))
-      })
-
-      flowViewCanvas.on('createOutputPin', (nodeId, position, pin) => {
-        store.dispatch(createOutputPin(nodeId, position, pin))
-      })
-
       flowViewCanvas.on('deleteLink', (linkId) => {
         store.dispatch(deleteLink(linkId))
       })
 
       flowViewCanvas.on('deleteNode', (nodeId) => {
         store.dispatch(deleteNode(nodeId))
-      })
-
-      flowViewCanvas.on('deleteInputPin', (nodeId, position) => {
-        store.dispatch(deleteInputPin(nodeId, position))
-      })
-
-      flowViewCanvas.on('deleteOutputPin', (nodeId, position) => {
-        store.dispatch(deleteOutputPin(nodeId, position))
       })
     }
 

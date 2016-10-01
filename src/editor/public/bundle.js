@@ -8281,6 +8281,9 @@ module.exports = warning;
         if (container === null) {
           container = document.createElement('div');
           container.id = containerId;
+
+          // Set height and width, including borders (400+1+1).
+          container.setAttribute('style', 'height: 402px; width: 402px;');
           document.body.appendChild(container);
         }
 
@@ -8304,15 +8307,27 @@ module.exports = warning;
       value: function render(view, callback) {
         var _this2 = this;
 
-        view = Object.assign({}, {
-          height: 400,
-          link: {},
-          node: {},
-          width: 400
-        }, view);
-
         var container = this.container;
         var item = this.item;
+
+        // Default values for height and width.
+        var height = 400;
+        var width = 400;
+
+        // Try to get height and width from container.
+        if (container) {
+          var rect = container.getBoundingClientRect();
+
+          height = rect.height;
+          width = rect.width;
+        }
+
+        view = Object.assign({}, {
+          height: height,
+          link: {},
+          node: {},
+          width: width
+        }, view);
 
         var createInputPin = function createInputPin(nodeId, pin) {
           var ins = view.node[nodeId].ins;
@@ -8912,8 +8927,6 @@ module.exports = warning;
             });
           }),
           Object.keys(view.link).map(function (id, i) {
-            console.log(view)
-            console.log(id)
             var _view$link$id = view.link[id];
             var from = _view$link$id.from;
             var to = _view$link$id.to;
@@ -9083,7 +9096,6 @@ module.exports = warning;
   exports.default = Canvas;
   module.exports = exports['default'];
 });
-
 },{"../utils/computeNodeWidth":82,"../utils/ignoreEvent":83,"../utils/xOfPin":85,"./Inspector":75,"./Link":76,"./Node":77,"./Selector":78,"./theme":80,"react":277,"react-dom":123}],75:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
@@ -9777,6 +9789,13 @@ module.exports = warning;
             // TODO const name = (typeof pin === 'string' ? { name: pin } : pin)
             var x = (0, _xOfPin2.default)(pinSize, computedWidth, array.length, i);
 
+            // TODO
+            // const onMouseDown = (e) => {
+            //   e.preventDefault()
+            //   e.stopPropagation()
+            //   onCreateLink({ from: null, to: [ id, i ] })
+            // }
+
             var onMouseUp = function onMouseUp(e) {
               e.preventDefault();
               e.stopPropagation();
@@ -9790,6 +9809,7 @@ module.exports = warning;
               key: i,
               fill: color.pin,
               height: pinSize,
+              onMouseDown: _ignoreEvent2.default,
               onMouseUp: onMouseUp,
               transform: 'translate(' + x + ',0)',
               width: pinSize
@@ -54281,7 +54301,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var store = (0, _configureStore2.default)();
 
-var container = document.getElementById('root');
+var container = document.getElementById('dflow-root');
 
 (0, _reactDom.render)(_react2.default.createElement(
   _reactRedux.Provider,
@@ -54322,28 +54342,12 @@ function canvasMiddleware(store) {
           store.dispatch((0, _actions.createLink)(link, linkId));
         });
 
-        flowViewCanvas.on('createInputPin', function (nodeId, position, pin) {
-          store.dispatch((0, _actions.createInputPin)(nodeId, position, pin));
-        });
-
-        flowViewCanvas.on('createOutputPin', function (nodeId, position, pin) {
-          store.dispatch((0, _actions.createOutputPin)(nodeId, position, pin));
-        });
-
         flowViewCanvas.on('deleteLink', function (linkId) {
           store.dispatch((0, _actions.deleteLink)(linkId));
         });
 
         flowViewCanvas.on('deleteNode', function (nodeId) {
           store.dispatch((0, _actions.deleteNode)(nodeId));
-        });
-
-        flowViewCanvas.on('deleteInputPin', function (nodeId, position) {
-          store.dispatch((0, _actions.deleteInputPin)(nodeId, position));
-        });
-
-        flowViewCanvas.on('deleteOutputPin', function (nodeId, position) {
-          store.dispatch((0, _actions.deleteOutputPin)(nodeId, position));
         });
       }
 
@@ -54383,47 +54387,41 @@ exports.default = function () {
 
   switch (action.type) {
     case 'CREATE_INPUT_PIN':
-      return state;
-
-    case 'CREATE_LINK':
-      view.link[linkId] = link;
-
       return Object.assign({}, state, { view: view });
 
+    case 'CREATE_LINK':
+      // Create dflow pipe.
+      pipe[linkId] = [link.from, link.to];
+
+      return Object.assign({}, state, { pipe: pipe });
+
     case 'CREATE_NODE':
+      // Create dflow task.
       task[nodeId] = node.text;
-      view.node[nodeId] = node;
 
-      return Object.assign({}, state, { task: task, view: view });
+      // Every dflow task has an output.
+      view.node[nodeId].outs = ['out'];
 
-    case 'CREATE_OUTPUT_PIN':
-      return state;
-
-    case 'DELETE_INPUT_PIN':
-      return state;
+      return Object.assign({}, state, { task: task });
 
     case 'DELETE_LINK':
-      delete view.link[linkId];
       delete pipe[linkId];
 
-      return Object.assign({}, state, { pipe: pipe, view: view });
+      return Object.assign({}, state, { pipe: pipe });
 
     case 'DELETE_NODE':
       delete task[nodeId];
-      delete view.node[nodeId];
 
-      Object.keys(view.link).map(function (linkId) {
-        var link = view.link[linkId];
+      Object.keys(pipe).map(function (pipeId) {
+        var isSource = pipe[pipeId][0] === nodeId;
+        var isTarget = pipe[pipeId][1] === nodeId;
 
-        if (link.from[0] === nodeId || link.to[0] === nodeId) {
+        if (isSource || isTarget) {
           delete view.link[linkId];
         }
       });
 
-      return Object.assign({}, state, { task: task, view: view });
-
-    case 'DELETE_OUTPUT_PIN':
-      return state;
+      return Object.assign({}, state, { task: task, pipe: pipe });
 
     case 'FETCH_GRAPH_FAILURE':
       return state;
@@ -54439,7 +54437,7 @@ exports.default = function () {
   }
 };
 
-var _emptyGraph = require('engine/emptyGraph.json');
+var _emptyGraph = require('../../../engine/emptyGraph.json');
 
 var _emptyGraph2 = _interopRequireDefault(_emptyGraph);
 
@@ -54447,7 +54445,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var initialState = Object.assign({}, _emptyGraph2.default);
 
-},{"engine/emptyGraph.json":313}],312:[function(require,module,exports){
+},{"../../../engine/emptyGraph.json":313}],312:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

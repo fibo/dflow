@@ -6,7 +6,7 @@ import configureStore from './store/configureStore'
 
 const store = configureStore()
 
-const container = document.getElementById('root')
+const container = document.getElementById('dflow-root')
 
 render(
   <Provider store={store}>
