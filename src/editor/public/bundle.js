@@ -8172,17 +8172,17 @@ module.exports = warning;
 },{"./emptyFunction":55}],73:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react', 'react-dom', './components/Canvas', 'events', 'not-defined', './utils/randomString', 'svgx'], factory);
+    define(['module', 'exports', 'react', 'react-dom', './components/Canvas', 'events', 'not-defined', './utils/randomString', 'svgx', './components/Inspector', './components/Link', './components/Node'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('react-dom'), require('./components/Canvas'), require('events'), require('not-defined'), require('./utils/randomString'), require('svgx'));
+    factory(module, exports, require('react'), require('react-dom'), require('./components/Canvas'), require('events'), require('not-defined'), require('./utils/randomString'), require('svgx'), require('./components/Inspector'), require('./components/Link'), require('./components/Node'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod, mod.exports, global.react, global.reactDom, global.Canvas, global.events, global.notDefined, global.randomString, global.svgx);
+    factory(mod, mod.exports, global.react, global.reactDom, global.Canvas, global.events, global.notDefined, global.randomString, global.svgx, global.Inspector, global.Link, global.Node);
     global.Canvas = mod.exports;
   }
-})(this, function (module, exports, _react, _reactDom, _Canvas, _events, _notDefined, _randomString, _svgx) {
+})(this, function (module, exports, _react, _reactDom, _Canvas, _events, _notDefined, _randomString, _svgx, _Inspector, _Link, _Node) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -8200,6 +8200,12 @@ module.exports = warning;
   var _randomString2 = _interopRequireDefault(_randomString);
 
   var _svgx2 = _interopRequireDefault(_svgx);
+
+  var _Inspector2 = _interopRequireDefault(_Inspector);
+
+  var _Link2 = _interopRequireDefault(_Link);
+
+  var _Node2 = _interopRequireDefault(_Node);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -8308,7 +8314,7 @@ module.exports = warning;
         var _this2 = this;
 
         var container = this.container;
-        var item = this.item;
+        var item = Object.assign({}, { inspector: { DefaultInspector: _Inspector2.default } }, { link: { DefaultLink: _Link2.default } }, { node: { DefaultNode: _Node2.default } }, this.item);
 
         // Default values for height and width.
         var height = 400;
@@ -8509,20 +8515,20 @@ module.exports = warning;
   exports.default = FlowViewCanvas;
   module.exports = exports['default'];
 });
-},{"./components/Canvas":74,"./utils/randomString":84,"events":47,"not-defined":116,"react":277,"react-dom":123,"svgx":299}],74:[function(require,module,exports){
+},{"./components/Canvas":74,"./components/Inspector":75,"./components/Link":76,"./components/Node":77,"./utils/randomString":84,"events":47,"not-defined":116,"react":277,"react-dom":123,"svgx":299}],74:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react', 'react-dom', '../utils/computeNodeWidth', './Link', './Node', './theme', '../utils/ignoreEvent', './Inspector', '../utils/xOfPin', './Selector'], factory);
+    define(['module', 'exports', 'react', 'react-dom', '../utils/computeNodeWidth', './Inspector', './Link', './Node', './theme', '../utils/ignoreEvent', '../utils/xOfPin', './Selector'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('react-dom'), require('../utils/computeNodeWidth'), require('./Link'), require('./Node'), require('./theme'), require('../utils/ignoreEvent'), require('./Inspector'), require('../utils/xOfPin'), require('./Selector'));
+    factory(module, exports, require('react'), require('react-dom'), require('../utils/computeNodeWidth'), require('./Inspector'), require('./Link'), require('./Node'), require('./theme'), require('../utils/ignoreEvent'), require('../utils/xOfPin'), require('./Selector'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod, mod.exports, global.react, global.reactDom, global.computeNodeWidth, global.Link, global.Node, global.theme, global.ignoreEvent, global.Inspector, global.xOfPin, global.Selector);
+    factory(mod, mod.exports, global.react, global.reactDom, global.computeNodeWidth, global.Inspector, global.Link, global.Node, global.theme, global.ignoreEvent, global.xOfPin, global.Selector);
     global.Canvas = mod.exports;
   }
-})(this, function (module, exports, _react, _reactDom, _computeNodeWidth, _Link, _Node, _theme, _ignoreEvent, _Inspector, _xOfPin, _Selector) {
+})(this, function (module, exports, _react, _reactDom, _computeNodeWidth, _Inspector, _Link, _Node, _theme, _ignoreEvent, _xOfPin, _Selector) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -8533,6 +8539,8 @@ module.exports = warning;
 
   var _computeNodeWidth2 = _interopRequireDefault(_computeNodeWidth);
 
+  var _Inspector2 = _interopRequireDefault(_Inspector);
+
   var _Link2 = _interopRequireDefault(_Link);
 
   var _Node2 = _interopRequireDefault(_Node);
@@ -8540,8 +8548,6 @@ module.exports = warning;
   var _theme2 = _interopRequireDefault(_theme);
 
   var _ignoreEvent2 = _interopRequireDefault(_ignoreEvent);
-
-  var _Inspector2 = _interopRequireDefault(_Inspector);
 
   var _xOfPin2 = _interopRequireDefault(_xOfPin);
 
@@ -8667,6 +8673,7 @@ module.exports = warning;
         var height = view.height;
         var width = view.width;
 
+        var Inspector = item.inspector.DefaultInspector;
         var Link = item.link.DefaultLink;
         var Node = item.node.DefaultNode;
 
@@ -8730,7 +8737,7 @@ module.exports = warning;
           e.preventDefault();
           e.stopPropagation();
 
-          // TODO CTRL key for multiple selection.
+          // TODO Shift key for multiple selection.
 
           setState({
             selectedItems: []
@@ -8789,6 +8796,7 @@ module.exports = warning;
             });
           } else {
             setState({
+              draggedItems: [],
               selectedItems: [],
               pointer: null
             });
@@ -8835,8 +8843,9 @@ module.exports = warning;
             var index = selectedItems.indexOf(id);
 
             if (index === -1) {
-              // CTRL key allows multiple selection.
-              if (e.ctrlKey) {
+              // Shift key allows multiple selection.
+              if (e.shiftKey) {
+                // TODO it does not work.
                 selectedItems.push(id);
               } else {
                 selectedItems = [id];
@@ -8862,8 +8871,9 @@ module.exports = warning;
             var index = draggedItems.indexOf(id);
 
             if (index === -1) {
-              // CTRL key allows multiple selection.
-              if (e.ctrlKey) {
+              // Shift key allows multiple selection.
+              if (e.shiftKey) {
+                // TODO it does not work.
                 draggedItems.push(id);
               } else {
                 draggedItems = [id];
@@ -8999,7 +9009,7 @@ module.exports = warning;
               y2: y2
             });
           }),
-          _react2.default.createElement(_Inspector2.default, {
+          _react2.default.createElement(Inspector, {
             createInputPin: createInputPin,
             createOutputPin: createOutputPin,
             deleteLink: deleteLink,
@@ -9046,6 +9056,7 @@ module.exports = warning;
     fontFamily: _react.PropTypes.string.isRequired,
     fontSize: _react.PropTypes.number.isRequired,
     item: _react.PropTypes.shape({
+      inspector: _react.PropTypes.object.isRequired,
       link: _react.PropTypes.object.isRequired,
       node: _react.PropTypes.object.isRequired
     }).isRequired,
@@ -9075,6 +9086,7 @@ module.exports = warning;
     fontFamily: _theme2.default.fontFamily,
     fontSize: 17, // FIXME fontSize seems to be ignored
     item: {
+      inspector: { DefaultInspector: _Inspector2.default },
       link: { DefaultLink: _Link2.default },
       node: { DefaultNode: _Node2.default }
     },
@@ -9187,12 +9199,6 @@ module.exports = warning;
       key: 'render',
       value: function render() {
         var _props = this.props;
-        var createInputPin = _props.createInputPin;
-        var createOutputPin = _props.createOutputPin;
-        var deleteLink = _props.deleteLink;
-        var deleteNode = _props.deleteNode;
-        var deleteInputPin = _props.deleteInputPin;
-        var deleteOutputPin = _props.deleteOutputPin;
         var items = _props.items;
         var view = _props.view;
         var width = _props.width;
@@ -9211,125 +9217,11 @@ module.exports = warning;
           var node = view.node[itemId];
 
           if (link) {
-            item = _react2.default.createElement(
-              'div',
-              null,
-              'link',
-              _react2.default.createElement(
-                'button',
-                {
-                  onClick: function onClick() {
-                    deleteLink(itemId);
-                  }
-                },
-                'delete link'
-              )
-            );
+            item = this.renderLink(itemId, link);
           }
 
           if (node) {
-            var lastInputIsConnected;
-            var lastOutputIsConnected;
-
-            (function () {
-              var ins = node.ins || [];
-              var outs = node.outs || [];
-
-              var lastInputPosition = ins.length - 1;
-              var lastOutputPosition = outs.length - 1;
-
-              lastInputIsConnected = false;
-              lastOutputIsConnected = false;
-
-
-              Object.keys(view.link).forEach(function (linkId) {
-                var link = view.link[linkId];
-
-                if (link.to && link.to[0] === itemId && link.to[1] === lastInputPosition) {
-                  lastInputIsConnected = true;
-                }
-
-                if (link.from[0] === itemId && link.from[1] === lastOutputPosition) {
-                  lastOutputIsConnected = true;
-                }
-              });
-
-              item = _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                  'label',
-                  {
-                    htmlFor: 'name'
-                  },
-                  'node'
-                ),
-                _react2.default.createElement('input', {
-                  type: 'text',
-                  id: 'name',
-                  disabled: true,
-                  style: { outline: 'none' },
-                  value: node.text
-                }),
-                _react2.default.createElement(
-                  'div',
-                  null,
-                  'ins',
-                  _react2.default.createElement(
-                    'button',
-                    {
-                      disabled: ins.length === 0 || lastInputIsConnected,
-                      onClick: function onClick() {
-                        deleteInputPin(itemId);
-                      }
-                    },
-                    '-'
-                  ),
-                  _react2.default.createElement(
-                    'button',
-                    {
-                      onClick: function onClick() {
-                        createInputPin(itemId);
-                      }
-                    },
-                    '+'
-                  )
-                ),
-                _react2.default.createElement(
-                  'div',
-                  null,
-                  'outs',
-                  _react2.default.createElement(
-                    'button',
-                    {
-                      disabled: outs.length === 0 || lastOutputIsConnected,
-                      onClick: function onClick() {
-                        deleteOutputPin(itemId);
-                      }
-                    },
-                    '-'
-                  ),
-                  _react2.default.createElement(
-                    'button',
-                    {
-                      onClick: function onClick() {
-                        createOutputPin(itemId);
-                      }
-                    },
-                    '+'
-                  )
-                ),
-                _react2.default.createElement(
-                  'button',
-                  {
-                    onClick: function onClick() {
-                      deleteNode(itemId);
-                    }
-                  },
-                  'delete node'
-                )
-              );
-            })();
+            item = this.renderNode(itemId, node);
           }
         }
 
@@ -9344,6 +9236,135 @@ module.exports = warning;
             y: y
           },
           item
+        );
+      }
+    }, {
+      key: 'renderLink',
+      value: function renderLink(linkId, link) {
+        var deleteLink = this.props.deleteLink;
+
+        return _react2.default.createElement(
+          'div',
+          null,
+          'link',
+          _react2.default.createElement(
+            'button',
+            {
+              onClick: function onClick() {
+                deleteLink(linkId);
+              }
+            },
+            'delete link'
+          )
+        );
+      }
+    }, {
+      key: 'renderNode',
+      value: function renderNode(nodeId, node) {
+        var _props2 = this.props;
+        var createInputPin = _props2.createInputPin;
+        var createOutputPin = _props2.createOutputPin;
+        var deleteNode = _props2.deleteNode;
+        var deleteInputPin = _props2.deleteInputPin;
+        var deleteOutputPin = _props2.deleteOutputPin;
+        var view = _props2.view;
+
+
+        var ins = node.ins || [];
+        var outs = node.outs || [];
+
+        var lastInputPosition = ins.length - 1;
+        var lastOutputPosition = outs.length - 1;
+
+        var lastInputIsConnected = false;
+        var lastOutputIsConnected = false;
+
+        Object.keys(view.link).forEach(function (linkId) {
+          var link = view.link[linkId];
+
+          if (link.to && link.to[0] === nodeId && link.to[1] === lastInputPosition) {
+            lastInputIsConnected = true;
+          }
+
+          if (link.from[0] === nodeId && link.from[1] === lastOutputPosition) {
+            lastOutputIsConnected = true;
+          }
+        });
+
+        return _react2.default.createElement(
+          'div',
+          null,
+          _react2.default.createElement(
+            'label',
+            {
+              htmlFor: 'name'
+            },
+            'node'
+          ),
+          _react2.default.createElement('input', {
+            type: 'text',
+            id: 'name',
+            disabled: true,
+            style: { outline: 'none' },
+            value: node.text
+          }),
+          _react2.default.createElement(
+            'div',
+            null,
+            'ins',
+            _react2.default.createElement(
+              'button',
+              {
+                disabled: ins.length === 0 || lastInputIsConnected,
+                onClick: function onClick() {
+                  deleteInputPin(nodeId);
+                }
+              },
+              '-'
+            ),
+            _react2.default.createElement(
+              'button',
+              {
+                onClick: function onClick() {
+                  createInputPin(nodeId);
+                }
+              },
+              '+'
+            )
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'outs',
+            _react2.default.createElement(
+              'button',
+              {
+                disabled: outs.length === 0 || lastOutputIsConnected,
+                onClick: function onClick() {
+                  deleteOutputPin(nodeId);
+                }
+              },
+              '-'
+            ),
+            _react2.default.createElement(
+              'button',
+              {
+                onClick: function onClick() {
+                  createOutputPin(nodeId);
+                }
+              },
+              '+'
+            )
+          ),
+          _react2.default.createElement(
+            'button',
+            {
+              onClick: function onClick() {
+                deleteNode(nodeId);
+              }
+            },
+            'delete node'
+          )
         );
       }
     }]);
@@ -54140,16 +54161,16 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var DflowCanvas = function (_Component) {
-  _inherits(DflowCanvas, _Component);
+var CanvasContainer = function (_Component) {
+  _inherits(CanvasContainer, _Component);
 
-  function DflowCanvas() {
-    _classCallCheck(this, DflowCanvas);
+  function CanvasContainer() {
+    _classCallCheck(this, CanvasContainer);
 
-    return _possibleConstructorReturn(this, (DflowCanvas.__proto__ || Object.getPrototypeOf(DflowCanvas)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (CanvasContainer.__proto__ || Object.getPrototypeOf(CanvasContainer)).apply(this, arguments));
   }
 
-  _createClass(DflowCanvas, [{
+  _createClass(CanvasContainer, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
       var _props = this.props;
@@ -54171,18 +54192,18 @@ var DflowCanvas = function (_Component) {
     }
   }]);
 
-  return DflowCanvas;
+  return CanvasContainer;
 }(_react.Component);
 
-DflowCanvas.propTypes = {
+CanvasContainer.propTypes = {
   id: _react.PropTypes.string.isRequired
 };
 
-DflowCanvas.defaultProps = {
+CanvasContainer.defaultProps = {
   id: 'dflow-canvas'
 };
 
-exports.default = DflowCanvas;
+exports.default = CanvasContainer;
 
 },{"react":277}],307:[function(require,module,exports){
 'use strict';
@@ -54197,9 +54218,123 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _Canvas = require('./Canvas');
+var _components = require('flow-view/components');
 
-var _Canvas2 = _interopRequireDefault(_Canvas);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DflowInspector = function (_Inspector) {
+  _inherits(DflowInspector, _Inspector);
+
+  function DflowInspector() {
+    _classCallCheck(this, DflowInspector);
+
+    return _possibleConstructorReturn(this, (DflowInspector.__proto__ || Object.getPrototypeOf(DflowInspector)).apply(this, arguments));
+  }
+
+  _createClass(DflowInspector, [{
+    key: 'renderNode',
+    value: function renderNode(nodeId, node) {
+      var _props = this.props;
+      var createInputPin = _props.createInputPin;
+      var deleteNode = _props.deleteNode;
+      var deleteInputPin = _props.deleteInputPin;
+      var view = _props.view;
+
+
+      var ins = node.ins || [];
+      var lastInputPosition = ins.length - 1;
+
+      var lastInputIsConnected = false;
+
+      Object.keys(view.link).forEach(function (linkId) {
+        var link = view.link[linkId];
+
+        if (link.to && link.to[0] === nodeId && link.to[1] === lastInputPosition) {
+          lastInputIsConnected = true;
+        }
+      });
+
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'label',
+          {
+            htmlFor: 'name'
+          },
+          'node'
+        ),
+        _react2.default.createElement('input', {
+          type: 'text',
+          id: 'name',
+          disabled: true,
+          style: { outline: 'none' },
+          value: node.text
+        }),
+        _react2.default.createElement(
+          'div',
+          null,
+          'ins',
+          _react2.default.createElement(
+            'button',
+            {
+              disabled: ins.length === 0 || lastInputIsConnected,
+              onClick: function onClick() {
+                deleteInputPin(nodeId);
+              }
+            },
+            '-'
+          ),
+          _react2.default.createElement(
+            'button',
+            {
+              onClick: function onClick() {
+                createInputPin(nodeId);
+              }
+            },
+            '+'
+          )
+        ),
+        _react2.default.createElement(
+          'button',
+          {
+            onClick: function onClick() {
+              deleteNode(nodeId);
+            }
+          },
+          'delete node'
+        )
+      );
+    }
+  }]);
+
+  return DflowInspector;
+}(_components.Inspector);
+
+exports.default = DflowInspector;
+
+},{"flow-view/components":79,"react":277}],308:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _CanvasContainer = require('./CanvasContainer');
+
+var _CanvasContainer2 = _interopRequireDefault(_CanvasContainer);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54227,7 +54362,7 @@ var Root = function (_Component) {
       return _react2.default.createElement(
         'div',
         null,
-        _react2.default.createElement(_Canvas2.default, {
+        _react2.default.createElement(_CanvasContainer2.default, {
           initCanvas: initCanvas,
           height: window.innerHeight,
           width: window.innerWidth
@@ -54247,7 +54382,7 @@ Root.defaultProps = { title: 'foo' };
 
 exports.default = Root;
 
-},{"./Canvas":306,"react":277}],308:[function(require,module,exports){
+},{"./CanvasContainer":306,"react":277}],309:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54278,7 +54413,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_Root2.default);
 
-},{"../actions":305,"../components/Root":307,"react-redux":127,"redux":295}],309:[function(require,module,exports){
+},{"../actions":305,"../components/Root":308,"react-redux":127,"redux":295}],310:[function(require,module,exports){
 'use strict';
 
 var _react = require('react');
@@ -54309,7 +54444,7 @@ var container = document.getElementById('dflow-root');
   _react2.default.createElement(_App2.default, null)
 ), container);
 
-},{"./containers/App":308,"./store/configureStore":312,"react":277,"react-dom":123,"react-redux":127}],310:[function(require,module,exports){
+},{"./containers/App":309,"./store/configureStore":313,"react":277,"react-dom":123,"react-redux":127}],311:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54319,7 +54454,13 @@ exports.default = canvasMiddleware;
 
 var _flowView = require('flow-view');
 
+var _Inspector = require('../components/Inspector');
+
+var _Inspector2 = _interopRequireDefault(_Inspector);
+
 var _actions = require('../actions');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var flowViewCanvas = null;
 
@@ -54330,7 +54471,11 @@ function canvasMiddleware(store) {
       var state = store.getState();
 
       if (action.type === 'INIT_CANVAS') {
-        flowViewCanvas = new _flowView.Canvas(action.canvasId);
+        flowViewCanvas = new _flowView.Canvas(action.canvasId, {
+          inspector: {
+            DefaultInspector: _Inspector2.default
+          }
+        });
 
         flowViewCanvas.render(state.view);
 
@@ -54365,7 +54510,7 @@ function canvasMiddleware(store) {
   };
 }
 
-},{"../actions":305,"flow-view":81}],311:[function(require,module,exports){
+},{"../actions":305,"../components/Inspector":307,"flow-view":81}],312:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54445,7 +54590,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var initialState = Object.assign({}, _emptyGraph2.default);
 
-},{"../../../engine/emptyGraph.json":313}],312:[function(require,module,exports){
+},{"../../../engine/emptyGraph.json":314}],313:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54476,7 +54621,7 @@ function configureStore(initialState) {
 
 exports.default = configureStore;
 
-},{"../middlewares/canvas":310,"../reducers":311,"redux":295,"redux-thunk":289}],313:[function(require,module,exports){
+},{"../middlewares/canvas":311,"../reducers":312,"redux":295,"redux-thunk":289}],314:[function(require,module,exports){
 module.exports={
   "data": {},
   "info": {},
@@ -54488,4 +54633,4 @@ module.exports={
   }
 }
 
-},{}]},{},[309]);
+},{}]},{},[310]);

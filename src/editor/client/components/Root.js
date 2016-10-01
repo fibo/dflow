@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react'
-import Canvas from './Canvas'
+import CanvasContainer from './CanvasContainer'
 
 class Root extends Component {
   render () {
@@ -7,7 +7,7 @@ class Root extends Component {
 
     return (
       <div>
-        <Canvas
+        <CanvasContainer
           initCanvas={initCanvas}
           height={window.innerHeight}
           width={window.innerWidth}
