@@ -19,7 +19,6 @@ class DflowInspector extends Inspector {
 
     const oneInput = singleInputTask(taskName)
     const noInput = noInputTask(taskName)
-    console.log(noInput)
 
     var lastInputIsConnected = false
 

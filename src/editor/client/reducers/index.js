@@ -1,7 +1,8 @@
 import emptyGraph from '../../../engine/emptyGraph.json'
+import no from 'not-defined'
 import noOutputForTask from '../utils/noOutputForTask'
 import singleInputTask from '../utils/singleInputTask'
-import no from 'not-defined'
+import typeOfNode from '../utils/typeOfNode'
 
 const initialState = Object.assign({}, emptyGraph)
 
@@ -28,8 +29,11 @@ export default function (state = initialState, action) {
     case 'CREATE_NODE':
       const taskName = node.text
 
-      // Create dflow task.
-      task[nodeId] = taskName
+      // Create dflow task, only if it is not a custom node.
+      // Custom nodes are responsible to create their own task.
+      if (typeOfNode(node) === 'DefaultNode') {
+        task[nodeId] = taskName
+      }
 
       const hasOutput = !noOutputForTask(taskName)
 
