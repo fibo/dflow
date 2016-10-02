@@ -11,7 +11,7 @@ var injectStrings = require('./inject/strings')
 var inputArgs = require('./inputArgs')
 var isDflowFun = require('./isDflowFun')
 var level = require('./level')
-var notDefined = require('not-defined')
+var no = require('not-defined')
 var regexArgument = require('./regex/argument')
 var regexComment = require('./regex/comment')
 var regexSubgraph = require('./regex/subgraph')
@@ -19,7 +19,7 @@ var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
 var walkGlobal = require('./walkGlobal')
 
-var defined = function (x) { return !notDefined(x) }
+var defined = function (x) { return !no(x) }
 
 /**
  * Create a dflow function.
@@ -117,7 +117,7 @@ function fun (graph, additionalFunctions) {
     if (regexSubgraph.test(taskName)) {
       var subgraphKey = taskName.substring(1)
 
-      if (notDefined(graph.func[subgraphKey])) throw new Error(msg)
+      if (no(graph.func[subgraphKey])) throw new Error(msg)
       else return
     }
 
@@ -127,7 +127,7 @@ function fun (graph, additionalFunctions) {
     // Skip globals.
     if (defined(walkGlobal(taskName))) return
 
-    if (notDefined(funcs[taskName])) throw new Error(msg)
+    if (no(funcs[taskName])) throw new Error(msg)
   }
 
   // Check if there is some missing task.
