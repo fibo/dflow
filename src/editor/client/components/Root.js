@@ -3,14 +3,20 @@ import CanvasContainer from './CanvasContainer'
 
 class Root extends Component {
   render () {
-    const { initCanvas } = this.props
+    const {
+      fetchGraphIfNeeded,
+      initCanvas
+    } = this.props
 
     return (
       <div>
+        <div>
+          <button>Save</button>
+          <button>Download</button>
+        </div>
         <CanvasContainer
+          fetchGraphIfNeeded={fetchGraphIfNeeded}
           initCanvas={initCanvas}
-          height={window.innerHeight}
-          width={window.innerWidth}
         />
       </div>
     )
@@ -20,7 +26,5 @@ class Root extends Component {
 Root.propTypes = {
   initCanvas: PropTypes.func.isRequired
 }
-
-Root.defaultProps = { title: 'foo' }
 
 export default Root

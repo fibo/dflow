@@ -17,24 +17,6 @@ export function createLink (link, linkId) {
   }
 }
 
-export function createInputPin (nodeId, position, pin) {
-  return {
-    type: 'CREATE_INPUT_PIN',
-    nodeId,
-    position,
-    pin
-  }
-}
-
-export function createOutputPin (nodeId, position, pin) {
-  return {
-    type: 'CREATE_OUTPUT_PIN',
-    nodeId,
-    position,
-    pin
-  }
-}
-
 export function deleteLink (linkId) {
   return {
     type: 'DELETE_LINK',
@@ -49,23 +31,7 @@ export function deleteNode (nodeId) {
   }
 }
 
-export function deleteInputPin (nodeId, position) {
-  return {
-    type: 'DELETE_INPUT_PIN',
-    nodeId,
-    position
-  }
-}
-
-export function deleteOutputPin (nodeId, position) {
-  return {
-    type: 'DELETE_OUTPUT_PIN',
-    nodeId,
-    position
-  }
-}
-
-function fetchGraph () {
+function fetchGraph (canvasId) {
   return (dispatch) => {
     dispatch({
       type: 'FETCH_GRAPH_REQUEST'
@@ -76,31 +42,26 @@ function fetchGraph () {
       .catch((error) => {
         dispatch({
           type: 'FETCH_GRAPH_FAILURE',
+          canvasId,
           error
         })
       })
-      .then((json) => dispatch(receiveGraph(json)))
+      .then((json) => dispatch(receiveGraph(json, canvasId)))
   }
 }
 
-export function fetchGraphIfNeeded () {
+export function fetchGraphIfNeeded (canvasId) {
   return (dispatch, getState) => {
     if (shouldFetchGraph(getState())) {
-      return dispatch(fetchGraph())
+      return dispatch(fetchGraph(canvasId))
     }
   }
 }
 
-export function initCanvas (canvasId) {
-  return {
-    type: 'INIT_CANVAS',
-    canvasId
-  }
-}
-
-function receiveGraph (graph) {
+function receiveGraph (graph, canvasId) {
   return {
     type: 'FETCH_GRAPH_SUCCESS',
+    canvasId,
     graph
   }
 }

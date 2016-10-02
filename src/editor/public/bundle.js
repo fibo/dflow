@@ -54012,14 +54012,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createNode = createNode;
 exports.createLink = createLink;
-exports.createInputPin = createInputPin;
-exports.createOutputPin = createOutputPin;
 exports.deleteLink = deleteLink;
 exports.deleteNode = deleteNode;
-exports.deleteInputPin = deleteInputPin;
-exports.deleteOutputPin = deleteOutputPin;
 exports.fetchGraphIfNeeded = fetchGraphIfNeeded;
-exports.initCanvas = initCanvas;
 
 var _isomorphicFetch = require('isomorphic-fetch');
 
@@ -54047,24 +54042,6 @@ function createLink(link, linkId) {
   };
 }
 
-function createInputPin(nodeId, position, pin) {
-  return {
-    type: 'CREATE_INPUT_PIN',
-    nodeId: nodeId,
-    position: position,
-    pin: pin
-  };
-}
-
-function createOutputPin(nodeId, position, pin) {
-  return {
-    type: 'CREATE_OUTPUT_PIN',
-    nodeId: nodeId,
-    position: position,
-    pin: pin
-  };
-}
-
 function deleteLink(linkId) {
   return {
     type: 'DELETE_LINK',
@@ -54079,23 +54056,7 @@ function deleteNode(nodeId) {
   };
 }
 
-function deleteInputPin(nodeId, position) {
-  return {
-    type: 'DELETE_INPUT_PIN',
-    nodeId: nodeId,
-    position: position
-  };
-}
-
-function deleteOutputPin(nodeId, position) {
-  return {
-    type: 'DELETE_OUTPUT_PIN',
-    nodeId: nodeId,
-    position: position
-  };
-}
-
-function fetchGraph() {
+function fetchGraph(canvasId) {
   return function (dispatch) {
     dispatch({
       type: 'FETCH_GRAPH_REQUEST'
@@ -54106,32 +54067,27 @@ function fetchGraph() {
     }).catch(function (error) {
       dispatch({
         type: 'FETCH_GRAPH_FAILURE',
+        canvasId: canvasId,
         error: error
       });
     }).then(function (json) {
-      return dispatch(receiveGraph(json));
+      return dispatch(receiveGraph(json, canvasId));
     });
   };
 }
 
-function fetchGraphIfNeeded() {
+function fetchGraphIfNeeded(canvasId) {
   return function (dispatch, getState) {
     if (shouldFetchGraph(getState())) {
-      return dispatch(fetchGraph());
+      return dispatch(fetchGraph(canvasId));
     }
   };
 }
 
-function initCanvas(canvasId) {
-  return {
-    type: 'INIT_CANVAS',
-    canvasId: canvasId
-  };
-}
-
-function receiveGraph(graph) {
+function receiveGraph(graph, canvasId) {
   return {
     type: 'FETCH_GRAPH_SUCCESS',
+    canvasId: canvasId,
     graph: graph
   };
 }
@@ -54174,11 +54130,11 @@ var CanvasContainer = function (_Component) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       var _props = this.props;
-      var initCanvas = _props.initCanvas;
+      var fetchGraphIfNeeded = _props.fetchGraphIfNeeded;
       var id = _props.id;
 
 
-      initCanvas(id);
+      fetchGraphIfNeeded(id);
     }
   }, {
     key: 'render',
@@ -54196,10 +54152,12 @@ var CanvasContainer = function (_Component) {
 }(_react.Component);
 
 CanvasContainer.propTypes = {
+  fetchGraphIfNeeded: _react.PropTypes.func.isRequired,
   id: _react.PropTypes.string.isRequired
 };
 
 CanvasContainer.defaultProps = {
+  fetchGraphIfNeeded: Function.prototype,
   id: 'dflow-canvas'
 };
 
@@ -54247,6 +54205,8 @@ var DflowInspector = function (_Inspector) {
       var view = _props.view;
 
 
+      var taskName = node.text;
+
       var ins = node.ins || [];
       var lastInputPosition = ins.length - 1;
 
@@ -54275,7 +54235,7 @@ var DflowInspector = function (_Inspector) {
           id: 'name',
           disabled: true,
           style: { outline: 'none' },
-          value: node.text
+          value: taskName
         }),
         _react2.default.createElement(
           'div',
@@ -54356,16 +54316,31 @@ var Root = function (_Component) {
   _createClass(Root, [{
     key: 'render',
     value: function render() {
-      var initCanvas = this.props.initCanvas;
+      var _props = this.props;
+      var fetchGraphIfNeeded = _props.fetchGraphIfNeeded;
+      var initCanvas = _props.initCanvas;
 
 
       return _react2.default.createElement(
         'div',
         null,
+        _react2.default.createElement(
+          'div',
+          null,
+          _react2.default.createElement(
+            'button',
+            null,
+            'Save'
+          ),
+          _react2.default.createElement(
+            'button',
+            null,
+            'Download'
+          )
+        ),
         _react2.default.createElement(_CanvasContainer2.default, {
-          initCanvas: initCanvas,
-          height: window.innerHeight,
-          width: window.innerWidth
+          fetchGraphIfNeeded: fetchGraphIfNeeded,
+          initCanvas: initCanvas
         })
       );
     }
@@ -54377,8 +54352,6 @@ var Root = function (_Component) {
 Root.propTypes = {
   initCanvas: _react.PropTypes.func.isRequired
 };
-
-Root.defaultProps = { title: 'foo' };
 
 exports.default = Root;
 
@@ -54407,6 +54380,7 @@ var mapStateToProps = function mapStateToProps(state, ownProps) {
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return (0, _redux.bindActionCreators)({
+    fetchGraphIfNeeded: _actions.fetchGraphIfNeeded,
     initCanvas: _actions.initCanvas
   }, dispatch);
 };
@@ -54468,16 +54442,15 @@ function canvasMiddleware(store) {
   return function (next) {
     return function (action) {
       var result = next(action);
-      var state = store.getState();
 
-      if (action.type === 'INIT_CANVAS') {
+      if (action.type === 'FETCH_GRAPH_SUCCESS') {
         flowViewCanvas = new _flowView.Canvas(action.canvasId, {
           inspector: {
             DefaultInspector: _Inspector2.default
           }
         });
 
-        flowViewCanvas.render(state.view);
+        flowViewCanvas.render(action.graph.view);
 
         flowViewCanvas.on('createNode', function (node, nodeId) {
           store.dispatch((0, _actions.createNode)(node, nodeId));
@@ -54500,7 +54473,7 @@ function canvasMiddleware(store) {
         switch (action.type) {
           case 'TODO_ACTION':
             // TODO flowViewCanvas.doSomething()
-            // for example set a node to error state.
+            // for example set node state to error to make it red.
             break;
         }
       }
@@ -54541,11 +54514,16 @@ exports.default = function () {
       return Object.assign({}, state, { pipe: pipe });
 
     case 'CREATE_NODE':
-      // Create dflow task.
-      task[nodeId] = node.text;
+      var taskName = node.text;
 
-      // Every dflow task has an output.
-      view.node[nodeId].outs = ['out'];
+      // Create dflow task.
+      task[nodeId] = taskName;
+
+      var hasOutput = !(0, _noOutputForTask2.default)(taskName);
+
+      if (hasOutput) {
+        view.node[nodeId].outs = ['out'];
+      }
 
       return Object.assign({}, state, { task: task });
 
@@ -54586,11 +54564,15 @@ var _emptyGraph = require('../../../engine/emptyGraph.json');
 
 var _emptyGraph2 = _interopRequireDefault(_emptyGraph);
 
+var _noOutputForTask = require('../utils/noOutputForTask');
+
+var _noOutputForTask2 = _interopRequireDefault(_noOutputForTask);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var initialState = Object.assign({}, _emptyGraph2.default);
 
-},{"../../../engine/emptyGraph.json":314}],313:[function(require,module,exports){
+},{"../../../engine/emptyGraph.json":315,"../utils/noOutputForTask":314}],313:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54622,6 +54604,27 @@ function configureStore(initialState) {
 exports.default = configureStore;
 
 },{"../middlewares/canvas":311,"../reducers":312,"redux":295,"redux-thunk":289}],314:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = noOutputForTask;
+/**
+ * Every task in dflow is a function hence it has an output,
+ * i.e. the return value of the function.
+ * Few tasks has no output, i.e. console.log, return, etc.
+ *
+ * @param {String} taskName
+ * @returns {Boolean}
+ */
+function noOutputForTask(taskName) {
+  var noOutputTasks = ['return', 'console.log', 'console.error'];
+
+  return noOutputTasks.indexOf(taskName) === -1;
+}
+
+},{}],315:[function(require,module,exports){
 module.exports={
   "data": {},
   "info": {},

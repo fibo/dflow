@@ -10,6 +10,8 @@ class DflowInspector extends Inspector {
       view
     } = this.props
 
+    const taskName = node.text
+
     const ins = node.ins || []
     const lastInputPosition = ins.length - 1
 
@@ -35,7 +37,7 @@ class DflowInspector extends Inspector {
           id='name'
           disabled
           style={{ outline: 'none' }}
-          value={node.text}
+          value={taskName}
         />
         <div>
           ins
