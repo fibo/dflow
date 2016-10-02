@@ -9,5 +9,5 @@
 export default function noOutputForTask (taskName) {
   const noOutputTasks = ['return', 'console.log', 'console.error']
 
-  return noOutputTasks.indexOf(taskName) === -1
+  return noOutputTasks.indexOf(taskName) > -1
 }

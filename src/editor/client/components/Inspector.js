@@ -1,5 +1,7 @@
 import React from 'react'
 import { Inspector } from 'flow-view/components'
+import noInputTask from '../utils/noInputTask'
+import singleInputTask from '../utils/singleInputTask'
 
 class DflowInspector extends Inspector {
   renderNode (nodeId, node) {
@@ -14,6 +16,10 @@ class DflowInspector extends Inspector {
 
     const ins = node.ins || []
     const lastInputPosition = ins.length - 1
+
+    const oneInput = singleInputTask(taskName)
+    const noInput = noInputTask(taskName)
+    console.log(noInput)
 
     var lastInputIsConnected = false
 
@@ -39,16 +45,18 @@ class DflowInspector extends Inspector {
           style={{ outline: 'none' }}
           value={taskName}
         />
-        <div>
-          ins
-          <button
-            disabled={(ins.length === 0) || lastInputIsConnected}
-            onClick={() => { deleteInputPin(nodeId) }}
-          >-</button>
-          <button
-            onClick={() => { createInputPin(nodeId) }}
-          >+</button>
-        </div>
+        {(noInput || oneInput) ? null : (
+          <div>
+            ins
+            <button
+              disabled={(ins.length === 0) || lastInputIsConnected}
+              onClick={() => { deleteInputPin(nodeId) }}
+            >-</button>
+            <button
+              onClick={() => { createInputPin(nodeId) }}
+            >+</button>
+          </div>
+        )}
         <button
           onClick={() => {
             deleteNode(nodeId)
