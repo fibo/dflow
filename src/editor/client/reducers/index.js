@@ -1,5 +1,7 @@
 import emptyGraph from '../../../engine/emptyGraph.json'
 import noOutputForTask from '../utils/noOutputForTask'
+import singleInputTask from '../utils/singleInputTask'
+import no from 'not-defined'
 
 const initialState = Object.assign({}, emptyGraph)
 
@@ -33,6 +35,14 @@ export default function (state = initialState, action) {
 
       if (hasOutput) {
         view.node[nodeId].outs = ['out']
+      }
+
+      const hasOneInput = singleInputTask(taskName)
+
+      if (hasOneInput) {
+        if (no(view.node[nodeId].ins)) {
+          view.node[nodeId].ins = ['in']
+        }
       }
 
       return Object.assign({}, state, { task })

@@ -54178,6 +54178,14 @@ var _react2 = _interopRequireDefault(_react);
 
 var _components = require('flow-view/components');
 
+var _noInputTask = require('../utils/noInputTask');
+
+var _noInputTask2 = _interopRequireDefault(_noInputTask);
+
+var _singleInputTask = require('../utils/singleInputTask');
+
+var _singleInputTask2 = _interopRequireDefault(_singleInputTask);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -54210,6 +54218,10 @@ var DflowInspector = function (_Inspector) {
       var ins = node.ins || [];
       var lastInputPosition = ins.length - 1;
 
+      var oneInput = (0, _singleInputTask2.default)(taskName);
+      var noInput = (0, _noInputTask2.default)(taskName);
+      console.log(noInput);
+
       var lastInputIsConnected = false;
 
       Object.keys(view.link).forEach(function (linkId) {
@@ -54237,7 +54249,7 @@ var DflowInspector = function (_Inspector) {
           style: { outline: 'none' },
           value: taskName
         }),
-        _react2.default.createElement(
+        noInput || oneInput ? null : _react2.default.createElement(
           'div',
           null,
           'ins',
@@ -54279,7 +54291,7 @@ var DflowInspector = function (_Inspector) {
 
 exports.default = DflowInspector;
 
-},{"flow-view/components":79,"react":277}],308:[function(require,module,exports){
+},{"../utils/noInputTask":314,"../utils/singleInputTask":316,"flow-view/components":79,"react":277}],308:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54525,6 +54537,14 @@ exports.default = function () {
         view.node[nodeId].outs = ['out'];
       }
 
+      var hasOneInput = (0, _singleInputTask2.default)(taskName);
+
+      if (hasOneInput) {
+        if ((0, _notDefined2.default)(view.node[nodeId].ins)) {
+          view.node[nodeId].ins = ['in'];
+        }
+      }
+
       return Object.assign({}, state, { task: task });
 
     case 'DELETE_LINK':
@@ -54568,11 +54588,19 @@ var _noOutputForTask = require('../utils/noOutputForTask');
 
 var _noOutputForTask2 = _interopRequireDefault(_noOutputForTask);
 
+var _singleInputTask = require('../utils/singleInputTask');
+
+var _singleInputTask2 = _interopRequireDefault(_singleInputTask);
+
+var _notDefined = require('not-defined');
+
+var _notDefined2 = _interopRequireDefault(_notDefined);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var initialState = Object.assign({}, _emptyGraph2.default);
 
-},{"../../../engine/emptyGraph.json":315,"../utils/noOutputForTask":314}],313:[function(require,module,exports){
+},{"../../../engine/emptyGraph.json":317,"../utils/noOutputForTask":315,"../utils/singleInputTask":316,"not-defined":116}],313:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54609,6 +54637,31 @@ exports.default = configureStore;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = noInputTask;
+var argumentRegex = require('../../../engine/regex/argument');
+var quotedRegex = require('../../../engine/regex/quoted');
+
+/**
+ * @param {String} taskName
+ * @returns {Boolean}
+ */
+function noInputTask(taskName) {
+  var noInputTasks = ['arguments'];
+
+  if (noInputTasks.indexOf(taskName) > -1) return true;
+
+  if (argumentRegex.test(taskName)) return true;
+  if (quotedRegex.test(taskName)) return true;
+
+  return false;
+}
+
+},{"../../../engine/regex/argument":318,"../../../engine/regex/quoted":319}],315:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.default = noOutputForTask;
 /**
  * Every task in dflow is a function hence it has an output,
@@ -54621,10 +54674,27 @@ exports.default = noOutputForTask;
 function noOutputForTask(taskName) {
   var noOutputTasks = ['return', 'console.log', 'console.error'];
 
-  return noOutputTasks.indexOf(taskName) === -1;
+  return noOutputTasks.indexOf(taskName) > -1;
 }
 
-},{}],315:[function(require,module,exports){
+},{}],316:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = singleInputTask;
+/**
+ * @param {String} taskName
+ * @returns {Boolean}
+ */
+function singleInputTask(taskName) {
+  var singleInputTasks = ['return'];
+
+  return singleInputTasks.indexOf(taskName) > -1;
+}
+
+},{}],317:[function(require,module,exports){
 module.exports={
   "data": {},
   "info": {},
@@ -54635,5 +54705,15 @@ module.exports={
     "node": {}
   }
 }
+
+},{}],318:[function(require,module,exports){
+"use strict";
+
+module.exports = /^arguments\[(\d+)\]$/;
+
+},{}],319:[function(require,module,exports){
+"use strict";
+
+module.exports = /^'.+'$/;
 
 },{}]},{},[310]);
