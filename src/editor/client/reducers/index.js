@@ -1,4 +1,5 @@
 import emptyGraph from '../../../engine/emptyGraph.json'
+import noOutputForTask from '../utils/noOutputForTask'
 
 const initialState = Object.assign({}, emptyGraph)
 
@@ -23,11 +24,16 @@ export default function (state = initialState, action) {
       return Object.assign({}, state, { pipe })
 
     case 'CREATE_NODE':
-      // Create dflow task.
-      task[nodeId] = node.text
+      const taskName = node.text
 
-      // Every dflow task has an output.
-      view.node[nodeId].outs = ['out']
+      // Create dflow task.
+      task[nodeId] = taskName
+
+      const hasOutput = !noOutputForTask(taskName)
+
+      if (hasOutput) {
+        view.node[nodeId].outs = ['out']
+      }
 
       return Object.assign({}, state, { task })
 

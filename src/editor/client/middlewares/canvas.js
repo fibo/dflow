@@ -12,16 +12,15 @@ var flowViewCanvas = null
 export default function canvasMiddleware (store) {
   return (next) => (action) => {
     const result = next(action)
-    const state = store.getState()
 
-    if (action.type === 'INIT_CANVAS') {
+    if (action.type === 'FETCH_GRAPH_SUCCESS') {
       flowViewCanvas = new Canvas(action.canvasId, {
         inspector: {
           DefaultInspector: Inspector
         }
       })
 
-      flowViewCanvas.render(state.view)
+      flowViewCanvas.render(action.graph.view)
 
       flowViewCanvas.on('createNode', (node, nodeId) => {
         store.dispatch(createNode(node, nodeId))
@@ -44,7 +43,7 @@ export default function canvasMiddleware (store) {
       switch (action.type) {
         case 'TODO_ACTION':
           // TODO flowViewCanvas.doSomething()
-          // for example set a node to error state.
+          // for example set node state to error to make it red.
           break
       }
     }

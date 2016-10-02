@@ -3,11 +3,11 @@ import React, { Component, PropTypes } from 'react'
 class CanvasContainer extends Component {
   componentDidMount () {
     const {
-      initCanvas,
+      fetchGraphIfNeeded,
       id
     } = this.props
 
-    initCanvas(id)
+    fetchGraphIfNeeded(id)
   }
 
   render () {
@@ -24,10 +24,12 @@ class CanvasContainer extends Component {
 }
 
 CanvasContainer.propTypes = {
+  fetchGraphIfNeeded: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired
 }
 
 CanvasContainer.defaultProps = {
+  fetchGraphIfNeeded: Function.prototype,
   id: 'dflow-canvas'
 }
 
