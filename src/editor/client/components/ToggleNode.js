@@ -16,8 +16,6 @@ class ToggleNode extends Node {
       pinSize
     } = this.props
 
-    const toggle = this.state.toggle
-
     const onClick = (e) => {
       e.preventDefault()
       e.stopPropagation()
@@ -25,18 +23,20 @@ class ToggleNode extends Node {
       // TODO probably the clean way to do this is
       // pass actions as a prop instead of the model itself.
       // Here it could be action.renameTask(id, 'true')
-      if (!toggle) {
-        model.task[id] = 'true'
-      } else {
-        model.task[id] = 'false'
-      }
+      if (this.state.toggle) {
+        this.setState({ toggle: false })
 
-      this.setState({ toggle: !toggle })
+        model.task[id] = 'false'
+      } else {
+        this.setState({ toggle: true })
+
+        model.task[id] = 'true'
+      }
     }
 
     return (
       <rect
-        fill={toggle ? 'limegreen' : 'tomato'}
+        fill={this.state.toggle ? 'limegreen' : 'tomato'}
         height={bodyHeight}
         onClick={onClick}
         x={pinSize}
