@@ -35,6 +35,8 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - arrow functions support.
 - postcss.
 - flow view integration.
+- Custom nodes: toggle.
+- Load and save graph.
 
 [Unreleased]: https://github.com/fibo/{{ package.name }}/compare/v{{ package.version }}...HEAD
 {% for tag in tags offset:2 %}
