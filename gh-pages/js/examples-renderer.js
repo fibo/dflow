@@ -8172,17 +8172,17 @@ module.exports = warning;
 },{"./emptyFunction":55}],73:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react', 'react-dom', './components/Canvas', 'events', 'not-defined', './utils/randomString', 'svgx', './components/Inspector', './components/Link', './components/Node'], factory);
+    define(['module', 'exports', 'react', 'react-dom', './components/Frame', 'events', 'not-defined', './utils/randomString', 'svgx'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('react-dom'), require('./components/Canvas'), require('events'), require('not-defined'), require('./utils/randomString'), require('svgx'), require('./components/Inspector'), require('./components/Link'), require('./components/Node'));
+    factory(module, exports, require('react'), require('react-dom'), require('./components/Frame'), require('events'), require('not-defined'), require('./utils/randomString'), require('svgx'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod, mod.exports, global.react, global.reactDom, global.Canvas, global.events, global.notDefined, global.randomString, global.svgx, global.Inspector, global.Link, global.Node);
+    factory(mod, mod.exports, global.react, global.reactDom, global.Frame, global.events, global.notDefined, global.randomString, global.svgx);
     global.Canvas = mod.exports;
   }
-})(this, function (module, exports, _react, _reactDom, _Canvas, _events, _notDefined, _randomString, _svgx, _Inspector, _Link, _Node) {
+})(this, function (module, exports, _react, _reactDom, _Frame, _events, _notDefined, _randomString, _svgx) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -8191,7 +8191,7 @@ module.exports = warning;
 
   var _react2 = _interopRequireDefault(_react);
 
-  var _Canvas2 = _interopRequireDefault(_Canvas);
+  var _Frame2 = _interopRequireDefault(_Frame);
 
   var _events2 = _interopRequireDefault(_events);
 
@@ -8200,12 +8200,6 @@ module.exports = warning;
   var _randomString2 = _interopRequireDefault(_randomString);
 
   var _svgx2 = _interopRequireDefault(_svgx);
-
-  var _Inspector2 = _interopRequireDefault(_Inspector);
-
-  var _Link2 = _interopRequireDefault(_Link);
-
-  var _Node2 = _interopRequireDefault(_Node);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -8264,13 +8258,13 @@ module.exports = warning;
   // TODO find a better way to generate ids.
   var idLength = 3;
 
-  var FlowViewCanvas = function (_EventEmitter) {
-    _inherits(FlowViewCanvas, _EventEmitter);
+  var Canvas = function (_EventEmitter) {
+    _inherits(Canvas, _EventEmitter);
 
-    function FlowViewCanvas(containerId, item) {
-      _classCallCheck(this, FlowViewCanvas);
+    function Canvas(containerId, item) {
+      _classCallCheck(this, Canvas);
 
-      var _this = _possibleConstructorReturn(this, (FlowViewCanvas.__proto__ || Object.getPrototypeOf(FlowViewCanvas)).call(this));
+      var _this = _possibleConstructorReturn(this, (Canvas.__proto__ || Object.getPrototypeOf(Canvas)).call(this));
 
       _this.container = null;
 
@@ -8304,17 +8298,26 @@ module.exports = warning;
      * Render to SVG.
      *
      * @param {Object} view
+     * @param {Object} [model]
      * @param {Function} [callback] run server side
      */
 
 
-    _createClass(FlowViewCanvas, [{
+    _createClass(Canvas, [{
       key: 'render',
-      value: function render(view, callback) {
+      value: function render(view, model, callback) {
         var _this2 = this;
 
         var container = this.container;
-        var item = Object.assign({}, { inspector: { DefaultInspector: _Inspector2.default } }, { link: { DefaultLink: _Link2.default } }, { node: { DefaultNode: _Node2.default } }, this.item);
+
+        var defaultItem = _Frame2.default.defaultProps.item;
+
+        var DefaultInspector = defaultItem.inspector.DefaultInspector;
+        var DefaultLink = defaultItem.link.DefaultLink;
+        var DefaultNode = defaultItem.node.DefaultNode;
+        var typeOfNode = defaultItem.util.typeOfNode;
+
+        var item = Object.assign({}, { inspector: { DefaultInspector: DefaultInspector } }, { link: { DefaultLink: DefaultLink } }, { node: { DefaultNode: DefaultNode } }, { util: { typeOfNode: typeOfNode } }, this.item);
 
         // Default values for height and width.
         var height = 400;
@@ -8473,17 +8476,18 @@ module.exports = warning;
           view.link[id] = Object.assign(view.link[id], link);
         };
 
-        var component = _react2.default.createElement(_Canvas2.default, {
+        var component = _react2.default.createElement(_Frame2.default, {
           createInputPin: createInputPin,
           createOutputPin: createOutputPin,
           createLink: createLink,
           createNode: createNode,
           deleteLink: deleteLink,
+          deleteInputPin: deleteInputPin,
           deleteNode: deleteNode,
+          deleteOutputPin: deleteOutputPin,
           dragItems: dragItems,
           item: item,
-          deleteInputPin: deleteInputPin,
-          deleteOutputPin: deleteOutputPin,
+          model: model,
           updateLink: updateLink,
           view: view
         });
@@ -8495,7 +8499,7 @@ module.exports = warning;
           // Server side rendering.
 
           var opts = { doctype: true, xmlns: true };
-          var jsx = _react2.default.createElement(_Canvas2.default, {
+          var jsx = _react2.default.createElement(_Frame2.default, {
             item: item,
             view: view
           });
@@ -8509,13 +8513,13 @@ module.exports = warning;
       }
     }]);
 
-    return FlowViewCanvas;
+    return Canvas;
   }(_events2.default);
 
-  exports.default = FlowViewCanvas;
+  exports.default = Canvas;
   module.exports = exports['default'];
 });
-},{"./components/Canvas":74,"./components/Inspector":75,"./components/Link":76,"./components/Node":77,"./utils/randomString":84,"events":47,"not-defined":109,"react":263,"react-dom":116,"svgx":277}],74:[function(require,module,exports){
+},{"./components/Frame":74,"./utils/randomString":84,"events":47,"not-defined":109,"react":263,"react-dom":116,"svgx":277}],74:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(['module', 'exports', 'react', 'react-dom', '../utils/computeNodeWidth', './Inspector', './Link', './Node', './theme', '../utils/ignoreEvent', '../utils/xOfPin', './Selector'], factory);
@@ -8526,7 +8530,7 @@ module.exports = warning;
       exports: {}
     };
     factory(mod, mod.exports, global.react, global.reactDom, global.computeNodeWidth, global.Inspector, global.Link, global.Node, global.theme, global.ignoreEvent, global.xOfPin, global.Selector);
-    global.Canvas = mod.exports;
+    global.Frame = mod.exports;
   }
 })(this, function (module, exports, _react, _reactDom, _computeNodeWidth, _Inspector, _Link, _Node, _theme, _ignoreEvent, _xOfPin, _Selector) {
   'use strict';
@@ -8607,13 +8611,13 @@ module.exports = warning;
     if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   }
 
-  var Canvas = function (_Component) {
-    _inherits(Canvas, _Component);
+  var Frame = function (_Component) {
+    _inherits(Frame, _Component);
 
-    function Canvas(props) {
-      _classCallCheck(this, Canvas);
+    function Frame(props) {
+      _classCallCheck(this, Frame);
 
-      var _this = _possibleConstructorReturn(this, (Canvas.__proto__ || Object.getPrototypeOf(Canvas)).call(this, props));
+      var _this = _possibleConstructorReturn(this, (Frame.__proto__ || Object.getPrototypeOf(Frame)).call(this, props));
 
       _this.state = {
         draggedLink: null,
@@ -8625,7 +8629,7 @@ module.exports = warning;
       return _this;
     }
 
-    _createClass(Canvas, [{
+    _createClass(Frame, [{
       key: 'componentDidMount',
       value: function componentDidMount() {
         var container = (0, _reactDom.findDOMNode)(this).parentNode;
@@ -8648,16 +8652,17 @@ module.exports = warning;
         var createLink = _props.createLink;
         var _createNode = _props.createNode;
         var deleteLink = _props.deleteLink;
+        var deleteInputPin = _props.deleteInputPin;
         var deleteNode = _props.deleteNode;
+        var deleteOutputPin = _props.deleteOutputPin;
         var dragItems = _props.dragItems;
         var fontFamily = _props.fontFamily;
         var fontSize = _props.fontSize;
         var item = _props.item;
         var lineWidth = _props.lineWidth;
+        var model = _props.model;
         var nodeBodyHeight = _props.nodeBodyHeight;
         var pinSize = _props.pinSize;
-        var deleteInputPin = _props.deleteInputPin;
-        var deleteOutputPin = _props.deleteOutputPin;
         var style = _props.style;
         var updateLink = _props.updateLink;
         var view = _props.view;
@@ -8673,9 +8678,10 @@ module.exports = warning;
         var height = view.height;
         var width = view.width;
 
+        var typeOfNode = item.util.typeOfNode;
+
         var Inspector = item.inspector.DefaultInspector;
         var Link = item.link.DefaultLink;
-        var Node = item.node.DefaultNode;
 
         var setState = this.setState.bind(this);
 
@@ -8905,15 +8911,19 @@ module.exports = warning;
             width: width
           },
           Object.keys(view.node).sort(selectedFirst).map(function (id, i) {
-            var _view$node$id = view.node[id];
-            var height = _view$node$id.height;
-            var ins = _view$node$id.ins;
-            var outs = _view$node$id.outs;
-            var text = _view$node$id.text;
-            var width = _view$node$id.width;
-            var x = _view$node$id.x;
-            var y = _view$node$id.y;
+            var node = view.node[id];
 
+            var height = node.height;
+            var ins = node.ins;
+            var outs = node.outs;
+            var text = node.text;
+            var width = node.width;
+            var x = node.x;
+            var y = node.y;
+
+
+            var nodeType = typeOfNode(node);
+            var Node = item.node[nodeType];
 
             return _react2.default.createElement(Node, {
               key: i,
@@ -8923,6 +8933,7 @@ module.exports = warning;
               height: height,
               id: id,
               ins: ins,
+              model: model,
               onCreateLink: onCreateLink,
               outs: outs,
               pinSize: pinSize,
@@ -9023,13 +9034,6 @@ module.exports = warning;
             createNode: function createNode(node) {
               _createNode(node);
 
-              // TODO It should be better to have emit('createNode', node)
-              // in the Selector and
-              // on('createNode', () => {
-              //   setState({ showSelector: false })
-              // })
-              // in the Canvas.
-
               // Need to change state to force React rendering.
               setState({
                 showSelector: false
@@ -9042,10 +9046,10 @@ module.exports = warning;
       }
     }]);
 
-    return Canvas;
+    return Frame;
   }(_react.Component);
 
-  Canvas.propTypes = {
+  Frame.propTypes = {
     createInputPin: _react.PropTypes.func.isRequired,
     createOutputPin: _react.PropTypes.func.isRequired,
     createLink: _react.PropTypes.func.isRequired,
@@ -9058,13 +9062,16 @@ module.exports = warning;
     item: _react.PropTypes.shape({
       inspector: _react.PropTypes.object.isRequired,
       link: _react.PropTypes.object.isRequired,
-      node: _react.PropTypes.object.isRequired
+      node: _react.PropTypes.object.isRequired,
+      util: _react.PropTypes.shape({
+        typeOfNode: _react.PropTypes.func.isRequired
+      })
     }).isRequired,
     nodeBodyHeight: _react.PropTypes.number.isRequired,
     lineWidth: _react.PropTypes.number.isRequired,
-    pinSize: _react.PropTypes.number.isRequired,
     deleteInputPin: _react.PropTypes.func.isRequired,
     deleteOutputPin: _react.PropTypes.func.isRequired,
+    pinSize: _react.PropTypes.number.isRequired,
     style: _react.PropTypes.object.isRequired,
     updateLink: _react.PropTypes.func.isRequired,
     view: _react.PropTypes.shape({
@@ -9075,26 +9082,31 @@ module.exports = warning;
     }).isRequired
   };
 
-  Canvas.defaultProps = {
+  Frame.defaultProps = {
     createInputPin: Function.prototype,
     createOutputPin: Function.prototype,
     createLink: Function.prototype,
     createNode: Function.prototype,
     deleteLink: Function.prototype,
+    deleteInputPin: Function.prototype,
     deleteNode: Function.prototype,
+    deleteOutputPin: Function.prototype,
     dragItems: Function.prototype,
     fontFamily: _theme2.default.fontFamily,
     fontSize: 17, // FIXME fontSize seems to be ignored
     item: {
       inspector: { DefaultInspector: _Inspector2.default },
       link: { DefaultLink: _Link2.default },
-      node: { DefaultNode: _Node2.default }
+      node: { DefaultNode: _Node2.default },
+      util: {
+        typeOfNode: function typeOfNode(node) {
+          return 'DefaultNode';
+        }
+      }
     },
     lineWidth: _theme2.default.lineWidth,
     nodeBodyHeight: _theme2.default.nodeBodyHeight,
     pinSize: _theme2.default.pinSize,
-    deleteInputPin: Function.prototype,
-    deleteOutputPin: Function.prototype,
     style: { border: '1px solid black' },
     updateLink: Function.prototype,
     view: {
@@ -9105,7 +9117,7 @@ module.exports = warning;
     }
   };
 
-  exports.default = Canvas;
+  exports.default = Frame;
   module.exports = exports['default'];
 });
 },{"../utils/computeNodeWidth":82,"../utils/ignoreEvent":83,"../utils/xOfPin":85,"./Inspector":75,"./Link":76,"./Node":77,"./Selector":78,"./theme":80,"react":263,"react-dom":116}],75:[function(require,module,exports){
@@ -10005,10 +10017,13 @@ module.exports = warning;
   var Selector = function (_Component) {
     _inherits(Selector, _Component);
 
-    function Selector() {
+    function Selector(props) {
       _classCallCheck(this, Selector);
 
-      return _possibleConstructorReturn(this, (Selector.__proto__ || Object.getPrototypeOf(Selector)).apply(this, arguments));
+      var _this = _possibleConstructorReturn(this, (Selector.__proto__ || Object.getPrototypeOf(Selector)).call(this, props));
+
+      _this.state = { text: '' };
+      return _this;
     }
 
     _createClass(Selector, [{
@@ -10024,6 +10039,13 @@ module.exports = warning;
         var width = _props.width;
 
 
+        var text = this.state.text;
+
+        var onChange = function onChange(e) {
+          var text = e.target.value.trim();
+          _this2.setState({ text: text });
+        };
+
         var onKeyPress = function onKeyPress(e) {
           var text = e.target.value.trim();
           var pointer = _this2.props.pointer;
@@ -10031,12 +10053,16 @@ module.exports = warning;
           var pressedEnter = e.key === 'Enter';
           var textIsNotBlank = text.length > 0;
 
-          if (pressedEnter && textIsNotBlank) {
-            createNode({
-              text: text,
-              x: pointer.x,
-              y: pointer.y
-            });
+          if (pressedEnter) {
+            if (textIsNotBlank) {
+              createNode({
+                text: text,
+                x: pointer.x,
+                y: pointer.y
+              });
+            }
+
+            _this2.setState({ text: '' });
           }
         };
 
@@ -10055,7 +10081,9 @@ module.exports = warning;
               if (input !== null) input.focus();
             },
             style: { outline: 'none' },
-            onKeyPress: onKeyPress
+            onChange: onChange,
+            onKeyPress: onKeyPress,
+            value: text
           })
         );
       }
@@ -10084,25 +10112,25 @@ module.exports = warning;
 },{"react":263}],79:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', './Canvas', './Link', './Node', './Inspector', './Selector'], factory);
+    define(['exports', './Frame', './Link', './Node', './Inspector', './Selector'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('./Canvas'), require('./Link'), require('./Node'), require('./Inspector'), require('./Selector'));
+    factory(exports, require('./Frame'), require('./Link'), require('./Node'), require('./Inspector'), require('./Selector'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.Canvas, global.Link, global.Node, global.Inspector, global.Selector);
+    factory(mod.exports, global.Frame, global.Link, global.Node, global.Inspector, global.Selector);
     global.index = mod.exports;
   }
-})(this, function (exports, _Canvas, _Link, _Node, _Inspector, _Selector) {
+})(this, function (exports, _Frame, _Link, _Node, _Inspector, _Selector) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.Selector = exports.Node = exports.Link = exports.Inspector = exports.Canvas = undefined;
+  exports.Selector = exports.Node = exports.Link = exports.Inspector = exports.Frame = undefined;
 
-  var _Canvas2 = _interopRequireDefault(_Canvas);
+  var _Frame2 = _interopRequireDefault(_Frame);
 
   var _Link2 = _interopRequireDefault(_Link);
 
@@ -10118,13 +10146,13 @@ module.exports = warning;
     };
   }
 
-  exports.Canvas = _Canvas2.default;
+  exports.Frame = _Frame2.default;
   exports.Inspector = _Inspector2.default;
   exports.Link = _Link2.default;
   exports.Node = _Node2.default;
   exports.Selector = _Selector2.default;
 });
-},{"./Canvas":74,"./Inspector":75,"./Link":76,"./Node":77,"./Selector":78}],80:[function(require,module,exports){
+},{"./Frame":74,"./Inspector":75,"./Link":76,"./Node":77,"./Selector":78}],80:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(['module', 'exports'], factory);
