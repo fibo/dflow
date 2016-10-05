@@ -80,7 +80,7 @@
   ],
   "dependencies": {
     "express": "4.x",
-    "flow-view": "^2.7.0",
+    "flow-view": "^2.7.1",
     "internal-ip": "1.x",
     "nopt": "3.x",
     "not-defined": "1.x",
