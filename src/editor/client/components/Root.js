@@ -1,5 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import CanvasContainer from './CanvasContainer'
+import Console from './Console'
 
 class Root extends Component {
   render () {
@@ -18,6 +19,7 @@ class Root extends Component {
           fetchGraphIfNeeded={fetchGraphIfNeeded}
           initCanvas={initCanvas}
         />
+        <Console />
       </div>
     )
   }

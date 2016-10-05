@@ -1,5 +1,6 @@
 import React from 'react'
 import { Node } from 'flow-view/components'
+import ignoreEvent from '../utils/ignoreEvent'
 
 class ToggleNode extends Node {
   constructor (props) {
@@ -16,19 +17,23 @@ class ToggleNode extends Node {
       pinSize
     } = this.props
 
-    const onClick = (e) => {
+    const toggle = this.state.toggle
+
+    const setState = this.setState.bind(this)
+
+    const onMouseDown = (e) => {
       e.preventDefault()
       e.stopPropagation()
 
       // TODO probably the clean way to do this is
       // pass actions as a prop instead of the model itself.
       // Here it could be action.renameTask(id, 'true')
-      if (this.state.toggle) {
-        this.setState({ toggle: false })
+      if (toggle) {
+        setState({ toggle: false })
 
         model.task[id] = 'false'
       } else {
-        this.setState({ toggle: true })
+        setState({ toggle: true })
 
         model.task[id] = 'true'
       }
@@ -36,9 +41,11 @@ class ToggleNode extends Node {
 
     return (
       <rect
-        fill={this.state.toggle ? 'limegreen' : 'tomato'}
+        fill={toggle ? 'limegreen' : 'tomato'}
         height={bodyHeight}
-        onClick={onClick}
+        onClick={ignoreEvent}
+        onMouseDown={onMouseDown}
+        onMouseUp={ignoreEvent}
         x={pinSize}
         y={pinSize}
         width={bodyHeight}
