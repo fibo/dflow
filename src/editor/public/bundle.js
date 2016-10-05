@@ -54198,6 +54198,70 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var id = 'dflow-console';
+
+var Console = function (_Component) {
+  _inherits(Console, _Component);
+
+  function Console() {
+    _classCallCheck(this, Console);
+
+    return _possibleConstructorReturn(this, (Console.__proto__ || Object.getPrototypeOf(Console)).apply(this, arguments));
+  }
+
+  _createClass(Console, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      (function () {
+        var logger = document.getElementById(id);
+        console.log = function () {
+          logger.innerHTML = '';
+
+          for (var i = 0; i < arguments.length; i++) {
+            if (_typeof(arguments[i]) === 'object') {
+              logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(arguments[i], undefined, 2) : arguments[i]) + ' ';
+            } else {
+              logger.innerHTML += arguments[i] + ' ';
+            }
+          }
+        };
+      })();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement('div', { id: id });
+    }
+  }]);
+
+  return Console;
+}(_react.Component);
+
+exports.default = Console;
+
+},{"react":277}],308:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = require('react');
@@ -54318,7 +54382,7 @@ var DflowInspector = function (_Inspector) {
 
 exports.default = DflowInspector;
 
-},{"../utils/noInputTask":315,"../utils/singleInputTask":317,"flow-view/components":79,"react":277}],308:[function(require,module,exports){
+},{"../utils/noInputTask":317,"../utils/singleInputTask":319,"flow-view/components":79,"react":277}],309:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54334,6 +54398,10 @@ var _react2 = _interopRequireDefault(_react);
 var _CanvasContainer = require('./CanvasContainer');
 
 var _CanvasContainer2 = _interopRequireDefault(_CanvasContainer);
+
+var _Console = require('./Console');
+
+var _Console2 = _interopRequireDefault(_Console);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54380,7 +54448,8 @@ var Root = function (_Component) {
         _react2.default.createElement(_CanvasContainer2.default, {
           fetchGraphIfNeeded: fetchGraphIfNeeded,
           initCanvas: initCanvas
-        })
+        }),
+        _react2.default.createElement(_Console2.default, null)
       );
     }
   }]);
@@ -54394,7 +54463,7 @@ Root.propTypes = {
 
 exports.default = Root;
 
-},{"./CanvasContainer":306,"react":277}],309:[function(require,module,exports){
+},{"./CanvasContainer":306,"./Console":307,"react":277}],310:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54408,6 +54477,10 @@ var _react = require('react');
 var _react2 = _interopRequireDefault(_react);
 
 var _components = require('flow-view/components');
+
+var _ignoreEvent = require('../utils/ignoreEvent');
+
+var _ignoreEvent2 = _interopRequireDefault(_ignoreEvent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54432,8 +54505,6 @@ var ToggleNode = function (_Node) {
   _createClass(ToggleNode, [{
     key: 'getBody',
     value: function getBody() {
-      var _this2 = this;
-
       var _props = this.props;
       var bodyHeight = _props.bodyHeight;
       var model = _props.model;
@@ -54441,28 +54512,34 @@ var ToggleNode = function (_Node) {
       var pinSize = _props.pinSize;
 
 
-      var onClick = function onClick(e) {
+      var toggle = this.state.toggle;
+
+      var setState = this.setState.bind(this);
+
+      var onMouseDown = function onMouseDown(e) {
         e.preventDefault();
         e.stopPropagation();
 
         // TODO probably the clean way to do this is
         // pass actions as a prop instead of the model itself.
         // Here it could be action.renameTask(id, 'true')
-        if (_this2.state.toggle) {
-          _this2.setState({ toggle: false });
+        if (toggle) {
+          setState({ toggle: false });
 
           model.task[id] = 'false';
         } else {
-          _this2.setState({ toggle: true });
+          setState({ toggle: true });
 
           model.task[id] = 'true';
         }
       };
 
       return _react2.default.createElement('rect', {
-        fill: this.state.toggle ? 'limegreen' : 'tomato',
+        fill: toggle ? 'limegreen' : 'tomato',
         height: bodyHeight,
-        onClick: onClick,
+        onClick: _ignoreEvent2.default,
+        onMouseDown: onMouseDown,
+        onMouseUp: _ignoreEvent2.default,
         x: pinSize,
         y: pinSize,
         width: bodyHeight
@@ -54475,7 +54552,7 @@ var ToggleNode = function (_Node) {
 
 exports.default = ToggleNode;
 
-},{"flow-view/components":79,"react":277}],310:[function(require,module,exports){
+},{"../utils/ignoreEvent":316,"flow-view/components":79,"react":277}],311:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54507,7 +54584,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_Root2.default);
 
-},{"../actions":305,"../components/Root":308,"react-redux":127,"redux":295}],311:[function(require,module,exports){
+},{"../actions":305,"../components/Root":309,"react-redux":127,"redux":295}],312:[function(require,module,exports){
 'use strict';
 
 var _react = require('react');
@@ -54538,7 +54615,7 @@ var container = document.getElementById('dflow-root');
   _react2.default.createElement(_App2.default, null)
 ), container);
 
-},{"./containers/App":310,"./store/configureStore":314,"react":277,"react-dom":123,"react-redux":127}],312:[function(require,module,exports){
+},{"./containers/App":311,"./store/configureStore":315,"react":277,"react-dom":123,"react-redux":127}],313:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54625,7 +54702,7 @@ function canvasMiddleware(store) {
   };
 }
 
-},{"../actions":305,"../components/Inspector":307,"../components/ToggleNode":309,"../utils/typeOfNode":318,"flow-view":81,"flow-view/components":79}],313:[function(require,module,exports){
+},{"../actions":305,"../components/Inspector":308,"../components/ToggleNode":310,"../utils/typeOfNode":320,"flow-view":81,"flow-view/components":79}],314:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54737,7 +54814,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var initialState = Object.assign({}, _emptyGraph2.default);
 
-},{"../../../engine/emptyGraph.json":319,"../utils/noOutputForTask":316,"../utils/singleInputTask":317,"../utils/typeOfNode":318,"not-defined":116}],314:[function(require,module,exports){
+},{"../../../engine/emptyGraph.json":321,"../utils/noOutputForTask":318,"../utils/singleInputTask":319,"../utils/typeOfNode":320,"not-defined":116}],315:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54768,7 +54845,19 @@ function configureStore(initialState) {
 
 exports.default = configureStore;
 
-},{"../middlewares/canvas":312,"../reducers":313,"redux":295,"redux-thunk":289}],315:[function(require,module,exports){
+},{"../middlewares/canvas":313,"../reducers":314,"redux":295,"redux-thunk":289}],316:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = ignoreEvent;
+function ignoreEvent(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+},{}],317:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54793,7 +54882,7 @@ function noInputTask(taskName) {
   return false;
 }
 
-},{"../../../engine/regex/argument":320,"../../../engine/regex/quoted":321}],316:[function(require,module,exports){
+},{"../../../engine/regex/argument":322,"../../../engine/regex/quoted":323}],318:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54814,7 +54903,7 @@ function noOutputForTask(taskName) {
   return noOutputTasks.indexOf(taskName) > -1;
 }
 
-},{}],317:[function(require,module,exports){
+},{}],319:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54826,12 +54915,12 @@ exports.default = singleInputTask;
  * @returns {Boolean}
  */
 function singleInputTask(taskName) {
-  var singleInputTasks = ['return'];
+  var singleInputTasks = ['return', 't'];
 
   return singleInputTasks.indexOf(taskName) > -1;
 }
 
-},{}],318:[function(require,module,exports){
+},{}],320:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54844,7 +54933,7 @@ function typeOfNode(node) {
   return 'DefaultNode';
 }
 
-},{}],319:[function(require,module,exports){
+},{}],321:[function(require,module,exports){
 module.exports={
   "data": {},
   "info": {},
@@ -54856,14 +54945,14 @@ module.exports={
   }
 }
 
-},{}],320:[function(require,module,exports){
+},{}],322:[function(require,module,exports){
 "use strict";
 
 module.exports = /^arguments\[(\d+)\]$/;
 
-},{}],321:[function(require,module,exports){
+},{}],323:[function(require,module,exports){
 "use strict";
 
 module.exports = /^'.+'$/;
 
-},{}]},{},[311]);
+},{}]},{},[312]);
