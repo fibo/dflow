@@ -22,6 +22,11 @@ app.get('/graph', (req, res) => {
   res.json(graph)
 })
 
+// TODO install body-parser and write graph to file
+// app.post('/graph', (req, res) => {
+//   here graphPath should not be null
+// })
+
 function start (opt) {
   if (no(opt)) opt = {}
 
@@ -33,14 +38,12 @@ function start (opt) {
   graph = JSON.parse(read(graphPath))
 
   http.listen(port, () => {
-    debug('editor server is listening on port %d', port)
+    const myIp = internalIp()
+    const uri = `http://${myIp}:${port}`
 
-    if (opt.open) {
-      const myIp = internalIp()
-      const uri = `http://${myIp}:${port}`
+    debug(`editor server is listening on ${uri}`)
 
-      opn(uri)
-    }
+    if (opt.open) opn(uri)
   })
 }
 
