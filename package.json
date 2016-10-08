@@ -42,7 +42,7 @@
     "lint_test": "cd test; standard --global describe --global it; cd -",
     "minify": "cd dist; uglifyjs ${npm_package_name}.js --source-map ${npm_package_name}.map --output ${npm_package_name}.min.js --compress --mangle --preamble \"// Software: ${npm_package_name}\n// Homepage: ${npm_package_homepage}\n// License: ${npm_package_license}\"; cd -",
     "postcss": "npm run lint_css && postcss --config postcss.json",
-    "postversion": "git push origin v${npm_package_version}; npm publish; npm run _push",
+    "postversion": "git push origin v${npm_package_version}; npm publish; npm run push",
     "postupdate-deps": "npm test && git commit -am 'updated deps' || git checkout -- package.json",
     "pull": "git pull origin master && npm run gh-pages:pull",
     "push": "git push origin master && npm run gh-pages:push",
