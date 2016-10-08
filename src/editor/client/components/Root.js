@@ -1,6 +1,5 @@
 import React, { PropTypes, Component } from 'react'
 import CanvasContainer from './CanvasContainer'
-import Console from './Console'
 
 class Root extends Component {
   render () {
@@ -9,17 +8,21 @@ class Root extends Component {
       initCanvas
     } = this.props
 
-    return (
-      <div>
+    /*
+     * TODO
         <div>
           <button>Save</button>
           <button>Download</button>
         </div>
+
+        */
+
+    return (
+      <div>
         <CanvasContainer
           fetchGraphIfNeeded={fetchGraphIfNeeded}
           initCanvas={initCanvas}
         />
-        <Console />
       </div>
     )
   }

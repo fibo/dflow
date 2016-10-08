@@ -22,7 +22,12 @@ export default function (state = initialState, action) {
 
     case 'CREATE_LINK':
       // Create dflow pipe.
-      pipe[linkId] = [ link.from, link.to ]
+      pipe[linkId] = [ link.from[0], link.to[0] ]
+
+      // Add target pin position only if it is not zero.
+      const targetPinPosition = link.to[1]
+
+      if (targetPinPosition) pipe[linkId][2] = targetPinPosition
 
       return Object.assign({}, state, { pipe })
 
