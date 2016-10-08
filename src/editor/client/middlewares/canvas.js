@@ -43,7 +43,6 @@ export default function canvasMiddleware (store) {
       })
 
       flowViewCanvas.on('createLink', (link, linkId) => {
-        console.log(link, linkId)
         store.dispatch(createLink(link, linkId))
       })
 

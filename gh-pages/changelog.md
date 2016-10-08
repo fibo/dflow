@@ -17,12 +17,11 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ### TODO
 
-- autosave and autorun (should be optional)
 - preview div: it is positioned aside editor and has an id,
   when going in production, the id can be an argument and the
   editor can be replaced by the pure engine version.
 
-## [v0.16.0] - 
+## [v0.16.0] - 2016-10-08
 
 ### Fixed
 
@@ -30,6 +29,7 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ### Added
 
+- Autorun client side.
 - Dynamic changelog.
 - cli actions.
 - arrow functions support.
