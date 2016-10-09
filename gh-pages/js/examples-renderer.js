@@ -53746,7 +53746,7 @@ module.exports={
     ]
   },
   "task": {
-    "4": "innerHTML",
+    "4": ".innerHTML",
     "6": "'This is a paragraph'",
     "8": "body",
     "9": ".appendChild()",
@@ -53756,7 +53756,7 @@ module.exports={
   "view": {
     "node": {
       "4": {
-        "text": "innerHTML",
+        "text": ".innerHTML",
         "x": 293,
         "y": 338,
         "ins": [

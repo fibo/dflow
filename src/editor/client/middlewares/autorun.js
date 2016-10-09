@@ -11,7 +11,7 @@ export default function autorunMiddleware (store) {
     // TODO nothing to do client side if context is *server*
     // if (state.info && state.info.context === 'server') return result
 
-    // Check taht graph is valid and execute it.
+    // Check that graph is valid and execute it.
     try {
       validate(state)
 

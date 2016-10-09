@@ -435,12 +435,21 @@ body {
   width: 100%;
 }
 
-#dflow-root {
-  height: 600px;
-  width: 600px;
-}
-
 #dflow-canvas {
   height: 100%;
   width: 100%;
+}
+
+#dflow-console {
+  height: 20px;
+}
+
+#dflow-preview {
+  width: 50vw;
+  height: 100%;
+}
+
+#dflow-root {
+  height: 90vh;
+  width: 50vw;
 }

@@ -1,4 +1,4 @@
-var logger = document.getElementById('dflow-console')
+const logger = document.getElementById('dflow-console')
 
 function consoleLog () {
   logger.innerHTML = ''

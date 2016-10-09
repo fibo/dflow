@@ -17,9 +17,16 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ### TODO
 
-- preview div: it is positioned aside editor and has an id,
-  when going in production, the id can be an argument and the
-  editor can be replaced by the pure engine version.
+## [v0.16.1] - 2016-10-09
+
+### Fixed
+
+- Updated to latest express.
+- Removed unnecessary dev deps in dependencies attribute.
+
+### Added
+
+- Styling files for preview and console divs.
 
 ## [v0.16.0] - 2016-10-08
 

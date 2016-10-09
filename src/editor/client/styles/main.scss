@@ -3,5 +3,7 @@
 /* Internal imports: load variables first. */
 @import "base/variables.scss";
 @import "base/body.scss";
-@import "dflow/root.css";
 @import "dflow/canvas.css";
+@import "dflow/console.css";
+@import "dflow/preview.css";
+@import "dflow/root.css";
