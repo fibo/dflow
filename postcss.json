@@ -2,7 +2,8 @@
   "use": [
     "autoprefixer",
     "postcss-import",
-    "precss"
+    "precss",
+    "cssnano"
   ],
   "input": "src/editor/client/styles/main.scss",
   "output": "src/editor/public/style.css",

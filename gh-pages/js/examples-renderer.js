@@ -52210,8 +52210,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // TODO remove import React from 'react'
-
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var DflowInspector = function (_Inspector) {
   _inherits(DflowInspector, _Inspector);
@@ -54087,28 +54086,7 @@ module.exports={
 }
 
 },{}],321:[function(require,module,exports){
-module.exports={
-  "task": {
-    "1": "arguments[0]",
-    "2": "arguments[1]",
-    "3": "+",
-    "4": "return"
-  },
-  "pipe": {
-    "5": [ "1", "3", 0 ],
-    "6": [ "2", "3", 1 ],
-    "7": [ "3", "4" ]
-  },
-  "data": {
-    "results": [
-      {
-        "args": [1, 2],
-        "expected": 3
-      }
-    ]
-  }
-}
-
+module.exports={"data":{"results":[{"args":[1,2],"expected":3}]},"info":{},"pipe":{"qek":["fkc","scw"],"utj":["pxj","scw",1],"bzm":["scw","msv"]},"task":{"fkc":"arguments[0]","pxj":"arguments[1]","scw":"+","msv":"return"},"view":{"link":{"qek":{"from":["fkc",0],"to":["scw",0]},"utj":{"from":["pxj",0],"to":["scw",1]},"bzm":{"from":["scw",0],"to":["msv",0]}},"node":{"fkc":{"text":"arguments[0]","x":246,"y":118,"outs":["out"]},"pxj":{"text":"arguments[1]","x":423,"y":118,"outs":["out"]},"scw":{"text":"+","x":353,"y":234,"outs":["out"],"ins":["in0","in1"]},"msv":{"text":"return","x":345,"y":331,"ins":["in"]}}}}
 },{}],322:[function(require,module,exports){
 module.exports={
   "data": {

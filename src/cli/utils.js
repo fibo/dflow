@@ -14,13 +14,13 @@ function dotJson (path) {
 exports.dotJson = dotJson
 
 /**
- * Append current working dir
+ * Append current working dir, if path is relative.
  *
  * ['graph1.json', 'graph2.json'].map(appendCwd)
  */
 
 function appendCwd (givenPath) {
-  return path.join(process.cwd(), givenPath)
+  return path.isAbsolute(givenPath) ? givenPath : path.join(process.cwd(), givenPath)
 }
 
 exports.appendCwd = appendCwd
