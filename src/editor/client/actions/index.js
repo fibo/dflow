@@ -58,6 +58,14 @@ export function fetchGraphIfNeeded (canvasId) {
   }
 }
 
+export function invalidNode (nodeId, error) {
+  return {
+    type: 'INVALID_NODE',
+    nodeId,
+    error
+  }
+}
+
 function receiveGraph (graph, canvasId) {
   return {
     type: 'FETCH_GRAPH_SUCCESS',

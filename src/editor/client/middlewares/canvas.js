@@ -1,5 +1,6 @@
 import { Canvas } from 'flow-view'
 import Inspector from '../components/Inspector'
+import InvalidNode from '../components/InvalidNode'
 import ToggleNode from '../components/ToggleNode'
 import { Node } from 'flow-view/components'
 import {
@@ -31,6 +32,7 @@ export default function canvasMiddleware (store) {
         },
         node: {
           DefaultNode: Node,
+          InvalidNode,
           ToggleNode
         },
         util: { typeOfNode }
