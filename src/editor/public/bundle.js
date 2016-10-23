@@ -55170,12 +55170,12 @@ var quotedRegex = require('../../../engine/regex/quoted');
  * @returns {Boolean}
  */
 function noInputTask(taskName) {
-  var noInputTasks = ['arguments'];
+  var noInputTasks = ['arguments', 'Infinity'];
 
   if (noInputTasks.indexOf(taskName) > -1) return true;
-
   if (argumentRegex.test(taskName)) return true;
   if (quotedRegex.test(taskName)) return true;
+  if (!isNaN(parseFloat(taskName))) return true;
 
   return false;
 }
