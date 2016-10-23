@@ -11,7 +11,7 @@ var emptyGraph = require('./emptyGraph.json')
 function createEmptyGraph (graphPath, callback) {
   var jsonString = JSON.stringify(emptyGraph)
 
-  write(graphPath, jsonString)
+  write(graphPath, jsonString, callback)
 }
 
 module.exports = createEmptyGraph

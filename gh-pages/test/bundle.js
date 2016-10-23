@@ -1907,7 +1907,14 @@ function isnan (val) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":1,"ieee754":3,"isarray":4}],3:[function(require,module,exports){
+},{"base64-js":1,"ieee754":4,"isarray":3}],3:[function(require,module,exports){
+var toString = {}.toString;
+
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
+};
+
+},{}],4:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -1992,13 +1999,6 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
   buffer[offset + i - d] |= s * 128
 }
-
-},{}],4:[function(require,module,exports){
-var toString = {}.toString;
-
-module.exports = Array.isArray || function (arr) {
-  return toString.call(arr) == '[object Array]';
-};
 
 },{}],5:[function(require,module,exports){
 module.exports=function(x){return (typeof x==='undefined')||(x === null)}
@@ -2567,7 +2567,7 @@ Formatter.prototype = {
   format: function(value) {
     var tp = t(value);
 
-    if (tp.type === t.OBJECT && this.alreadySeen(value)) {
+    if (this.alreadySeen(value)) {
       return '[Circular]';
     }
 
@@ -2797,11 +2797,7 @@ function formatRegExp(value) {
 }
 
 function formatFunction(value) {
-  var obj = {};
-  Object.keys(value).forEach(function(key) {
-    obj[key] = value[key];
-  });
-  return formatPlainObject.call(this, obj, {
+  return formatPlainObject.call(this, value, {
     prefix: 'Function',
     additionalKeys: [['name', functionName(value)]]
   });
@@ -3131,8 +3127,7 @@ TypeAdaptorStorage.prototype = {
 
 var defaultTypeAdaptorStorage = new TypeAdaptorStorage();
 
-// default for objects
-defaultTypeAdaptorStorage.addType(new t.Type(t.OBJECT), {
+var objectAdaptor = {
   forEach: function(obj, f, context) {
     for (var prop in obj) {
       if (shouldUtil.hasOwnProperty(obj, prop) && shouldUtil.propertyIsEnumerable(obj, prop)) {
@@ -3154,7 +3149,11 @@ defaultTypeAdaptorStorage.addType(new t.Type(t.OBJECT), {
   iterator: function(obj) {
     return new ObjectIterator(obj);
   }
-});
+};
+
+// default for objects
+defaultTypeAdaptorStorage.addType(new t.Type(t.OBJECT), objectAdaptor);
+defaultTypeAdaptorStorage.addType(new t.Type(t.FUNCTION), objectAdaptor);
 
 var mapAdaptor = {
   has: function(obj, key) {

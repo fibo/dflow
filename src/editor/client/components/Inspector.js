@@ -1,4 +1,3 @@
-// TODO remove import React from 'react'
 import { Inspector } from 'flow-view/components'
 import noInputTask from '../utils/noInputTask'
 import singleInputTask from '../utils/singleInputTask'

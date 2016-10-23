@@ -4,20 +4,19 @@ import CanvasContainer from './CanvasContainer'
 class Root extends Component {
   render () {
     const {
-      fetchGraphIfNeeded
+      fetchGraphIfNeeded,
+      view
     } = this.props
-
-    /*
-     * TODO
-        <div>
-          <button>Save</button>
-          <button>Download</button>
-        </div>
-
-        */
 
     return (
       <div>
+        <div>
+          <button
+            onClick={() => {
+              console.log(view)
+            }}
+          >Download</button>
+        </div>
         <CanvasContainer
           fetchGraphIfNeeded={fetchGraphIfNeeded}
         />
