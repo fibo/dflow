@@ -23,8 +23,6 @@ var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
 var walkGlobal = require('./walkGlobal')
 
-var defined = function (x) { return !no(x) }
-
 /**
  * Create a dflow function.
  *
@@ -129,7 +127,7 @@ function fun (graph, additionalFunctions) {
     if (regexArgument.exec(taskName)) return
 
     // Skip globals.
-    if (defined(walkGlobal(taskName))) return
+    if (walkGlobal(taskName)) return
 
     if (no(funcs[taskName])) throw new Error(msg)
   }
@@ -167,9 +165,7 @@ function fun (graph, additionalFunctions) {
 
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.
-      if (gotReturn) {
-        return
-      }
+      if (gotReturn) return
 
       if ((taskName === 'return') && (!gotReturn)) {
         returnValue = args[0]
@@ -178,7 +174,7 @@ function fun (graph, additionalFunctions) {
       }
 
       // If task is not defined at run time, throw an error.
-      if (typeof f === 'undefined') {
+      if (no(f)) {
         throw new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
       }
 

@@ -16,7 +16,7 @@
     "browserify": "for x in dist examples test_engine; do npm run browserify_$x; done",
     "browserify_dist": "NODE_ENV=production browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
     "browserify_editor": "npm run lint_editor && browserify -t babelify src/editor/client/index.js -o src/editor/public/bundle.js",
-    "browserify_examples": "NODE_ENV=production browserify -r ./src/examples/renderer/client-side.js:examples-renderer -o gh-pages/js/examples-renderer.js",
+    "browserify_examples": "NODE_ENV=production browserify -t babelify -r ./src/examples/renderer/client-side.js:examples-renderer -o gh-pages/js/examples-renderer.js",
     "browserify_test_engine": "NODE_ENV=production NODE_PATH=src browserify test/engine/**/*.js -o gh-pages/test/bundle.js",
     "check-deps": "npm outdated",
     "coverage": "npm run istanbul && npm run coveralls",
@@ -83,7 +83,7 @@
     "not-defined": "1.x",
     "opn": "4.x",
     "read-file-utf8": "1.x",
-    "write-file-utf8": "1.x"
+    "write-file-utf8": "1.2.0"
   },
   "devDependencies": {
     "babel-preset-es2015": "6.x",
@@ -91,7 +91,7 @@
     "babelify": "7.x",
     "brfs": "1.x",
     "browserify": "13.x",
-    "flow-view": "^2.8.0",
+    "flow-view": "^2.8.1",
     "isomorphic-fetch": "2.x",
     "istanbul": "^0.4.3",
     "mocha": "3.x",
@@ -110,7 +110,7 @@
     "should": "11.x",
     "standard": "8.x",
     "stylelint": "7.x",
-    "stylelint-config-standard": "13.x",
+    "stylelint-config-standard": "14.x",
     "uglify-js": "2.x"
   }
 }

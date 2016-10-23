@@ -13,9 +13,21 @@ All notable changes to this project will be documented in this file.
 <sub>This project adheres to [Semantic Versioning](http://semver.org/).
 Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
+## TODO
+
+### Fixed
+
+- Duplicated pipe error.
+- Launch editor server after a new graph is created.
+- Added d3 example to the example page.
+- Examples renderer now uses dflow components.
+
 ## [Unreleased]
 
-### TODO
+### Added
+
+- Invalid nodes feedback.
+- Numbers and Infinity has no input.
 
 ## [v0.16.1] - 2016-10-09
 

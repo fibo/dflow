@@ -8417,10 +8417,7 @@ module.exports = warning;
         };
 
         var deleteLink = function deleteLink(id) {
-          // Trigger a deleteLink event only if it is not a dragged link.
-          if (view.link[id].to) {
-            _this2.emit('deleteLink', id);
-          }
+          _this2.emit('deleteLink', id);
 
           delete view.link[id];
         };
@@ -8770,7 +8767,7 @@ module.exports = warning;
           e.stopPropagation();
 
           var draggedLinkId = _this2.state.draggedLinkId;
-          if (draggedLinkId) deleteLink(draggedLinkId);
+          if (draggedLinkId) delete view.link[draggedLinkId];
 
           setState({
             draggedItems: [],
@@ -8809,7 +8806,7 @@ module.exports = warning;
           var draggedLinkId = _this2.state.draggedLinkId;
 
           if (draggedLinkId) {
-            deleteLink(draggedLinkId);
+            delete view.link[draggedLinkId];
 
             setState({
               draggedLinkId: null,
@@ -8850,7 +8847,7 @@ module.exports = warning;
             var draggedLinkId = _this2.state.draggedLinkId;
 
             if (draggedLinkId) {
-              deleteLink(draggedLinkId);
+              delete view.link[draggedLinkId];
 
               setState({
                 draggedLinkId: null
@@ -8882,10 +8879,18 @@ module.exports = warning;
           };
         };
 
-        var startDraggingLink = function startDraggingLink(id) {
-          delete view.link[id].to;
+        var startDraggingLinkTarget = function startDraggingLinkTarget(id) {
+          // Remember link source.
+          var from = view.link[id].from;
 
-          setState({ draggedLinkId: id });
+          // Delete dragged link so the 'deleteLink' event is triggered.
+          deleteLink(id);
+
+          // Create a brand new link, this is the right choice to avoid
+          // conflicts, for example the user could start dragging the link
+          // target and then drop it again in the same target.
+          var draggedLinkId = createLink({ from: from });
+          setState({ draggedLinkId: draggedLinkId });
         };
 
         var willDragItem = function willDragItem(id) {
@@ -9030,7 +9035,7 @@ module.exports = warning;
               lineWidth: lineWidth,
               id: id,
               onCreateLink: onCreateLink,
-              startDraggingLink: startDraggingLink,
+              startDraggingLinkTarget: startDraggingLinkTarget,
               pinSize: pinSize,
               selected: selectedItems.indexOf(id) > -1,
               selectLink: selectItem(id),
@@ -9622,7 +9627,7 @@ module.exports = warning;
         var fill = _props.fill;
         var from = _props.from;
         var onCreateLink = _props.onCreateLink;
-        var startDraggingLink = _props.startDraggingLink;
+        var startDraggingLinkTarget = _props.startDraggingLinkTarget;
         var pinSize = _props.pinSize;
         var selected = _props.selected;
         var selectLink = _props.selectLink;
@@ -9645,7 +9650,7 @@ module.exports = warning;
           e.preventDefault();
           e.stopPropagation();
 
-          startDraggingLink(id);
+          startDraggingLinkTarget(id);
         };
 
         return _react2.default.createElement(
@@ -9691,7 +9696,7 @@ module.exports = warning;
     fill: _react.PropTypes.string.isRequired,
     from: _react.PropTypes.array,
     onCreateLink: _react.PropTypes.func.isRequired,
-    startDraggingLink: _react.PropTypes.func.isRequired,
+    startDraggingLinkTarget: _react.PropTypes.func.isRequired,
     pinSize: _react.PropTypes.number.isRequired,
     selected: _react.PropTypes.bool.isRequired,
     selectLink: _react.PropTypes.func.isRequired,
@@ -9706,7 +9711,7 @@ module.exports = warning;
   Link.defaultProps = {
     fill: 'gray',
     onCreateLink: Function.prototype,
-    startDraggingLink: Function.prototype,
+    startDraggingLinkTarget: Function.prototype,
     pinSize: _theme2.default.pinSize,
     selected: false,
     selectLink: Function.prototype,

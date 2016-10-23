@@ -4,10 +4,10 @@ title: Examples
 
 # Examples
 
-
 List of example graphs:
 
 * [apply](http://g14n.info/dflow/examples/apply.html)
+* [hello world](http://g14n.info/dflow/examples/hello-world.html)
 
 <!--
 * [createParagraph](http://g14n.info/dflow/examples/createParagraph.html)
@@ -19,6 +19,12 @@ List of example graphs:
 * [sum](http://g14n.info/dflow/examples/sum.html)
 * [welcome](http://g14n.info/dflow/examples/welcome.html)
 -->
+
+## D3 hello world
+
+An example of dflow using d3, just to write an hello world is in the [examples/d3](https://github.com/fibo/dflow/tree/master/src/examples/d3) folder.
+
+**TODO** extract the graph from the index.html source and make it visible and editable.
 
 ## RequireBin
 
