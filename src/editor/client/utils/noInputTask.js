@@ -6,12 +6,15 @@ const quotedRegex = require('../../../engine/regex/quoted')
  * @returns {Boolean}
  */
 export default function noInputTask (taskName) {
-  const noInputTasks = ['arguments']
+  const noInputTasks = [
+    'arguments',
+    'Infinity'
+  ]
 
   if (noInputTasks.indexOf(taskName) > -1) return true
-
   if (argumentRegex.test(taskName)) return true
   if (quotedRegex.test(taskName)) return true
+  if (!isNaN(parseFloat(taskName))) return true
 
   return false
 }
