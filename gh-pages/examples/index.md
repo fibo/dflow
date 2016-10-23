@@ -8,6 +8,7 @@ List of example graphs:
 
 * [apply](http://g14n.info/dflow/examples/apply.html)
 * [hello world](http://g14n.info/dflow/examples/hello-world.html)
+* [sum](http://g14n.info/dflow/examples/sum.html)
 
 <!--
 * [createParagraph](http://g14n.info/dflow/examples/createParagraph.html)
@@ -16,7 +17,6 @@ List of example graphs:
 * [indexOf](http://g14n.info/dflow/examples/indexOf.html)
 * [new](http://g14n.info/dflow/examples/new.html)
 * [or](http://g14n.info/dflow/examples/or.html)
-* [sum](http://g14n.info/dflow/examples/sum.html)
 * [welcome](http://g14n.info/dflow/examples/welcome.html)
 -->
 

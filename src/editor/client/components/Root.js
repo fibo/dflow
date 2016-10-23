@@ -4,18 +4,21 @@ import CanvasContainer from './CanvasContainer'
 class Root extends Component {
   render () {
     const {
+      data,
       fetchGraphIfNeeded,
+      info,
+      pipe,
+      task,
       view
     } = this.props
 
     return (
       <div>
         <div>
-          <button
-            onClick={() => {
-              console.log(view)
-            }}
-          >Download</button>
+          <a
+            download='graph.json'
+            href={'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({ data, info, pipe, task, view }))}
+          >Download</a>
         </div>
         <CanvasContainer
           fetchGraphIfNeeded={fetchGraphIfNeeded}

@@ -15,12 +15,19 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## TODO
 
+### Added
+
+- Download link
+
 ### Fixed
 
 - Duplicated pipe error.
 - Launch editor server after a new graph is created.
 - Added d3 example to the example page.
 - Examples renderer now uses dflow components.
+- Can open graph if given path is absolute.
+- Added examples: sum, hello world.
+- Minified style.css
 
 ## [Unreleased]
 
