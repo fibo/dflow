@@ -15,6 +15,10 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## TODO
 
+## [Unreleased]
+
+## [v0.16.2] - 2016-10-23
+
 ### Added
 
 - Download link
@@ -28,8 +32,6 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - Can open graph if given path is absolute.
 - Added examples: sum, hello world.
 - Minified style.css
-
-## [Unreleased]
 
 ### Added
 
