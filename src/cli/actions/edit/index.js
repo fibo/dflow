@@ -47,7 +47,7 @@ module.exports = (args) => {
   fs.stat(graphPath, (err, stats) => {
     if (err && err.code === 'ENOENT') {
       createEmptyGraph(graphPath, () => {
-        debug(`created ${graphPath}`)
+        debug(`created graph ${graphPath}`)
 
         server.start({
           graphPath,
@@ -56,7 +56,7 @@ module.exports = (args) => {
       })
     } else {
       if (stats.isFile()) {
-        debug(`found ${graphPath}`)
+        debug(`found graph ${graphPath}`)
 
         server.start({
           graphPath,
