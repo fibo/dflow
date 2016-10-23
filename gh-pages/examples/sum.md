@@ -4,5 +4,5 @@ description: arithmetic sum operator
 layout: example
 graph:
   name: sum
-  height: 255
+  height: 400
 ---
