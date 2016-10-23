@@ -2,8 +2,7 @@ import Root from '../components/Root'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
-  fetchGraphIfNeeded,
-  initCanvas
+  fetchGraphIfNeeded
 } from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
@@ -12,8 +11,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators({
-    fetchGraphIfNeeded,
-    initCanvas
+    fetchGraphIfNeeded
   }, dispatch)
 }
 

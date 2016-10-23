@@ -4,8 +4,7 @@ import CanvasContainer from './CanvasContainer'
 class Root extends Component {
   render () {
     const {
-      fetchGraphIfNeeded,
-      initCanvas
+      fetchGraphIfNeeded
     } = this.props
 
     /*
@@ -21,7 +20,6 @@ class Root extends Component {
       <div>
         <CanvasContainer
           fetchGraphIfNeeded={fetchGraphIfNeeded}
-          initCanvas={initCanvas}
         />
       </div>
     )
@@ -29,7 +27,7 @@ class Root extends Component {
 }
 
 Root.propTypes = {
-  initCanvas: PropTypes.func.isRequired
+  fetchGraphIfNeeded: PropTypes.func.isRequired
 }
 
 export default Root

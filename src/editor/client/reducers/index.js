@@ -11,6 +11,7 @@ export default function (state = initialState, action) {
   var task = Object.assign({}, state.task)
   var view = Object.assign({}, state.view)
 
+  const error = action.error
   const link = action.link
   const linkId = action.linkId
   const node = action.node
@@ -83,6 +84,11 @@ export default function (state = initialState, action) {
 
     case 'FETCH_GRAPH_SUCCESS':
       return Object.assign({}, state, action.graph)
+
+    case 'INVALID_NODE':
+      view.node[nodeId].error = error
+
+      return Object.assign({}, state, { view })
 
     default:
       return state
