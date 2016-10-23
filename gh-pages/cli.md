@@ -23,6 +23,8 @@ Set `DEBUG=dflow` environment variable to enable [debug](https://www.npmjs.com/p
 
 ## Edit
 
+> launches the dflow editor
+
 ### Usage
 
 Launch *dflow* from command line, and start editing your first graph using your favourite browser.
@@ -51,6 +53,8 @@ dflow -o
 
 ### Usage
 
+> run a dflow graph
+
 ```
 Usage: dflow run [options] [path/to/graph.json]
 
@@ -59,6 +63,8 @@ Available options:
 ```
 
 ## Validate
+
+> checks if a graph looks valid
 
 ### Usage
 
