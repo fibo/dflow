@@ -2,9 +2,12 @@ var fun = require('engine/fun')
 
 describe('example package', function () {
   describe('npm-package-template', function () {
-    it('is an npm package template')
+    it('is an npm package template', function () {
+      var pkg = require('examples/packages/npm-package-template')
 
-    // var graph = require('examples/packages/npm-package-template')
+      pkg.graph.should.be.an.Object
+      pkg.funcs.should.be.an.Object
+    })
   })
 
   describe('npm-package-minimal', function () {

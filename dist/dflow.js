@@ -18,6 +18,7 @@ var level = require('./level')
 var no = require('not-defined')
 var regexArgument = require('./regex/argument')
 var regexComment = require('./regex/comment')
+var regexDotOperator = require('./regex/dotOperator')
 var regexSubgraph = require('./regex/subgraph')
 var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
@@ -126,6 +127,10 @@ function fun (graph, additionalFunctions) {
     // Skip arguments[0] ... arguments[N].
     if (regexArgument.exec(taskName)) return
 
+    // Skip dot operator tasks.
+    if (regexDotOperator.func.test(taskName)) return
+    if (regexDotOperator.attr.test(taskName)) return
+
     // Skip globals.
     if (walkGlobal(taskName)) return
 
@@ -203,7 +208,9 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./functions/builtin":3,"./inject/accessors":5,"./inject/additionalFunctions":6,"./inject/arguments":7,"./inject/arrowFunctions":8,"./inject/dotOperators":9,"./inject/globals":10,"./inject/numbers":11,"./inject/references":12,"./inject/strings":13,"./inputArgs":14,"./isDflowFun":16,"./level":17,"./regex/argument":20,"./regex/comment":21,"./regex/subgraph":25,"./reservedKeys":26,"./validate":27,"./walkGlobal":28,"not-defined":1}],3:[function(require,module,exports){
+},{"./functions/builtin":3,"./inject/accessors":5,"./inject/additionalFunctions":6,"./inject/arguments":7,"./inject/arrowFunctions":8,"./inject/dotOperators":9,"./inject/globals":10,"./inject/numbers":11,"./inject/references":12,"./inject/strings":13,"./inputArgs":14,"./isDflowFun":16,"./level":17,"./regex/argument":20,"./regex/comment":21,"./regex/dotOperator":22,"./regex/subgraph":25,"./reservedKeys":26,"./validate":27,"./walkGlobal":28,"not-defined":1}],3:[function(require,module,exports){
+var no = require('not-defined')
+
 // Arithmetic operators
 
 exports['+'] = function (a, b) { return a + b }
@@ -241,22 +248,26 @@ exports['<='] = function (a, b) { return a <= b }
 // Other operators
 
 exports.apply = function (fun, thisArg, argsArray) {
+  if (no(fun)) return
+
   return fun.apply(thisArg, argsArray)
 }
 
-exports['.'] = function (obj, prop) { return obj[prop] }
+// TODO try to import it in the editor, it seems to complain with
+// TypeError: Cannot read property '' of undefined(…)
+exports['.'] = function (obj, prop) {
+  if (no(obj) || no(prop)) return
+
+  return obj[prop]
+}
 
 exports['='] = function (a, b) { return (a = b) }
 
 exports['typeof'] = function (a) { return typeof a }
 
-exports['new'] = function () {
-  var Obj = arguments[0]
-  var arg1 = arguments[1]
-  var arg2 = arguments[2]
-  var arg3 = arguments[3]
-  var arg4 = arguments[4]
-  var arg5 = arguments[5]
+exports['new'] = function (Obj, arg1, arg2, arg3, arg4, arg5) {
+  if (no(Obj)) return
+
   var argN = arguments.length - 1
 
   if (argN === 0) return new Obj()
@@ -305,7 +316,7 @@ exports.true = function () { return true }
 
 exports.now = function () { return new Date() }
 
-},{}],4:[function(require,module,exports){
+},{"not-defined":1}],4:[function(require,module,exports){
 exports.document = function () {
   return document
 }
@@ -324,10 +335,6 @@ exports.window = function () {
 
 exports.AudioContext = function () {
   return window.AudioContext || window.webkitAudioContext
-}
-
-exports.getElementById = function (id) {
-  return window.document.getElementById(id)
 }
 
 exports.innerHTML = function (node, content) {
@@ -495,7 +502,7 @@ function arrowFunctions (funcs, task) {
 module.exports = arrowFunctions
 
 },{}],9:[function(require,module,exports){
-var dotOperatorRegex = require('../regex/dotOperator')
+var regexDotOperator = require('../regex/dotOperator')
 
 /**
  * Inject functions that emulate dot operator.
@@ -534,7 +541,7 @@ function injectDotOperators (funcs, task) {
       }
     }
 
-    if (dotOperatorRegex.func.test(taskName)) {
+    if (regexDotOperator.func.test(taskName)) {
       // .foo() -> foo
       var attributeName = taskName.substring(1, taskName.length - 2)
 
@@ -564,7 +571,7 @@ function injectDotOperators (funcs, task) {
       return attr
     }
 
-    if (dotOperatorRegex.attr.test(taskName)) {
+    if (regexDotOperator.attr.test(taskName)) {
       // .foo -> foo
       attributeName = taskName.substring(1)
 
@@ -1119,6 +1126,9 @@ if (typeof global === 'object') {
  */
 
 function walkGlobal (taskName) {
+  // Skip dot operator.
+  if (taskName === '.') return
+
   function toNextProp (next, prop) {
     return next[prop]
   }

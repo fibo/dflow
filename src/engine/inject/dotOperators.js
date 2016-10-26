@@ -1,4 +1,4 @@
-var dotOperatorRegex = require('../regex/dotOperator')
+var regexDotOperator = require('../regex/dotOperator')
 
 /**
  * Inject functions that emulate dot operator.
@@ -37,7 +37,7 @@ function injectDotOperators (funcs, task) {
       }
     }
 
-    if (dotOperatorRegex.func.test(taskName)) {
+    if (regexDotOperator.func.test(taskName)) {
       // .foo() -> foo
       var attributeName = taskName.substring(1, taskName.length - 2)
 
@@ -67,7 +67,7 @@ function injectDotOperators (funcs, task) {
       return attr
     }
 
-    if (dotOperatorRegex.attr.test(taskName)) {
+    if (regexDotOperator.attr.test(taskName)) {
       // .foo -> foo
       attributeName = taskName.substring(1)
 

@@ -7,14 +7,14 @@ export default function autorunMiddleware (store) {
   return (next) => (action) => {
     const result = next(action)
 
-    const state = store.getState()
+    const { graph } = store.getState()
 
     // TODO nothing to do client side if context is *server*
-    // if (state.info && state.info.context === 'server') return result
+    // if (graph.info && graph.info.context === 'server') return result
 
     // Check that graph is valid.
     try {
-      validate(state)
+      validate(graph)
     } catch (err) {
       console.error(err)
     }
@@ -23,7 +23,7 @@ export default function autorunMiddleware (store) {
     try {
       // TODO additionalFunctions... how to pass them?
       // TODO how to pass arguments?
-      fun(state, additionalFunctions)()
+      fun(graph, additionalFunctions)()
     } catch (err) {
       if (action.type === 'CREATE_NODE') {
         // Mark node as invalid so it is highlighted in the editor.

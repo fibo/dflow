@@ -1,7 +1,12 @@
 export default function typeOfNode (node) {
   if (node.error) return 'InvalidNode'
 
-  if (node.text === 't') return 'ToggleNode'
-
-  return 'DefaultNode'
+  switch (node.text) {
+    case 't':
+      return 'ToggleNode'
+    case 'canvas':
+      return 'CanvasNode'
+    default:
+      return 'DefaultNode'
+  }
 }

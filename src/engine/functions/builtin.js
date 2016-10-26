@@ -1,3 +1,5 @@
+var no = require('not-defined')
+
 // Arithmetic operators
 
 exports['+'] = function (a, b) { return a + b }
@@ -35,22 +37,26 @@ exports['<='] = function (a, b) { return a <= b }
 // Other operators
 
 exports.apply = function (fun, thisArg, argsArray) {
+  if (no(fun)) return
+
   return fun.apply(thisArg, argsArray)
 }
 
-exports['.'] = function (obj, prop) { return obj[prop] }
+// TODO try to import it in the editor, it seems to complain with
+// TypeError: Cannot read property '' of undefined(…)
+exports['.'] = function (obj, prop) {
+  if (no(obj) || no(prop)) return
+
+  return obj[prop]
+}
 
 exports['='] = function (a, b) { return (a = b) }
 
 exports['typeof'] = function (a) { return typeof a }
 
-exports['new'] = function () {
-  var Obj = arguments[0]
-  var arg1 = arguments[1]
-  var arg2 = arguments[2]
-  var arg3 = arguments[3]
-  var arg4 = arguments[4]
-  var arg5 = arguments[5]
+exports['new'] = function (Obj, arg1, arg2, arg3, arg4, arg5) {
+  if (no(Obj)) return
+
   var argN = arguments.length - 1
 
   if (argN === 0) return new Obj()

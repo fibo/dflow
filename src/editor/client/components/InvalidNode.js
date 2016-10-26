@@ -20,7 +20,7 @@ class InvalidNode extends Node {
         x={pinSize}
         y={bodyHeight + pinSize - margin}
       >
-        <tspan>{text} (not found)</tspan>
+        <tspan>{text}</tspan>
       </text>
     )
   }
