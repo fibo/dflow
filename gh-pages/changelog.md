@@ -17,6 +17,22 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
+### Added
+
+- Custom canvas node
+
+## [v0.16.3] - 2016-10-26
+
+### Added
+
+- Example npm package
+- Last pending test
+
+### Fixed
+
+- Dot operator
+- Apply operator
+
 ## [v0.16.2] - 2016-10-23
 
 ### Added

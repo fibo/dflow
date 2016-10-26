@@ -18,6 +18,9 @@ if (typeof global === 'object') {
  */
 
 function walkGlobal (taskName) {
+  // Skip dot operator.
+  if (taskName === '.') return
+
   function toNextProp (next, prop) {
     return next[prop]
   }

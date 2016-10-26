@@ -4,12 +4,8 @@ import CanvasContainer from './CanvasContainer'
 class Root extends Component {
   render () {
     const {
-      data,
       fetchGraphIfNeeded,
-      info,
-      pipe,
-      task,
-      view
+      graph
     } = this.props
 
     return (
@@ -17,7 +13,7 @@ class Root extends Component {
         <div>
           <a
             download='graph.json'
-            href={'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({ data, info, pipe, task, view }))}
+            href={'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(graph))}
           >Download</a>
         </div>
         <CanvasContainer

@@ -7,7 +7,11 @@ const quotedRegex = require('../../../engine/regex/quoted')
  */
 export default function noInputTask (taskName) {
   const noInputTasks = [
+    '[]',
+    '{}',
     'arguments',
+    'body',
+    'document',
     'Infinity'
   ]
 

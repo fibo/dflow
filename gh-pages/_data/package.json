@@ -57,7 +57,10 @@
   "watch": {
     "browserify_editor": {
       "ignore": "src/editor/client/styles/",
-      "patterns": "src/editor/client"
+      "patterns": [
+        "src/editor/client",
+        "src/engine"
+      ]
     },
     "homepage": "README.md",
     "postcss": {

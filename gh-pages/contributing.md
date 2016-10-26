@@ -15,7 +15,7 @@ The design goals are:
 * The implementation should be easy to port to other languages.
 * The graph must fit in a plain JSON.
 
-You may also improve [editor CLI](https://github.com/fibo/dflow/blob/master/gh-pages/editor.md).
+You may also improve the [CLI](https://github.com/fibo/dflow/blob/master/gh-pages/cli.md).
 
 ## Development workflow
 
@@ -34,7 +34,7 @@ Note that, thanks to [pre-commit](https://www.npmjs.com/package/pre-commit), `np
 
 ## Project deploy
 
-Three commit bits are needed to publish a new version:
+Two commit bits are needed to publish a new version:
 
 * npm
 * GitHub repository

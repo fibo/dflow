@@ -18,10 +18,6 @@ exports.AudioContext = function () {
   return window.AudioContext || window.webkitAudioContext
 }
 
-exports.getElementById = function (id) {
-  return window.document.getElementById(id)
-}
-
 exports.innerHTML = function (node, content) {
   node.innerHTML = content
 

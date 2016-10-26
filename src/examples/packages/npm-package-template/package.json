@@ -1,9 +1,9 @@
 {
-  "name": "minimal-dflow-packaged-graph",
+  "name": "dflow-packaged-graph",
   "version": "1.0.0",
   "private": true,
-  "description": "example of minimal dflow graph packaged with npm",
-  "main": "index.json",
+  "description": "example of reusable dflow graph packaged with npm",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
