@@ -1,7 +1,7 @@
 {
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
-  "version": "0.16.2",
+  "version": "0.16.3",
   "homepage": "http://g14n.info/dflow",
   "author": {
     "name": "Gianluca Casati",
@@ -46,6 +46,7 @@
     "pull": "git pull origin master && npm run gh-pages:pull",
     "push": "git push origin master && npm run gh-pages:push",
     "start": "DEBUG=dflow node src/cli/dflow --open",
+    "svg": "for x in apply hello-world indexOf sum; do node src/examples/renderer/server-side.js $x > gh-pages/svg/${x}.json; done",
     "test": "NODE_PATH=src mocha",
     "watch": "npm-watch"
   },
