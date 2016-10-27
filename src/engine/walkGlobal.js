@@ -18,8 +18,8 @@ if (typeof global === 'object') {
  */
 
 function walkGlobal (taskName) {
-  // Skip dot operator.
-  if (taskName === '.') return
+  // Skip dot operator and tasks that starts with a dot.
+  if (taskName.indexOf('.') === 0) return
 
   function toNextProp (next, prop) {
     return next[prop]

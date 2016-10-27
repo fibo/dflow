@@ -6308,7 +6308,8 @@ try {
 module.exports = should;
 
 },{"./cjs/should":12}],14:[function(require,module,exports){
-var accessorRegex = require('../regex/accessor')
+var no = require('not-defined')
+var regexAccessor = require('../regex/accessor')
 
 /**
  * Inject functions to set or get graph data.
@@ -6318,9 +6319,7 @@ var accessorRegex = require('../regex/accessor')
  */
 
 function injectAccessors (funcs, graph) {
-  if (typeof graph.data === 'undefined') {
-    graph.data = {}
-  }
+  if (no(graph.data)) graph.data = {}
 
   funcs['this.graph.data'] = function () { return graph.data }
 
@@ -6344,7 +6343,7 @@ function injectAccessors (funcs, graph) {
       return graph.data[accessorName]
     }
 
-    if (accessorRegex.test(taskName)) {
+    if (regexAccessor.test(taskName)) {
       accessorName = taskName.substring(1)
 
       funcs[taskName] = accessor
@@ -6356,7 +6355,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":23}],15:[function(require,module,exports){
+},{"../regex/accessor":23,"not-defined":5}],15:[function(require,module,exports){
 /**
  * Optionally add custom functions.
  *
@@ -6389,7 +6388,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 },{}],16:[function(require,module,exports){
-var argumentRegex = require('../regex/argument')
+var regexArgument = require('../regex/argument')
 
 /**
  * Inject functions to retrieve arguments.
@@ -6414,7 +6413,7 @@ function injectArguments (funcs, task, args) {
     if (funcName === 'arguments') {
       funcs[funcName] = function getArguments () { return args }
     } else {
-      var arg = argumentRegex.exec(funcName)
+      var arg = regexArgument.exec(funcName)
 
       if (arg) {
         funcs[funcName] = getArgument.bind(null, arg[1])
@@ -6549,7 +6548,7 @@ function injectDotOperators (funcs, task) {
 module.exports = injectDotOperators
 
 },{"../regex/dotOperator":25}],19:[function(require,module,exports){
-var notDefined = require('not-defined')
+var no = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
 
@@ -6577,7 +6576,7 @@ function injectGlobals (funcs, task) {
 
     var globalValue = walkGlobal(taskName)
 
-    if (notDefined(globalValue)) return
+    if (no(globalValue)) return
 
     if (typeof globalValue === 'function') {
       funcs[taskName] = globalValue
@@ -6626,7 +6625,7 @@ function injectNumbers (funcs, task) {
 module.exports = injectNumbers
 
 },{}],21:[function(require,module,exports){
-var referenceRegex = require('../regex/reference')
+var regexReference = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
 /**
@@ -6654,7 +6653,7 @@ function injectReferences (funcs, task) {
       return referencedFunction
     }
 
-    if (referenceRegex.test(taskName)) {
+    if (regexReference.test(taskName)) {
       referenceName = taskName.substring(1)
 
       if (typeof funcs[referenceName] === 'function') {
@@ -6675,7 +6674,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 },{"../regex/reference":27,"../walkGlobal":29}],22:[function(require,module,exports){
-var quotedRegex = require('../regex/quoted')
+var regexQuoted = require('../regex/quoted')
 
 /**
  * Inject functions that return strings.
@@ -6692,7 +6691,7 @@ function injectStrings (funcs, task) {
   function inject (taskKey) {
     var taskName = task[taskKey]
 
-    if (quotedRegex.test(taskName)) {
+    if (regexQuoted.test(taskName)) {
       funcs[taskName] = function () {
         return taskName.substr(1, taskName.length - 2)
       }
@@ -6756,8 +6755,8 @@ if (typeof global === 'object') {
  */
 
 function walkGlobal (taskName) {
-  // Skip dot operator.
-  if (taskName === '.') return
+  // Skip dot operator and tasks that starts with a dot.
+  if (taskName.indexOf('.') === 0) return
 
   function toNextProp (next, prop) {
     return next[prop]

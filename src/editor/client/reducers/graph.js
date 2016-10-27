@@ -2,6 +2,8 @@ import emptyGraph from '../../../engine/emptyGraph.json'
 import no from 'not-defined'
 import noOutputForTask from '../utils/noOutputForTask'
 import singleInputTask from '../utils/singleInputTask'
+import threeInputsTask from '../utils/threeInputsTask'
+import twoInputsTask from '../utils/twoInputsTask'
 import typeOfNode from '../utils/typeOfNode'
 
 const initialState = Object.assign({}, emptyGraph)
@@ -52,6 +54,22 @@ export default function (state = initialState, action) {
       if (hasOneInput) {
         if (no(view.node[nodeId].ins)) {
           view.node[nodeId].ins = ['in']
+        }
+      }
+
+      const hasTwoInputs = twoInputsTask(taskName)
+
+      if (hasTwoInputs) {
+        if (no(view.node[nodeId].ins)) {
+          view.node[nodeId].ins = ['in1', 'in2']
+        }
+      }
+
+      const hasThreeInputs = threeInputsTask(taskName)
+
+      if (hasThreeInputs) {
+        if (no(view.node[nodeId].ins)) {
+          view.node[nodeId].ins = ['in1', 'in2', 'in3']
         }
       }
 

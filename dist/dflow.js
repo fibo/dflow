@@ -261,7 +261,19 @@ exports['.'] = function (obj, prop) {
   return obj[prop]
 }
 
-exports['='] = function (a, b) { return (a = b) }
+exports['='] = function (a, b) {
+  if (no(a)) return
+
+  a = b
+
+  return a
+}
+
+/* eslint-disable */
+exports['=='] = function (a, b) { return (a == b) }
+/* eslint-enable */
+
+exports['==='] = function (a, b) { return (a === b) }
 
 exports['typeof'] = function (a) { return typeof a }
 
@@ -282,8 +294,6 @@ exports['new'] = function (Obj, arg1, arg2, arg3, arg4, arg5) {
 // Array
 
 exports['[]'] = function () { return [] }
-
-exports.indexOf = function (a, b) { return a.indexOf(b) }
 
 exports.push = function (a, b) { return a.push(b) }
 
@@ -344,7 +354,8 @@ exports.innerHTML = function (node, content) {
 }
 
 },{}],5:[function(require,module,exports){
-var accessorRegex = require('../regex/accessor')
+var no = require('not-defined')
+var regexAccessor = require('../regex/accessor')
 
 /**
  * Inject functions to set or get graph data.
@@ -354,9 +365,7 @@ var accessorRegex = require('../regex/accessor')
  */
 
 function injectAccessors (funcs, graph) {
-  if (typeof graph.data === 'undefined') {
-    graph.data = {}
-  }
+  if (no(graph.data)) graph.data = {}
 
   funcs['this.graph.data'] = function () { return graph.data }
 
@@ -380,7 +389,7 @@ function injectAccessors (funcs, graph) {
       return graph.data[accessorName]
     }
 
-    if (accessorRegex.test(taskName)) {
+    if (regexAccessor.test(taskName)) {
       accessorName = taskName.substring(1)
 
       funcs[taskName] = accessor
@@ -392,7 +401,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":19}],6:[function(require,module,exports){
+},{"../regex/accessor":19,"not-defined":1}],6:[function(require,module,exports){
 /**
  * Optionally add custom functions.
  *
@@ -425,7 +434,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 module.exports = injectAdditionalFunctions
 
 },{}],7:[function(require,module,exports){
-var argumentRegex = require('../regex/argument')
+var regexArgument = require('../regex/argument')
 
 /**
  * Inject functions to retrieve arguments.
@@ -450,7 +459,7 @@ function injectArguments (funcs, task, args) {
     if (funcName === 'arguments') {
       funcs[funcName] = function getArguments () { return args }
     } else {
-      var arg = argumentRegex.exec(funcName)
+      var arg = regexArgument.exec(funcName)
 
       if (arg) {
         funcs[funcName] = getArgument.bind(null, arg[1])
@@ -585,7 +594,7 @@ function injectDotOperators (funcs, task) {
 module.exports = injectDotOperators
 
 },{"../regex/dotOperator":22}],10:[function(require,module,exports){
-var notDefined = require('not-defined')
+var no = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
 
@@ -613,7 +622,7 @@ function injectGlobals (funcs, task) {
 
     var globalValue = walkGlobal(taskName)
 
-    if (notDefined(globalValue)) return
+    if (no(globalValue)) return
 
     if (typeof globalValue === 'function') {
       funcs[taskName] = globalValue
@@ -662,7 +671,7 @@ function injectNumbers (funcs, task) {
 module.exports = injectNumbers
 
 },{}],12:[function(require,module,exports){
-var referenceRegex = require('../regex/reference')
+var regexReference = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
 /**
@@ -690,7 +699,7 @@ function injectReferences (funcs, task) {
       return referencedFunction
     }
 
-    if (referenceRegex.test(taskName)) {
+    if (regexReference.test(taskName)) {
       referenceName = taskName.substring(1)
 
       if (typeof funcs[referenceName] === 'function') {
@@ -711,7 +720,7 @@ function injectReferences (funcs, task) {
 module.exports = injectReferences
 
 },{"../regex/reference":24,"../walkGlobal":28}],13:[function(require,module,exports){
-var quotedRegex = require('../regex/quoted')
+var regexQuoted = require('../regex/quoted')
 
 /**
  * Inject functions that return strings.
@@ -728,7 +737,7 @@ function injectStrings (funcs, task) {
   function inject (taskKey) {
     var taskName = task[taskKey]
 
-    if (quotedRegex.test(taskName)) {
+    if (regexQuoted.test(taskName)) {
       funcs[taskName] = function () {
         return taskName.substr(1, taskName.length - 2)
       }
@@ -928,12 +937,12 @@ module.exports = [
 ]
 
 },{}],27:[function(require,module,exports){
-var accessorRegex = require('./regex/accessor')
-var argumentRegex = require('./regex/argument')
-var dotOperatorRegex = require('./regex/dotOperator')
-var referenceRegex = require('./regex/reference')
+var regexAccessor = require('./regex/accessor')
+var regexArgument = require('./regex/argument')
+var regexDotOperator = require('./regex/dotOperator')
+var regexReference = require('./regex/reference')
 var reservedKeys = require('./reservedKeys')
-var subgraphRegex = require('./regex/subgraph')
+var regexSubgraph = require('./regex/subgraph')
 
 /**
  * Check graph consistency.
@@ -971,23 +980,23 @@ function validate (graph, additionalFunctions) {
 
       reservedKeys.forEach(throwIfEqualsTaskName)
 
-      if (argumentRegex.test(taskName)) {
+      if (regexArgument.test(taskName)) {
         throw new TypeError('Reserved function name: ' + taskName)
       }
 
-      if (accessorRegex.test(taskName)) {
+      if (regexAccessor.test(taskName)) {
         throw new TypeError('Function name cannot start with "@": ' + taskName)
       }
 
-      if (dotOperatorRegex.attr.test(taskName)) {
+      if (regexDotOperator.attr.test(taskName)) {
         throw new TypeError('Function name cannot start with ".":' + taskName)
       }
 
-      if (dotOperatorRegex.func.test(taskName)) {
+      if (regexDotOperator.func.test(taskName)) {
         throw new TypeError('Function name cannot start with "." and end with "()":' + taskName)
       }
 
-      if (referenceRegex.test(taskName)) {
+      if (regexReference.test(taskName)) {
         throw new TypeError('Function name cannot start with "&": ' + taskName)
       }
     }
@@ -1071,7 +1080,7 @@ function validate (graph, additionalFunctions) {
   function onlySubgraphs (key) {
     var taskName = task[key]
 
-    return subgraphRegex.test(taskName)
+    return regexSubgraph.test(taskName)
   }
 
   function checkSubgraph (key) {
@@ -1126,8 +1135,8 @@ if (typeof global === 'object') {
  */
 
 function walkGlobal (taskName) {
-  // Skip dot operator.
-  if (taskName === '.') return
+  // Skip dot operator and tasks that starts with a dot.
+  if (taskName.indexOf('.') === 0) return
 
   function toNextProp (next, prop) {
     return next[prop]
