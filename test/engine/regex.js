@@ -26,11 +26,13 @@ describe('regex', function () {
     it('matches .validJavaScriptVariableName', function () {
       dotOperator.func.test('.foo').should.be.true
       dotOperator.func.test('.1foo').should.be.false
+      dotOperator.func.test('.foo()').should.be.false
     })
   })
 
   describe('dotOperator.func', function () {
     it('matches .validJavaScriptFunctionName()', function () {
+      dotOperator.func.test('.foo').should.be.false
       dotOperator.func.test('.foo()').should.be.true
       dotOperator.func.test('.1foo()').should.be.false
     })
@@ -46,6 +48,7 @@ describe('regex', function () {
     it('matches /functionName', function () {
       subgraph.test('/foo').should.be.true
       subgraph.test('//comment').should.be.false
+      subgraph.test('// comment').should.be.false
       subgraph.test('notStartingWithSlash').should.be.false
     })
   })
