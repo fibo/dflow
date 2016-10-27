@@ -295,10 +295,6 @@ exports['new'] = function (Obj, arg1, arg2, arg3, arg4, arg5) {
 
 exports['[]'] = function () { return [] }
 
-exports.push = function (a, b) { return a.push(b) }
-
-exports.pop = function (a, b) { return a.pop(b) }
-
 // console
 
 exports['console.error'] = console.error.bind(console)
@@ -541,9 +537,7 @@ function injectDotOperators (funcs, task) {
     function dotOperatorFunc (attributeName, obj) {
       var func
 
-      if (typeof obj === 'object') {
-        func = obj[attributeName]
-      }
+      if (obj) func = obj[attributeName]
 
       if (typeof func === 'function') {
         return func.apply(obj, Array.prototype.slice.call(arguments, 2))
@@ -569,13 +563,9 @@ function injectDotOperators (funcs, task) {
     function dotOperatorAttr (attributeName, obj) {
       var attr
 
-      if (typeof obj === 'object') {
-        attr = obj[attributeName]
-      }
+      if (obj) attr = obj[attributeName]
 
-      if (typeof attr === 'function') {
-        return attr.bind(obj)
-      }
+      if (typeof attr === 'function') return attr.bind(obj)
 
       return attr
     }

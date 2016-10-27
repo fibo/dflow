@@ -6,10 +6,10 @@ title: Examples
 
 List of example graphs:
 
-* [apply](http://g14n.info/dflow/examples/apply.html)
-* [hello world](http://g14n.info/dflow/examples/hello-world.html)
-* [indexOf](http://g14n.info/dflow/examples/index-of.html)
-* [sum](http://g14n.info/dflow/examples/sum.html)
+[![Hello World](http://g14n.info/dflow/svg/hello-world.svg)][hello-world]
+[![apply](http://g14n.info/dflow/svg/apply.svg)][apply]
+[![indexOf](http://g14n.info/dflow/svg/indexOf.svg)][indexOf]
+[![sum](http://g14n.info/dflow/svg/sum.svg)][sum]
 
 <!--
 * [createParagraph](http://g14n.info/dflow/examples/createParagraph.html)
@@ -59,3 +59,9 @@ It is really easy: create your *dflow* graph and save it to a JSON file, *index.
 Simple as that, see [npm-package-minimal](https://github.com/fibo/dflow/tree/master/src/examples/packages/npm-package-minimal) as an example.
 
 For a more complete example, see [npm-package-template](https://github.com/fibo/dflow/tree/master/src/examples/packages/npm-package-template).
+
+[hello-world]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
+[apply]: http://g14n.info/dflow/examples/apply.html "apply"
+[indexOf]: http://g14n.info/dflow/examples/indexOf.html "indexOf"
+[sum]: http://g14n.info/dflow/examples/sum.html "sum"
+
