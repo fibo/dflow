@@ -1,4 +1,4 @@
-var notDefined = require('not-defined')
+var no = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
 
@@ -26,7 +26,7 @@ function injectGlobals (funcs, task) {
 
     var globalValue = walkGlobal(taskName)
 
-    if (notDefined(globalValue)) return
+    if (no(globalValue)) return
 
     if (typeof globalValue === 'function') {
       funcs[taskName] = globalValue

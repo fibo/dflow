@@ -50,7 +50,19 @@ exports['.'] = function (obj, prop) {
   return obj[prop]
 }
 
-exports['='] = function (a, b) { return (a = b) }
+exports['='] = function (a, b) {
+  if (no(a)) return
+
+  a = b
+
+  return a
+}
+
+/* eslint-disable */
+exports['=='] = function (a, b) { return (a == b) }
+/* eslint-enable */
+
+exports['==='] = function (a, b) { return (a === b) }
 
 exports['typeof'] = function (a) { return typeof a }
 
@@ -71,12 +83,6 @@ exports['new'] = function (Obj, arg1, arg2, arg3, arg4, arg5) {
 // Array
 
 exports['[]'] = function () { return [] }
-
-exports.indexOf = function (a, b) { return a.indexOf(b) }
-
-exports.push = function (a, b) { return a.push(b) }
-
-exports.pop = function (a, b) { return a.pop(b) }
 
 // console
 

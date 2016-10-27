@@ -19,11 +19,13 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ### Added
 
-- Custom canvas node
+- Custom canvas node???
+- Enahanced num inputs of task resolution
 
 ### Fixed
 
 - Refactored regex variable names to be all the same
+- Extended dot operator injected functions
 
 ## [v0.16.3] - 2016-10-26
 
