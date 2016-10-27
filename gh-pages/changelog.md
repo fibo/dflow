@@ -15,11 +15,17 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## TODO
 
+- Save button
+- Add drag node event to flow-view, otherwise no event is fired when moving nodes
+- Custom canvas node???
+- By now dflow.fun computes the outs but does not expose them. Put them in the dflowFun.graph.outs so user will be able to see them on mouseover pins.
+
 ## [Unreleased]
 
 ### Added
 
-- Custom canvas node???
+- First examples edited with dflow cli.
+- Test graphs in separated folder.
 - Enahanced num inputs of task resolution
 
 ### Fixed
