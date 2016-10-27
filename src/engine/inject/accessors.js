@@ -1,4 +1,5 @@
-var accessorRegex = require('../regex/accessor')
+var no = require('not-defined')
+var regexAccessor = require('../regex/accessor')
 
 /**
  * Inject functions to set or get graph data.
@@ -8,9 +9,7 @@ var accessorRegex = require('../regex/accessor')
  */
 
 function injectAccessors (funcs, graph) {
-  if (typeof graph.data === 'undefined') {
-    graph.data = {}
-  }
+  if (no(graph.data)) graph.data = {}
 
   funcs['this.graph.data'] = function () { return graph.data }
 
@@ -34,7 +33,7 @@ function injectAccessors (funcs, graph) {
       return graph.data[accessorName]
     }
 
-    if (accessorRegex.test(taskName)) {
+    if (regexAccessor.test(taskName)) {
       accessorName = taskName.substring(1)
 
       funcs[taskName] = accessor

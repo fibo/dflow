@@ -1,4 +1,4 @@
-var argumentRegex = require('../regex/argument')
+var regexArgument = require('../regex/argument')
 
 /**
  * Inject functions to retrieve arguments.
@@ -23,7 +23,7 @@ function injectArguments (funcs, task, args) {
     if (funcName === 'arguments') {
       funcs[funcName] = function getArguments () { return args }
     } else {
-      var arg = argumentRegex.exec(funcName)
+      var arg = regexArgument.exec(funcName)
 
       if (arg) {
         funcs[funcName] = getArgument.bind(null, arg[1])
