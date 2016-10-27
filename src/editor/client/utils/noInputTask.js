@@ -1,5 +1,6 @@
 const builtinFunctions = require('../../../engine/functions/builtin')
 const regexArgument = require('../../../engine/regex/argument')
+const regexReference = require('../../../engine/regex/reference')
 const regexQuoted = require('../../../engine/regex/quoted')
 const walkGlobal = require('../../../engine/walkGlobal')
 
@@ -11,6 +12,7 @@ export default function noInputTask (taskName) {
   if (taskName === 'console.log') return false
 
   if (regexArgument.test(taskName)) return true
+  if (regexReference.test(taskName)) return true
   if (regexQuoted.test(taskName)) return true
   if (!isNaN(parseFloat(taskName))) return true
 

@@ -55182,6 +55182,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = noInputTask;
 var builtinFunctions = require('../../../engine/functions/builtin');
 var regexArgument = require('../../../engine/regex/argument');
+var regexReference = require('../../../engine/regex/reference');
 var regexQuoted = require('../../../engine/regex/quoted');
 var walkGlobal = require('../../../engine/walkGlobal');
 
@@ -55193,6 +55194,7 @@ function noInputTask(taskName) {
   if (taskName === 'console.log') return false;
 
   if (regexArgument.test(taskName)) return true;
+  if (regexReference.test(taskName)) return true;
   if (regexQuoted.test(taskName)) return true;
   if (!isNaN(parseFloat(taskName))) return true;
 
@@ -55210,13 +55212,15 @@ function noInputTask(taskName) {
   return noInputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":329,"../../../engine/regex/argument":345,"../../../engine/regex/quoted":348,"../../../engine/walkGlobal":353}],322:[function(require,module,exports){
+},{"../../../engine/functions/builtin":329,"../../../engine/regex/argument":345,"../../../engine/regex/quoted":348,"../../../engine/regex/reference":349,"../../../engine/walkGlobal":353}],322:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = noOutputForTask;
+var regexComment = require('../../../engine/regex/comment');
+
 /**
  * Every task in dflow is a function hence it has an output,
  * i.e. the return value of the function.
@@ -55225,13 +55229,16 @@ exports.default = noOutputForTask;
  * @param {String} taskName
  * @returns {Boolean}
  */
+
 function noOutputForTask(taskName) {
+  if (regexComment.test(taskName)) return true;
+
   var noOutputTasks = ['return', 'console.log', 'console.error'];
 
   return noOutputTasks.indexOf(taskName) > -1;
 }
 
-},{}],323:[function(require,module,exports){
+},{"../../../engine/regex/comment":346}],323:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55249,6 +55256,7 @@ var walkGlobal = require('../../../engine/walkGlobal');
 
 function singleInputTask(taskName) {
   if (regexDotOperator.attr.test(taskName)) return true;
+  if (regexDotOperator.func.test(taskName)) return false;
 
   var builtin = builtinFunctions[taskName];
   if (builtin) return builtin.length === 1;

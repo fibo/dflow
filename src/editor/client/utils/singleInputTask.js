@@ -9,6 +9,7 @@ const walkGlobal = require('../../../engine/walkGlobal')
 
 export default function singleInputTask (taskName) {
   if (regexDotOperator.attr.test(taskName)) return true
+  if (regexDotOperator.func.test(taskName)) return false
 
   const builtin = builtinFunctions[taskName]
   if (builtin) return builtin.length === 1

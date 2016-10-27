@@ -13,7 +13,7 @@
 exports.indexOf = require('./indexOf.json')
 
 // exports.or = require('./or.json')
-// exports.sum = require('./sum.json')
+exports.sum = require('./sum.json')
 // exports.welcome = require('./welcome.json')
 
 // TODO
