@@ -23,6 +23,8 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
+## [v0.17.0] - 2016-10-27
+
 ### Added
 
 - First examples edited with dflow cli.
@@ -32,7 +34,7 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ### Fixed
 
-- Refactored regex variable names to be all the same
+- Refactored regex variable names
 - Extended dot operator injected functions
 
 ## [v0.16.3] - 2016-10-26
