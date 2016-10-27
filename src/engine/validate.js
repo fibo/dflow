@@ -1,9 +1,9 @@
-var accessorRegex = require('./regex/accessor')
-var argumentRegex = require('./regex/argument')
-var dotOperatorRegex = require('./regex/dotOperator')
-var referenceRegex = require('./regex/reference')
+var regexAccessor = require('./regex/accessor')
+var regexArgument = require('./regex/argument')
+var regexDotOperator = require('./regex/dotOperator')
+var regexReference = require('./regex/reference')
 var reservedKeys = require('./reservedKeys')
-var subgraphRegex = require('./regex/subgraph')
+var regexSubgraph = require('./regex/subgraph')
 
 /**
  * Check graph consistency.
@@ -41,23 +41,23 @@ function validate (graph, additionalFunctions) {
 
       reservedKeys.forEach(throwIfEqualsTaskName)
 
-      if (argumentRegex.test(taskName)) {
+      if (regexArgument.test(taskName)) {
         throw new TypeError('Reserved function name: ' + taskName)
       }
 
-      if (accessorRegex.test(taskName)) {
+      if (regexAccessor.test(taskName)) {
         throw new TypeError('Function name cannot start with "@": ' + taskName)
       }
 
-      if (dotOperatorRegex.attr.test(taskName)) {
+      if (regexDotOperator.attr.test(taskName)) {
         throw new TypeError('Function name cannot start with ".":' + taskName)
       }
 
-      if (dotOperatorRegex.func.test(taskName)) {
+      if (regexDotOperator.func.test(taskName)) {
         throw new TypeError('Function name cannot start with "." and end with "()":' + taskName)
       }
 
-      if (referenceRegex.test(taskName)) {
+      if (regexReference.test(taskName)) {
         throw new TypeError('Function name cannot start with "&": ' + taskName)
       }
     }
@@ -141,7 +141,7 @@ function validate (graph, additionalFunctions) {
   function onlySubgraphs (key) {
     var taskName = task[key]
 
-    return subgraphRegex.test(taskName)
+    return regexSubgraph.test(taskName)
   }
 
   function checkSubgraph (key) {

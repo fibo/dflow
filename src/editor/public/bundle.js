@@ -54426,6 +54426,10 @@ var _singleInputTask = require('../utils/singleInputTask');
 
 var _singleInputTask2 = _interopRequireDefault(_singleInputTask);
 
+var _twoInputsTask = require('../utils/twoInputsTask');
+
+var _twoInputsTask2 = _interopRequireDefault(_twoInputsTask);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -54450,8 +54454,9 @@ var DflowInspector = function (_Inspector) {
 
       var noInput = (0, _noInputTask2.default)(taskName);
       var oneInput = (0, _singleInputTask2.default)(taskName);
+      var twoInputs = (0, _twoInputsTask2.default)(taskName);
 
-      if (noInput || oneInput) return null;
+      if (noInput || oneInput || twoInputs) return null;
 
       return _get(DflowInspector.prototype.__proto__ || Object.getPrototypeOf(DflowInspector.prototype), 'renderInsControls', this).call(this, nodeId, node);
     }
@@ -54467,7 +54472,7 @@ var DflowInspector = function (_Inspector) {
 
 exports.default = DflowInspector;
 
-},{"../utils/noInputTask":321,"../utils/singleInputTask":323,"flow-view/components":79}],309:[function(require,module,exports){
+},{"../utils/noInputTask":321,"../utils/singleInputTask":323,"../utils/twoInputsTask":324,"flow-view/components":79}],309:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54826,7 +54831,7 @@ function autorunMiddleware(store) {
   };
 }
 
-},{"../../../engine/fun":326,"../../../engine/validate":350,"../actions":305,"../utils/additionalFunctions":319}],315:[function(require,module,exports){
+},{"../../../engine/fun":327,"../../../engine/validate":351,"../actions":305,"../utils/additionalFunctions":319}],315:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54923,7 +54928,7 @@ function canvasMiddleware(store) {
   };
 }
 
-},{"../actions":305,"../components/CanvasNode":307,"../components/Inspector":308,"../components/InvalidNode":309,"../components/ToggleNode":311,"../utils/typeOfNode":324,"flow-view":81,"flow-view/components":79}],316:[function(require,module,exports){
+},{"../actions":305,"../components/CanvasNode":307,"../components/Inspector":308,"../components/InvalidNode":309,"../components/ToggleNode":311,"../utils/typeOfNode":325,"flow-view":81,"flow-view/components":79}],316:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55046,7 +55051,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var initialState = Object.assign({}, _emptyGraph2.default);
 
-},{"../../../engine/emptyGraph.json":325,"../utils/noOutputForTask":322,"../utils/singleInputTask":323,"../utils/typeOfNode":324,"not-defined":116}],317:[function(require,module,exports){
+},{"../../../engine/emptyGraph.json":326,"../utils/noOutputForTask":322,"../utils/singleInputTask":323,"../utils/typeOfNode":325,"not-defined":116}],317:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55169,7 +55174,7 @@ function noInputTask(taskName) {
   return false;
 }
 
-},{"../../../engine/regex/argument":343,"../../../engine/regex/quoted":346}],322:[function(require,module,exports){
+},{"../../../engine/regex/argument":344,"../../../engine/regex/quoted":347}],322:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55213,6 +55218,26 @@ function singleInputTask(taskName) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = twoInputsTask;
+var regexDotOperator = require('../../../engine/regex/dotOperator');
+
+/**
+ * @param {String} taskName
+ * @returns {Boolean}
+ */
+function twoInputsTask(taskName) {
+  if (regexDotOperator.attr(taskName)) return true;
+  if (regexDotOperator.func(taskName)) return true;
+
+  return false;
+}
+
+},{"../../../engine/regex/dotOperator":346}],325:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.default = typeOfNode;
 function typeOfNode(node) {
   if (node.error) return 'InvalidNode';
@@ -55227,7 +55252,7 @@ function typeOfNode(node) {
   }
 }
 
-},{}],325:[function(require,module,exports){
+},{}],326:[function(require,module,exports){
 module.exports={
   "data": {},
   "info": {},
@@ -55239,7 +55264,7 @@ module.exports={
   }
 }
 
-},{}],326:[function(require,module,exports){
+},{}],327:[function(require,module,exports){
 'use strict';
 
 var builtinFunctions = require('./functions/builtin');
@@ -55445,7 +55470,7 @@ function fun(graph, additionalFunctions) {
 
 module.exports = fun;
 
-},{"./functions/builtin":327,"./inject/accessors":328,"./inject/additionalFunctions":329,"./inject/arguments":330,"./inject/arrowFunctions":331,"./inject/dotOperators":332,"./inject/globals":333,"./inject/numbers":334,"./inject/references":335,"./inject/strings":336,"./inputArgs":337,"./isDflowFun":339,"./level":340,"./regex/argument":343,"./regex/comment":344,"./regex/dotOperator":345,"./regex/subgraph":348,"./reservedKeys":349,"./validate":350,"./walkGlobal":351,"not-defined":116}],327:[function(require,module,exports){
+},{"./functions/builtin":328,"./inject/accessors":329,"./inject/additionalFunctions":330,"./inject/arguments":331,"./inject/arrowFunctions":332,"./inject/dotOperators":333,"./inject/globals":334,"./inject/numbers":335,"./inject/references":336,"./inject/strings":337,"./inputArgs":338,"./isDflowFun":340,"./level":341,"./regex/argument":344,"./regex/comment":345,"./regex/dotOperator":346,"./regex/subgraph":349,"./reservedKeys":350,"./validate":351,"./walkGlobal":352,"not-defined":116}],328:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -55611,10 +55636,11 @@ exports.now = function () {
   return new Date();
 };
 
-},{"not-defined":116}],328:[function(require,module,exports){
+},{"not-defined":116}],329:[function(require,module,exports){
 'use strict';
 
-var accessorRegex = require('../regex/accessor');
+var no = require('not-defined');
+var regexAccessor = require('../regex/accessor');
 
 /**
  * Inject functions to set or get graph data.
@@ -55624,9 +55650,7 @@ var accessorRegex = require('../regex/accessor');
  */
 
 function injectAccessors(funcs, graph) {
-  if (typeof graph.data === 'undefined') {
-    graph.data = {};
-  }
+  if (no(graph.data)) graph.data = {};
 
   funcs['this.graph.data'] = function () {
     return graph.data;
@@ -55652,7 +55676,7 @@ function injectAccessors(funcs, graph) {
       return graph.data[accessorName];
     }
 
-    if (accessorRegex.test(taskName)) {
+    if (regexAccessor.test(taskName)) {
       accessorName = taskName.substring(1);
 
       funcs[taskName] = accessor;
@@ -55664,7 +55688,7 @@ function injectAccessors(funcs, graph) {
 
 module.exports = injectAccessors;
 
-},{"../regex/accessor":342}],329:[function(require,module,exports){
+},{"../regex/accessor":343,"not-defined":116}],330:[function(require,module,exports){
 'use strict';
 
 /**
@@ -55697,10 +55721,10 @@ function injectAdditionalFunctions(funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions;
 
-},{}],330:[function(require,module,exports){
+},{}],331:[function(require,module,exports){
 'use strict';
 
-var argumentRegex = require('../regex/argument');
+var regexArgument = require('../regex/argument');
 
 /**
  * Inject functions to retrieve arguments.
@@ -55727,7 +55751,7 @@ function injectArguments(funcs, task, args) {
         return args;
       };
     } else {
-      var arg = argumentRegex.exec(funcName);
+      var arg = regexArgument.exec(funcName);
 
       if (arg) {
         funcs[funcName] = getArgument.bind(null, arg[1]);
@@ -55740,7 +55764,7 @@ function injectArguments(funcs, task, args) {
 
 module.exports = injectArguments;
 
-},{"../regex/argument":343}],331:[function(require,module,exports){
+},{"../regex/argument":344}],332:[function(require,module,exports){
 'use strict';
 
 /**
@@ -55777,7 +55801,7 @@ function arrowFunctions(funcs, task) {
 
 module.exports = arrowFunctions;
 
-},{}],332:[function(require,module,exports){
+},{}],333:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -55864,7 +55888,7 @@ function injectDotOperators(funcs, task) {
 
 module.exports = injectDotOperators;
 
-},{"../regex/dotOperator":345}],333:[function(require,module,exports){
+},{"../regex/dotOperator":346}],334:[function(require,module,exports){
 'use strict';
 
 var notDefined = require('not-defined');
@@ -55911,7 +55935,7 @@ function injectGlobals(funcs, task) {
 
 module.exports = injectGlobals;
 
-},{"../reservedKeys":349,"../walkGlobal":351,"not-defined":116}],334:[function(require,module,exports){
+},{"../reservedKeys":350,"../walkGlobal":352,"not-defined":116}],335:[function(require,module,exports){
 "use strict";
 
 /**
@@ -55945,10 +55969,10 @@ function injectNumbers(funcs, task) {
 
 module.exports = injectNumbers;
 
-},{}],335:[function(require,module,exports){
+},{}],336:[function(require,module,exports){
 'use strict';
 
-var referenceRegex = require('../regex/reference');
+var regexReference = require('../regex/reference');
 var walkGlobal = require('../walkGlobal');
 
 /**
@@ -55976,7 +56000,7 @@ function injectReferences(funcs, task) {
       return referencedFunction;
     }
 
-    if (referenceRegex.test(taskName)) {
+    if (regexReference.test(taskName)) {
       referenceName = taskName.substring(1);
 
       if (typeof funcs[referenceName] === 'function') {
@@ -55996,10 +56020,10 @@ function injectReferences(funcs, task) {
 
 module.exports = injectReferences;
 
-},{"../regex/reference":347,"../walkGlobal":351}],336:[function(require,module,exports){
+},{"../regex/reference":348,"../walkGlobal":352}],337:[function(require,module,exports){
 'use strict';
 
-var quotedRegex = require('../regex/quoted');
+var regexQuoted = require('../regex/quoted');
 
 /**
  * Inject functions that return strings.
@@ -56016,7 +56040,7 @@ function injectStrings(funcs, task) {
   function inject(taskKey) {
     var taskName = task[taskKey];
 
-    if (quotedRegex.test(taskName)) {
+    if (regexQuoted.test(taskName)) {
       funcs[taskName] = function () {
         return taskName.substr(1, taskName.length - 2);
       };
@@ -56028,7 +56052,7 @@ function injectStrings(funcs, task) {
 
 module.exports = injectStrings;
 
-},{"../regex/quoted":346}],337:[function(require,module,exports){
+},{"../regex/quoted":347}],338:[function(require,module,exports){
 'use strict';
 
 var inputPipes = require('./inputPipes');
@@ -56061,7 +56085,7 @@ function inputArgs(outs, pipe, taskKey) {
 
 module.exports = inputArgs;
 
-},{"./inputPipes":338}],338:[function(require,module,exports){
+},{"./inputPipes":339}],339:[function(require,module,exports){
 "use strict";
 
 /**
@@ -56091,7 +56115,7 @@ function inputPipes(pipe, taskKey) {
 
 module.exports = inputPipes;
 
-},{}],339:[function(require,module,exports){
+},{}],340:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -56125,7 +56149,7 @@ function isDflowFun(f) {
 
 module.exports = isDflowFun;
 
-},{"./validate":350}],340:[function(require,module,exports){
+},{"./validate":351}],341:[function(require,module,exports){
 'use strict';
 
 var parents = require('./parents');
@@ -56162,7 +56186,7 @@ function level(pipe, cachedLevelOf, taskKey) {
 
 module.exports = level;
 
-},{"./parents":341}],341:[function(require,module,exports){
+},{"./parents":342}],342:[function(require,module,exports){
 'use strict';
 
 var inputPipes = require('./inputPipes');
@@ -56191,60 +56215,60 @@ function parents(pipe, taskKey) {
 
 module.exports = parents;
 
-},{"./inputPipes":338}],342:[function(require,module,exports){
+},{"./inputPipes":339}],343:[function(require,module,exports){
 "use strict";
 
 module.exports = /^@[\w][\w\d]+$/;
 
-},{}],343:[function(require,module,exports){
+},{}],344:[function(require,module,exports){
 "use strict";
 
 module.exports = /^arguments\[(\d+)\]$/;
 
-},{}],344:[function(require,module,exports){
+},{}],345:[function(require,module,exports){
 "use strict";
 
 module.exports = /^\/\/.+$/;
 
-},{}],345:[function(require,module,exports){
+},{}],346:[function(require,module,exports){
 "use strict";
 
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/;
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/;
 
-},{}],346:[function(require,module,exports){
+},{}],347:[function(require,module,exports){
 "use strict";
 
 module.exports = /^'.+'$/;
 
-},{}],347:[function(require,module,exports){
+},{}],348:[function(require,module,exports){
 "use strict";
 
 module.exports = /^&(.+)$/;
 
-},{}],348:[function(require,module,exports){
+},{}],349:[function(require,module,exports){
 "use strict";
 
 module.exports = /^\/[\w][\w\d]+$/;
 
-},{}],349:[function(require,module,exports){
+},{}],350:[function(require,module,exports){
 'use strict';
 
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = ['arguments', 'dflow.fun', 'dflow.isDflowFun', 'dflow.validate', 'return', 'this', 'this.graph'];
 
-},{}],350:[function(require,module,exports){
+},{}],351:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var accessorRegex = require('./regex/accessor');
-var argumentRegex = require('./regex/argument');
-var dotOperatorRegex = require('./regex/dotOperator');
-var referenceRegex = require('./regex/reference');
+var regexAccessor = require('./regex/accessor');
+var regexArgument = require('./regex/argument');
+var regexDotOperator = require('./regex/dotOperator');
+var regexReference = require('./regex/reference');
 var reservedKeys = require('./reservedKeys');
-var subgraphRegex = require('./regex/subgraph');
+var regexSubgraph = require('./regex/subgraph');
 
 /**
  * Check graph consistency.
@@ -56282,23 +56306,23 @@ function validate(graph, additionalFunctions) {
 
       reservedKeys.forEach(throwIfEqualsTaskName);
 
-      if (argumentRegex.test(taskName)) {
+      if (regexArgument.test(taskName)) {
         throw new TypeError('Reserved function name: ' + taskName);
       }
 
-      if (accessorRegex.test(taskName)) {
+      if (regexAccessor.test(taskName)) {
         throw new TypeError('Function name cannot start with "@": ' + taskName);
       }
 
-      if (dotOperatorRegex.attr.test(taskName)) {
+      if (regexDotOperator.attr.test(taskName)) {
         throw new TypeError('Function name cannot start with ".":' + taskName);
       }
 
-      if (dotOperatorRegex.func.test(taskName)) {
+      if (regexDotOperator.func.test(taskName)) {
         throw new TypeError('Function name cannot start with "." and end with "()":' + taskName);
       }
 
-      if (referenceRegex.test(taskName)) {
+      if (regexReference.test(taskName)) {
         throw new TypeError('Function name cannot start with "&": ' + taskName);
       }
     }
@@ -56381,7 +56405,7 @@ function validate(graph, additionalFunctions) {
   function onlySubgraphs(key) {
     var taskName = task[key];
 
-    return subgraphRegex.test(taskName);
+    return regexSubgraph.test(taskName);
   }
 
   function checkSubgraph(key) {
@@ -56411,7 +56435,7 @@ function validate(graph, additionalFunctions) {
 
 module.exports = validate;
 
-},{"./regex/accessor":342,"./regex/argument":343,"./regex/dotOperator":345,"./regex/reference":347,"./regex/subgraph":348,"./reservedKeys":349}],351:[function(require,module,exports){
+},{"./regex/accessor":343,"./regex/argument":344,"./regex/dotOperator":346,"./regex/reference":348,"./regex/subgraph":349,"./reservedKeys":350}],352:[function(require,module,exports){
 (function (global){
 'use strict';
 

@@ -21,6 +21,10 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 - Custom canvas node
 
+### Fixed
+
+- Refactored regex variable names to be all the same
+
 ## [v0.16.3] - 2016-10-26
 
 ### Added

@@ -1,4 +1,4 @@
-var referenceRegex = require('../regex/reference')
+var regexReference = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
 /**
@@ -26,7 +26,7 @@ function injectReferences (funcs, task) {
       return referencedFunction
     }
 
-    if (referenceRegex.test(taskName)) {
+    if (regexReference.test(taskName)) {
       referenceName = taskName.substring(1)
 
       if (typeof funcs[referenceName] === 'function') {

@@ -1,4 +1,4 @@
-var quotedRegex = require('../regex/quoted')
+var regexQuoted = require('../regex/quoted')
 
 /**
  * Inject functions that return strings.
@@ -15,7 +15,7 @@ function injectStrings (funcs, task) {
   function inject (taskKey) {
     var taskName = task[taskKey]
 
-    if (quotedRegex.test(taskName)) {
+    if (regexQuoted.test(taskName)) {
       funcs[taskName] = function () {
         return taskName.substr(1, taskName.length - 2)
       }
