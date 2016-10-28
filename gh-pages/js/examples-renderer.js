@@ -52528,8 +52528,24 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = typeOfNode;
+
+var _subgraph = require('../../../engine/regex/subgraph');
+
+var _subgraph2 = _interopRequireDefault(_subgraph);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Get type of node.
+ *
+ * @param {Object} node
+ * @returns {String} nodeType
+ */
+
 function typeOfNode(node) {
   if (node.error) return 'InvalidNode';
+
+  if (_subgraph2.default.test(node.text)) return 'SubgraphNode';
 
   switch (node.text) {
     case 't':
@@ -52541,7 +52557,7 @@ function typeOfNode(node) {
   }
 }
 
-},{}],287:[function(require,module,exports){
+},{"../../../engine/regex/subgraph":311}],287:[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/dflow
  */
@@ -53530,7 +53546,9 @@ module.exports = /^'.+'$/;
 module.exports = /^&(.+)$/;
 
 },{}],311:[function(require,module,exports){
-module.exports = /^\/[\w][\w\d]+$/
+"use strict";
+
+module.exports = /^\/[\w][\w\d]+$/;
 
 },{}],312:[function(require,module,exports){
 // Also arguments[0] ... arguments[N] are reserved.
