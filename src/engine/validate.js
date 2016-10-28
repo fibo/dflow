@@ -1,3 +1,4 @@
+var no = require('not-defined')
 var regexAccessor = require('./regex/accessor')
 var regexArgument = require('./regex/argument')
 var regexDotOperator = require('./regex/dotOperator')
@@ -108,29 +109,18 @@ function validate (graph, additionalFunctions) {
 
     // Check for orphan pipes.
 
-    if (typeof task[from] === 'undefined') {
-      throw new Error('Orphan pipe: ' + pipe[key])
-    }
+    if (no(task[from])) throw new Error('Orphan pipe: ' + pipe[key])
 
-    if (typeof task[to] === 'undefined') {
-      throw new Error('Orphan pipe: ' + pipe[key])
-    }
+    if (no(task[to])) throw new Error('Orphan pipe: ' + pipe[key])
 
     // Remember pipes, avoid duplicates.
 
-    if (typeof seenPipe[from] === 'undefined') {
-      seenPipe[from] = {}
-    }
+    if (no(seenPipe[from])) seenPipe[from] = {}
 
-    if (typeof seenPipe[from][to] === 'undefined') {
-      seenPipe[from][to] = []
-    }
+    if (no(seenPipe[from][to])) seenPipe[from][to] = []
 
-    if (typeof seenPipe[from][to][arg] === 'undefined') {
-      seenPipe[from][to][arg] = true
-    } else {
-      throw new Error('Duplicated pipe: ' + pipe[key])
-    }
+    if (no(seenPipe[from][to][arg])) seenPipe[from][to][arg] = true
+    else throw new Error('Duplicated pipe: ' + pipe[key])
   }
 
   Object.keys(pipe)
@@ -149,9 +139,7 @@ function validate (graph, additionalFunctions) {
 
     var funcName = taskName.substring(1)
 
-    if (typeof func[funcName] === 'undefined') {
-      throw new Error('Undefined subgraph: ' + funcName)
-    }
+    if (no(func[funcName])) throw new Error('Undefined subgraph: ' + funcName)
   }
 
   Object.keys(task)

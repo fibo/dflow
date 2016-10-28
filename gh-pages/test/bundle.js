@@ -6356,6 +6356,8 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 },{"../regex/accessor":23,"not-defined":5}],15:[function(require,module,exports){
+var no = require('not-defined')
+
 /**
  * Optionally add custom functions.
  *
@@ -6365,9 +6367,7 @@ module.exports = injectAccessors
 
 function injectAdditionalFunctions (funcs, additionalFunctions) {
   // Nothing to do if no additional function is given.
-  if (typeof additionalFunctions === 'undefined') {
-    return
-  }
+  if (no(additionalFunctions)) return
 
   /**
    * Validate and insert an additional function.
@@ -6376,9 +6376,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
   function injectAdditionalFunction (key) {
     var isAFunction = typeof additionalFunctions[key] === 'function'
 
-    if (isAFunction) {
-      funcs[key] = additionalFunctions[key]
-    }
+    if (isAFunction) funcs[key] = additionalFunctions[key]
   }
 
   Object.keys(additionalFunctions)
@@ -6387,7 +6385,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{}],16:[function(require,module,exports){
+},{"not-defined":5}],16:[function(require,module,exports){
 var regexArgument = require('../regex/argument')
 
 /**

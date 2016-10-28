@@ -77,13 +77,9 @@ function fun (graph, additionalFunctions) {
    */
 
   function byLevel (a, b) {
-    if (typeof cachedLevelOf[a] === 'undefined') {
-      cachedLevelOf[a] = computeLevelOf(a)
-    }
+    if (no(cachedLevelOf[a])) cachedLevelOf[a] = computeLevelOf(a)
 
-    if (typeof cachedLevelOf[b] === 'undefined') {
-      cachedLevelOf[b] = computeLevelOf(b)
-    }
+    if (no(cachedLevelOf[b])) cachedLevelOf[b] = computeLevelOf(b)
 
     return cachedLevelOf[a] - cachedLevelOf[b]
   }
