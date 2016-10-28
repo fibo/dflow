@@ -1,7 +1,9 @@
-import fun from '../../../engine/fun'
-import validate from '../../../engine/validate'
 import additionalFunctions from '../utils/additionalFunctions'
+import emptyGraph from '../../../engine/emptyGraph.json'
+import fun from '../../../engine/fun'
 import { invalidNode } from '../actions'
+import regexSubgraph from '../../../engine/regex/subgraph'
+import validate from '../../../engine/validate'
 
 export default function autorunMiddleware (store) {
   return (next) => (action) => {
@@ -9,8 +11,17 @@ export default function autorunMiddleware (store) {
 
     const { graph } = store.getState()
 
+    const node = action.node
+
     // TODO nothing to do client side if context is *server*
     // if (graph.info && graph.info.context === 'server') return result
+
+    if (regexSubgraph.test(node.text)) {
+      // Remove first character, i.e. "/"
+      const subgraphName = node.text.substring(1)
+
+      graph.func[subgraphName] = Object.assign({}, emptyGraph)
+    }
 
     // Check that graph is valid.
     try {
@@ -30,7 +41,7 @@ export default function autorunMiddleware (store) {
         store.dispatch(invalidNode(action.nodeId, err))
 
         // Create a fake function in order to avoid dflowFun errors.
-        additionalFunctions[action.node.text] = Function.prototype
+        additionalFunctions[node.text] = Function.prototype
       } else {
         console.error(err)
       }

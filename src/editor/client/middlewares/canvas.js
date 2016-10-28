@@ -2,6 +2,7 @@ import { Canvas } from 'flow-view'
 import CanvasNode from '../components/CanvasNode'
 import Inspector from '../components/Inspector'
 import InvalidNode from '../components/InvalidNode'
+import SubgraphNode from '../components/SubgraphNode'
 import ToggleNode from '../components/ToggleNode'
 import { Node } from 'flow-view/components'
 import {
@@ -35,6 +36,7 @@ export default function canvasMiddleware (store) {
           CanvasNode,
           DefaultNode: Node,
           InvalidNode,
+          SubgraphNode,
           ToggleNode
         },
         util: { typeOfNode }
