@@ -23,6 +23,10 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
+### Changed
+
+- Refactored engine using not-defined package
+
 ## [v0.17.0] - 2016-10-27
 
 ### Added

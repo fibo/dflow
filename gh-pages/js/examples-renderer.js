@@ -52643,13 +52643,9 @@ function fun (graph, additionalFunctions) {
    */
 
   function byLevel (a, b) {
-    if (typeof cachedLevelOf[a] === 'undefined') {
-      cachedLevelOf[a] = computeLevelOf(a)
-    }
+    if (no(cachedLevelOf[a])) cachedLevelOf[a] = computeLevelOf(a)
 
-    if (typeof cachedLevelOf[b] === 'undefined') {
-      cachedLevelOf[b] = computeLevelOf(b)
-    }
+    if (no(cachedLevelOf[b])) cachedLevelOf[b] = computeLevelOf(b)
 
     return cachedLevelOf[a] - cachedLevelOf[b]
   }
@@ -53014,6 +53010,8 @@ function injectAccessors (funcs, graph) {
 module.exports = injectAccessors
 
 },{"../regex/accessor":305,"not-defined":109}],292:[function(require,module,exports){
+var no = require('not-defined')
+
 /**
  * Optionally add custom functions.
  *
@@ -53023,9 +53021,7 @@ module.exports = injectAccessors
 
 function injectAdditionalFunctions (funcs, additionalFunctions) {
   // Nothing to do if no additional function is given.
-  if (typeof additionalFunctions === 'undefined') {
-    return
-  }
+  if (no(additionalFunctions)) return
 
   /**
    * Validate and insert an additional function.
@@ -53034,9 +53030,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
   function injectAdditionalFunction (key) {
     var isAFunction = typeof additionalFunctions[key] === 'function'
 
-    if (isAFunction) {
-      funcs[key] = additionalFunctions[key]
-    }
+    if (isAFunction) funcs[key] = additionalFunctions[key]
   }
 
   Object.keys(additionalFunctions)
@@ -53045,7 +53039,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{}],293:[function(require,module,exports){
+},{"not-defined":109}],293:[function(require,module,exports){
 var regexArgument = require('../regex/argument')
 
 /**
@@ -53551,6 +53545,7 @@ module.exports = [
 ]
 
 },{}],313:[function(require,module,exports){
+var no = require('not-defined')
 var regexAccessor = require('./regex/accessor')
 var regexArgument = require('./regex/argument')
 var regexDotOperator = require('./regex/dotOperator')
@@ -53661,29 +53656,18 @@ function validate (graph, additionalFunctions) {
 
     // Check for orphan pipes.
 
-    if (typeof task[from] === 'undefined') {
-      throw new Error('Orphan pipe: ' + pipe[key])
-    }
+    if (no(task[from])) throw new Error('Orphan pipe: ' + pipe[key])
 
-    if (typeof task[to] === 'undefined') {
-      throw new Error('Orphan pipe: ' + pipe[key])
-    }
+    if (no(task[to])) throw new Error('Orphan pipe: ' + pipe[key])
 
     // Remember pipes, avoid duplicates.
 
-    if (typeof seenPipe[from] === 'undefined') {
-      seenPipe[from] = {}
-    }
+    if (no(seenPipe[from])) seenPipe[from] = {}
 
-    if (typeof seenPipe[from][to] === 'undefined') {
-      seenPipe[from][to] = []
-    }
+    if (no(seenPipe[from][to])) seenPipe[from][to] = []
 
-    if (typeof seenPipe[from][to][arg] === 'undefined') {
-      seenPipe[from][to][arg] = true
-    } else {
-      throw new Error('Duplicated pipe: ' + pipe[key])
-    }
+    if (no(seenPipe[from][to][arg])) seenPipe[from][to][arg] = true
+    else throw new Error('Duplicated pipe: ' + pipe[key])
   }
 
   Object.keys(pipe)
@@ -53702,9 +53686,7 @@ function validate (graph, additionalFunctions) {
 
     var funcName = taskName.substring(1)
 
-    if (typeof func[funcName] === 'undefined') {
-      throw new Error('Undefined subgraph: ' + funcName)
-    }
+    if (no(func[funcName])) throw new Error('Undefined subgraph: ' + funcName)
   }
 
   Object.keys(task)
@@ -53727,7 +53709,7 @@ function validate (graph, additionalFunctions) {
 
 module.exports = validate
 
-},{"./regex/accessor":305,"./regex/argument":306,"./regex/dotOperator":308,"./regex/reference":310,"./regex/subgraph":311,"./reservedKeys":312}],314:[function(require,module,exports){
+},{"./regex/accessor":305,"./regex/argument":306,"./regex/dotOperator":308,"./regex/reference":310,"./regex/subgraph":311,"./reservedKeys":312,"not-defined":109}],314:[function(require,module,exports){
 (function (global){
 'use strict';
 
