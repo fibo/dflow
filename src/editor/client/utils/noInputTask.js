@@ -1,8 +1,8 @@
-const builtinFunctions = require('../../../engine/functions/builtin')
-const regexArgument = require('../../../engine/regex/argument')
-const regexReference = require('../../../engine/regex/reference')
-const regexQuoted = require('../../../engine/regex/quoted')
-const walkGlobal = require('../../../engine/walkGlobal')
+import builtinFunctions from '../../../engine/functions/builtin'
+import regexArgument from '../../../engine/regex/argument'
+import regexReference from '../../../engine/regex/reference'
+import regexQuoted from '../../../engine/regex/quoted'
+import walkGlobal from '../../../engine/walkGlobal'
 
 /**
  * @param {String} taskName

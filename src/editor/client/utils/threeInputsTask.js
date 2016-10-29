@@ -1,4 +1,4 @@
-const builtinFunctions = require('../../../engine/functions/builtin')
+import builtinFunctions from '../../../engine/functions/builtin'
 
 /**
  * @param {String} taskName

@@ -1,4 +1,5 @@
 import React from 'react'
+import ignoreEvent from '../utils/ignoreEvent'
 import { Node } from 'flow-view/components'
 
 class SubgraphNode extends Node {
@@ -15,13 +16,22 @@ class SubgraphNode extends Node {
     const margin = fontSize * 0.2
 
     return (
-      <text
-        fill={'yellow'}
-        x={pinSize}
-        y={bodyHeight + pinSize - margin}
-      >
-        <tspan>{text}</tspan>
-      </text>
+      <g>
+        <text
+          x={0}
+          y={0 - margin}
+          onClick={() => { console.log('click') }}
+          onMouseMove={ignoreEvent}
+        >
+          <tspan>&#9999;</tspan>
+        </text>
+        <text
+          x={pinSize}
+          y={bodyHeight + pinSize - margin}
+        >
+          <tspan>{text}</tspan>
+        </text>
+      </g>
     )
   }
 }

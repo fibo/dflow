@@ -1,6 +1,6 @@
-const builtinFunctions = require('../../../engine/functions/builtin')
-const regexDotOperator = require('../../../engine/regex/dotOperator')
-const walkGlobal = require('../../../engine/walkGlobal')
+import builtinFunctions from '../../../engine/functions/builtin'
+import regexDotOperator from '../../../engine/regex/dotOperator'
+import walkGlobal from '../../../engine/walkGlobal'
 
 /**
  * @param {String} taskName
