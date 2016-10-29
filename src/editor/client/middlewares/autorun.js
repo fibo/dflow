@@ -1,42 +1,32 @@
 import additionalFunctions from '../utils/additionalFunctions'
-import emptyGraph from '../../../engine/emptyGraph.json'
 import fun from '../../../engine/fun'
 import { invalidNode } from '../actions'
-import regexSubgraph from '../../../engine/regex/subgraph'
-import validate from '../../../engine/validate'
 
 export default function autorunMiddleware (store) {
   return (next) => (action) => {
     const result = next(action)
 
-    const { graph } = store.getState()
+    const { editor, graph } = store.getState()
+
+    if (!editor.autorun) return result
 
     const node = action.node
+    const CREATE_NODE = (action.type === 'CREATE_NODE')
 
     // TODO nothing to do client side if context is *server*
     // if (graph.info && graph.info.context === 'server') return result
 
-    if (regexSubgraph.test(node.text)) {
-      // Remove first character, i.e. "/"
-      const subgraphName = node.text.substring(1)
-
-      graph.func[subgraphName] = Object.assign({}, emptyGraph)
-    }
-
-    // Check that graph is valid.
-    try {
-      validate(graph)
-    } catch (err) {
-      console.error(err)
-    }
-
     // Try to execute graph.
+
     try {
       // TODO additionalFunctions... how to pass them?
       // TODO how to pass arguments?
       fun(graph, additionalFunctions)()
     } catch (err) {
-      if (action.type === 'CREATE_NODE') {
+      if (CREATE_NODE) {
+        // TODO if it is an invalid task get node id, or node ids
+        // then mark as error those nodes.
+
         // Mark node as invalid so it is highlighted in the editor.
         store.dispatch(invalidNode(action.nodeId, err))
 

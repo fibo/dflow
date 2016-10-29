@@ -9,9 +9,8 @@ import typeOfNode from '../utils/typeOfNode'
 const initialState = Object.assign({}, emptyGraph)
 
 export default function (state = initialState, action) {
-  var pipe = Object.assign({}, state.pipe)
-  var task = Object.assign({}, state.task)
-  var view = Object.assign({}, state.view)
+  const graph = Object.assign({}, state)
+  var { pipe, task, view } = graph
 
   const error = action.error
   const link = action.link
@@ -21,7 +20,7 @@ export default function (state = initialState, action) {
 
   switch (action.type) {
     case 'CREATE_INPUT_PIN':
-      return Object.assign({}, state, { view })
+      return Object.assign({}, graph, { view })
 
     case 'CREATE_LINK':
       // Create dflow pipe.
@@ -32,7 +31,7 @@ export default function (state = initialState, action) {
 
       if (targetPinPosition) pipe[linkId][2] = targetPinPosition
 
-      return Object.assign({}, state, { pipe })
+      return Object.assign({}, graph, { pipe })
 
     case 'CREATE_NODE':
       const taskName = node.text
@@ -73,12 +72,12 @@ export default function (state = initialState, action) {
         }
       }
 
-      return Object.assign({}, state, { task })
+      return Object.assign({}, graph, { task })
 
     case 'DELETE_LINK':
       delete pipe[linkId]
 
-      return Object.assign({}, state, { pipe })
+      return Object.assign({}, graph, { pipe })
 
     case 'DELETE_NODE':
       delete task[nodeId]
@@ -92,23 +91,23 @@ export default function (state = initialState, action) {
         }
       })
 
-      return Object.assign({}, state, { task, pipe })
+      return Object.assign({}, graph, { task, pipe })
 
     case 'FETCH_GRAPH_FAILURE':
-      return state
+      return graph
 
     case 'FETCH_GRAPH_REQUEST':
-      return state
+      return graph
 
     case 'FETCH_GRAPH_SUCCESS':
-      return Object.assign({}, state, action.graph)
+      return Object.assign({}, graph, action.graph)
 
     case 'INVALID_NODE':
       view.node[nodeId].error = error
 
-      return Object.assign({}, state, { view })
+      return Object.assign({}, graph, { view })
 
     default:
-      return state
+      return graph
   }
 }

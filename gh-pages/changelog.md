@@ -23,6 +23,10 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
+### Added
+
+- Autorun input checkbox.
+
 ### Changed
 
 - Refactored engine using not-defined package

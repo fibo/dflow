@@ -31,6 +31,18 @@ export function deleteNode (nodeId) {
   }
 }
 
+export function disableAutorun () {
+  return {
+    type: 'DISABLE_AUTORUN'
+  }
+}
+
+export function enableAutorun (name) {
+  return {
+    type: 'ENABLE_AUTORUN'
+  }
+}
+
 function fetchGraph (canvasId) {
   return (dispatch) => {
     dispatch({

@@ -1,4 +1,4 @@
-const regexComment = require('../../../engine/regex/comment')
+import regexComment from '../../../engine/regex/comment'
 
 /**
  * Every task in dflow is a function hence it has an output,
