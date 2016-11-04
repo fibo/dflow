@@ -9,7 +9,7 @@ import walkGlobal from '../../../engine/walkGlobal'
  * @returns {Boolean}
  */
 export default function noInputTask (taskName) {
-  if (taskName === 'console.log') return false
+  if (taskName.split('.')[0] === 'console') return false
 
   if (regexArgument.test(taskName)) return true
   if (regexReference.test(taskName)) return true

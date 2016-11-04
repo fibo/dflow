@@ -19,7 +19,13 @@ var graphPath = null
 var graph = null
 
 app.get('/graph', (req, res) => {
+  debug('read graph')
   res.json(graph)
+})
+
+app.put('/graph', (req, res) => {
+  debug('update graph')
+  // TODO write to file
 })
 
 // TODO install body-parser and write graph to file

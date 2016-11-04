@@ -12,8 +12,15 @@ class CanvasNode extends Node {
   }
 
   componentDidMount () {
-    const id = this.props.id
-    console.log(document.getElementById(id))
+    const {
+      id,
+      model
+    } = this.props
+
+    const element = document.getElementById(id)
+
+    if (model.task[id]) return
+    else model.task[id] = () => element
   }
 
   getBody () {
@@ -31,7 +38,12 @@ class CanvasNode extends Node {
     const margin = fontSize * 0.2
 
     return (
-      <g>
+      <g
+        onClick={ignoreEvent}
+        onDoubleClick={ignoreEvent}
+        onMouseDown={ignoreEvent}
+        onMouseUp={ignoreEvent}
+      >
         <text
           x={pinSize}
           y={0 - margin}
@@ -40,12 +52,8 @@ class CanvasNode extends Node {
         </text>
         <foreignObject
           x={0}
-          y={0}
+          y={pinSize}
           height={bodyHeight}
-          onClick={ignoreEvent}
-          onDoubleClick={ignoreEvent}
-          onMouseDown={ignoreEvent}
-          onMouseUp={ignoreEvent}
           width={width}
         >
           <canvas

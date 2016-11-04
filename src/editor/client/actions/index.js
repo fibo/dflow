@@ -1,71 +1,58 @@
 import fetch from 'isomorphic-fetch'
 import no from 'not-defined'
 
-export function createNode (node, nodeId) {
-  return {
-    type: 'CREATE_NODE',
-    node,
-    nodeId
-  }
-}
+import {
+  checkStatus,
+  parseJSON,
+  prepareRequest
+} from '../utils/fetch'
 
-export function createLink (link, linkId) {
-  return {
-    type: 'CREATE_LINK',
-    link,
-    linkId
-  }
-}
+export const createNode = (node, nodeId) => ({
+  type: 'CREATE_NODE',
+  node,
+  nodeId
+})
 
-export function deleteLink (linkId) {
-  return {
-    type: 'DELETE_LINK',
-    linkId
-  }
-}
+export const createLink = (link, linkId) => ({
+  type: 'CREATE_LINK',
+  link,
+  linkId
+})
 
-export function deleteNode (nodeId) {
-  return {
-    type: 'DELETE_NODE',
-    nodeId
-  }
-}
+export const deleteLink = (linkId) => ({
+  type: 'DELETE_LINK',
+  linkId
+})
 
-export function disableAutorun () {
-  return {
-    type: 'DISABLE_AUTORUN'
-  }
-}
+export const deleteNode = (nodeId) => ({
+  type: 'DELETE_NODE',
+  nodeId
+})
 
-export function enableAutorun (name) {
-  return {
-    type: 'ENABLE_AUTORUN'
-  }
-}
+export const disableAutorun = () => ({
+  type: 'DISABLE_AUTORUN'
+})
 
-function fetchGraph (canvasId) {
+export const enableAutorun = () => ({
+  type: 'ENABLE_AUTORUN'
+})
+
+function fetchGraph () {
   return (dispatch) => {
-    dispatch({
-      type: 'FETCH_GRAPH_REQUEST'
-    })
+    const { receiveData, responseFailure } = prepareRequest(dispatch, 'FETCH_GRAPH')
 
     return fetch('/graph')
-      .then((response) => response.json())
-      .catch((error) => {
-        dispatch({
-          type: 'FETCH_GRAPH_FAILURE',
-          canvasId,
-          error
-        })
-      })
-      .then((json) => dispatch(receiveGraph(json, canvasId)))
+      .then(checkStatus)
+      .then(parseJSON)
+      .then(receiveData)
+      .catch(responseFailure)
   }
 }
 
-export function fetchGraphIfNeeded (canvasId) {
+export function fetchGraphIfNeeded () {
   return (dispatch, getState) => {
     if (shouldFetchGraph(getState())) {
-      return dispatch(fetchGraph(canvasId))
+      return dispatch(fetchGraph())
     }
   }
 }
@@ -75,14 +62,6 @@ export function invalidNode (nodeId, error) {
     type: 'INVALID_NODE',
     nodeId,
     error
-  }
-}
-
-function receiveGraph (graph, canvasId) {
-  return {
-    type: 'FETCH_GRAPH_SUCCESS',
-    canvasId,
-    graph
   }
 }
 
