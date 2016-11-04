@@ -100,7 +100,7 @@ export default function (state = initialState, action) {
       return graph
 
     case 'FETCH_GRAPH_SUCCESS':
-      return Object.assign({}, graph, action.graph)
+      return Object.assign({}, action.data)
 
     case 'INVALID_NODE':
       view.node[nodeId].error = error

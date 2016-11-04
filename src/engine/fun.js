@@ -134,14 +134,21 @@ function fun (graph, additionalFunctions) {
         .filter(comments)
         .forEach(checkTaskIsCompiled)
 
+  // Error and outputs reference.
+  var err = null
+  var outs = null
+
   /**
    * Here we are, this is the ❤ of dflow.
    */
 
   function dflowFun () {
     var gotReturn = false
-    var outs = {}
     var returnValue
+
+    // Reset error and outputs.
+    err = null
+    outs = {}
 
     var inputArgsOf = inputArgs.bind(null, outs, pipe)
 
@@ -156,6 +163,9 @@ function fun (graph, additionalFunctions) {
      */
 
     function run (taskKey) {
+      // Skip execution if some error ocurred.
+      if (err) return
+
       var args = inputArgsOf(taskKey)
       var taskName = task[taskKey]
       var f = funcs[taskName]
@@ -178,8 +188,11 @@ function fun (graph, additionalFunctions) {
       // Try to execute task.
       try {
         outs[taskKey] = f.apply(null, args)
-      } catch (err) {
-        throw err
+      } catch (e) {
+        err = new Error(e)
+        err.message = e
+        err.taskName = taskName
+        err.taskKey = taskKey
       }
     }
 
@@ -194,6 +207,10 @@ function fun (graph, additionalFunctions) {
 
   // Remember function was created from a dflow graph.
   dflowFun.graph = graph
+
+  // Add error and outputs to the graph, so they can be inspected.
+  dflowFun.graph.outs = outs
+  dflowFun.graph.err = err
 
   return dflowFun
 }

@@ -1,4 +1,5 @@
 import { Canvas } from 'flow-view'
+import CanvasContainer from '../components/CanvasContainer'
 import CanvasNode from '../components/CanvasNode'
 import Inspector from '../components/Inspector'
 import InvalidNode from '../components/InvalidNode'
@@ -21,14 +22,14 @@ export default function canvasMiddleware (store) {
     const result = next(action)
 
     if (action.type === 'FETCH_GRAPH_SUCCESS') {
-      const graph = action.graph
+      const graph = action.data
 
       const data = graph.data
       const pipe = graph.pipe
       const task = graph.task
       const view = graph.view
 
-      flowViewCanvas = new Canvas(action.canvasId, {
+      flowViewCanvas = new Canvas(CanvasContainer.defaultProps.id, {
         inspector: {
           DefaultInspector: Inspector
         },

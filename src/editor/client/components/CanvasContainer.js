@@ -2,12 +2,7 @@ import React, { Component, PropTypes } from 'react'
 
 class CanvasContainer extends Component {
   componentDidMount () {
-    const {
-      fetchGraphIfNeeded,
-      id
-    } = this.props
-
-    fetchGraphIfNeeded(id)
+    this.props.fetchGraphIfNeeded()
   }
 
   render () {

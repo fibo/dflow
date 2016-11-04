@@ -9133,17 +9133,7 @@ module.exports = warning;
   module.exports = exports['default'];
 });
 },{"../utils/computeNodeWidth":81,"../utils/ignoreEvent":82,"../utils/xOfPin":84,"./Inspector":74,"./Link":75,"./Node":76,"./Selector":77,"./theme":79,"react":277,"react-dom":123}],74:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react', '../utils/ignoreEvent'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('../utils/ignoreEvent'));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports, global.react, global.ignoreEvent);
-    global.Inspector = mod.exports;
+(function (global, factory) { if (typeof define === "function" && define.amd) { define(['module', 'exports', 'react', '../utils/ignoreEvent'], factory); } else if (typeof exports !== "undefined") { factory(module, exports, require('react'), require('../utils/ignoreEvent')); } else { var mod = { exports: {} }; factory(mod, mod.exports, global.react, global.ignoreEvent); global.Inspector = mod.exports;
   }
 })(this, function (module, exports, _react, _ignoreEvent) {
   'use strict';
@@ -9259,6 +9249,7 @@ module.exports = warning;
           {
             onClick: function onClick() {
               // Remove focus from input.
+              console.log(document.activeElement)
               document.activeElement.blur();
             },
             onDoubleClick: _ignoreEvent2.default,
@@ -9508,6 +9499,7 @@ module.exports = warning;
   exports.default = Inspector;
   module.exports = exports['default'];
 });
+
 },{"../utils/ignoreEvent":82,"react":277}],75:[function(require,module,exports){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
@@ -54141,12 +54133,7 @@ function config (name) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.createNode = createNode;
-exports.createLink = createLink;
-exports.deleteLink = deleteLink;
-exports.deleteNode = deleteNode;
-exports.disableAutorun = disableAutorun;
-exports.enableAutorun = enableAutorun;
+exports.enableAutorun = exports.disableAutorun = exports.deleteNode = exports.deleteLink = exports.createLink = exports.createNode = undefined;
 exports.fetchGraphIfNeeded = fetchGraphIfNeeded;
 exports.invalidNode = invalidNode;
 
@@ -54158,74 +54145,66 @@ var _notDefined = require('not-defined');
 
 var _notDefined2 = _interopRequireDefault(_notDefined);
 
+var _fetch = require('../utils/fetch');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function createNode(node, nodeId) {
+var createNode = exports.createNode = function createNode(node, nodeId) {
   return {
     type: 'CREATE_NODE',
     node: node,
     nodeId: nodeId
   };
-}
+};
 
-function createLink(link, linkId) {
+var createLink = exports.createLink = function createLink(link, linkId) {
   return {
     type: 'CREATE_LINK',
     link: link,
     linkId: linkId
   };
-}
+};
 
-function deleteLink(linkId) {
+var deleteLink = exports.deleteLink = function deleteLink(linkId) {
   return {
     type: 'DELETE_LINK',
     linkId: linkId
   };
-}
+};
 
-function deleteNode(nodeId) {
+var deleteNode = exports.deleteNode = function deleteNode(nodeId) {
   return {
     type: 'DELETE_NODE',
     nodeId: nodeId
   };
-}
+};
 
-function disableAutorun() {
+var disableAutorun = exports.disableAutorun = function disableAutorun() {
   return {
     type: 'DISABLE_AUTORUN'
   };
-}
+};
 
-function enableAutorun(name) {
+var enableAutorun = exports.enableAutorun = function enableAutorun() {
   return {
     type: 'ENABLE_AUTORUN'
   };
-}
+};
 
-function fetchGraph(canvasId) {
+function fetchGraph() {
   return function (dispatch) {
-    dispatch({
-      type: 'FETCH_GRAPH_REQUEST'
-    });
+    var _prepareRequest = (0, _fetch.prepareRequest)(dispatch, 'FETCH_GRAPH'),
+        receiveData = _prepareRequest.receiveData,
+        responseFailure = _prepareRequest.responseFailure;
 
-    return (0, _isomorphicFetch2.default)('/graph').then(function (response) {
-      return response.json();
-    }).catch(function (error) {
-      dispatch({
-        type: 'FETCH_GRAPH_FAILURE',
-        canvasId: canvasId,
-        error: error
-      });
-    }).then(function (json) {
-      return dispatch(receiveGraph(json, canvasId));
-    });
+    return (0, _isomorphicFetch2.default)('/graph').then(_fetch.checkStatus).then(_fetch.parseJSON).then(receiveData).catch(responseFailure);
   };
 }
 
-function fetchGraphIfNeeded(canvasId) {
+function fetchGraphIfNeeded() {
   return function (dispatch, getState) {
     if (shouldFetchGraph(getState())) {
-      return dispatch(fetchGraph(canvasId));
+      return dispatch(fetchGraph());
     }
   };
 }
@@ -54238,19 +54217,11 @@ function invalidNode(nodeId, error) {
   };
 }
 
-function receiveGraph(graph, canvasId) {
-  return {
-    type: 'FETCH_GRAPH_SUCCESS',
-    canvasId: canvasId,
-    graph: graph
-  };
-}
-
 function shouldFetchGraph(state) {
   return (0, _notDefined2.default)(state.when_downloaded);
 }
 
-},{"isomorphic-fetch":99,"not-defined":116}],305:[function(require,module,exports){
+},{"../utils/fetch":324,"isomorphic-fetch":99,"not-defined":116}],305:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54283,12 +54254,7 @@ var CanvasContainer = function (_Component) {
   _createClass(CanvasContainer, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var _props = this.props,
-          fetchGraphIfNeeded = _props.fetchGraphIfNeeded,
-          id = _props.id;
-
-
-      fetchGraphIfNeeded(id);
+      this.props.fetchGraphIfNeeded();
     }
   }, {
     key: 'render',
@@ -54359,19 +54325,27 @@ var CanvasNode = function (_Node) {
   _createClass(CanvasNode, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var id = this.props.id;
-      console.log(document.getElementById(id));
+      var _props = this.props,
+          id = _props.id,
+          model = _props.model;
+
+
+      var element = document.getElementById(id);
+
+      if (model.task[id]) return;else model.task[id] = function () {
+        return element;
+      };
     }
   }, {
     key: 'getBody',
     value: function getBody() {
-      var _props = this.props,
-          bodyHeight = _props.bodyHeight,
-          fontSize = _props.fontSize,
-          id = _props.id,
-          pinSize = _props.pinSize,
-          text = _props.text,
-          width = _props.width;
+      var _props2 = this.props,
+          bodyHeight = _props2.bodyHeight,
+          fontSize = _props2.fontSize,
+          id = _props2.id,
+          pinSize = _props2.pinSize,
+          text = _props2.text,
+          width = _props2.width;
 
       // Heuristic value, based on Courier font.
       // (comment copyed from flow-view Node)
@@ -54380,7 +54354,12 @@ var CanvasNode = function (_Node) {
 
       return _react2.default.createElement(
         'g',
-        null,
+        {
+          onClick: _ignoreEvent.ignoreEvent,
+          onDoubleClick: _ignoreEvent.ignoreEvent,
+          onMouseDown: _ignoreEvent.ignoreEvent,
+          onMouseUp: _ignoreEvent.ignoreEvent
+        },
         _react2.default.createElement(
           'text',
           {
@@ -54397,12 +54376,8 @@ var CanvasNode = function (_Node) {
           'foreignObject',
           {
             x: 0,
-            y: 0,
+            y: pinSize,
             height: bodyHeight,
-            onClick: _ignoreEvent.ignoreEvent,
-            onDoubleClick: _ignoreEvent.ignoreEvent,
-            onMouseDown: _ignoreEvent.ignoreEvent,
-            onMouseUp: _ignoreEvent.ignoreEvent,
             width: width
           },
           _react2.default.createElement('canvas', {
@@ -54492,7 +54467,7 @@ var DflowInspector = function (_Inspector) {
 
 exports.default = DflowInspector;
 
-},{"../utils/noInputTask":324,"../utils/singleInputTask":326,"../utils/twoInputsTask":328,"flow-view/components":78}],308:[function(require,module,exports){
+},{"../utils/noInputTask":330,"../utils/singleInputTask":332,"../utils/twoInputsTask":334,"flow-view/components":78}],308:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54756,7 +54731,7 @@ var SubgraphNode = function (_Node) {
 
 exports.default = SubgraphNode;
 
-},{"../utils/ignoreEvent":323,"flow-view/components":78,"react":277}],311:[function(require,module,exports){
+},{"../utils/ignoreEvent":329,"flow-view/components":78,"react":277}],311:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54845,7 +54820,7 @@ var ToggleNode = function (_Node) {
 
 exports.default = ToggleNode;
 
-},{"../utils/ignoreEvent":323,"flow-view/components":78,"react":277}],312:[function(require,module,exports){
+},{"../utils/ignoreEvent":329,"flow-view/components":78,"react":277}],312:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54940,31 +54915,34 @@ function autorunMiddleware(store) {
 
       if (!editor.autorun) return result;
 
-      var node = action.node;
-      var CREATE_NODE = action.type === 'CREATE_NODE';
-
       // TODO nothing to do client side if context is *server*
       // if (graph.info && graph.info.context === 'server') return result
+
+      // TODO additionalFunctions... how to pass them?
+      // they could be passed by server as a funcs.js script in DOM
+      // TODO how to pass arguments?
+      var dflowFun;
 
       // Try to execute graph.
 
       try {
-        // TODO additionalFunctions... how to pass them?
-        // TODO how to pass arguments?
-        (0, _fun2.default)(graph, _additionalFunctions2.default)();
+        dflowFun = (0, _fun2.default)(graph, _additionalFunctions2.default);
+        dflowFun();
       } catch (err) {
-        if (CREATE_NODE) {
-          // TODO if it is an invalid task get node id, or node ids
-          // then mark as error those nodes.
+        store.dispatch((0, _actions.disableAutorun)());
 
+        if (dflowFun && dflowFun.err) {
           // Mark node as invalid so it is highlighted in the editor.
-          store.dispatch((0, _actions.invalidNode)(action.nodeId, err));
-
-          // Create a fake function in order to avoid dflowFun errors.
-          _additionalFunctions2.default[node.text] = Function.prototype;
-        } else {
-          console.error(err);
+          store.dispatch((0, _actions.invalidNode)(dflowFun.err.taskKey, err));
         }
+
+        // TODO if it is an invalid task get node id, or node ids
+        // then mark as error those nodes.
+
+        // TODO do the following if an **ignore errors** flag is active.
+        // Create a fake function in order to avoid dflowFun errors.
+        // additionalFunctions[node.text] = Function.prototype
+        console.error(err);
         // TODO dflowFunction should collect all errors and finally throw them
         // so here it could be possible to catch them and highlight red nodes by their ids.
       }
@@ -54974,7 +54952,7 @@ function autorunMiddleware(store) {
   };
 }
 
-},{"../../../engine/fun":331,"../actions":304,"../utils/additionalFunctions":322}],315:[function(require,module,exports){
+},{"../../../engine/fun":337,"../actions":304,"../utils/additionalFunctions":322}],315:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54983,6 +54961,10 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = canvasMiddleware;
 
 var _flowView = require('flow-view');
+
+var _CanvasContainer = require('../components/CanvasContainer');
+
+var _CanvasContainer2 = _interopRequireDefault(_CanvasContainer);
 
 var _CanvasNode = require('../components/CanvasNode');
 
@@ -55022,14 +55004,14 @@ function canvasMiddleware(store) {
       var result = next(action);
 
       if (action.type === 'FETCH_GRAPH_SUCCESS') {
-        var graph = action.graph;
+        var graph = action.data;
 
         var data = graph.data;
         var pipe = graph.pipe;
         var task = graph.task;
         var view = graph.view;
 
-        flowViewCanvas = new _flowView.Canvas(action.canvasId, {
+        flowViewCanvas = new _flowView.Canvas(_CanvasContainer2.default.defaultProps.id, {
           inspector: {
             DefaultInspector: _Inspector2.default
           },
@@ -55076,7 +55058,7 @@ function canvasMiddleware(store) {
   };
 }
 
-},{"../actions":304,"../components/CanvasNode":306,"../components/Inspector":307,"../components/InvalidNode":308,"../components/SubgraphNode":310,"../components/ToggleNode":311,"../utils/typeOfNode":329,"flow-view":80,"flow-view/components":78}],316:[function(require,module,exports){
+},{"../actions":304,"../components/CanvasContainer":305,"../components/CanvasNode":306,"../components/Inspector":307,"../components/InvalidNode":308,"../components/SubgraphNode":310,"../components/ToggleNode":311,"../utils/typeOfNode":335,"flow-view":80,"flow-view/components":78}],316:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55125,7 +55107,7 @@ function autorunMiddleware(store) {
   };
 }
 
-},{"../../../engine/emptyGraph.json":330,"../../../engine/regex/subgraph":353,"not-defined":116}],317:[function(require,module,exports){
+},{"../../../engine/emptyGraph.json":336,"../../../engine/regex/subgraph":359,"not-defined":116}],317:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55136,6 +55118,8 @@ exports.default = autorunMiddleware;
 var _validate = require('../../../engine/validate');
 
 var _validate2 = _interopRequireDefault(_validate);
+
+var _actions = require('../actions');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -55150,6 +55134,9 @@ function autorunMiddleware(store) {
       try {
         (0, _validate2.default)(graph);
       } catch (err) {
+        store.dispatch((0, _actions.disableAutorun)());
+        // TODO remove console and add to some footbar.
+        // dispach an invalidGraph method with err as parameter.
         console.error(err);
       }
 
@@ -55158,7 +55145,7 @@ function autorunMiddleware(store) {
   };
 }
 
-},{"../../../engine/validate":355}],318:[function(require,module,exports){
+},{"../../../engine/validate":361,"../actions":304}],318:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55294,7 +55281,7 @@ exports.default = function () {
       return graph;
 
     case 'FETCH_GRAPH_SUCCESS':
-      return Object.assign({}, graph, action.graph);
+      return Object.assign({}, action.data);
 
     case 'INVALID_NODE':
       view.node[nodeId].error = error;
@@ -55338,7 +55325,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var initialState = Object.assign({}, _emptyGraph2.default);
 
-},{"../../../engine/emptyGraph.json":330,"../utils/noOutputForTask":325,"../utils/singleInputTask":326,"../utils/threeInputsTask":327,"../utils/twoInputsTask":328,"../utils/typeOfNode":329,"not-defined":116}],320:[function(require,module,exports){
+},{"../../../engine/emptyGraph.json":336,"../utils/noOutputForTask":331,"../utils/singleInputTask":332,"../utils/threeInputsTask":333,"../utils/twoInputsTask":334,"../utils/typeOfNode":335,"not-defined":116}],320:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55444,13 +55431,128 @@ exports.default = additionalFunctions;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = ignoreEvent;
-function ignoreEvent(e) {
-  e.preventDefault();
-  e.stopPropagation();
+exports.default = checkStatus;
+function checkStatus(response) {
+  if (response.ok) {
+    return response;
+  } else {
+    var error = new Error(response.statusText);
+    error.response = response;
+    throw error;
+  }
 }
 
 },{}],324:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.prepareRequest = exports.parseJSON = exports.checkStatus = undefined;
+
+var _checkStatus = require('./checkStatus');
+
+var _checkStatus2 = _interopRequireDefault(_checkStatus);
+
+var _parseJSON = require('./parseJSON');
+
+var _parseJSON2 = _interopRequireDefault(_parseJSON);
+
+var _prepareRequest = require('./prepareRequest');
+
+var _prepareRequest2 = _interopRequireDefault(_prepareRequest);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.checkStatus = _checkStatus2.default;
+exports.parseJSON = _parseJSON2.default;
+exports.prepareRequest = _prepareRequest2.default;
+
+},{"./checkStatus":323,"./parseJSON":325,"./prepareRequest":326}],325:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = parseJSON;
+function parseJSON(response) {
+  return response.json();
+}
+
+},{}],326:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = prepareRequest;
+
+var _receiveData = require('./receiveData');
+
+var _receiveData2 = _interopRequireDefault(_receiveData);
+
+var _responseFailure = require('./responseFailure');
+
+var _responseFailure2 = _interopRequireDefault(_responseFailure);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function prepareRequest(dispatch, actionName) {
+  dispatch({ type: actionName + '_REQUEST' });
+
+  return {
+    receiveData: (0, _receiveData2.default)(dispatch, actionName),
+    responseFailure: (0, _responseFailure2.default)(dispatch, actionName)
+  };
+}
+
+},{"./receiveData":327,"./responseFailure":328}],327:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = receiveData;
+function receiveData(dispatch, actionName) {
+  return function (data) {
+    dispatch({
+      type: actionName + "_SUCCESS",
+      data: data
+    });
+  };
+}
+
+},{}],328:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = responseFailure;
+function responseFailure(dispatch, actionName) {
+  return function (error) {
+    dispatch({
+      type: actionName + "_FAILURE",
+      error: error
+    });
+  };
+}
+
+},{}],329:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = ignoreEvent;
+function ignoreEvent(e) {
+  console.log(e);
+  e.preventDefault();
+  e.stopPropagation();
+  return false;
+}
+
+},{}],330:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55485,7 +55587,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {Boolean}
  */
 function noInputTask(taskName) {
-  if (taskName === 'console.log') return false;
+  if (taskName.split('.')[0] === 'console') return false;
 
   if (_argument2.default.test(taskName)) return true;
   if (_reference2.default.test(taskName)) return true;
@@ -55506,7 +55608,7 @@ function noInputTask(taskName) {
   return noInputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":332,"../../../engine/regex/argument":348,"../../../engine/regex/quoted":351,"../../../engine/regex/reference":352,"../../../engine/walkGlobal":356}],325:[function(require,module,exports){
+},{"../../../engine/functions/builtin":338,"../../../engine/regex/argument":354,"../../../engine/regex/quoted":357,"../../../engine/regex/reference":358,"../../../engine/walkGlobal":362}],331:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55532,12 +55634,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function noOutputForTask(taskName) {
   if (_comment2.default.test(taskName)) return true;
 
-  var noOutputTasks = ['return', 'console.log', 'console.error'];
+  if (taskName.split('.')[0] === 'console') return true;
+
+  var noOutputTasks = ['return'];
 
   return noOutputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/regex/comment":349}],326:[function(require,module,exports){
+},{"../../../engine/regex/comment":355}],332:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55582,7 +55686,7 @@ function singleInputTask(taskName) {
   return singleInputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":332,"../../../engine/regex/dotOperator":350,"../../../engine/walkGlobal":356}],327:[function(require,module,exports){
+},{"../../../engine/functions/builtin":338,"../../../engine/regex/dotOperator":356,"../../../engine/walkGlobal":362}],333:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55608,7 +55712,7 @@ function threeInputsTask(taskName) {
   return false;
 }
 
-},{"../../../engine/functions/builtin":332}],328:[function(require,module,exports){
+},{"../../../engine/functions/builtin":338}],334:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55649,7 +55753,7 @@ function twoInputsTask(taskName) {
   return false;
 }
 
-},{"../../../engine/functions/builtin":332,"../../../engine/regex/dotOperator":350,"../../../engine/walkGlobal":356}],329:[function(require,module,exports){
+},{"../../../engine/functions/builtin":338,"../../../engine/regex/dotOperator":356,"../../../engine/walkGlobal":362}],335:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55685,7 +55789,7 @@ function typeOfNode(node) {
   }
 }
 
-},{"../../../engine/regex/subgraph":353}],330:[function(require,module,exports){
+},{"../../../engine/regex/subgraph":359}],336:[function(require,module,exports){
 module.exports={
   "data": {},
   "func": {},
@@ -55698,7 +55802,7 @@ module.exports={
   }
 }
 
-},{}],331:[function(require,module,exports){
+},{}],337:[function(require,module,exports){
 'use strict';
 
 var builtinFunctions = require('./functions/builtin');
@@ -55833,14 +55937,21 @@ function fun(graph, additionalFunctions) {
   // Check if there is some missing task.
   Object.keys(task).filter(comments).forEach(checkTaskIsCompiled);
 
+  // Error and outputs reference.
+  var err = null;
+  var outs = null;
+
   /**
    * Here we are, this is the ❤ of dflow.
    */
 
   function dflowFun() {
     var gotReturn = false;
-    var outs = {};
     var returnValue;
+
+    // Reset error and outputs.
+    err = null;
+    outs = {};
 
     var inputArgsOf = inputArgs.bind(null, outs, pipe);
 
@@ -55859,6 +55970,9 @@ function fun(graph, additionalFunctions) {
      */
 
     function run(taskKey) {
+      // Skip execution if some error ocurred.
+      if (err) return;
+
       var args = inputArgsOf(taskKey);
       var taskName = task[taskKey];
       var f = funcs[taskName];
@@ -55881,8 +55995,11 @@ function fun(graph, additionalFunctions) {
       // Try to execute task.
       try {
         outs[taskKey] = f.apply(null, args);
-      } catch (err) {
-        throw err;
+      } catch (e) {
+        err = new Error(e);
+        err.message = e;
+        err.taskName = taskName;
+        err.taskKey = taskKey;
       }
     }
 
@@ -55895,12 +56012,16 @@ function fun(graph, additionalFunctions) {
   // Remember function was created from a dflow graph.
   dflowFun.graph = graph;
 
+  // Add error and outputs to the graph, so they can be inspected.
+  dflowFun.graph.outs = outs;
+  dflowFun.graph.err = err;
+
   return dflowFun;
 }
 
 module.exports = fun;
 
-},{"./functions/builtin":332,"./inject/accessors":333,"./inject/additionalFunctions":334,"./inject/arguments":335,"./inject/arrowFunctions":336,"./inject/dotOperators":337,"./inject/globals":338,"./inject/numbers":339,"./inject/references":340,"./inject/strings":341,"./inputArgs":342,"./isDflowFun":344,"./level":345,"./regex/argument":348,"./regex/comment":349,"./regex/dotOperator":350,"./regex/subgraph":353,"./reservedKeys":354,"./validate":355,"./walkGlobal":356,"not-defined":116}],332:[function(require,module,exports){
+},{"./functions/builtin":338,"./inject/accessors":339,"./inject/additionalFunctions":340,"./inject/arguments":341,"./inject/arrowFunctions":342,"./inject/dotOperators":343,"./inject/globals":344,"./inject/numbers":345,"./inject/references":346,"./inject/strings":347,"./inputArgs":348,"./isDflowFun":350,"./level":351,"./regex/argument":354,"./regex/comment":355,"./regex/dotOperator":356,"./regex/subgraph":359,"./reservedKeys":360,"./validate":361,"./walkGlobal":362,"not-defined":116}],338:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -56068,7 +56189,7 @@ exports.now = function () {
   return new Date();
 };
 
-},{"not-defined":116}],333:[function(require,module,exports){
+},{"not-defined":116}],339:[function(require,module,exports){
 'use strict';
 
 var no = require('not-defined');
@@ -56120,7 +56241,7 @@ function injectAccessors(funcs, graph) {
 
 module.exports = injectAccessors;
 
-},{"../regex/accessor":347,"not-defined":116}],334:[function(require,module,exports){
+},{"../regex/accessor":353,"not-defined":116}],340:[function(require,module,exports){
 'use strict';
 
 var no = require('not-defined');
@@ -56151,7 +56272,7 @@ function injectAdditionalFunctions(funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions;
 
-},{"not-defined":116}],335:[function(require,module,exports){
+},{"not-defined":116}],341:[function(require,module,exports){
 'use strict';
 
 var regexArgument = require('../regex/argument');
@@ -56194,7 +56315,7 @@ function injectArguments(funcs, task, args) {
 
 module.exports = injectArguments;
 
-},{"../regex/argument":348}],336:[function(require,module,exports){
+},{"../regex/argument":354}],342:[function(require,module,exports){
 'use strict';
 
 /**
@@ -56231,7 +56352,7 @@ function arrowFunctions(funcs, task) {
 
 module.exports = arrowFunctions;
 
-},{}],337:[function(require,module,exports){
+},{}],343:[function(require,module,exports){
 'use strict';
 
 var regexDotOperator = require('../regex/dotOperator');
@@ -56310,7 +56431,7 @@ function injectDotOperators(funcs, task) {
 
 module.exports = injectDotOperators;
 
-},{"../regex/dotOperator":350}],338:[function(require,module,exports){
+},{"../regex/dotOperator":356}],344:[function(require,module,exports){
 'use strict';
 
 var no = require('not-defined');
@@ -56357,7 +56478,7 @@ function injectGlobals(funcs, task) {
 
 module.exports = injectGlobals;
 
-},{"../reservedKeys":354,"../walkGlobal":356,"not-defined":116}],339:[function(require,module,exports){
+},{"../reservedKeys":360,"../walkGlobal":362,"not-defined":116}],345:[function(require,module,exports){
 "use strict";
 
 /**
@@ -56391,7 +56512,7 @@ function injectNumbers(funcs, task) {
 
 module.exports = injectNumbers;
 
-},{}],340:[function(require,module,exports){
+},{}],346:[function(require,module,exports){
 'use strict';
 
 var regexReference = require('../regex/reference');
@@ -56442,7 +56563,7 @@ function injectReferences(funcs, task) {
 
 module.exports = injectReferences;
 
-},{"../regex/reference":352,"../walkGlobal":356}],341:[function(require,module,exports){
+},{"../regex/reference":358,"../walkGlobal":362}],347:[function(require,module,exports){
 'use strict';
 
 var regexQuoted = require('../regex/quoted');
@@ -56474,7 +56595,7 @@ function injectStrings(funcs, task) {
 
 module.exports = injectStrings;
 
-},{"../regex/quoted":351}],342:[function(require,module,exports){
+},{"../regex/quoted":357}],348:[function(require,module,exports){
 'use strict';
 
 var inputPipes = require('./inputPipes');
@@ -56507,7 +56628,7 @@ function inputArgs(outs, pipe, taskKey) {
 
 module.exports = inputArgs;
 
-},{"./inputPipes":343}],343:[function(require,module,exports){
+},{"./inputPipes":349}],349:[function(require,module,exports){
 "use strict";
 
 /**
@@ -56537,7 +56658,7 @@ function inputPipes(pipe, taskKey) {
 
 module.exports = inputPipes;
 
-},{}],344:[function(require,module,exports){
+},{}],350:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -56571,7 +56692,7 @@ function isDflowFun(f) {
 
 module.exports = isDflowFun;
 
-},{"./validate":355}],345:[function(require,module,exports){
+},{"./validate":361}],351:[function(require,module,exports){
 'use strict';
 
 var parents = require('./parents');
@@ -56608,7 +56729,7 @@ function level(pipe, cachedLevelOf, taskKey) {
 
 module.exports = level;
 
-},{"./parents":346}],346:[function(require,module,exports){
+},{"./parents":352}],352:[function(require,module,exports){
 'use strict';
 
 var inputPipes = require('./inputPipes');
@@ -56637,50 +56758,50 @@ function parents(pipe, taskKey) {
 
 module.exports = parents;
 
-},{"./inputPipes":343}],347:[function(require,module,exports){
+},{"./inputPipes":349}],353:[function(require,module,exports){
 "use strict";
 
 module.exports = /^@[\w][\w\d]+$/;
 
-},{}],348:[function(require,module,exports){
+},{}],354:[function(require,module,exports){
 "use strict";
 
 module.exports = /^arguments\[(\d+)\]$/;
 
-},{}],349:[function(require,module,exports){
+},{}],355:[function(require,module,exports){
 "use strict";
 
 module.exports = /^\/\/.+$/;
 
-},{}],350:[function(require,module,exports){
+},{}],356:[function(require,module,exports){
 "use strict";
 
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/;
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/;
 
-},{}],351:[function(require,module,exports){
+},{}],357:[function(require,module,exports){
 "use strict";
 
 module.exports = /^'.+'$/;
 
-},{}],352:[function(require,module,exports){
+},{}],358:[function(require,module,exports){
 "use strict";
 
 module.exports = /^&(.+)$/;
 
-},{}],353:[function(require,module,exports){
+},{}],359:[function(require,module,exports){
 "use strict";
 
 module.exports = /^\/[\w][\w\d]+$/;
 
-},{}],354:[function(require,module,exports){
+},{}],360:[function(require,module,exports){
 'use strict';
 
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = ['arguments', 'dflow.fun', 'dflow.isDflowFun', 'dflow.validate', 'return', 'this', 'this.graph'];
 
-},{}],355:[function(require,module,exports){
+},{}],361:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -56844,7 +56965,7 @@ function validate(graph, additionalFunctions) {
 
 module.exports = validate;
 
-},{"./regex/accessor":347,"./regex/argument":348,"./regex/dotOperator":350,"./regex/reference":352,"./regex/subgraph":353,"./reservedKeys":354,"not-defined":116}],356:[function(require,module,exports){
+},{"./regex/accessor":353,"./regex/argument":354,"./regex/dotOperator":356,"./regex/reference":358,"./regex/subgraph":359,"./reservedKeys":360,"not-defined":116}],362:[function(require,module,exports){
 (function (global){
 'use strict';
 

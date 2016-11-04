@@ -1,4 +1,7 @@
 import validate from '../../../engine/validate'
+import {
+  disableAutorun
+} from '../actions'
 
 export default function autorunMiddleware (store) {
   return (next) => (action) => {
@@ -9,6 +12,9 @@ export default function autorunMiddleware (store) {
     try {
       validate(graph)
     } catch (err) {
+      store.dispatch(disableAutorun())
+      // TODO remove console and add to some footbar.
+      // dispach an invalidGraph method with err as parameter.
       console.error(err)
     }
 

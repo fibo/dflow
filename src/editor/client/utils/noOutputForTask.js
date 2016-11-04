@@ -12,7 +12,9 @@ import regexComment from '../../../engine/regex/comment'
 export default function noOutputForTask (taskName) {
   if (regexComment.test(taskName)) return true
 
-  const noOutputTasks = ['return', 'console.log', 'console.error']
+  if (taskName.split('.')[0] === 'console') return true
+
+  const noOutputTasks = ['return']
 
   return noOutputTasks.indexOf(taskName) > -1
 }
