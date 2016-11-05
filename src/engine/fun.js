@@ -134,10 +134,6 @@ function fun (graph, additionalFunctions) {
         .filter(comments)
         .forEach(checkTaskIsCompiled)
 
-  // Error and outputs reference.
-  var err = null
-  var outs = null
-
   /**
    * Here we are, this is the ❤ of dflow.
    */
@@ -145,12 +141,7 @@ function fun (graph, additionalFunctions) {
   function dflowFun () {
     var gotReturn = false
     var returnValue
-
-    // Reset error and outputs.
-    err = null
-    outs = {}
-
-    var inputArgsOf = inputArgs.bind(null, outs, pipe)
+    var outs = {}
 
     // Inject run-time builtin tasks.
 
@@ -163,15 +154,13 @@ function fun (graph, additionalFunctions) {
      */
 
     function run (taskKey) {
-      // Skip execution if some error ocurred.
-      if (err) return
-
-      var args = inputArgsOf(taskKey)
+      var args = inputArgs(outs, pipe, taskKey)
       var taskName = task[taskKey]
       var f = funcs[taskName]
 
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.
+
       if (gotReturn) return
 
       if ((taskName === 'return') && (!gotReturn)) {
@@ -181,22 +170,26 @@ function fun (graph, additionalFunctions) {
       }
 
       // If task is not defined at run time, throw an error.
+
       if (no(f)) {
         throw new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
       }
 
       // Try to execute task.
+
       try {
         outs[taskKey] = f.apply(null, args)
-      } catch (e) {
-        err = new Error(e)
-        err.message = e
+      } catch (err) {
+        // Enrich error with useful dflow task info.
         err.taskName = taskName
         err.taskKey = taskKey
+
+        throw err
       }
     }
 
     // Run every graph task, sorted by level.
+
     Object.keys(task)
           .filter(comments)
           .sort(byLevel)
@@ -206,11 +199,8 @@ function fun (graph, additionalFunctions) {
   }
 
   // Remember function was created from a dflow graph.
-  dflowFun.graph = graph
 
-  // Add error and outputs to the graph, so they can be inspected.
-  dflowFun.graph.outs = outs
-  dflowFun.graph.err = err
+  dflowFun.graph = graph
 
   return dflowFun
 }
