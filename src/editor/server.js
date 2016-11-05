@@ -28,11 +28,6 @@ app.put('/graph', (req, res) => {
   // TODO write to file
 })
 
-// TODO install body-parser and write graph to file
-// app.post('/graph', (req, res) => {
-//   here graphPath should not be null
-// })
-
 function start (opt) {
   if (no(opt)) opt = {}
 
