@@ -26,6 +26,8 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 ### Added
 
 - Autorun input checkbox.
+- Runtime error enriched with task info.
+- Can create subgraphs.
 
 ### Changed
 
