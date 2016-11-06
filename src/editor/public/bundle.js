@@ -54606,6 +54606,15 @@ var Root = function (_Component) {
               'li',
               null,
               _react2.default.createElement(
+                'button',
+                null,
+                'Save'
+              )
+            ),
+            _react2.default.createElement(
+              'li',
+              null,
+              _react2.default.createElement(
                 'form',
                 null,
                 _react2.default.createElement(
@@ -54923,28 +54932,37 @@ function autorunMiddleware(store) {
       // TODO how to pass arguments?
       var dflowFun;
 
-      // Try to execute graph.
+      // Try to compile graph.
 
       try {
         dflowFun = (0, _fun2.default)(graph, _additionalFunctions2.default);
+      } catch (err) {
+        store.dispatch((0, _actions.disableAutorun)());
+
+        if (err.taskKey) {
+          // Mark node as invalid so it is highlighted in the editor.
+          store.dispatch((0, _actions.invalidNode)(err.taskKey, err));
+        }
+
+        console.error(err);
+      }
+
+      // Try to execute graph.
+
+      try {
         dflowFun();
       } catch (err) {
         store.dispatch((0, _actions.disableAutorun)());
 
-        if (dflowFun && dflowFun.err) {
+        if (err.taskKey) {
           // Mark node as invalid so it is highlighted in the editor.
-          store.dispatch((0, _actions.invalidNode)(dflowFun.err.taskKey, err));
+          store.dispatch((0, _actions.invalidNode)(err.taskKey, err));
         }
-
-        // TODO if it is an invalid task get node id, or node ids
-        // then mark as error those nodes.
 
         // TODO do the following if an **ignore errors** flag is active.
         // Create a fake function in order to avoid dflowFun errors.
         // additionalFunctions[node.text] = Function.prototype
         console.error(err);
-        // TODO dflowFunction should collect all errors and finally throw them
-        // so here it could be possible to catch them and highlight red nodes by their ids.
       }
 
       return result;
@@ -55546,7 +55564,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = ignoreEvent;
 function ignoreEvent(e) {
-  console.log(e);
   e.preventDefault();
   e.stopPropagation();
   return false;
@@ -55653,6 +55670,10 @@ var _builtin = require('../../../engine/functions/builtin');
 
 var _builtin2 = _interopRequireDefault(_builtin);
 
+var _accessor = require('../../../engine/regex/accessor');
+
+var _accessor2 = _interopRequireDefault(_accessor);
+
 var _dotOperator = require('../../../engine/regex/dotOperator');
 
 var _dotOperator2 = _interopRequireDefault(_dotOperator);
@@ -55669,6 +55690,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 function singleInputTask(taskName) {
+  if (_accessor2.default.test(taskName)) return true;
   if (_dotOperator2.default.attr.test(taskName)) return true;
   if (_dotOperator2.default.func.test(taskName)) return false;
 
@@ -55686,7 +55708,7 @@ function singleInputTask(taskName) {
   return singleInputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":338,"../../../engine/regex/dotOperator":356,"../../../engine/walkGlobal":362}],333:[function(require,module,exports){
+},{"../../../engine/functions/builtin":338,"../../../engine/regex/accessor":353,"../../../engine/regex/dotOperator":356,"../../../engine/walkGlobal":362}],333:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55918,7 +55940,12 @@ function fun(graph, additionalFunctions) {
     if (regexSubgraph.test(taskName)) {
       var subgraphKey = taskName.substring(1);
 
-      if (no(graph.func[subgraphKey])) throw new Error(msg);else return;
+      if (no(graph.func[subgraphKey])) {
+        var subgraphNotFound = new Error(msg);
+        subgraphNotFound.taskKey = taskKey;
+        subgraphNotFound.taskName = taskName;
+        throw subgraphNotFound;
+      } else return;
     }
 
     // Skip arguments[0] ... arguments[N].
@@ -55931,7 +55958,12 @@ function fun(graph, additionalFunctions) {
     // Skip globals.
     if (walkGlobal(taskName)) return;
 
-    if (no(funcs[taskName])) throw new Error(msg);
+    if (no(funcs[taskName])) {
+      var subgraphNotCompiled = new Error(msg);
+      subgraphNotCompiled.taskKey = taskKey;
+      subgraphNotCompiled.taskName = taskName;
+      throw subgraphNotCompiled;
+    }
   }
 
   // Check if there is some missing task.
@@ -55979,7 +56011,9 @@ function fun(graph, additionalFunctions) {
       // If task is not defined at run time, throw an error.
 
       if (no(f)) {
-        throw new Error('Task not found: ' + taskName + ' [' + taskKey + '] ');
+        var taskNotFound = new Error('Task not found: ' + taskName + ' [' + taskKey + '] ');
+        taskNotFound.taskKey = taskKey;
+        taskNotFound.taskName = taskName;
       }
 
       // Try to execute task.

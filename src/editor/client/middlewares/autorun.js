@@ -21,28 +21,37 @@ export default function autorunMiddleware (store) {
     // TODO how to pass arguments?
     var dflowFun
 
-    // Try to execute graph.
+    // Try to compile graph.
 
     try {
       dflowFun = fun(graph, additionalFunctions)
+    } catch (err) {
+      store.dispatch(disableAutorun())
+
+      if (err.taskKey) {
+        // Mark node as invalid so it is highlighted in the editor.
+        store.dispatch(invalidNode(err.taskKey, err))
+      }
+
+      console.error(err)
+    }
+
+    // Try to execute graph.
+
+    try {
       dflowFun()
     } catch (err) {
       store.dispatch(disableAutorun())
 
-      if (dflowFun && dflowFun.err) {
+      if (err.taskKey) {
         // Mark node as invalid so it is highlighted in the editor.
-        store.dispatch(invalidNode(dflowFun.err.taskKey, err))
+        store.dispatch(invalidNode(err.taskKey, err))
       }
-
-      // TODO if it is an invalid task get node id, or node ids
-      // then mark as error those nodes.
 
       // TODO do the following if an **ignore errors** flag is active.
       // Create a fake function in order to avoid dflowFun errors.
       // additionalFunctions[node.text] = Function.prototype
       console.error(err)
-      // TODO dflowFunction should collect all errors and finally throw them
-      // so here it could be possible to catch them and highlight red nodes by their ids.
     }
 
     return result

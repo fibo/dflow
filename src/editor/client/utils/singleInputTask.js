@@ -1,4 +1,5 @@
 import builtinFunctions from '../../../engine/functions/builtin'
+import regexAccessor from '../../../engine/regex/accessor'
 import regexDotOperator from '../../../engine/regex/dotOperator'
 import walkGlobal from '../../../engine/walkGlobal'
 
@@ -8,6 +9,7 @@ import walkGlobal from '../../../engine/walkGlobal'
  */
 
 export default function singleInputTask (taskName) {
+  if (regexAccessor.test(taskName)) return true
   if (regexDotOperator.attr.test(taskName)) return true
   if (regexDotOperator.func.test(taskName)) return false
 

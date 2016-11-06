@@ -24,6 +24,9 @@ class Root extends Component {
               >Download</a>
             </li>
             <li>
+              <button>Save</button>
+            </li>
+            <li>
               <form>
                 <label forName='autorun' >autorun</label>
                 <input

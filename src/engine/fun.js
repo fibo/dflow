@@ -112,8 +112,12 @@ function fun (graph, additionalFunctions) {
     if (regexSubgraph.test(taskName)) {
       var subgraphKey = taskName.substring(1)
 
-      if (no(graph.func[subgraphKey])) throw new Error(msg)
-      else return
+      if (no(graph.func[subgraphKey])) {
+        var subgraphNotFound = new Error(msg)
+        subgraphNotFound.taskKey = taskKey
+        subgraphNotFound.taskName = taskName
+        throw subgraphNotFound
+      } else return
     }
 
     // Skip arguments[0] ... arguments[N].
@@ -126,7 +130,12 @@ function fun (graph, additionalFunctions) {
     // Skip globals.
     if (walkGlobal(taskName)) return
 
-    if (no(funcs[taskName])) throw new Error(msg)
+    if (no(funcs[taskName])) {
+      var subgraphNotCompiled = new Error(msg)
+      subgraphNotCompiled.taskKey = taskKey
+      subgraphNotCompiled.taskName = taskName
+      throw subgraphNotCompiled
+    }
   }
 
   // Check if there is some missing task.
@@ -172,7 +181,9 @@ function fun (graph, additionalFunctions) {
       // If task is not defined at run time, throw an error.
 
       if (no(f)) {
-        throw new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
+        var taskNotFound = new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
+        taskNotFound.taskKey = taskKey
+        taskNotFound.taskName = taskName
       }
 
       // Try to execute task.

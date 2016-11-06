@@ -18,8 +18,11 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - Save button
 - Add drag node event to flow-view, otherwise no event is fired when moving nodes
 - Custom canvas node???
-- By now dflow.fun computes the outs but does not expose them. Put them in the dflowFun.graph.outs so user will be able to see them on mouseover pins.
-- Fix toggle, make it work
+- Fix toggle, make it work. It depends on blur event set by flow-view Inspector
+- accessor nodes should accept only valid JSON and displayed as custom nodes. If you click them, a modal is opened to edit them if they are not connected, they can also show a preview of their values
+- find a smart way to show output values, it should be like vvvv debug you can apply it to a single task or the whole subgraph or graph
+- can edit subgraphs, canvas should be able to empty and show the subgraphwhile a navbat like   root / subgraph1 / subgraph2 with dropdowns let you navigate throw the tree.
+
 
 ## [Unreleased]
 
