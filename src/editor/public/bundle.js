@@ -55272,7 +55272,7 @@ function autorunMiddleware(store) {
   };
 }
 
-},{"../../../engine/emptyGraph.json":344,"../../../engine/regex/subgraph":367,"not-defined":122}],323:[function(require,module,exports){
+},{"../../../engine/emptyGraph.json":344,"../../../engine/regex/subgraph":368,"not-defined":122}],323:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55310,7 +55310,7 @@ function autorunMiddleware(store) {
   };
 }
 
-},{"../../../engine/validate":369,"../actions":310}],324:[function(require,module,exports){
+},{"../../../engine/validate":370,"../actions":310}],324:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55574,6 +55574,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+var _window = require('../../../engine/functions/window');
+
+var _window2 = _interopRequireDefault(_window);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var logger = document.getElementById('dflow-console');
 
 function consoleLog() {
@@ -55588,18 +55594,13 @@ function consoleLog() {
   }
 }
 
-function dflowPreview() {
-  return document.getElementById('dflow-preview');
-}
-
-var additionalFunctions = {
-  'body': dflowPreview,
+var additionalFunctions = Object.assign({}, _window2.default, {
   'console.log': consoleLog
-};
+});
 
 exports.default = additionalFunctions;
 
-},{}],329:[function(require,module,exports){
+},{"../../../engine/functions/window":347}],329:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -55849,7 +55850,7 @@ function noInputTask(taskName) {
   return noInputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":346,"../../../engine/regex/argument":362,"../../../engine/regex/quoted":365,"../../../engine/regex/reference":366,"../../../engine/walkGlobal":370}],339:[function(require,module,exports){
+},{"../../../engine/functions/builtin":346,"../../../engine/regex/argument":363,"../../../engine/regex/quoted":366,"../../../engine/regex/reference":367,"../../../engine/walkGlobal":371}],339:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55882,7 +55883,7 @@ function noOutputForTask(taskName) {
   return noOutputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/regex/comment":363}],340:[function(require,module,exports){
+},{"../../../engine/regex/comment":364}],340:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55932,7 +55933,7 @@ function singleInputTask(taskName) {
   return singleInputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":346,"../../../engine/regex/accessor":361,"../../../engine/regex/dotOperator":364,"../../../engine/walkGlobal":370}],341:[function(require,module,exports){
+},{"../../../engine/functions/builtin":346,"../../../engine/regex/accessor":362,"../../../engine/regex/dotOperator":365,"../../../engine/walkGlobal":371}],341:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55999,7 +56000,7 @@ function twoInputsTask(taskName) {
   return false;
 }
 
-},{"../../../engine/functions/builtin":346,"../../../engine/regex/dotOperator":364,"../../../engine/walkGlobal":370}],343:[function(require,module,exports){
+},{"../../../engine/functions/builtin":346,"../../../engine/regex/dotOperator":365,"../../../engine/walkGlobal":371}],343:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -56035,7 +56036,7 @@ function typeOfNode(node) {
   }
 }
 
-},{"../../../engine/regex/subgraph":367}],344:[function(require,module,exports){
+},{"../../../engine/regex/subgraph":368}],344:[function(require,module,exports){
 module.exports={
   "data": {},
   "func": {},
@@ -56269,7 +56270,7 @@ function fun(graph, additionalFunctions) {
 
 module.exports = fun;
 
-},{"./functions/builtin":346,"./inject/accessors":347,"./inject/additionalFunctions":348,"./inject/arguments":349,"./inject/arrowFunctions":350,"./inject/dotOperators":351,"./inject/globals":352,"./inject/numbers":353,"./inject/references":354,"./inject/strings":355,"./inputArgs":356,"./isDflowFun":358,"./level":359,"./regex/argument":362,"./regex/comment":363,"./regex/dotOperator":364,"./regex/subgraph":367,"./reservedKeys":368,"./validate":369,"./walkGlobal":370,"not-defined":122}],346:[function(require,module,exports){
+},{"./functions/builtin":346,"./inject/accessors":348,"./inject/additionalFunctions":349,"./inject/arguments":350,"./inject/arrowFunctions":351,"./inject/dotOperators":352,"./inject/globals":353,"./inject/numbers":354,"./inject/references":355,"./inject/strings":356,"./inputArgs":357,"./isDflowFun":359,"./level":360,"./regex/argument":363,"./regex/comment":364,"./regex/dotOperator":365,"./regex/subgraph":368,"./reservedKeys":369,"./validate":370,"./walkGlobal":371,"not-defined":122}],346:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -56438,6 +56439,36 @@ exports.now = function () {
 };
 
 },{"not-defined":122}],347:[function(require,module,exports){
+"use strict";
+
+exports.document = function () {
+  return document;
+};
+
+exports.body = function () {
+  return document.body;
+};
+
+exports.head = function () {
+  return document.head;
+};
+
+exports.window = function () {
+  return window;
+};
+
+exports.AudioContext = function () {
+  var WebAudio = window.AudioContext || window.webkitAudioContext;
+  return new WebAudio();
+};
+
+exports.innerHTML = function (node, content) {
+  node.innerHTML = content;
+
+  return node;
+};
+
+},{}],348:[function(require,module,exports){
 'use strict';
 
 var no = require('not-defined');
@@ -56489,7 +56520,7 @@ function injectAccessors(funcs, graph) {
 
 module.exports = injectAccessors;
 
-},{"../regex/accessor":361,"not-defined":122}],348:[function(require,module,exports){
+},{"../regex/accessor":362,"not-defined":122}],349:[function(require,module,exports){
 'use strict';
 
 var no = require('not-defined');
@@ -56520,7 +56551,7 @@ function injectAdditionalFunctions(funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions;
 
-},{"not-defined":122}],349:[function(require,module,exports){
+},{"not-defined":122}],350:[function(require,module,exports){
 'use strict';
 
 var regexArgument = require('../regex/argument');
@@ -56563,7 +56594,7 @@ function injectArguments(funcs, task, args) {
 
 module.exports = injectArguments;
 
-},{"../regex/argument":362}],350:[function(require,module,exports){
+},{"../regex/argument":363}],351:[function(require,module,exports){
 'use strict';
 
 /**
@@ -56600,7 +56631,7 @@ function arrowFunctions(funcs, task) {
 
 module.exports = arrowFunctions;
 
-},{}],351:[function(require,module,exports){
+},{}],352:[function(require,module,exports){
 'use strict';
 
 var regexDotOperator = require('../regex/dotOperator');
@@ -56679,7 +56710,7 @@ function injectDotOperators(funcs, task) {
 
 module.exports = injectDotOperators;
 
-},{"../regex/dotOperator":364}],352:[function(require,module,exports){
+},{"../regex/dotOperator":365}],353:[function(require,module,exports){
 'use strict';
 
 var no = require('not-defined');
@@ -56726,7 +56757,7 @@ function injectGlobals(funcs, task) {
 
 module.exports = injectGlobals;
 
-},{"../reservedKeys":368,"../walkGlobal":370,"not-defined":122}],353:[function(require,module,exports){
+},{"../reservedKeys":369,"../walkGlobal":371,"not-defined":122}],354:[function(require,module,exports){
 "use strict";
 
 /**
@@ -56760,7 +56791,7 @@ function injectNumbers(funcs, task) {
 
 module.exports = injectNumbers;
 
-},{}],354:[function(require,module,exports){
+},{}],355:[function(require,module,exports){
 'use strict';
 
 var regexReference = require('../regex/reference');
@@ -56811,7 +56842,7 @@ function injectReferences(funcs, task) {
 
 module.exports = injectReferences;
 
-},{"../regex/reference":366,"../walkGlobal":370}],355:[function(require,module,exports){
+},{"../regex/reference":367,"../walkGlobal":371}],356:[function(require,module,exports){
 'use strict';
 
 var regexQuoted = require('../regex/quoted');
@@ -56843,7 +56874,7 @@ function injectStrings(funcs, task) {
 
 module.exports = injectStrings;
 
-},{"../regex/quoted":365}],356:[function(require,module,exports){
+},{"../regex/quoted":366}],357:[function(require,module,exports){
 'use strict';
 
 var inputPipes = require('./inputPipes');
@@ -56876,7 +56907,7 @@ function inputArgs(outs, pipe, taskKey) {
 
 module.exports = inputArgs;
 
-},{"./inputPipes":357}],357:[function(require,module,exports){
+},{"./inputPipes":358}],358:[function(require,module,exports){
 "use strict";
 
 /**
@@ -56906,7 +56937,7 @@ function inputPipes(pipe, taskKey) {
 
 module.exports = inputPipes;
 
-},{}],358:[function(require,module,exports){
+},{}],359:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -56940,7 +56971,7 @@ function isDflowFun(f) {
 
 module.exports = isDflowFun;
 
-},{"./validate":369}],359:[function(require,module,exports){
+},{"./validate":370}],360:[function(require,module,exports){
 'use strict';
 
 var parents = require('./parents');
@@ -56977,7 +57008,7 @@ function level(pipe, cachedLevelOf, taskKey) {
 
 module.exports = level;
 
-},{"./parents":360}],360:[function(require,module,exports){
+},{"./parents":361}],361:[function(require,module,exports){
 'use strict';
 
 var inputPipes = require('./inputPipes');
@@ -57006,50 +57037,50 @@ function parents(pipe, taskKey) {
 
 module.exports = parents;
 
-},{"./inputPipes":357}],361:[function(require,module,exports){
+},{"./inputPipes":358}],362:[function(require,module,exports){
 "use strict";
 
 module.exports = /^@[\w][\w\d]+$/;
 
-},{}],362:[function(require,module,exports){
+},{}],363:[function(require,module,exports){
 "use strict";
 
 module.exports = /^arguments\[(\d+)\]$/;
 
-},{}],363:[function(require,module,exports){
+},{}],364:[function(require,module,exports){
 "use strict";
 
 module.exports = /^\/\/.+$/;
 
-},{}],364:[function(require,module,exports){
+},{}],365:[function(require,module,exports){
 "use strict";
 
 exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/;
 
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/;
 
-},{}],365:[function(require,module,exports){
+},{}],366:[function(require,module,exports){
 "use strict";
 
 module.exports = /^'.+'$/;
 
-},{}],366:[function(require,module,exports){
+},{}],367:[function(require,module,exports){
 "use strict";
 
 module.exports = /^&(.+)$/;
 
-},{}],367:[function(require,module,exports){
+},{}],368:[function(require,module,exports){
 "use strict";
 
 module.exports = /^\/[\w][\w\d]+$/;
 
-},{}],368:[function(require,module,exports){
+},{}],369:[function(require,module,exports){
 'use strict';
 
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = ['arguments', 'dflow.fun', 'dflow.isDflowFun', 'dflow.validate', 'return', 'this', 'this.graph'];
 
-},{}],369:[function(require,module,exports){
+},{}],370:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -57213,7 +57244,7 @@ function validate(graph, additionalFunctions) {
 
 module.exports = validate;
 
-},{"./regex/accessor":361,"./regex/argument":362,"./regex/dotOperator":364,"./regex/reference":366,"./regex/subgraph":367,"./reservedKeys":368,"not-defined":122}],370:[function(require,module,exports){
+},{"./regex/accessor":362,"./regex/argument":363,"./regex/dotOperator":365,"./regex/reference":367,"./regex/subgraph":368,"./reservedKeys":369,"not-defined":122}],371:[function(require,module,exports){
 (function (global){
 'use strict';
 
