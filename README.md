@@ -75,7 +75,7 @@ which will clone repo, install deps, start the *dflow* cli and open your browser
 
 ## Support and License
 
-*dflow* is [MIT](http://g14n.info/mit-license) licensed.
+*dflow* is [MIT](http://g14n.info/mit-license) licensed, yes you can use it to build a product on top of it!
 
 I wrote few times a [Dataflow engine][dataflow-wikipedia], the first one was PNI (Perl Node Interface) and the design evolved until I could say confidently that **dflow is here to stay**.
 
