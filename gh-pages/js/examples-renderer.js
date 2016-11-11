@@ -52415,6 +52415,7 @@ exports.default = ignoreEvent;
 function ignoreEvent(e) {
   e.preventDefault();
   e.stopPropagation();
+  return false;
 }
 
 },{}],282:[function(require,module,exports){
@@ -52452,7 +52453,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {Boolean}
  */
 function noInputTask(taskName) {
-  if (taskName === 'console.log') return false;
+  if (taskName.split('.')[0] === 'console') return false;
 
   if (_argument2.default.test(taskName)) return true;
   if (_reference2.default.test(taskName)) return true;
@@ -52485,6 +52486,10 @@ var _builtin = require('../../../engine/functions/builtin');
 
 var _builtin2 = _interopRequireDefault(_builtin);
 
+var _accessor = require('../../../engine/regex/accessor');
+
+var _accessor2 = _interopRequireDefault(_accessor);
+
 var _dotOperator = require('../../../engine/regex/dotOperator');
 
 var _dotOperator2 = _interopRequireDefault(_dotOperator);
@@ -52501,6 +52506,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 function singleInputTask(taskName) {
+  if (_accessor2.default.test(taskName)) return true;
   if (_dotOperator2.default.attr.test(taskName)) return true;
   if (_dotOperator2.default.func.test(taskName)) return false;
 
@@ -52518,7 +52524,7 @@ function singleInputTask(taskName) {
   return singleInputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":288,"../../../engine/regex/dotOperator":307,"../../../engine/walkGlobal":313}],284:[function(require,module,exports){
+},{"../../../engine/functions/builtin":288,"../../../engine/regex/accessor":304,"../../../engine/regex/dotOperator":307,"../../../engine/walkGlobal":313}],284:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52732,8 +52738,12 @@ function fun (graph, additionalFunctions) {
     if (regexSubgraph.test(taskName)) {
       var subgraphKey = taskName.substring(1)
 
-      if (no(graph.func[subgraphKey])) throw new Error(msg)
-      else return
+      if (no(graph.func[subgraphKey])) {
+        var subgraphNotFound = new Error(msg)
+        subgraphNotFound.taskKey = taskKey
+        subgraphNotFound.taskName = taskName
+        throw subgraphNotFound
+      } else return
     }
 
     // Skip arguments[0] ... arguments[N].
@@ -52746,7 +52756,12 @@ function fun (graph, additionalFunctions) {
     // Skip globals.
     if (walkGlobal(taskName)) return
 
-    if (no(funcs[taskName])) throw new Error(msg)
+    if (no(funcs[taskName])) {
+      var subgraphNotCompiled = new Error(msg)
+      subgraphNotCompiled.taskKey = taskKey
+      subgraphNotCompiled.taskName = taskName
+      throw subgraphNotCompiled
+    }
   }
 
   // Check if there is some missing task.
@@ -52760,10 +52775,8 @@ function fun (graph, additionalFunctions) {
 
   function dflowFun () {
     var gotReturn = false
-    var outs = {}
     var returnValue
-
-    var inputArgsOf = inputArgs.bind(null, outs, pipe)
+    var outs = {}
 
     // Inject run-time builtin tasks.
 
@@ -52776,12 +52789,13 @@ function fun (graph, additionalFunctions) {
      */
 
     function run (taskKey) {
-      var args = inputArgsOf(taskKey)
+      var args = inputArgs(outs, pipe, taskKey)
       var taskName = task[taskKey]
       var f = funcs[taskName]
 
       // Behave like a JavaScript function:
       // if found a return, skip all other tasks.
+
       if (gotReturn) return
 
       if ((taskName === 'return') && (!gotReturn)) {
@@ -52791,19 +52805,28 @@ function fun (graph, additionalFunctions) {
       }
 
       // If task is not defined at run time, throw an error.
+
       if (no(f)) {
-        throw new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
+        var taskNotFound = new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
+        taskNotFound.taskKey = taskKey
+        taskNotFound.taskName = taskName
       }
 
       // Try to execute task.
+
       try {
         outs[taskKey] = f.apply(null, args)
       } catch (err) {
+        // Enrich error with useful dflow task info.
+        err.taskName = taskName
+        err.taskKey = taskKey
+
         throw err
       }
     }
 
     // Run every graph task, sorted by level.
+
     Object.keys(task)
           .filter(comments)
           .sort(byLevel)
@@ -52813,6 +52836,7 @@ function fun (graph, additionalFunctions) {
   }
 
   // Remember function was created from a dflow graph.
+
   dflowFun.graph = graph
 
   return dflowFun
@@ -53556,7 +53580,9 @@ function parents (pipe, taskKey) {
 module.exports = parents
 
 },{"./inputPipes":300}],304:[function(require,module,exports){
-module.exports = /^@[\w][\w\d]+$/
+"use strict";
+
+module.exports = /^@[\w][\w\d]+$/;
 
 },{}],305:[function(require,module,exports){
 "use strict";

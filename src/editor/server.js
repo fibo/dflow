@@ -1,15 +1,18 @@
-const no = require('not-defined')
-const read = require('read-file-utf8')
-const express = require('express')
-const path = require('path')
-const opn = require('opn')
-const internalIp = require('internal-ip')
+const bodyParser = require('body-parser')
 const debug = require('debug')('dflow')
+const express = require('express')
+const internalIp = require('internal-ip')
+const no = require('not-defined')
+const opn = require('opn')
+const path = require('path')
+const read = require('read-file-utf8')
+const write = require('write-file-utf8')
 
 const app = express()
 const http = require('http').Server(app)
 
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
@@ -25,7 +28,12 @@ app.get('/graph', (req, res) => {
 
 app.put('/graph', (req, res) => {
   debug('update graph')
-  // TODO write to file
+  // TODO why using a JSON body parser when it is only needed to
+  // write the content in a file? Using express could be avoided.
+  write(graphPath, JSON.stringify(req.body), (err) => {
+    if (err) res.status(500).json({ ok: false })
+    else res.json({ ok: true })
+  })
 })
 
 function start (opt) {

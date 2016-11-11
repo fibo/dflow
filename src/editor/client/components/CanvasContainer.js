@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 
 class CanvasContainer extends Component {
   componentDidMount () {
-    this.props.fetchGraphIfNeeded()
+    this.props.readGraphIfNeeded()
   }
 
   render () {

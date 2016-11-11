@@ -1,22 +1,21 @@
-import fetch from 'isomorphic-fetch'
 import no from 'not-defined'
 
 import {
-  checkStatus,
-  parseJSON,
-  prepareRequest
+  get,
+  prepareRequest,
+  put
 } from '../utils/fetch'
-
-export const createNode = (node, nodeId) => ({
-  type: 'CREATE_NODE',
-  node,
-  nodeId
-})
 
 export const createLink = (link, linkId) => ({
   type: 'CREATE_LINK',
   link,
   linkId
+})
+
+export const createNode = (node, nodeId) => ({
+  type: 'CREATE_NODE',
+  node,
+  nodeId
 })
 
 export const deleteLink = (linkId) => ({
@@ -37,34 +36,40 @@ export const enableAutorun = () => ({
   type: 'ENABLE_AUTORUN'
 })
 
-function fetchGraph () {
-  return (dispatch) => {
-    const { receiveData, responseFailure } = prepareRequest(dispatch, 'FETCH_GRAPH')
+export const invalidNode = (nodeId, error) => ({
+  type: 'INVALID_NODE',
+  nodeId,
+  error
+})
 
-    return fetch('/graph')
-      .then(checkStatus)
-      .then(parseJSON)
+function readGraph () {
+  return (dispatch) => {
+    const { receiveData, responseFailure } = prepareRequest(dispatch, 'READ_GRAPH')
+
+    return get('/graph')
       .then(receiveData)
       .catch(responseFailure)
   }
 }
 
-export function fetchGraphIfNeeded () {
+export function readGraphIfNeeded () {
   return (dispatch, getState) => {
-    if (shouldFetchGraph(getState())) {
-      return dispatch(fetchGraph())
+    if (shouldReadGraph(getState())) {
+      return dispatch(readGraph())
     }
   }
 }
 
-export function invalidNode (nodeId, error) {
-  return {
-    type: 'INVALID_NODE',
-    nodeId,
-    error
+export function updateGraph (graph) {
+  return (dispatch) => {
+    const { receiveData, responseFailure } = prepareRequest(dispatch, 'UPDATE_GRAPH')
+
+    return put('/graph', graph)
+      .then(receiveData)
+      .catch(responseFailure)
   }
 }
 
-function shouldFetchGraph (state) {
+function shouldReadGraph (state) {
   return no(state.when_downloaded)
 }
