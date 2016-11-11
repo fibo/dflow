@@ -15,7 +15,6 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## TODO
 
-- Save button
 - Add drag node event to flow-view, otherwise no event is fired when moving nodes
 - Custom canvas node???
 - Fix toggle, make it work. It depends on blur event set by flow-view Inspector
@@ -26,11 +25,14 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
+## [v0.17.1] - 2016-11-11
+
 ### Added
 
 - Autorun input checkbox.
 - Runtime error enriched with task info.
 - Can create subgraphs.
+- Save button.
 
 ### Changed
 

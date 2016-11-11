@@ -9,8 +9,9 @@ class Root extends Component {
       disableAutorun,
       editor,
       enableAutorun,
-      fetchGraphIfNeeded,
-      graph
+      graph,
+      readGraphIfNeeded,
+      updateGraph
     } = this.props
 
     return (
@@ -24,7 +25,11 @@ class Root extends Component {
               >Download</a>
             </li>
             <li>
-              <button>Save</button>
+              <button
+                onClick={() => { updateGraph(graph) }}
+              >
+                Save
+              </button>
             </li>
             <li>
               <form>
@@ -42,7 +47,7 @@ class Root extends Component {
           </ul>
         </nav>
         <CanvasContainer
-          fetchGraphIfNeeded={fetchGraphIfNeeded}
+          readGraphIfNeeded={readGraphIfNeeded}
         />
       </div>
     )
@@ -50,7 +55,10 @@ class Root extends Component {
 }
 
 Root.propTypes = {
-  fetchGraphIfNeeded: PropTypes.func.isRequired
+  disableAutorun: PropTypes.func.isRequired,
+  enableAutorun: PropTypes.func.isRequired,
+  readGraphIfNeeded: PropTypes.func.isRequired,
+  updateGraph: PropTypes.func.isRequired
 }
 
 export default Root

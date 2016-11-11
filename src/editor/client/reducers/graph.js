@@ -93,19 +93,28 @@ export default function (state = initialState, action) {
 
       return Object.assign({}, graph, { task, pipe })
 
-    case 'FETCH_GRAPH_FAILURE':
-      return graph
-
-    case 'FETCH_GRAPH_REQUEST':
-      return graph
-
-    case 'FETCH_GRAPH_SUCCESS':
-      return Object.assign({}, action.data)
-
     case 'INVALID_NODE':
       view.node[nodeId].error = error
 
       return Object.assign({}, graph, { view })
+
+    case 'READ_GRAPH_FAILURE':
+      return graph
+
+    case 'READ_GRAPH_REQUEST':
+      return graph
+
+    case 'READ_GRAPH_SUCCESS':
+      return Object.assign({}, action.data)
+
+    case 'UPDATE_GRAPH_FAILURE':
+      return graph
+
+    case 'UPDATE_GRAPH_REQUEST':
+      return graph
+
+    case 'UPDATE_GRAPH_SUCCESS':
+      return graph
 
     default:
       return graph

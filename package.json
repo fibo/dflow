@@ -81,6 +81,7 @@
     "visual"
   ],
   "dependencies": {
+    "body-parser": "^1.15.1",
     "debug": "^2.2.0",
     "express": "^5.0.0-alpha.2",
     "internal-ip": "1.x",
@@ -88,7 +89,7 @@
     "not-defined": "1.x",
     "opn": "4.x",
     "read-file-utf8": "1.x",
-    "write-file-utf8": "1.2.0"
+    "write-file-utf8": "^1.2.0"
   },
   "devDependencies": {
     "babel-preset-es2015": "6.x",

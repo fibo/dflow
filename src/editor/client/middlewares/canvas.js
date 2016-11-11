@@ -21,7 +21,7 @@ export default function canvasMiddleware (store) {
   return (next) => (action) => {
     const result = next(action)
 
-    if (action.type === 'FETCH_GRAPH_SUCCESS') {
+    if (action.type === 'READ_GRAPH_SUCCESS') {
       const graph = action.data
 
       const data = graph.data
