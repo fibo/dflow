@@ -27,10 +27,12 @@ app.get('/graph', (req, res) => {
 })
 
 app.put('/graph', (req, res) => {
+  graph = req.body
+
   debug('update graph')
   // TODO why using a JSON body parser when it is only needed to
   // write the content in a file? Using express could be avoided.
-  write(graphPath, JSON.stringify(req.body), (err) => {
+  write(graphPath, JSON.stringify(graph), (err) => {
     if (err) res.status(500).json({ ok: false })
     else res.json({ ok: true })
   })
