@@ -25,6 +25,10 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
+###
+
+- WebAudio context
+
 ## [v0.17.1] - 2016-11-11
 
 ### Added

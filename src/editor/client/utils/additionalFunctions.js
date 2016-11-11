@@ -1,3 +1,5 @@
+import windowFunctions from '../../../engine/functions/window'
+
 const logger = document.getElementById('dflow-console')
 
 function consoleLog () {
@@ -12,13 +14,11 @@ function consoleLog () {
   }
 }
 
-function dflowPreview () {
-  return document.getElementById('dflow-preview')
-}
-
-const additionalFunctions = {
-  'body': dflowPreview,
-  'console.log': consoleLog
-}
+const additionalFunctions = Object.assign({},
+  windowFunctions,
+  {
+    'console.log': consoleLog
+  }
+)
 
 export default additionalFunctions

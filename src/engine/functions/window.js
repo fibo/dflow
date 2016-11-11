@@ -15,7 +15,8 @@ exports.window = function () {
 }
 
 exports.AudioContext = function () {
-  return window.AudioContext || window.webkitAudioContext
+  const WebAudio = window.AudioContext || window.webkitAudioContext
+  return new WebAudio()
 }
 
 exports.innerHTML = function (node, content) {

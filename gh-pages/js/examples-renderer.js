@@ -53029,8 +53029,8 @@ exports.window = function () {
   return window
 }
 
-exports.AudioContext = function () {
-  return window.AudioContext || window.webkitAudioContext
+exports.WebAudio = function () {
+  return new window.AudioContext()
 }
 
 exports.innerHTML = function (node, content) {
