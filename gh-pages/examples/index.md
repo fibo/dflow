@@ -15,7 +15,6 @@ List of example graphs:
 * [createParagraph](http://g14n.info/dflow/examples/createParagraph.html)
 * [dateParse](http://g14n.info/dflow/examples/dateParse.html)
 * [dotOperator](http://g14n.info/dflow/examples/dotOperator.html)
-* [indexOf](http://g14n.info/dflow/examples/indexOf.html)
 * [new](http://g14n.info/dflow/examples/new.html)
 * [or](http://g14n.info/dflow/examples/or.html)
 * [welcome](http://g14n.info/dflow/examples/welcome.html)
@@ -62,6 +61,6 @@ For a more complete example, see [npm-package-template](https://github.com/fibo/
 
 [hello-world]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
 [apply]: http://g14n.info/dflow/examples/apply.html "apply"
-[indexOf]: http://g14n.info/dflow/examples/indexOf.html "indexOf"
+[indexOf]: http://g14n.info/dflow/examples/index-of.html "indexOf"
 [sum]: http://g14n.info/dflow/examples/sum.html "sum"
 
