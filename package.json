@@ -12,7 +12,7 @@
   "main": "index.js",
   "browser": "./src/engine/context/client-window.js",
   "scripts": {
-    "build": "npm test && npm run postcss && npm run browserify && npm run minify && npm run jekyll; npm run git_add-f; git status",
+    "build": "npm test && npm run postcss && npm run browserify && npm run minify && npm run svg && npm run jekyll; npm run git_add-f; git status",
     "browserify": "for x in dist examples test_engine; do npm run browserify_$x; done",
     "browserify_dist": "NODE_ENV=production browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
     "browserify_editor": "npm run lint_editor && NODE_ENV=production browserify -t babelify src/editor/client/index.js -o src/editor/public/bundle.js",
