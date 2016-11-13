@@ -8645,34 +8645,34 @@ module.exports = warning;
       value: function render() {
         var _this2 = this;
 
-        var _props = this.props;
-        var createInputPin = _props.createInputPin;
-        var createOutputPin = _props.createOutputPin;
-        var createLink = _props.createLink;
-        var _createNode = _props.createNode;
-        var deleteLink = _props.deleteLink;
-        var deleteInputPin = _props.deleteInputPin;
-        var deleteNode = _props.deleteNode;
-        var deleteOutputPin = _props.deleteOutputPin;
-        var dragItems = _props.dragItems;
-        var fontFamily = _props.fontFamily;
-        var fontSize = _props.fontSize;
-        var item = _props.item;
-        var lineWidth = _props.lineWidth;
-        var model = _props.model;
-        var nodeBodyHeight = _props.nodeBodyHeight;
-        var pinSize = _props.pinSize;
-        var _renameNode = _props.renameNode;
-        var style = _props.style;
-        var updateLink = _props.updateLink;
-        var view = _props.view;
-        var _state = this.state;
-        var draggedItems = _state.draggedItems;
-        var draggedLinkId = _state.draggedLinkId;
-        var offset = _state.offset;
-        var pointer = _state.pointer;
-        var selectedItems = _state.selectedItems;
-        var showSelector = _state.showSelector;
+        var _props = this.props,
+            createInputPin = _props.createInputPin,
+            createOutputPin = _props.createOutputPin,
+            createLink = _props.createLink,
+            _createNode = _props.createNode,
+            deleteLink = _props.deleteLink,
+            deleteInputPin = _props.deleteInputPin,
+            deleteNode = _props.deleteNode,
+            deleteOutputPin = _props.deleteOutputPin,
+            dragItems = _props.dragItems,
+            fontFamily = _props.fontFamily,
+            fontSize = _props.fontSize,
+            item = _props.item,
+            lineWidth = _props.lineWidth,
+            model = _props.model,
+            nodeBodyHeight = _props.nodeBodyHeight,
+            pinSize = _props.pinSize,
+            _renameNode = _props.renameNode,
+            style = _props.style,
+            updateLink = _props.updateLink,
+            view = _props.view;
+        var _state = this.state,
+            draggedItems = _state.draggedItems,
+            draggedLinkId = _state.draggedLinkId,
+            offset = _state.offset,
+            pointer = _state.pointer,
+            selectedItems = _state.selectedItems,
+            showSelector = _state.showSelector;
 
 
         var height = view.height;
@@ -8917,13 +8917,13 @@ module.exports = warning;
           Object.keys(view.node).sort(selectedFirst).map(function (id, i) {
             var node = view.node[id];
 
-            var height = node.height;
-            var ins = node.ins;
-            var outs = node.outs;
-            var text = node.text;
-            var width = node.width;
-            var x = node.x;
-            var y = node.y;
+            var height = node.height,
+                ins = node.ins,
+                outs = node.outs,
+                text = node.text,
+                width = node.width,
+                x = node.x,
+                y = node.y;
 
 
             var nodeType = typeOfNode(node);
@@ -8952,9 +8952,9 @@ module.exports = warning;
             });
           }),
           Object.keys(view.link).map(function (id, i) {
-            var _view$link$id = view.link[id];
-            var from = _view$link$id.from;
-            var to = _view$link$id.to;
+            var _view$link$id = view.link[id],
+                from = _view$link$id.from,
+                to = _view$link$id.to;
 
 
             var x1 = null;
@@ -9227,12 +9227,12 @@ module.exports = warning;
     _createClass(Inspector, [{
       key: 'render',
       value: function render() {
-        var _props = this.props;
-        var items = _props.items;
-        var view = _props.view;
-        var width = _props.width;
-        var x = _props.x;
-        var y = _props.y;
+        var _props = this.props,
+            items = _props.items,
+            view = _props.view,
+            width = _props.width,
+            x = _props.x,
+            y = _props.y;
 
 
         // TODO implement multiple item selection.
@@ -9294,10 +9294,10 @@ module.exports = warning;
     }, {
       key: 'renderInsControls',
       value: function renderInsControls(nodeId, node) {
-        var _props2 = this.props;
-        var createInputPin = _props2.createInputPin;
-        var deleteInputPin = _props2.deleteInputPin;
-        var view = _props2.view;
+        var _props2 = this.props,
+            createInputPin = _props2.createInputPin,
+            deleteInputPin = _props2.deleteInputPin,
+            view = _props2.view;
 
 
         var ins = node.ins || [];
@@ -9340,10 +9340,10 @@ module.exports = warning;
     }, {
       key: 'renderOutsControls',
       value: function renderOutsControls(nodeId, node) {
-        var _props3 = this.props;
-        var createOutputPin = _props3.createOutputPin;
-        var deleteOutputPin = _props3.deleteOutputPin;
-        var view = _props3.view;
+        var _props3 = this.props,
+            createOutputPin = _props3.createOutputPin,
+            deleteOutputPin = _props3.deleteOutputPin,
+            view = _props3.view;
 
 
         var outs = node.outs || [];
@@ -9386,9 +9386,9 @@ module.exports = warning;
     }, {
       key: 'renderNode',
       value: function renderNode(nodeId, node) {
-        var _props4 = this.props;
-        var deleteNode = _props4.deleteNode;
-        var renameNode = _props4.renameNode;
+        var _props4 = this.props,
+            deleteNode = _props4.deleteNode,
+            renameNode = _props4.renameNode;
 
 
         var setState = this.setState.bind(this);
@@ -9600,21 +9600,21 @@ module.exports = warning;
     _createClass(Link, [{
       key: 'render',
       value: function render() {
-        var _props = this.props;
-        var id = _props.id;
-        var fill = _props.fill;
-        var from = _props.from;
-        var onCreateLink = _props.onCreateLink;
-        var startDraggingLinkTarget = _props.startDraggingLinkTarget;
-        var pinSize = _props.pinSize;
-        var selected = _props.selected;
-        var selectLink = _props.selectLink;
-        var to = _props.to;
-        var width = _props.width;
-        var x1 = _props.x1;
-        var y1 = _props.y1;
-        var x2 = _props.x2;
-        var y2 = _props.y2;
+        var _props = this.props,
+            id = _props.id,
+            fill = _props.fill,
+            from = _props.from,
+            onCreateLink = _props.onCreateLink,
+            startDraggingLinkTarget = _props.startDraggingLinkTarget,
+            pinSize = _props.pinSize,
+            selected = _props.selected,
+            selectLink = _props.selectLink,
+            to = _props.to,
+            width = _props.width,
+            x1 = _props.x1,
+            y1 = _props.y1,
+            x2 = _props.x2,
+            y2 = _props.y2;
 
 
         var onSourceMouseDown = function onSourceMouseDown(e) {
@@ -9795,11 +9795,11 @@ module.exports = warning;
     _createClass(Node, [{
       key: 'getBody',
       value: function getBody() {
-        var _props = this.props;
-        var bodyHeight = _props.bodyHeight;
-        var fontSize = _props.fontSize;
-        var pinSize = _props.pinSize;
-        var text = _props.text;
+        var _props = this.props,
+            bodyHeight = _props.bodyHeight,
+            fontSize = _props.fontSize,
+            pinSize = _props.pinSize,
+            text = _props.text;
 
 
         // TODO place an id in the div wrapping the body and try to
@@ -9855,25 +9855,25 @@ module.exports = warning;
     }, {
       key: 'render',
       value: function render() {
-        var _props2 = this.props;
-        var bodyHeight = _props2.bodyHeight;
-        var dragged = _props2.dragged;
-        var draggedLinkId = _props2.draggedLinkId;
-        var color = _props2.color;
-        var fontSize = _props2.fontSize;
-        var id = _props2.id;
-        var ins = _props2.ins;
-        var onCreateLink = _props2.onCreateLink;
-        var outs = _props2.outs;
-        var pinSize = _props2.pinSize;
-        var selected = _props2.selected;
-        var selectNode = _props2.selectNode;
-        var text = _props2.text;
-        var updateLink = _props2.updateLink;
-        var width = _props2.width;
-        var willDragNode = _props2.willDragNode;
-        var x = _props2.x;
-        var y = _props2.y;
+        var _props2 = this.props,
+            bodyHeight = _props2.bodyHeight,
+            dragged = _props2.dragged,
+            draggedLinkId = _props2.draggedLinkId,
+            color = _props2.color,
+            fontSize = _props2.fontSize,
+            id = _props2.id,
+            ins = _props2.ins,
+            onCreateLink = _props2.onCreateLink,
+            outs = _props2.outs,
+            pinSize = _props2.pinSize,
+            selected = _props2.selected,
+            selectNode = _props2.selectNode,
+            text = _props2.text,
+            updateLink = _props2.updateLink,
+            width = _props2.width,
+            willDragNode = _props2.willDragNode,
+            x = _props2.x,
+            y = _props2.y;
 
 
         var bodyContent = this.getBody();
@@ -10122,18 +10122,18 @@ module.exports = warning;
       value: function render() {
         var _this2 = this;
 
-        var _props = this.props;
-        var createNode = _props.createNode;
-        var height = _props.height;
-        var pointer = _props.pointer;
-        var show = _props.show;
-        var width = _props.width;
+        var _props = this.props,
+            createNode = _props.createNode,
+            height = _props.height,
+            pointer = _props.pointer,
+            show = _props.show,
+            width = _props.width;
 
 
         var text = this.state.text;
 
         var onChange = function onChange(e) {
-          var text = e.target.value.trim();
+          var text = e.target.value;
           _this2.setState({ text: text });
         };
 
@@ -10328,10 +10328,10 @@ module.exports = warning;
   });
 
   var computeNodeWidth = function computeNodeWidth(_ref) {
-    var bodyHeight = _ref.bodyHeight;
-    var pinSize = _ref.pinSize;
-    var fontSize = _ref.fontSize;
-    var node = _ref.node;
+    var bodyHeight = _ref.bodyHeight,
+        pinSize = _ref.pinSize,
+        fontSize = _ref.fontSize,
+        node = _ref.node;
 
     var ins = node.ins || [];
     var outs = node.outs || [];
@@ -53029,8 +53029,9 @@ exports.window = function () {
   return window
 }
 
-exports.WebAudio = function () {
-  return new window.AudioContext()
+exports.AudioContext = function () {
+  const WebAudio = window.AudioContext || window.webkitAudioContext
+  return new WebAudio()
 }
 
 exports.innerHTML = function (node, content) {
@@ -54176,7 +54177,8 @@ module.exports={
 }
 
 },{}],317:[function(require,module,exports){
-module.exports={"data":{"message":"Hello World, by dflow","results":[]},"info":{},"pipe":{"ihs":["dnq","2"]},"task":{"2":"console.log","dnq":"@message"},"view":{"node":{"2":{"x":80,"y":150,"w":15,"task":"2","text":"console.log","ins":[{"name":"in0"}]},"dnq":{"text":"@message","x":269,"y":25,"outs":["out"]}},"link":{"ihs":{"from":["dnq",0],"to":["2",0]}}}}
+module.exports={"data":{},"info":{},"pipe":{"lxf":["ypj","2"]},"task":{"2":"console.log","ypj":"'Hello world'"},"view":{"node":{"2":{"x":149,"y":154,"w":15,"task":"2","text":"console.log","ins":[{"name":"in0"}]},"ypj":{"text":"'Hello world'","x":138,"y":31,"outs":["out"]}},"link":{"lxf":{"from":["ypj",0],"to":["2",0]}}}}
+
 },{}],318:[function(require,module,exports){
 'use strict';
 

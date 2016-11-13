@@ -353,8 +353,9 @@ exports.window = function () {
   return window
 }
 
-exports.WebAudio = function () {
-  return new window.AudioContext()
+exports.AudioContext = function () {
+  const WebAudio = window.AudioContext || window.webkitAudioContext
+  return new WebAudio()
 }
 
 exports.innerHTML = function (node, content) {
