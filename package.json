@@ -81,9 +81,7 @@
     "visual"
   ],
   "dependencies": {
-    "body-parser": "^1.15.1",
     "debug": "^2.2.0",
-    "express": "^5.0.0-alpha.2",
     "internal-ip": "1.x",
     "nopt": "3.x",
     "not-defined": "1.x",
