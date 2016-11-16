@@ -13,6 +13,10 @@ class CanvasContainer extends Component {
     return (
       <div
         id={id}
+        style={{
+          height: '100%',
+          width: '100%'
+        }}
       />
     )
   }

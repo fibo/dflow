@@ -36,15 +36,15 @@
     "jekyll": "npm run homepage; npm run gh-pages:_data; cd gh-pages; jekyll build; cd ..",
     "lint": "for x in cli css engine editor test; do npm run lint_$x; done",
     "lint_cli": "cd src/cli; standard; standard dflow; cd -",
-    "lint_css": "cd src/editor/client/styles; stylelint *css */*css; cd ..",
+    "lint_css": "sass-lint -v src/editor/client/sass/*",
     "lint_engine": "cd src/engine; standard; cd -",
     "lint_editor": "cd src/editor; standard; cd -",
     "lint_test": "cd test; standard --global describe --global it; cd -",
     "minify": "cd dist; uglifyjs ${npm_package_name}.js --source-map ${npm_package_name}.map --output ${npm_package_name}.min.js --compress --mangle --preamble \"// Software: ${npm_package_name}\n// Homepage: ${npm_package_homepage}\n// License: ${npm_package_license}\"; cd -",
-    "postcss": "npm run lint_css && postcss --config postcss.json",
     "postversion": "git push origin v${npm_package_version}; npm publish; npm run push",
     "pull": "git pull origin master && npm run gh-pages:pull",
     "push": "git push origin master && npm run gh-pages:push",
+    "sass": "node-sass src/editor/client/sass/style.scss --output src/editor/client/public",
     "start": "DEBUG=dflow node src/cli/dflow --open",
     "svg": "for x in apply hello-world indexOf sum; do node src/examples/renderer/server-side.js $x; done",
     "test": "NODE_PATH=src mocha",
@@ -64,17 +64,11 @@
       ]
     },
     "homepage": "README.md",
-    "postcss": {
-      "extensions": "css,scss",
-      "patterns": "src/editor/client/styles/"
-    }
+    "sass": "src/editor/client/sass"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/fibo/dflow.git"
-  },
-  "stylelint": {
-    "extends": "stylelint-config-standard"
   },
   "keywords": [
     "dataflow",
@@ -97,27 +91,23 @@
     "babelify": "7.x",
     "brfs": "1.x",
     "browserify": "13.x",
-    "cssnano": "^3.8.0",
+    "dot-editorconfig": "^0.3.0",
     "flow-view": "^2.8.1",
     "isomorphic-fetch": "2.x",
     "istanbul": "^0.4.3",
     "mocha": "3.x",
     "mocha-lcov-reporter": "1.x",
-    "normalize.css": "5.x",
+    "node-sass": "^3.13.0",
     "npm-watch": "^0.1.6",
-    "postcss-cli": "2.x",
-    "postcss-import": "8.x",
     "pre-commit": "1.x",
-    "precss": "1.x",
     "react": "15.x",
     "react-dom": "15.x",
     "react-redux": "4.x",
     "redux": "3.x",
     "redux-thunk": "2.x",
+    "sass-lint": "^1.10.2",
     "should": "11.x",
     "standard": "8.x",
-    "stylelint": "7.x",
-    "stylelint-config-standard": "14.x",
     "uglify-js": "2.x"
   }
 }
