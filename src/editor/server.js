@@ -1,16 +1,13 @@
 const debug = require('debug')('dflow')
 const http = require('http')
-const internalIp = require('internal-ip')
-const no = require('not-defined')
-const opn = require('opn')
 const path = require('path')
 const read = require('read-file-utf8')
+/*
 // const write = require('write-file-utf8')
 
 var graphPath = null
 var graph = null
 
-/*
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(bodyParser.json())
 
@@ -67,8 +64,7 @@ const server = http.createServer((req, res) => {
     case 'PUT':
       switch (url) {
         case '/graph':
-          res.writeHead(200, {'Content-Type': 'application/json'})
-          res.end(read(graphPath))
+          // TODO write req.body to file
           break
 
         default: res.end()
@@ -78,24 +74,4 @@ const server = http.createServer((req, res) => {
   }
 })
 
-function start (opt) {
-  if (no(opt)) opt = {}
-
-  // TODO opt.port
-  const port = 3000
-
-  // Read JSON graph.
-  graphPath = opt.graphPath
-  graph = JSON.parse(read(graphPath))
-
-  server.listen(port, () => {
-    const myIp = internalIp()
-    const uri = `http://${myIp}:${port}`
-
-    debug(`editor server is listening on ${uri}`)
-
-    if (opt.open) opn(uri)
-  })
-}
-
-exports.start = start
+module.exports = server
