@@ -106,6 +106,7 @@
     "sass-lint": "^1.10.2",
     "should": "11.x",
     "standard": "8.x",
+    "supertest": "^2.0.1",
     "uglify-js": "2.x"
   }
 }

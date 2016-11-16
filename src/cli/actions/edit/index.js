@@ -1,7 +1,10 @@
 const createEmptyGraph = require('../../../engine/createEmptyGraph')
 const debug = require('debug')('dflow')
 const fs = require('fs')
+const internalIp = require('internal-ip')
 const nopt = require('nopt')
+const opn = require('opn')
+const read = require('read-file-utf8')
 const server = require('../../../editor/server')
 const usage = require('./usage')
 const utils = require('../../utils')
@@ -21,6 +24,23 @@ const shortHandOpts = {
 const showUsage = () => {
   console.log(usage)
   process.exit(0)
+}
+
+const startServer = ({ graphPath, open }) => {
+  const port = 3000
+
+  // Read JSON graph.
+  var graph = JSON.parse(read(graphPath))
+  console.log(graph) // TODO send graph to server some how
+
+  server.listen(port, () => {
+    const myIp = internalIp()
+    const uri = `http://${myIp}:${port}`
+
+    debug(`editor server is listening on ${uri}`)
+
+    if (open) opn(uri)
+  })
 }
 
 module.exports = (args) => {
@@ -49,7 +69,7 @@ module.exports = (args) => {
       createEmptyGraph(graphPath, () => {
         debug(`created graph ${graphPath}`)
 
-        server.start({
+        startServer({
           graphPath,
           open
         })
@@ -58,7 +78,7 @@ module.exports = (args) => {
       if (stats.isFile()) {
         debug(`found graph ${graphPath}`)
 
-        server.start({
+        startServer({
           graphPath,
           open
         })
