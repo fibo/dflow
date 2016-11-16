@@ -37,11 +37,6 @@ app.put('/graph', (req, res) => {
 
 */
 
-const notFound = (res) => {
-  res.writeHead(404, 'Not found', {'Content-Type': 'text/html'})
-  res.end('<html><head><title>404 - Not found</title></head><body><h1>Not found.</h1></body></html>')
-}
-
 const server = http.createServer((req, res) => {
   const method = req.method
   const url = req.url
@@ -50,11 +45,36 @@ const server = http.createServer((req, res) => {
 
   switch (method) {
     case 'GET':
-      res.end(read(path.join(__dirname, 'index.html')))
-      break
+      switch (url) {
+        case '/':
+          res.writeHead(200, {'Content-Type': 'text/html'})
+          res.end(read(path.join(__dirname, 'index.html')))
+          break
 
-    default:
-      notFound(res)
+        case '/bundle.js':
+          res.writeHead(200, {'Content-Type': 'text/javascript'})
+          res.end(read(path.join(__dirname, 'public', 'bundle.js')))
+          break
+
+        case '/style.css':
+          res.writeHead(200, {'Content-Type': 'text/css'})
+          res.end(read(path.join(__dirname, 'public', 'style.css')))
+          break
+
+        default: res.end()
+      } break
+
+    case 'PUT':
+      switch (url) {
+        case '/graph':
+          res.writeHead(200, {'Content-Type': 'application/json'})
+          res.end(read(graphPath))
+          break
+
+        default: res.end()
+      } break
+
+    default: res.end()
   }
 })
 
