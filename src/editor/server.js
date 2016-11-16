@@ -1,25 +1,22 @@
-const bodyParser = require('body-parser')
 const debug = require('debug')('dflow')
-const express = require('express')
+const http = require('http')
 const internalIp = require('internal-ip')
 const no = require('not-defined')
 const opn = require('opn')
 const path = require('path')
 const read = require('read-file-utf8')
-const write = require('write-file-utf8')
+// const write = require('write-file-utf8')
 
-const app = express()
-const http = require('http').Server(app)
+var graphPath = null
+var graph = null
 
+/*
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
 })
-
-var graphPath = null
-var graph = null
 
 app.get('/graph', (req, res) => {
   debug('read graph')
@@ -38,6 +35,29 @@ app.put('/graph', (req, res) => {
   })
 })
 
+*/
+
+const notFound = (res) => {
+  res.writeHead(404, 'Not found', {'Content-Type': 'text/html'})
+  res.end('<html><head><title>404 - Not found</title></head><body><h1>Not found.</h1></body></html>')
+}
+
+const server = http.createServer((req, res) => {
+  const method = req.method
+  const url = req.url
+
+  debug(`${method} ${url}`)
+
+  switch (method) {
+    case 'GET':
+      res.end(read(path.join(__dirname, 'index.html')))
+      break
+
+    default:
+      notFound(res)
+  }
+})
+
 function start (opt) {
   if (no(opt)) opt = {}
 
@@ -48,7 +68,7 @@ function start (opt) {
   graphPath = opt.graphPath
   graph = JSON.parse(read(graphPath))
 
-  http.listen(port, () => {
+  server.listen(port, () => {
     const myIp = internalIp()
     const uri = `http://${myIp}:${port}`
 
