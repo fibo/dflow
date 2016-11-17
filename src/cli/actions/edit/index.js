@@ -26,7 +26,7 @@ const showUsage = () => {
   process.exit(0)
 }
 
-const startServer = ({ graphPath, open }) => {
+const startServer = (graphPath, open) => {
   const port = 3000
 
   // Read JSON graph.
@@ -69,19 +69,13 @@ module.exports = (args) => {
       createEmptyGraph(graphPath, () => {
         debug(`created graph ${graphPath}`)
 
-        startServer({
-          graphPath,
-          open
-        })
+        startServer(graphPath, open)
       })
     } else {
       if (stats.isFile()) {
         debug(`found graph ${graphPath}`)
 
-        startServer({
-          graphPath,
-          open
-        })
+        startServer(graphPath, open)
       } else {
         showUsage()
       }
