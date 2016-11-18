@@ -33,7 +33,7 @@ class Root extends Component {
             </li>
             <li>
               <form>
-                <label forName='autorun' >autorun</label>
+                <label>autorun</label>
                 <input
                   checked={editor.autorun}
                   name='autorun'

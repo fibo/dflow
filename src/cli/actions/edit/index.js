@@ -1,16 +1,18 @@
-const createEmptyGraph = require('../../../engine/createEmptyGraph')
 const debug = require('debug')('dflow')
 const fs = require('fs')
+const http = require('http')
 const internalIp = require('internal-ip')
 const nopt = require('nopt')
 const opn = require('opn')
-const read = require('read-file-utf8')
-const server = require('../../../editor/server')
+
+const createEmptyGraph = require('../../../engine/createEmptyGraph')
+const editorServer = require('../../../editor/server')
+const Graph = require('./Graph')
 const usage = require('./usage')
 const utils = require('../../utils')
 
-var dotJson = utils.dotJson
-var appendCwd = utils.appendCwd
+const dotJson = utils.dotJson
+const appendCwd = utils.appendCwd
 
 const knownOpts = {
   help: Boolean
@@ -29,9 +31,9 @@ const showUsage = () => {
 const startServer = (graphPath, open) => {
   const port = 3000
 
-  // Read JSON graph.
-  var graph = JSON.parse(read(graphPath))
-  console.log(graph) // TODO send graph to server some how
+  const graph = new Graph(graphPath)
+
+  const server = http.createServer(editorServer(graph.CRUD()))
 
   server.listen(port, () => {
     const myIp = internalIp()
