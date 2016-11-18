@@ -34,6 +34,7 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 ### Changed
 
 - Removed express dependency.
+- Relaxed deps.
 
 ## [v0.17.1] - 2016-11-11
 

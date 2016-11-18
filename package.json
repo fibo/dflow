@@ -75,13 +75,13 @@
     "visual"
   ],
   "dependencies": {
-    "debug": "^2.2.0",
+    "debug": "2.x",
     "internal-ip": "1.x",
     "nopt": "3.x",
     "not-defined": "1.x",
     "opn": "4.x",
     "read-file-utf8": "1.x",
-    "write-file-utf8": "^1.2.0"
+    "write-file-utf8": "1.x"
   },
   "devDependencies": {
     "brfs": "1.x",
@@ -94,11 +94,11 @@
     "node-sass": "^3.13.0",
     "npm-watch": "^0.1.6",
     "pre-commit": "1.x",
-    "sass-lint": "^1.10.2",
+    "sass-lint": "1.x",
     "should": "11.x",
     "standard": "8.x",
     "supertest": "^2.0.1",
     "uglify-js": "2.x",
-    "zeroconf-redux": "^0.9.0"
+    "zeroconf-redux": "0.x"
   }
 }
