@@ -1,1 +1,17 @@
-body{background:#fdfdfd}nav{margin:0;padding:0}nav ul{display:flex;width:100%}nav ul li{flex-grow:1;list-style-type:none}#dflow-canvas{height:100%;width:100%}#dflow-console{height:2em}#dflow-root{height:80vh;width:100%}
+body {
+  background: #fdfdfd; }
+
+nav {
+  margin: 0;
+  padding: 0; }
+  nav ul {
+    list-style-type: none; }
+    nav ul li {
+      float: left; }
+
+.dflow-console {
+  height: 2em; }
+
+.dflow-root {
+  height: 80vh;
+  width: 100%; }

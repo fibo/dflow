@@ -29,6 +29,12 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 - WebAudio context
 
+## [v0.18.0] - 2016-11-18
+
+### Changed
+
+- Removed express dependency.
+
 ## [v0.17.1] - 2016-11-11
 
 ### Added
