@@ -44,7 +44,7 @@
     "postversion": "git push origin v${npm_package_version}; npm publish; npm run push",
     "pull": "git pull origin master && npm run gh-pages:pull",
     "push": "git push origin master && npm run gh-pages:push",
-    "sass": "node-sass src/editor/client/sass/style.scss --output src/editor/client/public",
+    "sass": "node-sass src/editor/client/sass/style.scss --output src/editor/public",
     "start": "DEBUG=dflow node src/cli/dflow --open",
     "svg": "for x in apply hello-world indexOf sum; do node src/examples/renderer/server-side.js $x; done",
     "test": "NODE_PATH=src mocha",
