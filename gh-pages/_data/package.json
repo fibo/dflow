@@ -1,7 +1,7 @@
 {
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
-  "version": "0.17.2",
+  "version": "0.18.0",
   "homepage": "http://g14n.info/dflow",
   "author": {
     "name": "Gianluca Casati",
@@ -27,8 +27,7 @@
     "gh-pages:_data:tags.json": "wget https://api.github.com/repos/fibo/${npm_package_name}/tags -O gh-pages/_data/tags.json",
     "gh-pages:push": "git subtree --prefix gh-pages push origin gh-pages",
     "gh-pages:pull": "git subtree --prefix gh-pages pull origin gh-pages",
-    "git_add-f": "for x in dist editor_public test_bundle; do npm run git_add-f_$x; done",
-    "git_add-f_editor_public": "git add -f src/editor/public/",
+    "git_add-f": "for x in dist test_bundle; do npm run git_add-f_$x; done",
     "git_add-f_dist": "git add -f dist/",
     "git_add-f_test_bundle": "git add -f gh-pages/test/bundle.js",
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
@@ -75,13 +74,13 @@
     "visual"
   ],
   "dependencies": {
-    "debug": "^2.2.0",
+    "debug": "2.x",
     "internal-ip": "1.x",
     "nopt": "3.x",
     "not-defined": "1.x",
     "opn": "4.x",
     "read-file-utf8": "1.x",
-    "write-file-utf8": "^1.2.0"
+    "write-file-utf8": "1.x"
   },
   "devDependencies": {
     "brfs": "1.x",
@@ -94,11 +93,11 @@
     "node-sass": "^3.13.0",
     "npm-watch": "^0.1.6",
     "pre-commit": "1.x",
-    "sass-lint": "^1.10.2",
+    "sass-lint": "1.x",
     "should": "11.x",
     "standard": "8.x",
     "supertest": "^2.0.1",
     "uglify-js": "2.x",
-    "zeroconf-redux": "^0.9.0"
+    "zeroconf-redux": "0.x"
   }
 }

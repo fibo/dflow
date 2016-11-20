@@ -1,12 +1,26 @@
+$padding-top: 14px;
+$padding-right: 16px;
+
 nav {
-  margin: 0;
-  padding: 0;
+  background-color: $transparent-black;
+  height: 3em;
 
   ul {
     list-style-type: none;
 
     li {
+      color: $white;
+      display: inline-block;
       float: left;
+      padding: $padding-top $padding-right;
+      text-align: center;
+      transition: .3s;
     }
   }
 }
+
+nav a {
+  color: $white;
+  text-decoration: none;
+}
+
