@@ -7,7 +7,7 @@ const opn = require('opn')
 
 const createEmptyGraph = require('../../../engine/createEmptyGraph')
 const editorServer = require('../../../editor/server')
-const Graph = require('./Graph')
+const Graph = require('../../../engine/Graph')
 const usage = require('./usage')
 const utils = require('../../utils')
 

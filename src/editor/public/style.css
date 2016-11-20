@@ -1,13 +1,26 @@
+* {
+  margin: 0;
+  padding: 0; }
+
 body {
   background: #fdfdfd; }
 
 nav {
-  margin: 0;
-  padding: 0; }
+  background-color: rgba(20, 20, 20, 0.9);
+  height: 3em; }
   nav ul {
     list-style-type: none; }
     nav ul li {
-      float: left; }
+      color: #fdfdfd;
+      display: inline-block;
+      float: left;
+      padding: 14px 16px;
+      text-align: center;
+      transition: .3s; }
+
+nav a {
+  color: #fdfdfd;
+  text-decoration: none; }
 
 .dflow-console {
   height: 2em; }
