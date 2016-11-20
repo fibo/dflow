@@ -29,6 +29,12 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 - WebAudio context
 
+## [v0.18.1] - 2016-11-20
+
+### Fixed
+
+- Include editor assets in npm package.
+
 ## [v0.18.0] - 2016-11-18
 
 ### Changed
