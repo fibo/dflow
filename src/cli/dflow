@@ -9,7 +9,7 @@ const pkg = require('../../package.json')
 const usage = require('./usage')
 
 // Do not crash on errors.
-process.on('uncaughtException', (error) => debug(error.stack))
+process.on('uncaughtException', (error) => console.error(error.stack))
 
 const edit = actions.edit
 const run = actions.run

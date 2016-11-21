@@ -29,16 +29,17 @@ const showUsage = () => {
 }
 
 const startServer = (graphPath, open) => {
-  const port = 3000
 
   const graph = new Graph(graphPath)
 
   const server = http.createServer(editorServer(graph.CRUD()))
 
-  server.listen(port, () => {
+  server.listen(() => {
+    const port = server.address().port
     const myIp = internalIp()
     const uri = `http://${myIp}:${port}`
 
+    debug(server.address().port)
     debug(`editor server is listening on ${uri}`)
 
     if (open) opn(uri)
