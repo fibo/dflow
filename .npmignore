@@ -3,3 +3,4 @@ coverage
 dist/
 gh-pages
 npm-debug.log
+bower.json

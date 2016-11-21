@@ -29,7 +29,11 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 - WebAudio context
 
-## [v0.18.1] - 2016-11-20
+## [v0.18.2] - 2016-11-21
+
+### Added
+
+- Editor server uses random port.
 
 ### Fixed
 

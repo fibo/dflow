@@ -1,7 +1,7 @@
 {
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "homepage": "http://g14n.info/dflow",
   "author": {
     "name": "Gianluca Casati",
@@ -93,6 +93,7 @@
     "node-sass": "^3.13.0",
     "npm-watch": "^0.1.6",
     "pre-commit": "1.x",
+    "redux-thunk": "^2.1.0",
     "sass-lint": "1.x",
     "should": "11.x",
     "standard": "8.x",
