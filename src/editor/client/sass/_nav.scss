@@ -15,12 +15,12 @@ nav {
       padding: $padding-top $padding-right;
       text-align: center;
       transition: .3s;
+
+      a {
+        color: $white;
+        text-decoration: none;
+      }
     }
   }
-}
-
-nav a {
-  color: $white;
-  text-decoration: none;
 }
 
