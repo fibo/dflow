@@ -54,6 +54,7 @@
     "test",
     "check-deps"
   ],
+  "sasslintConfig": "src/editor/client/sass/.sass-lint.yml",
   "watch": {
     "browserify_editor": {
       "ignore": "src/editor/client/styles/",
