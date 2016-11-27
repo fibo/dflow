@@ -33,13 +33,6 @@ class Graph {
 
     write(graphPath, graph)
   }
-
-  CRUD () {
-    const read = this.read.bind(this)
-    const update = this.update.bind(this)
-
-    return { read, update }
-  }
 }
 
 module.exports = Graph
