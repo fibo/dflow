@@ -4003,7 +4003,7 @@ module.exports={
         "spec": ">=0.22.0 <0.23.0",
         "type": "range"
       },
-      "/Users/gcasati/github.com/fibo/dflow/node_modules/svgx"
+      "/home/io/github.com/fibo/dflow/node_modules/svgx"
     ]
   ],
   "_from": "cheerio@>=0.22.0 <0.23.0",
@@ -4037,7 +4037,7 @@ module.exports={
   "_shasum": "a9baa860a3f9b595a6b81b1a86873121ed3a269e",
   "_shrinkwrap": null,
   "_spec": "cheerio@^0.22.0",
-  "_where": "/Users/gcasati/github.com/fibo/dflow/node_modules/svgx",
+  "_where": "/home/io/github.com/fibo/dflow/node_modules/svgx",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -52842,9 +52842,16 @@ exports.window = function () {
   return window
 }
 
-exports.AudioContext = function () {
-  const WebAudio = window.AudioContext || window.webkitAudioContext
-  return new WebAudio()
+var myAudioContext = null
+
+function audioContext () {
+  if (myAudioContext) {
+    return myAudioContext
+  } else {
+    var AudioContext = window.AudioContext || window.webkitAudioContext
+    myAudioContext = new AudioContext()
+    return myAudioContext
+  }
 }
 
 exports.innerHTML = function (node, content) {

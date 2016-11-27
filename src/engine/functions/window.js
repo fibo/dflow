@@ -14,9 +14,16 @@ exports.window = function () {
   return window
 }
 
-exports.AudioContext = function () {
-  const WebAudio = window.AudioContext || window.webkitAudioContext
-  return new WebAudio()
+var myAudioContext = null
+
+function audioContext () {
+  if (myAudioContext) {
+    return myAudioContext
+  } else {
+    var AudioContext = window.AudioContext || window.webkitAudioContext
+    myAudioContext = new AudioContext()
+    return myAudioContext
+  }
 }
 
 exports.innerHTML = function (node, content) {
