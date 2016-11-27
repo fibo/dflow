@@ -31,7 +31,7 @@ const showUsage = () => {
 const startServer = (graphPath, open) => {
   const graph = new Graph(graphPath)
 
-  const server = http.createServer(editorServer(graph.CRUD()))
+  const server = http.createServer(editorServer(graph))
 
   server.listen(() => {
     const port = server.address().port
