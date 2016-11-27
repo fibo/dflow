@@ -26,6 +26,8 @@ function audioContext () {
   }
 }
 
+exports.audioContext = audioContext
+
 exports.innerHTML = function (node, content) {
   node.innerHTML = content
 
