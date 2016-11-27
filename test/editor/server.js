@@ -11,47 +11,52 @@ const graph = new Graph(graphPath)
 
 const app = http.createServer(editorServer(graph))
 
-const resource = (path) => ({
-  hasContentType: (contentType) => {
-    it(`is ${contentType}`, (done) => {
-      request(app)
-        .get(path)
-        .expect('Content-Type', contentType)
-        .expect(200)
-        .end((err, res) => done(err))
-    })
-  }
-})
-
 describe('editor server', () => {
-  describe('GET /', () => {
-    resource('/').hasContentType('text/html; charset=UTF-8')
+  it('GET /', (done) => {
+    request(app)
+      .get('/')
+      .expect('Content-Type', 'text/html; charset=UTF-8')
+      .expect('Content-Encoding', 'gzip')
+      .expect(200)
+      .end((err, res) => done(err))
   })
 
-  describe('GET /bundle.js', () => {
-    resource('/bundle.js').hasContentType('text/javascript')
+  it('GET /bundle.js', (done) => {
+    request(app)
+      .get('/bundle.js')
+      .expect('Content-Type', 'application/javascript')
+      .expect('Content-Encoding', 'gzip')
+      .expect(200)
+      .end((err, res) => done(err))
   })
 
-  describe('GET /style.css', () => {
-    resource('/style.css').hasContentType('text/css; charset=UTF-8')
+  it('GET /style.css', (done) => {
+    request(app)
+      .get('/style.css')
+      .expect('Content-Type', 'text/css; charset=UTF-8')
+      .expect('Content-Encoding', 'gzip')
+      .expect(200)
+      .end((err, res) => done(err))
   })
 
-  describe('GET /graph', () => {
-    resource('/graph').hasContentType('application/json; charset=UTF-8')
+  it('GET /graph', (done) => {
+    request(app)
+      .get('/graph')
+      .expect('Content-Type', 'application/json')
+      .expect(200)
+      .end((err, res) => done(err))
   })
 
-  describe('PUT /graph', () => {
-    it('updates graph', (done) => {
-      const newGraph = {}
+  it('PUT /graph', (done) => {
+    const newGraph = {}
 
-      request(app)
-        .put('/graph')
-        .send(newGraph)
-        .expect(200)
-        .end((err, res) => {
-          should.deepEqual(graph.read(), JSON.stringify(newGraph))
-          done(err)
-        })
-    })
+    request(app)
+      .put('/graph')
+      .send(newGraph)
+      .expect(200)
+      .end((err, res) => {
+        should.deepEqual(graph.read(), JSON.stringify(newGraph))
+        done(err)
+      })
   })
 })

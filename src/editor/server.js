@@ -1,6 +1,7 @@
+const fs = require('fs')
 const debug = require('debug')('dflow')
 const path = require('path')
-const read = require('read-file-utf8')
+const zlib = require('zlib')
 
 /**
  * Handle onRequest event for editor server.
@@ -16,23 +17,32 @@ const editorServer = (graph) => (req, res) => {
     case 'GET':
       switch (url) {
         case '/':
+          res.setHeader('Content-Encoding', 'gzip')
           res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'})
-          res.end(read(path.join(__dirname, 'index.html')))
+          fs.createReadStream(path.join(__dirname, 'index.html'))
+            .pipe(zlib.createGzip())
+            .pipe(res)
           break
 
         case '/bundle.js':
-          res.writeHead(200, {'Content-Type': 'text/javascript'})
-          res.end(read(path.join(__dirname, 'public', 'bundle.js')))
+          res.setHeader('Content-Encoding', 'gzip')
+          res.writeHead(200, {'Content-Type': 'application/javascript'})
+          fs.createReadStream(path.join(__dirname, 'public', 'bundle.js'))
+            .pipe(zlib.createGzip())
+            .pipe(res)
           break
 
         case '/graph':
-          res.writeHead(200, {'Content-Type': 'application/json; charset=UTF-8'})
+          res.writeHead(200, {'Content-Type': 'application/json'})
           res.end(graph.read())
           break
 
         case '/style.css':
+          res.setHeader('Content-Encoding', 'gzip')
           res.writeHead(200, {'Content-Type': 'text/css; charset=UTF-8'})
-          res.end(read(path.join(__dirname, 'public', 'style.css')))
+          fs.createReadStream(path.join(__dirname, 'public', 'style.css'))
+            .pipe(zlib.createGzip())
+            .pipe(res)
           break
 
         default: res.end()

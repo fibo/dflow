@@ -25,9 +25,16 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
-###
+## [v0.18.3] - 2016-11-27
+
+### Added
 
 - WebAudio context
+- Editor sends bundle.js, index.html and style.css as gzipped streams.
+
+### Fixed
+
+- console.log
 
 ## [v0.18.2] - 2016-11-21
 

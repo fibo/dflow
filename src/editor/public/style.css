@@ -17,13 +17,9 @@ nav {
       padding: 14px 16px;
       text-align: center;
       transition: .3s; }
-
-nav a {
-  color: #fdfdfd;
-  text-decoration: none; }
-
-.dflow-console {
-  height: 2em; }
+      nav ul li a {
+        color: #fdfdfd;
+        text-decoration: none; }
 
 .dflow-root {
   height: 80vh;
