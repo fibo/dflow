@@ -43,7 +43,30 @@ function injectDotOperators (funcs, task) {
     }
 
     /**
-     * Dot operator attribute.
+     * Dot operator attribute write.
+     *
+     * @param {String} attributeName
+     * @param {Object} obj
+     * @param {*} attributeValue
+     *
+     * @returns {Object} obj modified
+     */
+
+    function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
+      obj[attributeName] = attributeValue
+
+      return obj
+    }
+
+    if (regexDotOperator.attrWrite.test(taskName)) {
+      // .foo=bar
+      attributeName = taskName.substring(1)
+
+      funcs[taskName] = dotOperatorAttributeWrite.bind(null, attributeName)
+    }
+
+    /**
+     * Dot operator attribute read.
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -51,7 +74,7 @@ function injectDotOperators (funcs, task) {
      * @returns {*} attribute
      */
 
-    function dotOperatorAttr (attributeName, obj) {
+    function dotOperatorAttributeRead (attributeName, obj) {
       var attr
 
       if (obj) attr = obj[attributeName]
@@ -61,11 +84,11 @@ function injectDotOperators (funcs, task) {
       return attr
     }
 
-    if (regexDotOperator.attr.test(taskName)) {
+    if (regexDotOperator.attrRead.test(taskName)) {
       // .foo -> foo
       attributeName = taskName.substring(1)
 
-      funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
+      funcs[taskName] = dotOperatorAttributeRead.bind(null, attributeName)
     }
   }
 
