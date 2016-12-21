@@ -51,6 +51,8 @@ function injectDotOperators (funcs, task) {
      */
 
     function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
+      if (arguments.length === 1) return
+
       obj[attributeName] = attributeValue
 
       return obj

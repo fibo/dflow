@@ -10,8 +10,7 @@ import walkGlobal from '../../../engine/walkGlobal'
 
 export default function singleInputTask (taskName) {
   if (regexAccessor.test(taskName)) return true
-  if (regexDotOperator.attr.test(taskName)) return true
-  if (regexDotOperator.func.test(taskName)) return false
+  if (regexDotOperator.attrRead.test(taskName)) return true
 
   const builtin = builtinFunctions[taskName]
   if (builtin) return builtin.length === 1

@@ -3760,6 +3760,28 @@ AssertionError.prototype = Object.create(Error.prototype, {
   }
 });
 
+// a bit hacky way how to get error to do not have stack
+function LightAssertionError(options) {
+  shouldUtil.merge(this, options);
+
+  if (!options.message) {
+    Object.defineProperty(this, 'message', {
+      get: function() {
+        if (!this._message) {
+          this._message = this.generateMessage();
+          this.generatedMessage = true;
+        }
+        return this._message;
+      }
+    });
+  }
+}
+
+LightAssertionError.prototype = {
+  generateMessage: AssertionError.prototype.generateMessage
+};
+
+
 /**
  * should Assertion
  * @param {*} obj Given object for assertion
@@ -3822,7 +3844,11 @@ Assertion.prototype = {
 
     params.assertion = this;
 
-    throw new AssertionError(params);
+    if (this.light) {
+      throw new LightAssertionError(params);
+    } else {
+      throw new AssertionError(params);
+    }
   },
 
   /**
@@ -3895,12 +3921,13 @@ Assertion.add = function(name, func) {
     value: function() {
       var context = new Assertion(this.obj, this, name);
       context.anyOne = this.anyOne;
+      context.light = true;
 
       try {
         func.apply(context, arguments);
       } catch (e) {
         // check for fail
-        if (e instanceof AssertionError) {
+        if (e instanceof AssertionError || e instanceof LightAssertionError) {
           // negative fail
           if (this.negate) {
             this.obj = context.obj;
@@ -3914,6 +3941,7 @@ Assertion.add = function(name, func) {
 
           // positive fail
           context.negate = false;
+          context.light = false;
           context.fail();
         }
         // throw if it is another exception
@@ -3924,6 +3952,7 @@ Assertion.add = function(name, func) {
       if (this.negate) {
         context.negate = true; // because .fail will set negate
         context.params.details = 'false negative fail';
+        context.light = false;
         context.fail();
       }
 
@@ -4362,6 +4391,7 @@ function chainAssertions(should, Assertion) {
    * @alias Assertion#of
    * @alias Assertion#a
    * @alias Assertion#and
+   * @alias Assertion#been
    * @alias Assertion#have
    * @alias Assertion#has
    * @alias Assertion#with
@@ -4371,7 +4401,7 @@ function chainAssertions(should, Assertion) {
    * @alias Assertion#it
    * @category assertion chaining
    */
-  ['an', 'of', 'a', 'and', 'be', 'has', 'have', 'with', 'is', 'which', 'the', 'it'].forEach(function(name) {
+  ['an', 'of', 'a', 'and', 'be', 'been', 'has', 'have', 'with', 'is', 'which', 'the', 'it'].forEach(function(name) {
     Assertion.addChain(name);
   });
 }
@@ -6501,14 +6531,33 @@ function injectDotOperators (funcs, task) {
     }
 
     if (regexDotOperator.func.test(taskName)) {
-      // .foo() -> foo
-      var attributeName = taskName.substring(1, taskName.length - 2)
-
-      funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
+                                                   // .foo() -> foo
+      funcs[taskName] = dotOperatorFunc.bind(null, taskName.substring(1, taskName.length - 2))
     }
 
     /**
-     * Dot operator attribute.
+     * Dot operator attribute write.
+     *
+     * @param {String} attributeName
+     * @param {Object} obj
+     * @param {*} attributeValue
+     *
+     * @returns {Object} obj modified
+     */
+
+    function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
+      obj[attributeName] = attributeValue
+
+      return obj
+    }
+
+    if (regexDotOperator.attrWrite.test(taskName)) {
+                                                             // .foo= -> foo
+      funcs[taskName] = dotOperatorAttributeWrite.bind(null, taskName.substring(1, taskName.length - 1))
+    }
+
+    /**
+     * Dot operator attribute read.
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -6516,7 +6565,7 @@ function injectDotOperators (funcs, task) {
      * @returns {*} attribute
      */
 
-    function dotOperatorAttr (attributeName, obj) {
+    function dotOperatorAttributeRead (attributeName, obj) {
       var attr
 
       if (obj) attr = obj[attributeName]
@@ -6526,11 +6575,9 @@ function injectDotOperators (funcs, task) {
       return attr
     }
 
-    if (regexDotOperator.attr.test(taskName)) {
-      // .foo -> foo
-      attributeName = taskName.substring(1)
-
-      funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
+    if (regexDotOperator.attrRead.test(taskName)) {
+                                                            // .foo -> foo
+      funcs[taskName] = dotOperatorAttributeRead.bind(null, taskName.substring(1))
     }
   }
 
@@ -6703,8 +6750,8 @@ module.exports = /^@[\w][\w\d]+$/
 module.exports = /^arguments\[(\d+)\]$/
 
 },{}],25:[function(require,module,exports){
-exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
-
+exports.attrRead = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
+exports.attrWrite = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)=$/
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
 },{}],26:[function(require,module,exports){
@@ -6904,7 +6951,16 @@ describe('injectArrowFunctions', function () {
 var injectDotOperators = require('engine/inject/dotOperators')
 
 describe('injectDotOperators', function () {
-  it('modifies funcs object with dot operators attribute-like injected', function () {
+  it('modifies funcs object with dot operators attribute readers injected', function () {
+    // This test works server side if Nodejs process global is used
+    // but it will fail client side, so using a fake process is better.
+    var procezz = {
+      version: 1,
+      exit: function () {
+        throw new Error('kernel panic')
+      }
+    }
+
     var funcs = {}
     var graph = {
       task: {
@@ -6921,10 +6977,31 @@ describe('injectDotOperators', function () {
     getVersion.should.be.a.Function
     exit.should.be.a.Function
 
-    getVersion(process).should.be.eql(process.version)
+    getVersion(procezz).should.be.eql(procezz.version)
 
-    // This will return a reference to process.exit, it should not call it.
+    // This will return a reference to procezz.exit, it should not call it.
     exit(process).should.be.a.Function
+  })
+
+  it('modifies funcs object with dot operators attribute writers injected', function () {
+    var funcs = {}
+    var graph = {
+      task: {
+        '1': '.foo='
+      }
+    }
+
+    injectDotOperators(funcs, graph.task)
+
+    var setFoo = funcs['.foo=']
+
+    setFoo.should.be.a.Function
+
+    var obj = {}
+    var obj2 = setFoo(obj, 'bar')
+
+    obj.foo.should.be.eql('bar')
+    obj2.foo.should.be.eql('bar')
   })
 
   it('modifies funcs object with dot operators function-like injected', function () {

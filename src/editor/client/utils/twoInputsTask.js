@@ -8,6 +8,7 @@ import walkGlobal from '../../../engine/walkGlobal'
  */
 export default function twoInputsTask (taskName) {
   if (regexDotOperator.func.test(taskName)) return true
+  if (regexDotOperator.attrWrite.test(taskName)) return true
 
   const builtin = builtinFunctions[taskName]
   if (builtin) return builtin.length === 2
