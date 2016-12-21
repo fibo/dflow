@@ -25,6 +25,14 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
+### Fixed
+
+- Graph.update() now is async, it caused a test to fail randomly
+
+### Added
+
+- CDNJS link
+
 ## [v0.18.3] - 2016-11-27
 
 ### Added
