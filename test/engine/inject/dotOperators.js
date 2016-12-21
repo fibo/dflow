@@ -1,7 +1,7 @@
 var injectDotOperators = require('engine/inject/dotOperators')
 
 describe('injectDotOperators', function () {
-  it('modifies funcs object with dot operators attribute-like injected', function () {
+  it('modifies funcs object with dot operators attribute readers injected', function () {
     var funcs = {}
     var graph = {
       task: {
@@ -23,6 +23,25 @@ describe('injectDotOperators', function () {
     // This will return a reference to process.exit, it should not call it.
     exit(process).should.be.a.Function
   })
+
+  it('modifies funcs object with dot operators attribute writers injected'/*, function () {
+    var funcs = {}
+    var graph = {
+      task: {
+        '1': '.foo='
+      }
+    }
+
+    injectDotOperators(funcs, graph.task)
+
+    var setFoo = funcs['.foo=']
+
+    setFoo.should.be.a.Function
+
+    var obj = {}
+    obj = setFoo(obj, 'bar')
+    obj.foo.should.be.eql('bar')
+  }*/)
 
   it('modifies funcs object with dot operators function-like injected', function () {
     var funcs = {}

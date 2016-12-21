@@ -88,6 +88,7 @@
     "flow-view": "^2.8.1",
     "isomorphic-fetch": "2.x",
     "istanbul": "^0.4.3",
+    "loadjs": "^3.2.1",
     "mocha": "3.x",
     "mocha-lcov-reporter": "1.x",
     "node-sass": "^3.13.0",

@@ -125,7 +125,8 @@ function fun (graph, additionalFunctions) {
 
     // Skip dot operator tasks.
     if (regexDotOperator.func.test(taskName)) return
-    if (regexDotOperator.attr.test(taskName)) return
+    if (regexDotOperator.attrRead.test(taskName)) return
+    if (regexDotOperator.attrWrite.test(taskName)) return
 
     // Skip globals.
     if (walkGlobal(taskName)) return

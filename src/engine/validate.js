@@ -50,8 +50,12 @@ function validate (graph, additionalFunctions) {
         throw new TypeError('Function name cannot start with "@": ' + taskName)
       }
 
-      if (regexDotOperator.attr.test(taskName)) {
+      if (regexDotOperator.attrRead.test(taskName)) {
         throw new TypeError('Function name cannot start with ".":' + taskName)
+      }
+
+      if (regexDotOperator.attrWrite.test(taskName)) {
+        throw new TypeError('Function name cannot start with "." and end with "=":' + taskName)
       }
 
       if (regexDotOperator.func.test(taskName)) {
