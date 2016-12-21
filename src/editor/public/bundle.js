@@ -56002,8 +56002,8 @@ function fun(graph, additionalFunctions) {
   injectDotOperators(funcs, task);
   injectGlobals(funcs, task);
   injectReferences(funcs, task);
-  injectNumbers(funcs, task);
   injectStrings(funcs, task);
+  injectNumbers(funcs, task);
   injectArrowFunctions(funcs, task);
 
   /**
@@ -57175,6 +57175,8 @@ module.exports = validate;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+var regexQuoted = require('./regex/quoted');
+
 var globalContext;
 
 if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object') {
@@ -57195,8 +57197,12 @@ if ((typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object'
  */
 
 function walkGlobal(taskName) {
-  // Skip dot operator and tasks that starts with a dot.
+  // Skip dot operator and tasks that start with a dot.
   if (taskName.indexOf('.') === 0) return;
+
+  // Skip strings and numbers which may include dots.
+  if (regexQuoted.test(taskName)) return;
+  if (parseFloat(taskName)) return;
 
   function toNextProp(next, prop) {
     return next[prop];
@@ -57208,4 +57214,4 @@ function walkGlobal(taskName) {
 module.exports = walkGlobal;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}]},{},[325]);
+},{"./regex/quoted":372}]},{},[325]);

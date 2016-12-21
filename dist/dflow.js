@@ -60,8 +60,8 @@ function fun (graph, additionalFunctions) {
   injectDotOperators(funcs, task)
   injectGlobals(funcs, task)
   injectReferences(funcs, task)
-  injectNumbers(funcs, task)
   injectStrings(funcs, task)
+  injectNumbers(funcs, task)
   injectArrowFunctions(funcs, task)
 
   /**
@@ -583,6 +583,8 @@ function injectDotOperators (funcs, task) {
      */
 
     function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
+      if (arguments.length === 1) return
+
       obj[attributeName] = attributeValue
 
       return obj
@@ -1137,6 +1139,8 @@ module.exports = validate
 
 },{"./regex/accessor":19,"./regex/argument":20,"./regex/dotOperator":22,"./regex/reference":24,"./regex/subgraph":25,"./reservedKeys":26,"not-defined":1}],28:[function(require,module,exports){
 (function (global){
+var regexQuoted = require('./regex/quoted')
+
 var globalContext
 
 if (typeof window === 'object') {
@@ -1157,8 +1161,12 @@ if (typeof global === 'object') {
  */
 
 function walkGlobal (taskName) {
-  // Skip dot operator and tasks that starts with a dot.
+  // Skip dot operator and tasks that start with a dot.
   if (taskName.indexOf('.') === 0) return
+
+  // Skip strings and numbers which may include dots.
+  if (regexQuoted.test(taskName)) return
+  if (parseFloat(taskName)) return
 
   function toNextProp (next, prop) {
     return next[prop]
@@ -1171,7 +1179,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"dflow":[function(require,module,exports){
+},{"./regex/quoted":23}],"dflow":[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/dflow
  */

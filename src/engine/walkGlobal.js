@@ -1,3 +1,5 @@
+var regexQuoted = require('./regex/quoted')
+
 var globalContext
 
 if (typeof window === 'object') {
@@ -18,8 +20,12 @@ if (typeof global === 'object') {
  */
 
 function walkGlobal (taskName) {
-  // Skip dot operator and tasks that starts with a dot.
+  // Skip dot operator and tasks that start with a dot.
   if (taskName.indexOf('.') === 0) return
+
+  // Skip strings and numbers which may include dots.
+  if (regexQuoted.test(taskName)) return
+  if (parseFloat(taskName)) return
 
   function toNextProp (next, prop) {
     return next[prop]
