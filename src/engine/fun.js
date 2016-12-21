@@ -56,8 +56,8 @@ function fun (graph, additionalFunctions) {
   injectDotOperators(funcs, task)
   injectGlobals(funcs, task)
   injectReferences(funcs, task)
-  injectNumbers(funcs, task)
   injectStrings(funcs, task)
+  injectNumbers(funcs, task)
   injectArrowFunctions(funcs, task)
 
   /**

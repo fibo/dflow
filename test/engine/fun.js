@@ -13,7 +13,10 @@ describe('fun', function () {
         '4': '*',
         '5': '@result',
         '6': 'return',
-        '7': '// this is a comment'
+        '7': '// this is a comment',
+        // The following tasks do not contribute to result.
+        '8': "'This is a string with a.dot'",
+        '9': '1.2'
       },
       pipe: {
         'a': [ '0', '2', 0 ],

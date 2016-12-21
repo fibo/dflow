@@ -6546,6 +6546,8 @@ function injectDotOperators (funcs, task) {
      */
 
     function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
+      if (arguments.length === 1) return
+
       obj[attributeName] = attributeValue
 
       return obj
@@ -6774,6 +6776,8 @@ module.exports = [
 
 },{}],29:[function(require,module,exports){
 (function (global){
+var regexQuoted = require('./regex/quoted')
+
 var globalContext
 
 if (typeof window === 'object') {
@@ -6794,8 +6798,12 @@ if (typeof global === 'object') {
  */
 
 function walkGlobal (taskName) {
-  // Skip dot operator and tasks that starts with a dot.
+  // Skip dot operator and tasks that start with a dot.
   if (taskName.indexOf('.') === 0) return
+
+  // Skip strings and numbers which may include dots.
+  if (regexQuoted.test(taskName)) return
+  if (parseFloat(taskName)) return
 
   function toNextProp (next, prop) {
     return next[prop]
@@ -6808,7 +6816,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],30:[function(require,module,exports){
+},{"./regex/quoted":26}],30:[function(require,module,exports){
 var injectAccessors = require('engine/inject/accessors')
 var should = require('should')
 
