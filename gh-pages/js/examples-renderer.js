@@ -4003,7 +4003,7 @@ module.exports={
         "spec": ">=0.22.0 <0.23.0",
         "type": "range"
       },
-      "/home/io/github.com/fibo/dflow/node_modules/svgx"
+      "/Users/gcasati/github.com/fibo/dflow/node_modules/svgx"
     ]
   ],
   "_from": "cheerio@>=0.22.0 <0.23.0",
@@ -4037,7 +4037,7 @@ module.exports={
   "_shasum": "a9baa860a3f9b595a6b81b1a86873121ed3a269e",
   "_shrinkwrap": null,
   "_spec": "cheerio@^0.22.0",
-  "_where": "/home/io/github.com/fibo/dflow/node_modules/svgx",
+  "_where": "/Users/gcasati/github.com/fibo/dflow/node_modules/svgx",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -7795,12 +7795,18 @@ module.exports = hyphenateStyleName;
  * will remain to ensure logic does not differ in production.
  */
 
-function invariant(condition, format, a, b, c, d, e, f) {
-  if (process.env.NODE_ENV !== 'production') {
+var validateFormat = function validateFormat(format) {};
+
+if (process.env.NODE_ENV !== 'production') {
+  validateFormat = function validateFormat(format) {
     if (format === undefined) {
       throw new Error('invariant requires an error message argument');
     }
-  }
+  };
+}
+
+function invariant(condition, format, a, b, c, d, e, f) {
+  validateFormat(format);
 
   if (!condition) {
     var error;
@@ -8576,34 +8582,34 @@ module.exports = warning;
       value: function render() {
         var _this2 = this;
 
-        var _props = this.props;
-        var createInputPin = _props.createInputPin;
-        var createOutputPin = _props.createOutputPin;
-        var createLink = _props.createLink;
-        var _createNode = _props.createNode;
-        var deleteLink = _props.deleteLink;
-        var deleteInputPin = _props.deleteInputPin;
-        var deleteNode = _props.deleteNode;
-        var deleteOutputPin = _props.deleteOutputPin;
-        var dragItems = _props.dragItems;
-        var fontFamily = _props.fontFamily;
-        var fontSize = _props.fontSize;
-        var item = _props.item;
-        var lineWidth = _props.lineWidth;
-        var model = _props.model;
-        var nodeBodyHeight = _props.nodeBodyHeight;
-        var pinSize = _props.pinSize;
-        var _renameNode = _props.renameNode;
-        var style = _props.style;
-        var updateLink = _props.updateLink;
-        var view = _props.view;
-        var _state = this.state;
-        var draggedItems = _state.draggedItems;
-        var draggedLinkId = _state.draggedLinkId;
-        var offset = _state.offset;
-        var pointer = _state.pointer;
-        var selectedItems = _state.selectedItems;
-        var showSelector = _state.showSelector;
+        var _props = this.props,
+            createInputPin = _props.createInputPin,
+            createOutputPin = _props.createOutputPin,
+            createLink = _props.createLink,
+            _createNode = _props.createNode,
+            deleteLink = _props.deleteLink,
+            deleteInputPin = _props.deleteInputPin,
+            deleteNode = _props.deleteNode,
+            deleteOutputPin = _props.deleteOutputPin,
+            dragItems = _props.dragItems,
+            fontFamily = _props.fontFamily,
+            fontSize = _props.fontSize,
+            item = _props.item,
+            lineWidth = _props.lineWidth,
+            model = _props.model,
+            nodeBodyHeight = _props.nodeBodyHeight,
+            pinSize = _props.pinSize,
+            _renameNode = _props.renameNode,
+            style = _props.style,
+            updateLink = _props.updateLink,
+            view = _props.view;
+        var _state = this.state,
+            draggedItems = _state.draggedItems,
+            draggedLinkId = _state.draggedLinkId,
+            offset = _state.offset,
+            pointer = _state.pointer,
+            selectedItems = _state.selectedItems,
+            showSelector = _state.showSelector;
 
 
         var height = view.height;
@@ -8848,13 +8854,13 @@ module.exports = warning;
           Object.keys(view.node).sort(selectedFirst).map(function (id, i) {
             var node = view.node[id];
 
-            var height = node.height;
-            var ins = node.ins;
-            var outs = node.outs;
-            var text = node.text;
-            var width = node.width;
-            var x = node.x;
-            var y = node.y;
+            var height = node.height,
+                ins = node.ins,
+                outs = node.outs,
+                text = node.text,
+                width = node.width,
+                x = node.x,
+                y = node.y;
 
 
             var nodeType = typeOfNode(node);
@@ -8883,9 +8889,9 @@ module.exports = warning;
             });
           }),
           Object.keys(view.link).map(function (id, i) {
-            var _view$link$id = view.link[id];
-            var from = _view$link$id.from;
-            var to = _view$link$id.to;
+            var _view$link$id = view.link[id],
+                from = _view$link$id.from,
+                to = _view$link$id.to;
 
 
             var x1 = null;
@@ -9158,12 +9164,12 @@ module.exports = warning;
     _createClass(Inspector, [{
       key: 'render',
       value: function render() {
-        var _props = this.props;
-        var items = _props.items;
-        var view = _props.view;
-        var width = _props.width;
-        var x = _props.x;
-        var y = _props.y;
+        var _props = this.props,
+            items = _props.items,
+            view = _props.view,
+            width = _props.width,
+            x = _props.x,
+            y = _props.y;
 
 
         // TODO implement multiple item selection.
@@ -9225,10 +9231,10 @@ module.exports = warning;
     }, {
       key: 'renderInsControls',
       value: function renderInsControls(nodeId, node) {
-        var _props2 = this.props;
-        var createInputPin = _props2.createInputPin;
-        var deleteInputPin = _props2.deleteInputPin;
-        var view = _props2.view;
+        var _props2 = this.props,
+            createInputPin = _props2.createInputPin,
+            deleteInputPin = _props2.deleteInputPin,
+            view = _props2.view;
 
 
         var ins = node.ins || [];
@@ -9271,10 +9277,10 @@ module.exports = warning;
     }, {
       key: 'renderOutsControls',
       value: function renderOutsControls(nodeId, node) {
-        var _props3 = this.props;
-        var createOutputPin = _props3.createOutputPin;
-        var deleteOutputPin = _props3.deleteOutputPin;
-        var view = _props3.view;
+        var _props3 = this.props,
+            createOutputPin = _props3.createOutputPin,
+            deleteOutputPin = _props3.deleteOutputPin,
+            view = _props3.view;
 
 
         var outs = node.outs || [];
@@ -9317,9 +9323,9 @@ module.exports = warning;
     }, {
       key: 'renderNode',
       value: function renderNode(nodeId, node) {
-        var _props4 = this.props;
-        var deleteNode = _props4.deleteNode;
-        var renameNode = _props4.renameNode;
+        var _props4 = this.props,
+            deleteNode = _props4.deleteNode,
+            renameNode = _props4.renameNode;
 
 
         var setState = this.setState.bind(this);
@@ -9531,21 +9537,21 @@ module.exports = warning;
     _createClass(Link, [{
       key: 'render',
       value: function render() {
-        var _props = this.props;
-        var id = _props.id;
-        var fill = _props.fill;
-        var from = _props.from;
-        var onCreateLink = _props.onCreateLink;
-        var startDraggingLinkTarget = _props.startDraggingLinkTarget;
-        var pinSize = _props.pinSize;
-        var selected = _props.selected;
-        var selectLink = _props.selectLink;
-        var to = _props.to;
-        var width = _props.width;
-        var x1 = _props.x1;
-        var y1 = _props.y1;
-        var x2 = _props.x2;
-        var y2 = _props.y2;
+        var _props = this.props,
+            id = _props.id,
+            fill = _props.fill,
+            from = _props.from,
+            onCreateLink = _props.onCreateLink,
+            startDraggingLinkTarget = _props.startDraggingLinkTarget,
+            pinSize = _props.pinSize,
+            selected = _props.selected,
+            selectLink = _props.selectLink,
+            to = _props.to,
+            width = _props.width,
+            x1 = _props.x1,
+            y1 = _props.y1,
+            x2 = _props.x2,
+            y2 = _props.y2;
 
 
         var onSourceMouseDown = function onSourceMouseDown(e) {
@@ -9562,20 +9568,31 @@ module.exports = warning;
           startDraggingLinkTarget(id);
         };
 
+        var startX = x1 + pinSize / 2;
+        var startY = y1 + pinSize / 2;
+        var endX = x2 + pinSize / 2;
+        var endY = y2 + pinSize / 2;
+
+        var midPointY = (startY + endY) / 2;
+        var verticalDistance = (endY - startY) / 2;
+
+        var controlPointX1 = startX;
+        var controlPointY1 = verticalDistance > 0 ? midPointY : startY - verticalDistance * 2;
+        var controlPointX2 = endX;
+        var controlPointY2 = verticalDistance > 0 ? midPointY : endY + verticalDistance * 2;
+
         return _react2.default.createElement(
           'g',
           {
             onClick: _ignoreEvent2.default,
             onDoubleClick: _ignoreEvent2.default
           },
-          _react2.default.createElement('line', {
+          _react2.default.createElement('path', {
+            d: 'M ' + startX + ' ' + startY + ' C ' + controlPointX1 + ' ' + controlPointY1 + ', ' + controlPointX2 + ' ' + controlPointY2 + ' ,' + endX + ' ' + endY,
+            fill: 'transparent',
             onMouseUp: selectLink,
             stroke: selected ? _theme2.default.highlightColor : fill,
-            strokeWidth: width,
-            x1: x1 + pinSize / 2,
-            y1: y1 + pinSize / 2,
-            x2: x2 + pinSize / 2,
-            y2: y2 + pinSize / 2
+            strokeWidth: width
           }),
           _react2.default.createElement('rect', {
             fill: fill,
@@ -9726,11 +9743,11 @@ module.exports = warning;
     _createClass(Node, [{
       key: 'getBody',
       value: function getBody() {
-        var _props = this.props;
-        var bodyHeight = _props.bodyHeight;
-        var fontSize = _props.fontSize;
-        var pinSize = _props.pinSize;
-        var text = _props.text;
+        var _props = this.props,
+            bodyHeight = _props.bodyHeight,
+            fontSize = _props.fontSize,
+            pinSize = _props.pinSize,
+            text = _props.text;
 
 
         // TODO place an id in the div wrapping the body and try to
@@ -9786,25 +9803,25 @@ module.exports = warning;
     }, {
       key: 'render',
       value: function render() {
-        var _props2 = this.props;
-        var bodyHeight = _props2.bodyHeight;
-        var dragged = _props2.dragged;
-        var draggedLinkId = _props2.draggedLinkId;
-        var color = _props2.color;
-        var fontSize = _props2.fontSize;
-        var id = _props2.id;
-        var ins = _props2.ins;
-        var onCreateLink = _props2.onCreateLink;
-        var outs = _props2.outs;
-        var pinSize = _props2.pinSize;
-        var selected = _props2.selected;
-        var selectNode = _props2.selectNode;
-        var text = _props2.text;
-        var updateLink = _props2.updateLink;
-        var width = _props2.width;
-        var willDragNode = _props2.willDragNode;
-        var x = _props2.x;
-        var y = _props2.y;
+        var _props2 = this.props,
+            bodyHeight = _props2.bodyHeight,
+            dragged = _props2.dragged,
+            draggedLinkId = _props2.draggedLinkId,
+            color = _props2.color,
+            fontSize = _props2.fontSize,
+            id = _props2.id,
+            ins = _props2.ins,
+            onCreateLink = _props2.onCreateLink,
+            outs = _props2.outs,
+            pinSize = _props2.pinSize,
+            selected = _props2.selected,
+            selectNode = _props2.selectNode,
+            text = _props2.text,
+            updateLink = _props2.updateLink,
+            width = _props2.width,
+            willDragNode = _props2.willDragNode,
+            x = _props2.x,
+            y = _props2.y;
 
 
         var bodyContent = this.getBody();
@@ -10053,18 +10070,18 @@ module.exports = warning;
       value: function render() {
         var _this2 = this;
 
-        var _props = this.props;
-        var createNode = _props.createNode;
-        var height = _props.height;
-        var pointer = _props.pointer;
-        var show = _props.show;
-        var width = _props.width;
+        var _props = this.props,
+            createNode = _props.createNode,
+            height = _props.height,
+            pointer = _props.pointer,
+            show = _props.show,
+            width = _props.width;
 
 
         var text = this.state.text;
 
         var onChange = function onChange(e) {
-          var text = e.target.value.trim();
+          var text = e.target.value;
           _this2.setState({ text: text });
         };
 
@@ -10259,10 +10276,10 @@ module.exports = warning;
   });
 
   var computeNodeWidth = function computeNodeWidth(_ref) {
-    var bodyHeight = _ref.bodyHeight;
-    var pinSize = _ref.pinSize;
-    var fontSize = _ref.fontSize;
-    var node = _ref.node;
+    var bodyHeight = _ref.bodyHeight,
+        pinSize = _ref.pinSize,
+        fontSize = _ref.fontSize,
+        node = _ref.node;
 
     var ins = node.ins || [];
     var outs = node.outs || [];
@@ -32945,6 +32962,28 @@ var getDictionaryKey = function (inst) {
   return '.' + inst._rootNodeID;
 };
 
+function isInteractive(tag) {
+  return tag === 'button' || tag === 'input' || tag === 'select' || tag === 'textarea';
+}
+
+function shouldPreventMouseEvent(name, type, props) {
+  switch (name) {
+    case 'onClick':
+    case 'onClickCapture':
+    case 'onDoubleClick':
+    case 'onDoubleClickCapture':
+    case 'onMouseDown':
+    case 'onMouseDownCapture':
+    case 'onMouseMove':
+    case 'onMouseMoveCapture':
+    case 'onMouseUp':
+    case 'onMouseUpCapture':
+      return !!(props.disabled && isInteractive(type));
+    default:
+      return false;
+  }
+}
+
 /**
  * This is a unified interface for event plugins to be installed and configured.
  *
@@ -33013,7 +33052,12 @@ var EventPluginHub = {
    * @return {?function} The stored callback.
    */
   getListener: function (inst, registrationName) {
+    // TODO: shouldPreventMouseEvent is DOM-specific and definitely should not
+    // live here; needs to be moved to a better place soon
     var bankForRegistrationName = listenerBank[registrationName];
+    if (shouldPreventMouseEvent(registrationName, inst._currentElement.type, inst._currentElement.props)) {
+      return null;
+    }
     var key = getDictionaryKey(inst);
     return bankForRegistrationName && bankForRegistrationName[key];
   },
@@ -42608,7 +42652,7 @@ module.exports = ReactUpdates;
 
 'use strict';
 
-module.exports = '15.4.0';
+module.exports = '15.4.1';
 },{}],196:[function(require,module,exports){
 /**
  * Copyright 2013-present, Facebook, Inc.
@@ -43186,18 +43230,6 @@ function isInteractive(tag) {
   return tag === 'button' || tag === 'input' || tag === 'select' || tag === 'textarea';
 }
 
-function shouldPreventMouseEvent(inst) {
-  if (inst) {
-    var disabled = inst._currentElement && inst._currentElement.props.disabled;
-
-    if (disabled) {
-      return isInteractive(inst._tag);
-    }
-  }
-
-  return false;
-}
-
 var SimpleEventPlugin = {
 
   eventTypes: eventTypes,
@@ -43268,10 +43300,7 @@ var SimpleEventPlugin = {
       case 'topMouseDown':
       case 'topMouseMove':
       case 'topMouseUp':
-        // Disabled elements should not respond to mouse events
-        if (shouldPreventMouseEvent(targetInst)) {
-          return null;
-        }
+      // TODO: Disabled elements should not respond to mouse events
       /* falls through */
       case 'topMouseOut':
       case 'topMouseOver':
@@ -47825,30 +47854,38 @@ typeof Set === 'function' && isNative(Set) &&
 // Set.prototype.keys
 Set.prototype != null && typeof Set.prototype.keys === 'function' && isNative(Set.prototype.keys);
 
+var setItem;
+var getItem;
+var removeItem;
+var getItemIDs;
+var addRoot;
+var removeRoot;
+var getRootIDs;
+
 if (canUseCollections) {
   var itemMap = new Map();
   var rootIDSet = new Set();
 
-  var setItem = function (id, item) {
+  setItem = function (id, item) {
     itemMap.set(id, item);
   };
-  var getItem = function (id) {
+  getItem = function (id) {
     return itemMap.get(id);
   };
-  var removeItem = function (id) {
+  removeItem = function (id) {
     itemMap['delete'](id);
   };
-  var getItemIDs = function () {
+  getItemIDs = function () {
     return Array.from(itemMap.keys());
   };
 
-  var addRoot = function (id) {
+  addRoot = function (id) {
     rootIDSet.add(id);
   };
-  var removeRoot = function (id) {
+  removeRoot = function (id) {
     rootIDSet['delete'](id);
   };
-  var getRootIDs = function () {
+  getRootIDs = function () {
     return Array.from(rootIDSet.keys());
   };
 } else {
@@ -47864,31 +47901,31 @@ if (canUseCollections) {
     return parseInt(key.substr(1), 10);
   };
 
-  var setItem = function (id, item) {
+  setItem = function (id, item) {
     var key = getKeyFromID(id);
     itemByKey[key] = item;
   };
-  var getItem = function (id) {
+  getItem = function (id) {
     var key = getKeyFromID(id);
     return itemByKey[key];
   };
-  var removeItem = function (id) {
+  removeItem = function (id) {
     var key = getKeyFromID(id);
     delete itemByKey[key];
   };
-  var getItemIDs = function () {
+  getItemIDs = function () {
     return Object.keys(itemByKey).map(getIDFromKey);
   };
 
-  var addRoot = function (id) {
+  addRoot = function (id) {
     var key = getKeyFromID(id);
     rootByKey[key] = true;
   };
-  var removeRoot = function (id) {
+  removeRoot = function (id) {
     var key = getKeyFromID(id);
     delete rootByKey[key];
   };
-  var getRootIDs = function () {
+  getRootIDs = function () {
     return Object.keys(rootByKey).map(getIDFromKey);
   };
 }
@@ -52320,8 +52357,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function singleInputTask(taskName) {
   if (_accessor2.default.test(taskName)) return true;
-  if (_dotOperator2.default.attr.test(taskName)) return true;
-  if (_dotOperator2.default.func.test(taskName)) return false;
+  if (_dotOperator2.default.attrRead.test(taskName)) return true;
 
   var builtin = _builtin2.default[taskName];
   if (builtin) return builtin.length === 1;
@@ -52365,6 +52401,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 function twoInputsTask(taskName) {
   if (_dotOperator2.default.func.test(taskName)) return true;
+  if (_dotOperator2.default.attrWrite.test(taskName)) return true;
 
   var builtin = _builtin2.default[taskName];
   if (builtin) return builtin.length === 2;
@@ -52564,7 +52601,8 @@ function fun (graph, additionalFunctions) {
 
     // Skip dot operator tasks.
     if (regexDotOperator.func.test(taskName)) return
-    if (regexDotOperator.attr.test(taskName)) return
+    if (regexDotOperator.attrRead.test(taskName)) return
+    if (regexDotOperator.attrWrite.test(taskName)) return
 
     // Skip globals.
     if (walkGlobal(taskName)) return
@@ -52826,22 +52864,6 @@ exports.now = function () {
 };
 
 },{"not-defined":107}],295:[function(require,module,exports){
-exports.document = function () {
-  return document
-}
-
-exports.body = function () {
-  return document.body
-}
-
-exports.head = function () {
-  return document.head
-}
-
-exports.window = function () {
-  return window
-}
-
 var myAudioContext = null
 
 function audioContext () {
@@ -52854,10 +52876,28 @@ function audioContext () {
   }
 }
 
+exports.audioContext = audioContext
+
+exports.body = function () {
+  return document.body
+}
+
+exports.document = function () {
+  return document
+}
+
+exports.head = function () {
+  return document.head
+}
+
 exports.innerHTML = function (node, content) {
   node.innerHTML = content
 
   return node
+}
+
+exports.window = function () {
+  return window
 }
 
 },{}],296:[function(require,module,exports){
@@ -53054,14 +53094,33 @@ function injectDotOperators (funcs, task) {
     }
 
     if (regexDotOperator.func.test(taskName)) {
-      // .foo() -> foo
-      var attributeName = taskName.substring(1, taskName.length - 2)
-
-      funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
+                                                   // .foo() -> foo
+      funcs[taskName] = dotOperatorFunc.bind(null, taskName.substring(1, taskName.length - 2))
     }
 
     /**
-     * Dot operator attribute.
+     * Dot operator attribute write.
+     *
+     * @param {String} attributeName
+     * @param {Object} obj
+     * @param {*} attributeValue
+     *
+     * @returns {Object} obj modified
+     */
+
+    function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
+      obj[attributeName] = attributeValue
+
+      return obj
+    }
+
+    if (regexDotOperator.attrWrite.test(taskName)) {
+                                                             // .foo= -> foo
+      funcs[taskName] = dotOperatorAttributeWrite.bind(null, taskName.substring(1, taskName.length - 1))
+    }
+
+    /**
+     * Dot operator attribute read.
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -53069,7 +53128,7 @@ function injectDotOperators (funcs, task) {
      * @returns {*} attribute
      */
 
-    function dotOperatorAttr (attributeName, obj) {
+    function dotOperatorAttributeRead (attributeName, obj) {
       var attr
 
       if (obj) attr = obj[attributeName]
@@ -53079,11 +53138,9 @@ function injectDotOperators (funcs, task) {
       return attr
     }
 
-    if (regexDotOperator.attr.test(taskName)) {
-      // .foo -> foo
-      attributeName = taskName.substring(1)
-
-      funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
+    if (regexDotOperator.attrRead.test(taskName)) {
+                                                            // .foo -> foo
+      funcs[taskName] = dotOperatorAttributeRead.bind(null, taskName.substring(1))
     }
   }
 
@@ -53416,8 +53473,8 @@ module.exports = /^\/\/.+$/
 },{}],313:[function(require,module,exports){
 "use strict";
 
-exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/;
-
+exports.attrRead = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/;
+exports.attrWrite = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)=$/;
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/;
 
 },{}],314:[function(require,module,exports){
@@ -53500,8 +53557,12 @@ function validate (graph, additionalFunctions) {
         throw new TypeError('Function name cannot start with "@": ' + taskName)
       }
 
-      if (regexDotOperator.attr.test(taskName)) {
+      if (regexDotOperator.attrRead.test(taskName)) {
         throw new TypeError('Function name cannot start with ".":' + taskName)
+      }
+
+      if (regexDotOperator.attrWrite.test(taskName)) {
+        throw new TypeError('Function name cannot start with "." and end with "=":' + taskName)
       }
 
       if (regexDotOperator.func.test(taskName)) {

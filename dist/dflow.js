@@ -129,7 +129,8 @@ function fun (graph, additionalFunctions) {
 
     // Skip dot operator tasks.
     if (regexDotOperator.func.test(taskName)) return
-    if (regexDotOperator.attr.test(taskName)) return
+    if (regexDotOperator.attrRead.test(taskName)) return
+    if (regexDotOperator.attrWrite.test(taskName)) return
 
     // Skip globals.
     if (walkGlobal(taskName)) return
@@ -337,22 +338,6 @@ exports.true = function () { return true }
 exports.now = function () { return new Date() }
 
 },{"not-defined":1}],4:[function(require,module,exports){
-exports.document = function () {
-  return document
-}
-
-exports.body = function () {
-  return document.body
-}
-
-exports.head = function () {
-  return document.head
-}
-
-exports.window = function () {
-  return window
-}
-
 var myAudioContext = null
 
 function audioContext () {
@@ -365,10 +350,28 @@ function audioContext () {
   }
 }
 
+exports.audioContext = audioContext
+
+exports.body = function () {
+  return document.body
+}
+
+exports.document = function () {
+  return document
+}
+
+exports.head = function () {
+  return document.head
+}
+
 exports.innerHTML = function (node, content) {
   node.innerHTML = content
 
   return node
+}
+
+exports.window = function () {
+  return window
 }
 
 },{}],5:[function(require,module,exports){
@@ -565,14 +568,33 @@ function injectDotOperators (funcs, task) {
     }
 
     if (regexDotOperator.func.test(taskName)) {
-      // .foo() -> foo
-      var attributeName = taskName.substring(1, taskName.length - 2)
-
-      funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
+                                                   // .foo() -> foo
+      funcs[taskName] = dotOperatorFunc.bind(null, taskName.substring(1, taskName.length - 2))
     }
 
     /**
-     * Dot operator attribute.
+     * Dot operator attribute write.
+     *
+     * @param {String} attributeName
+     * @param {Object} obj
+     * @param {*} attributeValue
+     *
+     * @returns {Object} obj modified
+     */
+
+    function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
+      obj[attributeName] = attributeValue
+
+      return obj
+    }
+
+    if (regexDotOperator.attrWrite.test(taskName)) {
+                                                             // .foo= -> foo
+      funcs[taskName] = dotOperatorAttributeWrite.bind(null, taskName.substring(1, taskName.length - 1))
+    }
+
+    /**
+     * Dot operator attribute read.
      *
      * @param {String} attributeName
      * @param {Object} obj
@@ -580,7 +602,7 @@ function injectDotOperators (funcs, task) {
      * @returns {*} attribute
      */
 
-    function dotOperatorAttr (attributeName, obj) {
+    function dotOperatorAttributeRead (attributeName, obj) {
       var attr
 
       if (obj) attr = obj[attributeName]
@@ -590,11 +612,9 @@ function injectDotOperators (funcs, task) {
       return attr
     }
 
-    if (regexDotOperator.attr.test(taskName)) {
-      // .foo -> foo
-      attributeName = taskName.substring(1)
-
-      funcs[taskName] = dotOperatorAttr.bind(null, attributeName)
+    if (regexDotOperator.attrRead.test(taskName)) {
+                                                            // .foo -> foo
+      funcs[taskName] = dotOperatorAttributeRead.bind(null, taskName.substring(1))
     }
   }
 
@@ -921,8 +941,8 @@ module.exports = /^arguments\[(\d+)\]$/
 module.exports = /^\/\/.+$/
 
 },{}],22:[function(require,module,exports){
-exports.attr = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
-
+exports.attrRead = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
+exports.attrWrite = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)=$/
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
 },{}],23:[function(require,module,exports){
@@ -999,8 +1019,12 @@ function validate (graph, additionalFunctions) {
         throw new TypeError('Function name cannot start with "@": ' + taskName)
       }
 
-      if (regexDotOperator.attr.test(taskName)) {
+      if (regexDotOperator.attrRead.test(taskName)) {
         throw new TypeError('Function name cannot start with ".":' + taskName)
+      }
+
+      if (regexDotOperator.attrWrite.test(taskName)) {
+        throw new TypeError('Function name cannot start with "." and end with "=":' + taskName)
       }
 
       if (regexDotOperator.func.test(taskName)) {
