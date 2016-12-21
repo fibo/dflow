@@ -2,6 +2,15 @@ var injectDotOperators = require('engine/inject/dotOperators')
 
 describe('injectDotOperators', function () {
   it('modifies funcs object with dot operators attribute readers injected', function () {
+    // This test works server side if Nodejs process global is used
+    // but it will fail client side, so using a fake process is better.
+    var procezz = {
+      version: 1,
+      exit: function () {
+        throw new Error('kernel panic')
+      }
+    }
+
     var funcs = {}
     var graph = {
       task: {
@@ -18,13 +27,13 @@ describe('injectDotOperators', function () {
     getVersion.should.be.a.Function
     exit.should.be.a.Function
 
-    getVersion(process).should.be.eql(process.version)
+    getVersion(procezz).should.be.eql(procezz.version)
 
-    // This will return a reference to process.exit, it should not call it.
+    // This will return a reference to procezz.exit, it should not call it.
     exit(process).should.be.a.Function
   })
 
-  it('modifies funcs object with dot operators attribute writers injected'/*, function () {
+  it('modifies funcs object with dot operators attribute writers injected', function () {
     var funcs = {}
     var graph = {
       task: {
@@ -39,9 +48,11 @@ describe('injectDotOperators', function () {
     setFoo.should.be.a.Function
 
     var obj = {}
-    obj = setFoo(obj, 'bar')
+    var obj2 = setFoo(obj, 'bar')
+
     obj.foo.should.be.eql('bar')
-  }*/)
+    obj2.foo.should.be.eql('bar')
+  })
 
   it('modifies funcs object with dot operators function-like injected', function () {
     var funcs = {}

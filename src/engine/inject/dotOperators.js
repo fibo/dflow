@@ -36,10 +36,8 @@ function injectDotOperators (funcs, task) {
     }
 
     if (regexDotOperator.func.test(taskName)) {
-      // .foo() -> foo
-      var attributeName = taskName.substring(1, taskName.length - 2)
-
-      funcs[taskName] = dotOperatorFunc.bind(null, attributeName)
+                                                   // .foo() -> foo
+      funcs[taskName] = dotOperatorFunc.bind(null, taskName.substring(1, taskName.length - 2))
     }
 
     /**
@@ -59,10 +57,8 @@ function injectDotOperators (funcs, task) {
     }
 
     if (regexDotOperator.attrWrite.test(taskName)) {
-      // .foo=bar
-      attributeName = taskName.substring(1)
-
-      funcs[taskName] = dotOperatorAttributeWrite.bind(null, attributeName)
+                                                             // .foo= -> foo
+      funcs[taskName] = dotOperatorAttributeWrite.bind(null, taskName.substring(1, taskName.length - 1))
     }
 
     /**
@@ -85,10 +81,8 @@ function injectDotOperators (funcs, task) {
     }
 
     if (regexDotOperator.attrRead.test(taskName)) {
-      // .foo -> foo
-      attributeName = taskName.substring(1)
-
-      funcs[taskName] = dotOperatorAttributeRead.bind(null, attributeName)
+                                                            // .foo -> foo
+      funcs[taskName] = dotOperatorAttributeRead.bind(null, taskName.substring(1))
     }
   }
 

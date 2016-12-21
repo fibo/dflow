@@ -31,7 +31,10 @@ A *graph* has the following properties
   * `this.graph.data`: returns the graph data content.
   * `@foo`: accessor to *graph.data.foo*.
   * `&bar`: returns *bar* function.
-  * `.quz`, `.quuz()`: returns a dot-operator-like function.
+  * dot-operator-like functions
+    - `.quz`: returns an attribute reader function.
+    - `.quuz=`: returns an attribute writer function.
+    - `.quuuz()`: returns a dot-operator-like function.
   * any task found in global context, for example
     - `isFunction`
     - `Math.cos`
@@ -52,7 +55,7 @@ of additional functions that will be used in the task resolution.
 In order to avoid conflicts with *injected* functions, the optional collection of *additionalFunctions* must contain function names validated by the following rules:
 
   * cannot be the name of an injected function: `arguments[0]` ... `arguments[N]`, [reserver keys][reserved-keys] like `this` and `return` are not allowed.
-  * cannot start with a *dot*, *ampersand* or *at sign*: names `@foo`, `&bar`, `.quz` and `.quuz()` for an additional function are not allowed.
+  * cannot start with a *dot*, *ampersand* or *at sign*: names `@foo`, `&bar`, `.quz`, `.quuz=` and `.quuuz()` for an additional function are not allowed.
 
 ### Arrow functions
 
