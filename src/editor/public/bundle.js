@@ -55710,10 +55710,6 @@ var _quoted = require('../../../engine/regex/quoted');
 
 var _quoted2 = _interopRequireDefault(_quoted);
 
-var _walkGlobal = require('../../../engine/walkGlobal');
-
-var _walkGlobal2 = _interopRequireDefault(_walkGlobal);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -55731,18 +55727,12 @@ function noInputTask(taskName) {
   var builtin = _builtin2.default[taskName];
   if (builtin) return builtin.length === 0;
 
-  var globalTask = (0, _walkGlobal2.default)(taskName);
-
-  if (globalTask) {
-    if (typeof globalTask === 'function') return globalTask.length === 0;else return true;
-  }
-
   var noInputTasks = ['arguments', 'body', 'document', 'Infinity'];
 
   return noInputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":352,"../../../engine/regex/argument":369,"../../../engine/regex/quoted":372,"../../../engine/regex/reference":373,"../../../engine/walkGlobal":377}],345:[function(require,module,exports){
+},{"../../../engine/functions/builtin":352,"../../../engine/regex/argument":369,"../../../engine/regex/quoted":372,"../../../engine/regex/reference":373}],345:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55819,7 +55809,7 @@ function singleInputTask(taskName) {
     return globalTask.length === 1;
   }
 
-  var singleInputTasks = ['return', 't'];
+  var singleInputTasks = ['alert', 'return', 't'];
 
   return singleInputTasks.indexOf(taskName) > -1;
 }
@@ -56332,7 +56322,7 @@ exports.now = function () {
 };
 
 },{"not-defined":120}],353:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var myAudioContext = null;
 
@@ -56360,11 +56350,14 @@ exports.head = function () {
   return document.head;
 };
 
-exports.innerHTML = function (node, content) {
-  node.innerHTML = content;
+// TODO more tags
+var tags = ['a', 'div', 'link', 'p', 'script'];
 
-  return node;
-};
+tags.forEach(function (x) {
+  exports[x] = function () {
+    return document.createElement(x);
+  };
+});
 
 exports.window = function () {
   return window;

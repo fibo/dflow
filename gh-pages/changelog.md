@@ -33,6 +33,7 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 ### Added
 
 - CDNJS link
+- Create element: script, div, p, h1, h2 ...
 
 ## [v0.18.3] - 2016-11-27
 

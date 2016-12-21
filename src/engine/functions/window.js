@@ -24,11 +24,16 @@ exports.head = function () {
   return document.head
 }
 
-exports.innerHTML = function (node, content) {
-  node.innerHTML = content
+// TODO more tags
+var tags = [
+  'a', 'div', 'link', 'p', 'script'
+]
 
-  return node
-}
+tags.forEach(function (x) {
+  exports[x] = function () {
+    return document.createElement(x)
+  }
+})
 
 exports.window = function () {
   return window

@@ -2,7 +2,6 @@ import builtinFunctions from '../../../engine/functions/builtin'
 import regexArgument from '../../../engine/regex/argument'
 import regexReference from '../../../engine/regex/reference'
 import regexQuoted from '../../../engine/regex/quoted'
-import walkGlobal from '../../../engine/walkGlobal'
 
 /**
  * @param {String} taskName
@@ -18,13 +17,6 @@ export default function noInputTask (taskName) {
 
   const builtin = builtinFunctions[taskName]
   if (builtin) return builtin.length === 0
-
-  const globalTask = walkGlobal(taskName)
-
-  if (globalTask) {
-    if (typeof globalTask === 'function') return globalTask.length === 0
-    else return true
-  }
 
   const noInputTasks = [
     'arguments',
