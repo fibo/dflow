@@ -23,7 +23,7 @@ class Graph {
     return graph
   }
 
-  update (newGraph) {
+  update (newGraph, callback) {
     var graph = this.graph
     const graphPath = this.graphPath
 
@@ -31,7 +31,7 @@ class Graph {
 
     graph = newGraph
 
-    write(graphPath, graph)
+    write(graphPath, graph, callback)
   }
 }
 

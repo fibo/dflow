@@ -58,11 +58,19 @@ const editorServer = (graph) => (req, res) => {
           })
 
           req.on('end', (err) => {
-            if (err) throw err
+            if (err) {
+              debug(err)
+              throw err
+            }
 
-            graph.update(body)
+            graph.update(body, (err) => {
+              if (err) {
+                debug(err)
+                throw err
+              }
 
-            res.end()
+              res.end()
+            })
           })
 
           break
