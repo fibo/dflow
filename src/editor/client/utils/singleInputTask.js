@@ -22,6 +22,7 @@ export default function singleInputTask (taskName) {
   }
 
   const singleInputTasks = [
+    'alert',
     'return',
     't'
   ]
