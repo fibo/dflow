@@ -6750,7 +6750,7 @@ module.exports = injectStrings
 module.exports = /^@[\w][\w\d]+$/
 
 },{}],24:[function(require,module,exports){
-module.exports = /^arguments\[(\d+)\]$/
+module.exports = /^arguments\[(\d+)]$/
 
 },{}],25:[function(require,module,exports){
 module.exports = /^\/\/.+$/
