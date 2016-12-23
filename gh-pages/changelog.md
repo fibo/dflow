@@ -21,9 +21,12 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - accessor nodes should accept only valid JSON and displayed as custom nodes. If you click them, a modal is opened to edit them if they are not connected, they can also show a preview of their values
 - find a smart way to show output values, it should be like vvvv debug you can apply it to a single task or the whole subgraph or graph
 - can edit subgraphs, canvas should be able to empty and show the subgraphwhile a navbat like   root / subgraph1 / subgraph2 with dropdowns let you navigate throw the tree.
+- Implement RUN_ONCE editor action (already there), add Run button and make it work.
 
 
 ## [Unreleased]
+
+## [v0.18.4] - 2016-12-23
 
 ### Fixed
 
@@ -40,6 +43,11 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - Create element: script, div, p, h1, h2 ...
 - dflow edit --port option
 - Better CLI docs and usage messages
+- Safe document appendChild
+- Rich hello world, shows hot to modify DOM
+- Added few Node core modules, in engine/functions/process.js: http, zlib, ecc.
+- Dependencies updated.
+
 
 ## [v0.18.3] - 2016-11-27
 

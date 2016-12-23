@@ -52292,10 +52292,6 @@ var _quoted = require('../../../engine/regex/quoted');
 
 var _quoted2 = _interopRequireDefault(_quoted);
 
-var _walkGlobal = require('../../../engine/walkGlobal');
-
-var _walkGlobal2 = _interopRequireDefault(_walkGlobal);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -52313,18 +52309,12 @@ function noInputTask(taskName) {
   var builtin = _builtin2.default[taskName];
   if (builtin) return builtin.length === 0;
 
-  var globalTask = (0, _walkGlobal2.default)(taskName);
-
-  if (globalTask) {
-    if (typeof globalTask === 'function') return globalTask.length === 0;else return true;
-  }
-
   var noInputTasks = ['arguments', 'body', 'document', 'Infinity'];
 
   return noInputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":294,"../../../engine/regex/argument":311,"../../../engine/regex/quoted":314,"../../../engine/regex/reference":315,"../../../engine/walkGlobal":319}],289:[function(require,module,exports){
+},{"../../../engine/functions/builtin":294,"../../../engine/regex/argument":312,"../../../engine/regex/quoted":315,"../../../engine/regex/reference":316}],289:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52343,6 +52333,10 @@ var _accessor2 = _interopRequireDefault(_accessor);
 var _dotOperator = require('../../../engine/regex/dotOperator');
 
 var _dotOperator2 = _interopRequireDefault(_dotOperator);
+
+var _window = require('../../../engine/functions/window');
+
+var _window2 = _interopRequireDefault(_window);
 
 var _walkGlobal = require('../../../engine/walkGlobal');
 
@@ -52370,10 +52364,10 @@ function singleInputTask(taskName) {
 
   var singleInputTasks = ['alert', 'return', 't'];
 
-  return singleInputTasks.indexOf(taskName) > -1;
+  return singleInputTasks.concat(_window2.default.availableTags()).indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":294,"../../../engine/regex/accessor":310,"../../../engine/regex/dotOperator":313,"../../../engine/walkGlobal":319}],290:[function(require,module,exports){
+},{"../../../engine/functions/builtin":294,"../../../engine/functions/window":296,"../../../engine/regex/accessor":311,"../../../engine/regex/dotOperator":314,"../../../engine/walkGlobal":320}],290:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52393,6 +52387,14 @@ var _walkGlobal = require('../../../engine/walkGlobal');
 
 var _walkGlobal2 = _interopRequireDefault(_walkGlobal);
 
+var _process = require('../../../engine/functions/process');
+
+var _process2 = _interopRequireDefault(_process);
+
+var _window = require('../../../engine/functions/window');
+
+var _window2 = _interopRequireDefault(_window);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -52403,8 +52405,14 @@ function twoInputsTask(taskName) {
   if (_dotOperator2.default.func.test(taskName)) return true;
   if (_dotOperator2.default.attrWrite.test(taskName)) return true;
 
-  var builtin = _builtin2.default[taskName];
-  if (builtin) return builtin.length === 2;
+  var builtinFun = _builtin2.default[taskName];
+  if (builtinFun) return builtinFun.length === 2;
+
+  var processFun = _process2.default[taskName];
+  if (processFun) return processFun.length === 2;
+
+  var windowFun = _window2.default[taskName];
+  if (windowFun) return windowFun.length === 2;
 
   var globalTask = (0, _walkGlobal2.default)(taskName);
 
@@ -52415,7 +52423,7 @@ function twoInputsTask(taskName) {
   return false;
 }
 
-},{"../../../engine/functions/builtin":294,"../../../engine/regex/dotOperator":313,"../../../engine/walkGlobal":319}],291:[function(require,module,exports){
+},{"../../../engine/functions/builtin":294,"../../../engine/functions/process":295,"../../../engine/functions/window":296,"../../../engine/regex/dotOperator":314,"../../../engine/walkGlobal":320}],291:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52451,7 +52459,7 @@ function typeOfNode(node) {
   }
 }
 
-},{"../../../engine/regex/subgraph":316}],292:[function(require,module,exports){
+},{"../../../engine/regex/subgraph":317}],292:[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/dflow
  */
@@ -52473,7 +52481,7 @@ function funBrowser (graph) {
 
 exports.fun = funBrowser
 
-},{"../fun":293,"../functions/window":295}],293:[function(require,module,exports){
+},{"../fun":293,"../functions/window":296}],293:[function(require,module,exports){
 var builtinFunctions = require('./functions/builtin')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
 var injectArguments = require('./inject/arguments')
@@ -52491,6 +52499,7 @@ var no = require('not-defined')
 var regexArgument = require('./regex/argument')
 var regexComment = require('./regex/comment')
 var regexDotOperator = require('./regex/dotOperator')
+var regexReference = require('./regex/reference')
 var regexSubgraph = require('./regex/subgraph')
 var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
@@ -52604,6 +52613,9 @@ function fun (graph, additionalFunctions) {
     if (regexDotOperator.attrRead.test(taskName)) return
     if (regexDotOperator.attrWrite.test(taskName)) return
 
+    // Skip references
+    if (regexReference.exec(taskName)) return
+
     // Skip globals.
     if (walkGlobal(taskName)) return
 
@@ -52695,7 +52707,7 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./functions/builtin":294,"./inject/accessors":296,"./inject/additionalFunctions":297,"./inject/arguments":298,"./inject/arrowFunctions":299,"./inject/dotOperators":300,"./inject/globals":301,"./inject/numbers":302,"./inject/references":303,"./inject/strings":304,"./inputArgs":305,"./isDflowFun":307,"./level":308,"./regex/argument":311,"./regex/comment":312,"./regex/dotOperator":313,"./regex/subgraph":316,"./reservedKeys":317,"./validate":318,"./walkGlobal":319,"not-defined":107}],294:[function(require,module,exports){
+},{"./functions/builtin":294,"./inject/accessors":297,"./inject/additionalFunctions":298,"./inject/arguments":299,"./inject/arrowFunctions":300,"./inject/dotOperators":301,"./inject/globals":302,"./inject/numbers":303,"./inject/references":304,"./inject/strings":305,"./inputArgs":306,"./isDflowFun":308,"./level":309,"./regex/argument":312,"./regex/comment":313,"./regex/dotOperator":314,"./regex/reference":316,"./regex/subgraph":317,"./reservedKeys":318,"./validate":319,"./walkGlobal":320,"not-defined":107}],294:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -52864,48 +52876,130 @@ exports.now = function () {
 };
 
 },{"not-defined":107}],295:[function(require,module,exports){
-var myAudioContext = null
+(function (process){
+'use strict';
 
-function audioContext () {
+function coreNodeModules() {
+  // TODO add more core node modules
+  return ['http', 'https', 'net', 'path', 'readline', 'zlib'];
+}
+
+exports.coreNodeModules = coreNodeModules;
+
+coreNodeModules().forEach(function (x) {
+  exports[x] = function () {
+    return require(x);
+  };
+});
+
+exports.process = function () {
+  return process;
+};
+
+}).call(this,require('_process'))
+},{"_process":113}],296:[function(require,module,exports){
+'use strict';
+
+var no = require('not-defined');
+
+var myAudioContext = null;
+
+function audioContext() {
   if (myAudioContext) {
-    return myAudioContext
+    return myAudioContext;
   } else {
-    var AudioContext = window.AudioContext || window.webkitAudioContext
-    myAudioContext = new AudioContext()
-    return myAudioContext
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    myAudioContext = new AudioContext();
+    return myAudioContext;
   }
 }
 
-exports.audioContext = audioContext
+exports.audioContext = audioContext;
+
+// Tash `.appendChild()` works but it is too dangerous!
+//
+// For example, inverting parent with child will delete parent.
+// For instance .appendChild(element, body) will erase body.
+//
+// Another issue is that appending a child that has an id must
+// be idempotent.
+//
+// It is worth to use this safe version.
+
+exports.appendChild = function (element, child) {
+  var protectedNodes = ['body', 'head'];
+
+  // Nothing to do if element or child is not provided.
+  if (arguments.length < 2) return;
+
+  // Prevent erase important DOM nodes.
+  protectedNodes.forEach(function (node) {
+    if (child === document[node]) {
+      throw new Error('cannot erase ' + node);
+    }
+  });
+
+  // Check arguments look like DOM nodes.
+  Array.prototype.slice.call(arguments).forEach(function (node) {
+    if (typeof node.appendChild !== 'function') {
+      throw new Error('Cannot appendChild, not an element:' + node);
+    }
+  });
+
+  // Be idempotent. It is required that child has an id.
+  var id = child.id;
+  if (no(id)) return;
+
+  var foundChild = document.getElementById(id);
+  if (foundChild) return foundChild;
+
+  // At this stage, child is a brand new element.
+  return element.appendChild(child);
+};
 
 exports.body = function () {
-  return document.body
-}
+  return document.body;
+};
 
 exports.document = function () {
-  return document
-}
+  return document;
+};
 
 exports.head = function () {
-  return document.head
+  return document.head;
+};
+
+function availableTags() {
+  return ['a', 'article', 'aside', 'button', 'form', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'input', 'label', 'li', 'link', 'ol', 'nav', 'p', 'script', 'svg', 'textarea', 'ul'];
 }
 
-// TODO more tags
-var tags = [
-  'a', 'div', 'link', 'p', 'script'
-]
+exports.availableTags = availableTags;
 
-tags.forEach(function (x) {
-  exports[x] = function () {
-    return document.createElement(x)
-  }
-})
+availableTags().forEach(function (x) {
+  exports[x] = function (id) {
+    var element;
+
+    // If id is provided, it must be a string.
+    if (id && typeof id !== 'string') {
+      throw new TypeError('Element id must be a string:' + id);
+    }
+
+    element = document.getElementById(id);
+
+    if (!element) {
+      element = document.createElement(x);
+      element.id = id;
+    }
+
+    return element;
+  };
+});
 
 exports.window = function () {
-  return window
-}
+  return window;
+};
 
-},{}],296:[function(require,module,exports){
+},{"not-defined":107}],297:[function(require,module,exports){
 var no = require('not-defined')
 var regexAccessor = require('../regex/accessor')
 
@@ -52953,7 +53047,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":310,"not-defined":107}],297:[function(require,module,exports){
+},{"../regex/accessor":311,"not-defined":107}],298:[function(require,module,exports){
 var no = require('not-defined')
 
 /**
@@ -52983,7 +53077,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{"not-defined":107}],298:[function(require,module,exports){
+},{"not-defined":107}],299:[function(require,module,exports){
 var regexArgument = require('../regex/argument')
 
 /**
@@ -53023,7 +53117,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":311}],299:[function(require,module,exports){
+},{"../regex/argument":312}],300:[function(require,module,exports){
 /**
  * If it contains an `=>`, escape single quotes and eval it.
  *
@@ -53060,7 +53154,8 @@ function arrowFunctions (funcs, task) {
 
 module.exports = arrowFunctions
 
-},{}],300:[function(require,module,exports){
+},{}],301:[function(require,module,exports){
+var no = require('not-defined')
 var regexDotOperator = require('../regex/dotOperator')
 
 /**
@@ -53114,7 +53209,7 @@ function injectDotOperators (funcs, task) {
      */
 
     function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
-      if (arguments.length === 1) return
+      if (no(obj)) return
 
       obj[attributeName] = attributeValue
 
@@ -53156,7 +53251,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":313}],301:[function(require,module,exports){
+},{"../regex/dotOperator":314,"not-defined":107}],302:[function(require,module,exports){
 var no = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
@@ -53202,7 +53297,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../reservedKeys":317,"../walkGlobal":319,"not-defined":107}],302:[function(require,module,exports){
+},{"../reservedKeys":318,"../walkGlobal":320,"not-defined":107}],303:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -53233,7 +53328,7 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],303:[function(require,module,exports){
+},{}],304:[function(require,module,exports){
 var regexReference = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
@@ -53282,7 +53377,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":315,"../walkGlobal":319}],304:[function(require,module,exports){
+},{"../regex/reference":316,"../walkGlobal":320}],305:[function(require,module,exports){
 var regexQuoted = require('../regex/quoted')
 
 /**
@@ -53313,7 +53408,7 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":314}],305:[function(require,module,exports){
+},{"../regex/quoted":315}],306:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -53344,7 +53439,7 @@ function inputArgs (outs, pipe, taskKey) {
 
 module.exports = inputArgs
 
-},{"./inputPipes":306}],306:[function(require,module,exports){
+},{"./inputPipes":307}],307:[function(require,module,exports){
 /**
  * Compute pipes that feed a task.
  *
@@ -53372,7 +53467,7 @@ function inputPipes (pipe, taskKey) {
 
 module.exports = inputPipes
 
-},{}],307:[function(require,module,exports){
+},{}],308:[function(require,module,exports){
 var validate = require('./validate')
 
 /**
@@ -53402,7 +53497,7 @@ function isDflowFun (f) {
 
 module.exports = isDflowFun
 
-},{"./validate":318}],308:[function(require,module,exports){
+},{"./validate":319}],309:[function(require,module,exports){
 var parents = require('./parents')
 
 /**
@@ -53437,7 +53532,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 
 module.exports = level
 
-},{"./parents":309}],309:[function(require,module,exports){
+},{"./parents":310}],310:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -53464,42 +53559,44 @@ function parents (pipe, taskKey) {
 
 module.exports = parents
 
-},{"./inputPipes":306}],310:[function(require,module,exports){
+},{"./inputPipes":307}],311:[function(require,module,exports){
 "use strict";
 
 module.exports = /^@[\w][\w\d]+$/;
 
-},{}],311:[function(require,module,exports){
+},{}],312:[function(require,module,exports){
 "use strict";
 
 module.exports = /^arguments\[(\d+)\]$/;
 
-},{}],312:[function(require,module,exports){
-module.exports = /^\/\/.+$/
-
 },{}],313:[function(require,module,exports){
+"use strict";
+
+module.exports = /^\/\/.+$/;
+
+},{}],314:[function(require,module,exports){
 "use strict";
 
 exports.attrRead = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/;
 exports.attrWrite = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)=$/;
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/;
 
-},{}],314:[function(require,module,exports){
+},{}],315:[function(require,module,exports){
 "use strict";
 
 module.exports = /^'.+'$/;
 
-},{}],315:[function(require,module,exports){
+},{}],316:[function(require,module,exports){
 "use strict";
 
 module.exports = /^&(.+)$/;
 
-},{}],316:[function(require,module,exports){
+},{}],317:[function(require,module,exports){
 "use strict";
 
 module.exports = /^\/[\w][\w\d]+$/;
 
-},{}],317:[function(require,module,exports){
+},{}],318:[function(require,module,exports){
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = [
   'arguments',
@@ -53511,7 +53608,7 @@ module.exports = [
   'this.graph'
 ]
 
-},{}],318:[function(require,module,exports){
+},{}],319:[function(require,module,exports){
 var no = require('not-defined')
 var regexAccessor = require('./regex/accessor')
 var regexArgument = require('./regex/argument')
@@ -53680,12 +53777,14 @@ function validate (graph, additionalFunctions) {
 
 module.exports = validate
 
-},{"./regex/accessor":310,"./regex/argument":311,"./regex/dotOperator":313,"./regex/reference":315,"./regex/subgraph":316,"./reservedKeys":317,"not-defined":107}],319:[function(require,module,exports){
+},{"./regex/accessor":311,"./regex/argument":312,"./regex/dotOperator":314,"./regex/reference":316,"./regex/subgraph":317,"./reservedKeys":318,"not-defined":107}],320:[function(require,module,exports){
 (function (global){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+var regexComment = require('./regex/comment');
+var regexReference = require('./regex/reference');
 var regexQuoted = require('./regex/quoted');
 
 var globalContext;
@@ -53711,9 +53810,15 @@ function walkGlobal(taskName) {
   // Skip dot operator and tasks that start with a dot.
   if (taskName.indexOf('.') === 0) return;
 
-  // Skip strings and numbers which may include dots.
-  if (regexQuoted.test(taskName)) return;
+  // Skip stuff that may include dots:
+  // * comments
+  // * strings
+  // * numbers
+  // * references
+  if (regexComment.test(taskName)) return;
   if (parseFloat(taskName)) return;
+  if (regexQuoted.test(taskName)) return;
+  if (regexReference.test(taskName)) return;
 
   function toNextProp(next, prop) {
     return next[prop];
@@ -53725,7 +53830,7 @@ function walkGlobal(taskName) {
 module.exports = walkGlobal;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./regex/quoted":314}],320:[function(require,module,exports){
+},{"./regex/comment":313,"./regex/quoted":315,"./regex/reference":316}],321:[function(require,module,exports){
 module.exports={
   "data": {
     "results": [ {
@@ -53864,7 +53969,7 @@ module.exports={
   }
 }
 
-},{}],321:[function(require,module,exports){
+},{}],322:[function(require,module,exports){
 module.exports={
   "info": {
     "context": "client"
@@ -54049,7 +54154,7 @@ module.exports={
   }
 }
 
-},{}],322:[function(require,module,exports){
+},{}],323:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -54070,10 +54175,10 @@ module.exports={
   }
 }
 
-},{}],323:[function(require,module,exports){
+},{}],324:[function(require,module,exports){
 module.exports={"data":{},"info":{},"pipe":{"lxf":["ypj","2"]},"task":{"2":"console.log","ypj":"'Hello world'"},"view":{"node":{"2":{"x":149,"y":154,"w":15,"task":"2","text":"console.log","ins":[{"name":"in0"}]},"ypj":{"text":"'Hello world'","x":138,"y":31,"outs":["out"]}},"link":{"lxf":{"from":["ypj",0],"to":["2",0]}}}}
 
-},{}],324:[function(require,module,exports){
+},{}],325:[function(require,module,exports){
 'use strict';
 
 // Do not use dynamic imports, for example importing the whole graph folder;
@@ -54096,9 +54201,9 @@ exports.welcome = require('./welcome.json');
 
 // TODO fix it! exports.dotOperator = require('./dotOperator.json')
 
-},{"./apply.json":320,"./createParagraph.json":321,"./dateParse.json":322,"./hello-world.json":323,"./indexOf.json":325,"./or.json":326,"./sum.json":327,"./welcome.json":328}],325:[function(require,module,exports){
+},{"./apply.json":321,"./createParagraph.json":322,"./dateParse.json":323,"./hello-world.json":324,"./indexOf.json":326,"./or.json":327,"./sum.json":328,"./welcome.json":329}],326:[function(require,module,exports){
 module.exports={"data":{"results":[{"args":["abcd","b"],"expected":1},{"args":[[7,8,9],9],"expected":2}]},"info":{},"pipe":{"rhq":["cjb","dqf"],"ari":["ffv","dqf",1],"qae":["dqf","ozw"]},"task":{"dqf":".indexOf()","ozw":"console.log","cjb":"'abcd'","ffv":"'b'","jhv":"// 1"},"view":{"link":{"rhq":{"from":["cjb",0],"to":["dqf",0]},"ari":{"from":["ffv",0],"to":["dqf",1]},"qae":{"from":["dqf",0],"to":["ozw",0]}},"node":{"dqf":{"text":".indexOf()","x":228,"y":117,"outs":["out"],"ins":["in1","in2"]},"ozw":{"text":"console.log","x":227,"y":212,"ins":["in0"]},"cjb":{"text":"'abcd'","x":229,"y":27,"outs":["out"]},"ffv":{"text":"'b'","x":349,"y":35,"outs":["out"]},"jhv":{"text":"// 1","x":409,"y":230}}}}
-},{}],326:[function(require,module,exports){
+},{}],327:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -54121,9 +54226,9 @@ module.exports={
   }
 }
 
-},{}],327:[function(require,module,exports){
-module.exports={"data":{},"info":{},"pipe":{"veg":["xvb","zmo"],"rbc":["vug","zmo",1],"zul":["zmo","uam"],"pjx":["zii","uam",1],"hsj":["uam","nef"]},"task":{"xvb":"1","vug":"2","zmo":"+","uam":"===","zii":"3","nef":"console.log"},"view":{"link":{"veg":{"from":["xvb",0],"to":["zmo",0]},"rbc":{"from":["vug",0],"to":["zmo",1]},"zul":{"from":["zmo",0],"to":["uam",0]},"pjx":{"from":["zii",0],"to":["uam",1]},"hsj":{"from":["uam",0],"to":["nef",0]}},"node":{"xvb":{"text":"1","x":232,"y":26,"outs":["out"]},"vug":{"text":"2","x":319,"y":27,"outs":["out"]},"zmo":{"text":"+","x":233,"y":119,"outs":["out"],"ins":["in1","in2"]},"uam":{"text":"===","x":234,"y":217,"outs":["out"],"ins":["in1","in2"]},"zii":{"text":"3","x":330,"y":122,"outs":["out"]},"nef":{"text":"console.log","x":235,"y":308,"ins":["in0"]}}}}
 },{}],328:[function(require,module,exports){
+module.exports={"data":{},"info":{},"pipe":{"veg":["xvb","zmo"],"rbc":["vug","zmo",1],"zul":["zmo","uam"],"pjx":["zii","uam",1],"hsj":["uam","nef"]},"task":{"xvb":"1","vug":"2","zmo":"+","uam":"===","zii":"3","nef":"console.log"},"view":{"link":{"veg":{"from":["xvb",0],"to":["zmo",0]},"rbc":{"from":["vug",0],"to":["zmo",1]},"zul":{"from":["zmo",0],"to":["uam",0]},"pjx":{"from":["zii",0],"to":["uam",1]},"hsj":{"from":["uam",0],"to":["nef",0]}},"node":{"xvb":{"text":"1","x":232,"y":26,"outs":["out"]},"vug":{"text":"2","x":319,"y":27,"outs":["out"]},"zmo":{"text":"+","x":233,"y":119,"outs":["out"],"ins":["in1","in2"]},"uam":{"text":"===","x":234,"y":217,"outs":["out"],"ins":["in1","in2"]},"zii":{"text":"3","x":330,"y":122,"outs":["out"]},"nef":{"text":"console.log","x":235,"y":308,"ins":["in0"]}}}}
+},{}],329:[function(require,module,exports){
 module.exports={
   "data": {
     "results": []
@@ -54179,7 +54284,7 @@ module.exports={
   }
 }
 
-},{}],329:[function(require,module,exports){
+},{}],330:[function(require,module,exports){
 // Cheating npm require.
 module.exports = require('../../../..')
 
@@ -54247,4 +54352,4 @@ function renderExample(divId, example) {
 
 module.exports = renderExample;
 
-},{"../../editor/client/components/Inspector":284,"../../editor/client/components/InvalidNode":285,"../../editor/client/components/ToggleNode":286,"../../editor/client/utils/typeOfNode":291,"../graphs":324,"dflow":329,"flow-view":78,"flow-view/components":76}]},{},[]);
+},{"../../editor/client/components/Inspector":284,"../../editor/client/components/InvalidNode":285,"../../editor/client/components/ToggleNode":286,"../../editor/client/utils/typeOfNode":291,"../graphs":325,"dflow":330,"flow-view":78,"flow-view/components":76}]},{},[]);

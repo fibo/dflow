@@ -6493,6 +6493,7 @@ function arrowFunctions (funcs, task) {
 module.exports = arrowFunctions
 
 },{}],18:[function(require,module,exports){
+var no = require('not-defined')
 var regexDotOperator = require('../regex/dotOperator')
 
 /**
@@ -6546,7 +6547,7 @@ function injectDotOperators (funcs, task) {
      */
 
     function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
-      if (arguments.length === 1) return
+      if (no(obj)) return
 
       obj[attributeName] = attributeValue
 
@@ -6588,7 +6589,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":25}],19:[function(require,module,exports){
+},{"../regex/dotOperator":26,"not-defined":5}],19:[function(require,module,exports){
 var no = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
@@ -6634,7 +6635,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../reservedKeys":28,"../walkGlobal":29,"not-defined":5}],20:[function(require,module,exports){
+},{"../reservedKeys":29,"../walkGlobal":30,"not-defined":5}],20:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -6714,7 +6715,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":27,"../walkGlobal":29}],22:[function(require,module,exports){
+},{"../regex/reference":28,"../walkGlobal":30}],22:[function(require,module,exports){
 var regexQuoted = require('../regex/quoted')
 
 /**
@@ -6745,24 +6746,27 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":26}],23:[function(require,module,exports){
+},{"../regex/quoted":27}],23:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
 },{}],24:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)\]$/
 
 },{}],25:[function(require,module,exports){
+module.exports = /^\/\/.+$/
+
+},{}],26:[function(require,module,exports){
 exports.attrRead = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 exports.attrWrite = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)=$/
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports = /^&(.+)$/
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = [
   'arguments',
@@ -6774,8 +6778,10 @@ module.exports = [
   'this.graph'
 ]
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 (function (global){
+var regexComment = require('./regex/comment')
+var regexReference = require('./regex/reference')
 var regexQuoted = require('./regex/quoted')
 
 var globalContext
@@ -6801,9 +6807,15 @@ function walkGlobal (taskName) {
   // Skip dot operator and tasks that start with a dot.
   if (taskName.indexOf('.') === 0) return
 
-  // Skip strings and numbers which may include dots.
-  if (regexQuoted.test(taskName)) return
+  // Skip stuff that may include dots:
+  // * comments
+  // * strings
+  // * numbers
+  // * references
+  if (regexComment.test(taskName)) return
   if (parseFloat(taskName)) return
+  if (regexQuoted.test(taskName)) return
+  if (regexReference.test(taskName)) return
 
   function toNextProp (next, prop) {
     return next[prop]
@@ -6816,7 +6828,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./regex/quoted":26}],30:[function(require,module,exports){
+},{"./regex/comment":25,"./regex/quoted":27,"./regex/reference":28}],31:[function(require,module,exports){
 var injectAccessors = require('engine/inject/accessors')
 var should = require('should')
 
@@ -6878,7 +6890,7 @@ describe('injectAccessors', function () {
   })
 })
 
-},{"engine/inject/accessors":14,"should":13}],31:[function(require,module,exports){
+},{"engine/inject/accessors":14,"should":13}],32:[function(require,module,exports){
 var injectAdditionalFunctions = require('engine/inject/additionalFunctions')
 
 describe('injectAdditionalFunctions', function () {
@@ -6896,7 +6908,7 @@ describe('injectAdditionalFunctions', function () {
   })
 })
 
-},{"engine/inject/additionalFunctions":15}],32:[function(require,module,exports){
+},{"engine/inject/additionalFunctions":15}],33:[function(require,module,exports){
 var injectArguments = require('engine/inject/arguments')
 
 var funcs = {}
@@ -6930,7 +6942,7 @@ describe('injectArguments', function () {
   })
 })
 
-},{"engine/inject/arguments":16}],33:[function(require,module,exports){
+},{"engine/inject/arguments":16}],34:[function(require,module,exports){
 var injectArrowFunctions = require('engine/inject/arrowFunctions')
 
 describe('injectArrowFunctions', function () {
@@ -6954,7 +6966,7 @@ describe('injectArrowFunctions', function () {
   })
 })
 
-},{"engine/inject/arrowFunctions":17}],34:[function(require,module,exports){
+},{"engine/inject/arrowFunctions":17}],35:[function(require,module,exports){
 (function (process){
 var injectDotOperators = require('engine/inject/dotOperators')
 
@@ -7040,7 +7052,7 @@ describe('injectDotOperators', function () {
 })
 
 }).call(this,require('_process'))
-},{"_process":6,"engine/inject/dotOperators":18}],35:[function(require,module,exports){
+},{"_process":6,"engine/inject/dotOperators":18}],36:[function(require,module,exports){
 (function (process){
 var injectGlobals = require('engine/inject/globals')
 
@@ -7074,7 +7086,7 @@ describe('injectGlobals', function () {
 })
 
 }).call(this,require('_process'))
-},{"_process":6,"engine/inject/globals":19}],36:[function(require,module,exports){
+},{"_process":6,"engine/inject/globals":19}],37:[function(require,module,exports){
 var injectNumbers = require('engine/inject/numbers')
 
 describe('injectNumbers', function () {
@@ -7098,7 +7110,7 @@ describe('injectNumbers', function () {
   })
 })
 
-},{"engine/inject/numbers":20}],37:[function(require,module,exports){
+},{"engine/inject/numbers":20}],38:[function(require,module,exports){
 var injectReferences = require('engine/inject/references')
 
 describe('injectReferences', function () {
@@ -7132,7 +7144,7 @@ describe('injectReferences', function () {
   })
 })
 
-},{"engine/inject/references":21}],38:[function(require,module,exports){
+},{"engine/inject/references":21}],39:[function(require,module,exports){
 var injectStrings = require('engine/inject/strings')
 
 describe('injectStrings', function () {
@@ -7152,4 +7164,4 @@ describe('injectStrings', function () {
   })
 })
 
-},{"engine/inject/strings":22}]},{},[30,31,32,33,34,35,36,37,38]);
+},{"engine/inject/strings":22}]},{},[31,32,33,34,35,36,37,38,39]);

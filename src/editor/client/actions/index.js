@@ -60,6 +60,10 @@ export function readGraphIfNeeded () {
   }
 }
 
+export const runOnce = () => ({
+  type: 'RUN_ONCE'
+})
+
 export function updateGraph (graph) {
   return (dispatch) => {
     const { receiveData, responseFailure } = prepareRequest(dispatch, 'UPDATE_GRAPH')
