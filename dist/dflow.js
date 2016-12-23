@@ -1003,7 +1003,7 @@ module.exports = parents
 module.exports = /^@[\w][\w\d]+$/
 
 },{}],20:[function(require,module,exports){
-module.exports = /^arguments\[(\d+)\]$/
+module.exports = /^arguments\[(\d+)]$/
 
 },{}],21:[function(require,module,exports){
 module.exports = /^\/\/.+$/

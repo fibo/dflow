@@ -57070,7 +57070,7 @@ module.exports = /^@[\w][\w\d]+$/;
 },{}],370:[function(require,module,exports){
 "use strict";
 
-module.exports = /^arguments\[(\d+)\]$/;
+module.exports = /^arguments\[(\d+)]$/;
 
 },{}],371:[function(require,module,exports){
 "use strict";
