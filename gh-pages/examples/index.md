@@ -6,11 +6,11 @@ title: Examples
 
 List of example graphs:
 
-[![Hello World](http://g14n.info/dflow/svg/hello-world.svg)][hello-world]
-[![apply](http://g14n.info/dflow/svg/apply.svg)][apply]
-[![indexOf](http://g14n.info/dflow/svg/indexOf.svg)][indexOf]
-[![loadScriptJS](http://g14n.info/dflow/examples/load-script-js.html)][loadScriptJS]
-[![sum](http://g14n.info/dflow/svg/sum.svg)][sum]
+[![helloWorld_SVG]][helloWorld]
+[![apply_SVG]][apply]
+[![indexOf_SVG]][indexOf]
+[![loadScriptJS_SVG]][loadScriptJS]
+[![sum_SVG]][sum]
 
 <!--
 * [createParagraph](http://g14n.info/dflow/examples/createParagraph.html)
@@ -60,9 +60,14 @@ Simple as that, see [npm-package-minimal](https://github.com/fibo/dflow/tree/mas
 
 For a more complete example, see [npm-package-template](https://github.com/fibo/dflow/tree/master/src/examples/packages/npm-package-template).
 
-[hello-world]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
+[helloWorld]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
 [apply]: http://g14n.info/dflow/examples/apply.html "apply"
 [indexOf]: http://g14n.info/dflow/examples/index-of.html "indexOf"
 [loadScriptJS]: http://g14n.info/dflow/examples/load-script-js.html "loadScriptJS"
 [sum]: http://g14n.info/dflow/examples/sum.html "sum"
 
+[helloWorld_SVG]: http://g14n.info/dflow/svg/hello-world.svg
+[apply_SVG]: http://g14n.info/dflow/svg/apply.svg
+[indexOf_SVG]: http://g14n.info/dflow/svg/indexOf.svg
+[loadScriptJS_SVG]: http://g14n.info/dflow/svg/loadScriptJS.svg
+[sum_SVG]: http://g14n.info/dflow/svg/sum.svg
