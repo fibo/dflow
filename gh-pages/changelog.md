@@ -34,6 +34,8 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 - CDNJS link
 - Create element: script, div, p, h1, h2 ...
+- dflow edit --port option
+- Better CLI docs and usage messages
 
 ## [v0.18.3] - 2016-11-27
 

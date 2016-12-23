@@ -1,6 +1,11 @@
 module.exports = `
-Usage: dflow run [options] [path/to/graph.json]
+> run a dflow graph
+
+Usage:
+
+    dflow run [options] [path/to/graph.json]
 
 Available options:
-  -h, --help          print usage and exit
+
+    -h, --help          print usage and exit
 `
