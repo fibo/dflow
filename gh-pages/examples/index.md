@@ -63,5 +63,6 @@ For a more complete example, see [npm-package-template](https://github.com/fibo/
 [hello-world]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
 [apply]: http://g14n.info/dflow/examples/apply.html "apply"
 [indexOf]: http://g14n.info/dflow/examples/index-of.html "indexOf"
+[loadScriptJS]: http://g14n.info/dflow/examples/load-script-js.html "loadScriptJS"
 [sum]: http://g14n.info/dflow/examples/sum.html "sum"
 
