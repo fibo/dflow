@@ -28,7 +28,11 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 ### Fixed
 
 - Graph.update() now is async, it caused a test to fail randomly
-- Quoted tasks can contain dots, there was a conflict with global tasks
+- Avoid conflict with global tasks, skip stuff that may contain dots
+  * comments
+  * numbers
+  * references
+  * strings
 
 ### Added
 

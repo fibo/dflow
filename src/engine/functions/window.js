@@ -12,29 +12,51 @@ function audioContext () {
 
 exports.audioContext = audioContext
 
-exports.body = function () {
-  return document.body
+// .appendChild() works but it is too dangerous
+// it is worth to use this safe version
+exports.appendChild = function (element, child) {
+  console.log(element, child)
 }
 
-exports.document = function () {
-  return document
+exports.body = function () { return document.body }
+
+exports.document = function () { return document }
+
+exports.head = function () { return document.head }
+
+function availableTags () {
+  return [
+    'a', 'article', 'aside', 'button', 'form', 'div',
+    'h1', 'h2', 'h3', 'h4', 'h5',
+    'input', 'label', 'li', 'link', 'ol', 'nav', 'p', 'script', 'svg',
+    'textarea', 'ul'
+  ]
 }
 
-exports.head = function () {
-  return document.head
-}
+exports.availableTags = availableTags
 
-// TODO more tags
-var tags = [
-  'a', 'div', 'link', 'p', 'script'
-]
+availableTags().forEach(function (x) {
+  exports[x] = function (id) {
+    var element
 
-tags.forEach(function (x) {
-  exports[x] = function () {
-    return document.createElement(x)
+    if (typeof id !== 'string') {
+      throw new TypeError('Element id must be a string:' + id)
+    }
+
+    element = document.getElementById(id)
+
+    if (!element) {
+      element = document.createElement(x)
+
+      Object.defineProperty(element, 'id', {
+        configurable: false,
+        writable: false,
+        value: id
+      })
+    }
+
+    return element
   }
 })
 
-exports.window = function () {
-  return window
-}
+exports.window = function () { return window }
