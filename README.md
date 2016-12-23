@@ -48,6 +48,7 @@ or use RawGit CDN adding this to your HTML page
 ```
 
 If you want to get a specific dflow engine version, get it on [CDNJS]!
+Awesome thanks to [LboAnn](https://github.com/extend1994) and [Peter Dave Hello](https://github.com/PeterDaveHello). 多謝
 
 ### Server side
 

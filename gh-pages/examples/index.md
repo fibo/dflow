@@ -9,6 +9,7 @@ List of example graphs:
 [![Hello World](http://g14n.info/dflow/svg/hello-world.svg)][hello-world]
 [![apply](http://g14n.info/dflow/svg/apply.svg)][apply]
 [![indexOf](http://g14n.info/dflow/svg/indexOf.svg)][indexOf]
+[![loadScriptJS](http://g14n.info/dflow/examples/load-script-js.html)][loadScriptJS]
 [![sum](http://g14n.info/dflow/svg/sum.svg)][sum]
 
 <!--
