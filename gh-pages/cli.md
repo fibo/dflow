@@ -16,63 +16,63 @@ Available actions are:
 * [run](#run)
 * [validate](#validate)
 
-Print current version with `dflow -v` or `dflow --version`.
-Display usage with `dflow [action] -h` or `dflow [action] --help` or action related usage
+Available options:
 
+    -h, --help          print usage and exit
+    -v, --version       print current version and exit
+
+Display action related usage:
+
+    dflow [action] --help
+
+Print current version with `dflow -v` or `dflow --version`.
+Display generic usage with `dflow -h`.
 Set `DEBUG=dflow` environment variable to enable [debug](https://www.npmjs.com/package/debug) messages.
 
 ## Edit
 
 > launches the dflow editor
 
-### Usage
+Usage:
 
-Launch *dflow* from command line, and start editing your first graph using your favourite browser.
-
-```
-Usage: dflow [edit] [options] [path/to/graph.json]
+    dflow [edit] [options] [path/to/graph.json]
 
 Available options:
-  -h, --help          print usage and exit
-  -o, --open          launch the browser once the server connects
-```
 
-If no graph is given, an empty graph named *graph.json* will be created.
+    -h, --help          print usage and exit
+    -p, --port          port number, defaults to random
+    -o, --open          launch the browser once the server connects
 
-Open your browser and go to `http://hostname-where-you-launched-dflow.example.org:3000`.
+If no graph is given, a *graph.json* will be created.
 
-### Example
+Examples:
 
-Start editing a *graph.json* in your localhost
+In your local host, start editing *graph.json*: it will open your browser.
 
-```bash
-dflow -o
-```
+    dflow -o
 
 ## Run
 
-### Usage
-
 > run a dflow graph
 
-```
-Usage: dflow run [options] [path/to/graph.json]
+Usage:
+
+    dflow run [options] [path/to/graph.json]
 
 Available options:
-  -h, --help          print usage and exit
-```
+
+    -h, --help          print usage and exit
 
 ## Validate
 
 > checks if a graph looks valid
 
-### Usage
+Usage:
 
-```
-Usage: dflow validate [options] [path/to/graph.json]
+    dflow validate [options] [path/to/graph.json]
 
 Available options:
-  -h, --help          print usage and exit
-  -f, --funcs         specify path/to/additionalFunctions.js
-```
+
+    -h, --help          print usage and exit
+    -f, --funcs         specify path/to/additionalFunctions.js
 

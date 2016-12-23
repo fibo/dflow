@@ -15,12 +15,14 @@ const dotJson = utils.dotJson
 const appendCwd = utils.appendCwd
 
 const knownOpts = {
-  help: Boolean
+  help: Boolean,
+  port: Number
 }
 
 const shortHandOpts = {
   h: '--help',
-  o: '--open'
+  o: '--open',
+  p: '--port'
 }
 
 const showUsage = () => {
@@ -28,20 +30,19 @@ const showUsage = () => {
   process.exit(0)
 }
 
-const startServer = (graphPath, open) => {
+const startServer = (graphPath, opt) => {
   const graph = new Graph(graphPath)
 
   const server = http.createServer(editorServer(graph))
 
-  server.listen(() => {
+  server.listen(opt.port, () => {
     const port = server.address().port
     const myIp = internalIp()
     const uri = `http://${myIp}:${port}`
 
-    debug(server.address().port)
     debug(`editor server is listening on ${uri}`)
 
-    if (open) opn(uri)
+    if (opt.open) opn(uri)
   })
 }
 
@@ -51,8 +52,6 @@ module.exports = (args) => {
   const opt = nopt(knownOpts, shortHandOpts, args, implicitEditAction ? 2 : 3)
 
   if (opt.help) showUsage()
-
-  const open = opt.open
 
   var graphPath = null
   const remain = opt.argv.remain
@@ -71,13 +70,13 @@ module.exports = (args) => {
       createEmptyGraph(graphPath, () => {
         debug(`created graph ${graphPath}`)
 
-        startServer(graphPath, open)
+        startServer(graphPath, opt)
       })
     } else {
       if (stats.isFile()) {
         debug(`found graph ${graphPath}`)
 
-        startServer(graphPath, open)
+        startServer(graphPath, opt)
       } else {
         showUsage()
       }

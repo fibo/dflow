@@ -12,14 +12,21 @@ var actionList = Object.keys(actions)
                        .join('\n')
 
 module.exports = `
-Usage: dflow [action] [options]
+Usage:
+
+    dflow [action] [options]
 
 Available actions:
 ${actionList}
 
 Available options:
-  -h, --help          print usage and exit
-  --version           print current version and exit
+
+    -h, --help          print usage and exit
+    -v, --version       print current version and exit
+
+Display action related usage:
+
+    dflow [action] --help
 
 For more info point your browser to ${homepage}
 `
