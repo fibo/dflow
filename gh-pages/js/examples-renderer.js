@@ -53831,144 +53831,7 @@ module.exports = walkGlobal;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./regex/comment":313,"./regex/quoted":315,"./regex/reference":316}],321:[function(require,module,exports){
-module.exports={
-  "data": {
-    "results": [ {
-        "args": [0],
-        "expected": true
-    } ]
-  },
-  "pipe": {
-    "6": [ "1", "4" ],
-    "7": [ "2", "4", 1 ],
-    "8": [ "3", "4", 2 ],
-    "9": [ "4", "5" ]
-  },
-  "task": {
-    "1": "&isFinite",
-    "2": "null",
-    "3": "arguments",
-    "4": "apply",
-    "5": "return"
-  },
-  "view": {
-    "node": {
-      "1": {
-        "text": "&isFinite",
-        "x": 81,
-        "y": 56,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "1"
-      },
-      "2": {
-        "text": "null",
-        "x": 207,
-        "y": 58,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "2"
-      },
-      "3": {
-        "text": "arguments",
-        "x": 288,
-        "y": 57,
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "3"
-      },
-      "4": {
-        "text": "apply",
-        "x": 179,
-        "y": 143,
-        "ins": [
-          {
-            "name": "in0"
-          },
-          {
-            "name": "in1"
-          },
-          {
-            "name": "in2"
-          }
-        ],
-        "outs": [
-          {
-            "name": "out"
-          }
-        ],
-        "task": "4"
-      },
-      "5": {
-        "text": "return",
-        "x": 178,
-        "y": 223,
-        "ins": [
-          {
-            "name": "in"
-          }
-        ],
-        "task": "5"
-      }
-    },
-    "link": {
-      "6": {
-        "from": [
-          "1",
-          0
-        ],
-        "to": [
-          "4",
-          0
-        ],
-        "id": "6"
-      },
-      "7": {
-        "from": [
-          "2",
-          0
-        ],
-        "to": [
-          "4",
-          1
-        ],
-        "id": "7"
-      },
-      "8": {
-        "from": [
-          "3",
-          0
-        ],
-        "to": [
-          "4",
-          2
-        ],
-        "id": "8"
-      },
-      "9": {
-        "from": [
-          "4",
-          0
-        ],
-        "to": [
-          "5",
-          0
-        ],
-        "id": "9"
-      }
-    }
-  }
-}
-
+module.exports={"data":{"results":[{"args":[0],"expected":true}]},"pipe":{"6":["1","4"],"7":["2","4",1],"8":["3","4",2],"9":["4","5"]},"task":{"1":"&isFinite","2":"null","3":"arguments","4":"apply","5":"return"},"view":{"node":{"1":{"text":"&isFinite","x":26,"y":54,"outs":[{"name":"out"}],"task":"1"},"2":{"text":"null","x":161,"y":55,"outs":[{"name":"out"}],"task":"2"},"3":{"text":"arguments","x":235,"y":54,"outs":[{"name":"out"}],"task":"3"},"4":{"text":"apply","x":104,"y":140,"ins":[{"name":"in0"},{"name":"in1"},{"name":"in2"}],"outs":[{"name":"out"}],"task":"4"},"5":{"text":"return","x":76,"y":204,"ins":[{"name":"in"}],"task":"5"}},"link":{"6":{"from":["1",0],"to":["4",0],"id":"6"},"7":{"from":["2",0],"to":["4",1],"id":"7"},"8":{"from":["3",0],"to":["4",2],"id":"8"},"9":{"from":["4",0],"to":["5",0],"id":"9"}}}}
 },{}],322:[function(require,module,exports){
 module.exports={
   "info": {
@@ -54176,7 +54039,7 @@ module.exports={
 }
 
 },{}],324:[function(require,module,exports){
-module.exports={"data":{},"info":{},"pipe":{"lxf":["ypj","2"]},"task":{"2":"console.log","ypj":"'Hello world'"},"view":{"node":{"2":{"x":149,"y":154,"w":15,"task":"2","text":"console.log","ins":[{"name":"in0"}]},"ypj":{"text":"'Hello world'","x":138,"y":31,"outs":["out"]}},"link":{"lxf":{"from":["ypj",0],"to":["2",0]}}}}
+module.exports={"data":{},"func":{},"info":{},"pipe":{"tot":["wtd","plu"],"kex":["glt","plu",1],"lum":["plu","upu",1],"npz":["whk","upu"]},"task":{"wtd":"h1","plu":".innerHTML=","glt":"'I ❤ dflow'","upu":".appendChild()","maz":"// This is a comment","whk":"body"},"view":{"link":{"tot":{"from":["wtd",0],"to":["plu",0]},"kex":{"from":["glt",0],"to":["plu",1]},"lum":{"from":["plu",0],"to":["upu",1]},"npz":{"from":["whk",0],"to":["upu",0]}},"node":{"wtd":{"text":"h1","x":150,"y":113,"outs":["out"],"ins":["in"]},"plu":{"text":".innerHTML=","x":93,"y":198,"outs":["out"],"ins":["in1","in2"]},"glt":{"text":"'Hello dflow world'","x":190,"y":65,"outs":["out"]},"upu":{"text":".appendChild()","x":49,"y":268,"outs":["out"],"ins":["in1","in2"]},"maz":{"text":"// This is a comment","x":145,"y":19},"whk":{"text":"body","x":61,"y":62,"outs":["out"]}}}}
 
 },{}],325:[function(require,module,exports){
 'use strict';
@@ -54189,6 +54052,7 @@ exports.dateParse = require('./dateParse.json');
 
 exports['hello-world'] = require('./hello-world.json');
 exports.indexOf = require('./indexOf.json');
+exports['load-script-js'] = require('./loadScriptJS.json');
 
 exports.sum = require('./sum.json');
 exports.or = require('./or.json');
@@ -54201,9 +54065,11 @@ exports.welcome = require('./welcome.json');
 
 // TODO fix it! exports.dotOperator = require('./dotOperator.json')
 
-},{"./apply.json":321,"./createParagraph.json":322,"./dateParse.json":323,"./hello-world.json":324,"./indexOf.json":326,"./or.json":327,"./sum.json":328,"./welcome.json":329}],326:[function(require,module,exports){
-module.exports={"data":{"results":[{"args":["abcd","b"],"expected":1},{"args":[[7,8,9],9],"expected":2}]},"info":{},"pipe":{"rhq":["cjb","dqf"],"ari":["ffv","dqf",1],"qae":["dqf","ozw"]},"task":{"dqf":".indexOf()","ozw":"console.log","cjb":"'abcd'","ffv":"'b'","jhv":"// 1"},"view":{"link":{"rhq":{"from":["cjb",0],"to":["dqf",0]},"ari":{"from":["ffv",0],"to":["dqf",1]},"qae":{"from":["dqf",0],"to":["ozw",0]}},"node":{"dqf":{"text":".indexOf()","x":228,"y":117,"outs":["out"],"ins":["in1","in2"]},"ozw":{"text":"console.log","x":227,"y":212,"ins":["in0"]},"cjb":{"text":"'abcd'","x":229,"y":27,"outs":["out"]},"ffv":{"text":"'b'","x":349,"y":35,"outs":["out"]},"jhv":{"text":"// 1","x":409,"y":230}}}}
+},{"./apply.json":321,"./createParagraph.json":322,"./dateParse.json":323,"./hello-world.json":324,"./indexOf.json":326,"./loadScriptJS.json":327,"./or.json":328,"./sum.json":329,"./welcome.json":330}],326:[function(require,module,exports){
+module.exports={"data":{"results":[{"args":["abcd","b"],"expected":1},{"args":[[7,8,9],9],"expected":2}]},"info":{},"pipe":{"rhq":["cjb","dqf"],"ari":["ffv","dqf",1],"qae":["dqf","ozw"]},"task":{"dqf":".indexOf()","ozw":"console.log","cjb":"'abcd'","ffv":"'b'","jhv":"// 1"},"view":{"link":{"rhq":{"from":["cjb",0],"to":["dqf",0]},"ari":{"from":["ffv",0],"to":["dqf",1]},"qae":{"from":["dqf",0],"to":["ozw",0]}},"node":{"dqf":{"text":".indexOf()","x":50,"y":95,"outs":["out"],"ins":["in1","in2"]},"ozw":{"text":"console.log","x":36,"y":190,"ins":["in0"]},"cjb":{"text":"'abcd'","x":54,"y":35,"outs":["out"]},"ffv":{"text":"'b'","x":179,"y":26,"outs":["out"]},"jhv":{"text":"// 1","x":184,"y":191}}}}
 },{}],327:[function(require,module,exports){
+module.exports={"data":{},"func":{},"info":{},"pipe":{"kqo":["ied","zhr",1],"jce":["qba","zhr"],"pvf":["nrz","cyk"],"jke":["qba","cyk",1],"jdt":["ypc","qba"],"qot":["ygo","ypc"],"upi":["icp","qba",1]},"task":{"qba":".src=","nrz":"body","zhr":".onload=","ygo":"'myid'","ied":"&console.log","cyk":"appendChild","ypc":"script","emw":"// safe version of .appendChild()","icp":"'dflow/examples/script.js'"},"view":{"link":{"kqo":{"from":["ied",0],"to":["zhr",1]},"jce":{"from":["qba",0],"to":["zhr",0]},"pvf":{"from":["nrz",0],"to":["cyk",0]},"jke":{"from":["qba",0],"to":["cyk",1]},"jdt":{"from":["ypc",0],"to":["qba",0]},"qot":{"from":["ygo",0],"to":["ypc",0]},"upi":{"from":["icp",0],"to":["qba",1]}},"node":{"qba":{"text":".src=","x":129,"y":179,"outs":["out"],"ins":["in1","in2"]},"nrz":{"text":"body","x":36,"y":214,"outs":["out"]},"zhr":{"text":".onload=","x":195,"y":269,"outs":["out"],"ins":["in1","in2"]},"ygo":{"text":"'myid'","x":24,"y":54,"outs":["out"]},"ied":{"text":"&console.log","x":262,"y":205,"outs":["out"]},"cyk":{"text":"appendChild","x":19,"y":304,"outs":["out"],"ins":["in1","in2"]},"ypc":{"text":"script","x":48,"y":120,"outs":["out"],"ins":["in"]},"emw":{"text":"// safe version of .appendChild()","x":18,"y":349},"icp":{"text":"'dflow/examples/script.js'","x":118,"y":35,"outs":["out"]}}}}
+},{}],328:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -54226,9 +54092,9 @@ module.exports={
   }
 }
 
-},{}],328:[function(require,module,exports){
-module.exports={"data":{},"info":{},"pipe":{"veg":["xvb","zmo"],"rbc":["vug","zmo",1],"zul":["zmo","uam"],"pjx":["zii","uam",1],"hsj":["uam","nef"]},"task":{"xvb":"1","vug":"2","zmo":"+","uam":"===","zii":"3","nef":"console.log"},"view":{"link":{"veg":{"from":["xvb",0],"to":["zmo",0]},"rbc":{"from":["vug",0],"to":["zmo",1]},"zul":{"from":["zmo",0],"to":["uam",0]},"pjx":{"from":["zii",0],"to":["uam",1]},"hsj":{"from":["uam",0],"to":["nef",0]}},"node":{"xvb":{"text":"1","x":232,"y":26,"outs":["out"]},"vug":{"text":"2","x":319,"y":27,"outs":["out"]},"zmo":{"text":"+","x":233,"y":119,"outs":["out"],"ins":["in1","in2"]},"uam":{"text":"===","x":234,"y":217,"outs":["out"],"ins":["in1","in2"]},"zii":{"text":"3","x":330,"y":122,"outs":["out"]},"nef":{"text":"console.log","x":235,"y":308,"ins":["in0"]}}}}
 },{}],329:[function(require,module,exports){
+module.exports={"data":{},"info":{},"pipe":{"veg":["xvb","zmo"],"rbc":["vug","zmo",1],"zul":["zmo","uam"],"pjx":["zii","uam",1],"hsj":["uam","nef"]},"task":{"xvb":"1","vug":"2","zmo":"+","uam":"===","zii":"3","nef":"console.log"},"view":{"link":{"veg":{"from":["xvb",0],"to":["zmo",0]},"rbc":{"from":["vug",0],"to":["zmo",1]},"zul":{"from":["zmo",0],"to":["uam",0]},"pjx":{"from":["zii",0],"to":["uam",1]},"hsj":{"from":["uam",0],"to":["nef",0]}},"node":{"xvb":{"text":"1","x":116,"y":29,"outs":["out"]},"vug":{"text":"2","x":213,"y":40,"outs":["out"]},"zmo":{"text":"+","x":156,"y":112,"outs":["out"],"ins":["in1","in2"]},"uam":{"text":"===","x":107,"y":178,"outs":["out"],"ins":["in1","in2"]},"zii":{"text":"3","x":212,"y":136,"outs":["out"]},"nef":{"text":"console.log","x":79,"y":265,"ins":["in0"]}}}}
+},{}],330:[function(require,module,exports){
 module.exports={
   "data": {
     "results": []
@@ -54284,7 +54150,7 @@ module.exports={
   }
 }
 
-},{}],330:[function(require,module,exports){
+},{}],331:[function(require,module,exports){
 // Cheating npm require.
 module.exports = require('../../../..')
 
@@ -54352,4 +54218,4 @@ function renderExample(divId, example) {
 
 module.exports = renderExample;
 
-},{"../../editor/client/components/Inspector":284,"../../editor/client/components/InvalidNode":285,"../../editor/client/components/ToggleNode":286,"../../editor/client/utils/typeOfNode":291,"../graphs":325,"dflow":330,"flow-view":78,"flow-view/components":76}]},{},[]);
+},{"../../editor/client/components/Inspector":284,"../../editor/client/components/InvalidNode":285,"../../editor/client/components/ToggleNode":286,"../../editor/client/utils/typeOfNode":291,"../graphs":325,"dflow":331,"flow-view":78,"flow-view/components":76}]},{},[]);

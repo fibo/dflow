@@ -45,7 +45,7 @@
     "push": "git push origin master && npm run gh-pages:push",
     "sass": "node-sass src/editor/client/sass/style.scss --output src/editor/public",
     "start": "DEBUG=dflow node src/cli/dflow --open",
-    "svg": "for x in apply hello-world indexOf sum; do node src/examples/renderer/server-side.js $x; done",
+    "svg": "for x in apply hello-world indexOf loadScriptJS sum; do node src/examples/renderer/server-side.js $x; done",
     "test": "NODE_PATH=src mocha",
     "watch": "npm-watch"
   },
@@ -74,9 +74,9 @@
     "visual"
   ],
   "dependencies": {
-    "debug": "2.x",
+    "debug": "^2.5.1",
     "internal-ip": "1.x",
-    "nopt": "3.x",
+    "nopt": "4.x",
     "not-defined": "1.x",
     "opn": "4.x",
     "read-file-utf8": "1.x",
@@ -90,8 +90,8 @@
     "istanbul": "^0.4.3",
     "mocha": "3.x",
     "mocha-lcov-reporter": "1.x",
-    "node-sass": "^3.13.0",
-    "npm-watch": "^0.1.6",
+    "node-sass": "4.x",
+    "npm-watch": "^0.1.7",
     "pre-commit": "1.x",
     "redux-thunk": "^2.1.0",
     "sass-lint": "1.x",
