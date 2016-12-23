@@ -1,1 +1,1 @@
-module.exports = /^arguments\[(\d+)\]$/
+module.exports = /^arguments\[(\d+)]$/
