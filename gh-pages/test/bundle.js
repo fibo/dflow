@@ -2004,188 +2004,6 @@ module.exports = Array.isArray || function (arr) {
 module.exports=function(x){return (typeof x==='undefined')||(x === null)}
 
 },{}],6:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],7:[function(require,module,exports){
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -2503,7 +2321,7 @@ function eq(a, b, opts) {
 eq.EQ = EQ;
 
 module.exports = eq;
-},{"should-type":10}],8:[function(require,module,exports){
+},{"should-type":9}],7:[function(require,module,exports){
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -3035,7 +2853,7 @@ Formatter.addType(new t.Type(t.OBJECT, t.HOST), function() {
 });
 
 module.exports = defaultFormat;
-},{"should-type":10,"should-type-adaptors":9}],9:[function(require,module,exports){
+},{"should-type":9,"should-type-adaptors":8}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -3320,7 +3138,7 @@ exports.some = some;
 exports.every = every;
 exports.isIterable = isIterable;
 exports.iterator = iterator;
-},{"should-type":10,"should-util":11}],10:[function(require,module,exports){
+},{"should-type":9,"should-util":10}],9:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -3586,7 +3404,7 @@ Object.keys(types).forEach(function(typeName) {
 
 module.exports = getGlobalType;
 }).call(this,require("buffer").Buffer)
-},{"buffer":2}],11:[function(require,module,exports){
+},{"buffer":2}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -3637,7 +3455,7 @@ exports.propertyIsEnumerable = propertyIsEnumerable;
 exports.merge = merge;
 exports.isIterator = isIterator;
 exports.isGeneratorFunction = isGeneratorFunction;
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -6321,7 +6139,7 @@ should
   .use(promiseAssertions);
 
 module.exports = should;
-},{"should-equal":7,"should-format":8,"should-type":10,"should-type-adaptors":9,"should-util":11}],13:[function(require,module,exports){
+},{"should-equal":6,"should-format":7,"should-type":9,"should-type-adaptors":8,"should-util":10}],12:[function(require,module,exports){
 var should = require('./cjs/should');
 
 var defaultProto = Object.prototype;
@@ -6337,7 +6155,360 @@ try {
 
 module.exports = should;
 
-},{"./cjs/should":12}],14:[function(require,module,exports){
+},{"./cjs/should":11}],13:[function(require,module,exports){
+module.exports={
+  "data": {},
+  "func": {},
+  "info": {},
+  "pipe": {},
+  "task": {},
+  "view": {
+    "link": {},
+    "node": {}
+  }
+}
+
+},{}],14:[function(require,module,exports){
+var builtinFunctions = require('./functions/builtin')
+var injectAdditionalFunctions = require('./inject/additionalFunctions')
+var injectArguments = require('./inject/arguments')
+var injectArrowFunctions = require('./inject/arrowFunctions')
+var injectAccessors = require('./inject/accessors')
+var injectDotOperators = require('./inject/dotOperators')
+var injectGlobals = require('./inject/globals')
+var injectNumbers = require('./inject/numbers')
+var injectReferences = require('./inject/references')
+var injectStrings = require('./inject/strings')
+var inputArgs = require('./inputArgs')
+var isDflowFun = require('./isDflowFun')
+var level = require('./level')
+var no = require('not-defined')
+var regexArgument = require('./regex/argument')
+var regexComment = require('./regex/comment')
+var regexDotOperator = require('./regex/dotOperator')
+var regexReference = require('./regex/reference')
+var regexSubgraph = require('./regex/subgraph')
+var reservedKeys = require('./reservedKeys')
+var validate = require('./validate')
+var walkGlobal = require('./walkGlobal')
+
+/**
+ * Create a dflow function.
+ *
+ * @param {Object} graph to be executed
+ * @param {Object} [additionalFunctions] is a collection of functions
+ *
+ * @returns {Function} dflowFun that executes the given graph.
+ */
+
+function fun (graph, additionalFunctions) {
+  // First of all, check if graph is valid.
+  try {
+    validate(graph, additionalFunctions)
+  } catch (err) {
+    throw err
+  }
+
+  var func = graph.func || {}
+  var pipe = graph.pipe
+  var task = graph.task
+
+  var cachedLevelOf = {}
+  var computeLevelOf = level.bind(null, pipe, cachedLevelOf)
+  var funcs = builtinFunctions
+
+  // Inject compile-time builtin tasks.
+
+  funcs['dflow.fun'] = fun
+  funcs['dflow.isDflowFun'] = isDflowFun
+  funcs['dflow.validate'] = validate
+
+  injectAccessors(funcs, graph)
+  injectAdditionalFunctions(funcs, additionalFunctions)
+  injectDotOperators(funcs, task)
+  injectGlobals(funcs, task)
+  injectReferences(funcs, task)
+  injectStrings(funcs, task)
+  injectNumbers(funcs, task)
+  injectArrowFunctions(funcs, task)
+
+  /**
+   * Compiles a sub graph.
+   */
+
+  function compileSubgraph (key) {
+    var subGraph = graph.func[key]
+
+    var funcName = '/' + key
+
+    funcs[funcName] = fun(subGraph, additionalFunctions)
+  }
+
+  /**
+   * Sorts tasks by their level.
+   */
+
+  function byLevel (a, b) {
+    if (no(cachedLevelOf[a])) cachedLevelOf[a] = computeLevelOf(a)
+
+    if (no(cachedLevelOf[b])) cachedLevelOf[b] = computeLevelOf(b)
+
+    return cachedLevelOf[a] - cachedLevelOf[b]
+  }
+
+  /**
+   * Ignores comments.
+   */
+
+  function comments (key) {
+    return !regexComment.test(task[key])
+  }
+
+  // Compile each subgraph.
+  Object.keys(func)
+        .forEach(compileSubgraph)
+
+  /**
+   * Throw if a task is not compiled.
+   */
+
+  function checkTaskIsCompiled (taskKey) {
+    var taskName = task[taskKey]
+
+    // Ignore tasks injected at run time.
+    if (reservedKeys.indexOf(taskName) > -1) return
+
+    var msg = 'Task not compiled: ' + taskName + ' [' + taskKey + ']'
+
+    // Check subgraphs.
+    if (regexSubgraph.test(taskName)) {
+      var subgraphKey = taskName.substring(1)
+
+      if (no(graph.func[subgraphKey])) {
+        var subgraphNotFound = new Error(msg)
+        subgraphNotFound.taskKey = taskKey
+        subgraphNotFound.taskName = taskName
+        throw subgraphNotFound
+      } else return
+    }
+
+    // Skip arguments[0] ... arguments[N].
+    if (regexArgument.exec(taskName)) return
+
+    // Skip dot operator tasks.
+    if (regexDotOperator.func.test(taskName)) return
+    if (regexDotOperator.attrRead.test(taskName)) return
+    if (regexDotOperator.attrWrite.test(taskName)) return
+
+    // Skip references
+    if (regexReference.exec(taskName)) return
+
+    // Skip globals.
+    if (walkGlobal(taskName)) return
+
+    if (no(funcs[taskName])) {
+      var subgraphNotCompiled = new Error(msg)
+      subgraphNotCompiled.taskKey = taskKey
+      subgraphNotCompiled.taskName = taskName
+      throw subgraphNotCompiled
+    }
+  }
+
+  // Check if there is some missing task.
+  Object.keys(task)
+        .filter(comments)
+        .forEach(checkTaskIsCompiled)
+
+  /**
+   * Here we are, this is the ❤ of dflow.
+   */
+
+  function dflowFun () {
+    var gotReturn = false
+    var returnValue
+    var outs = {}
+
+    // Inject run-time builtin tasks.
+
+    funcs['this'] = function () { return dflowFun }
+    funcs['this.graph'] = function () { return graph }
+    injectArguments(funcs, task, arguments)
+
+    /**
+     * Execute task.
+     */
+
+    function run (taskKey) {
+      var args = inputArgs(outs, pipe, taskKey)
+      var taskName = task[taskKey]
+      var f = funcs[taskName]
+
+      // Behave like a JavaScript function:
+      // if found a return, skip all other tasks.
+
+      if (gotReturn) return
+
+      if ((taskName === 'return') && (!gotReturn)) {
+        returnValue = args[0]
+        gotReturn = true
+        return
+      }
+
+      // If task is not defined at run time, throw an error.
+
+      if (no(f)) {
+        var taskNotFound = new Error('Task not found: ' + taskName + ' [' + taskKey + '] ')
+        taskNotFound.taskKey = taskKey
+        taskNotFound.taskName = taskName
+      }
+
+      // Try to execute task.
+
+      try {
+        outs[taskKey] = f.apply(null, args)
+      } catch (err) {
+        // Enrich error with useful dflow task info.
+        err.taskName = taskName
+        err.taskKey = taskKey
+
+        throw err
+      }
+    }
+
+    // Run every graph task, sorted by level.
+
+    Object.keys(task)
+          .filter(comments)
+          .sort(byLevel)
+          .forEach(run)
+
+    return returnValue
+  }
+
+  // Remember function was created from a dflow graph.
+
+  dflowFun.graph = graph
+
+  return dflowFun
+}
+
+module.exports = fun
+
+},{"./functions/builtin":15,"./inject/accessors":16,"./inject/additionalFunctions":17,"./inject/arguments":18,"./inject/arrowFunctions":19,"./inject/dotOperators":20,"./inject/globals":21,"./inject/numbers":22,"./inject/references":23,"./inject/strings":24,"./inputArgs":25,"./isDflowFun":27,"./level":28,"./regex/argument":31,"./regex/comment":32,"./regex/dotOperator":33,"./regex/reference":35,"./regex/subgraph":36,"./reservedKeys":37,"./validate":38,"./walkGlobal":39,"not-defined":5}],15:[function(require,module,exports){
+var no = require('not-defined')
+
+// Arithmetic operators
+
+exports['+'] = function (a, b) { return a + b }
+
+exports['*'] = function (a, b) { return a * b }
+
+exports['-'] = function (a, b) { return a - b }
+
+exports['/'] = function (a, b) { return a / b }
+
+exports['%'] = function (a, b) { return a % b }
+
+// Logical operators
+
+exports['&&'] = function (a, b) { return a && b }
+
+exports['||'] = function (a, b) { return a || b }
+
+exports['!'] = function (a) { return !a }
+
+// Comparison operators
+
+exports['==='] = function (a, b) { return a === b }
+
+exports['!=='] = function (a, b) { return a !== b }
+
+exports['>'] = function (a, b) { return a > b }
+
+exports['<'] = function (a, b) { return a < b }
+
+exports['>='] = function (a, b) { return a >= b }
+
+exports['<='] = function (a, b) { return a <= b }
+
+// Other operators
+
+exports.apply = function (fun, thisArg, argsArray) {
+  if (no(fun)) return
+
+  return fun.apply(thisArg, argsArray)
+}
+
+// TODO try to import it in the editor, it seems to complain with
+// TypeError: Cannot read property '' of undefined(…)
+exports['.'] = function (obj, prop) {
+  if (no(obj) || no(prop)) return
+
+  return obj[prop]
+}
+
+exports['='] = function (a, b) {
+  if (no(a)) return
+
+  a = b
+
+  return a
+}
+
+/* eslint-disable */
+exports['=='] = function (a, b) { return (a == b) }
+/* eslint-enable */
+
+exports['==='] = function (a, b) { return (a === b) }
+
+exports['typeof'] = function (a) { return typeof a }
+
+exports['new'] = function (Obj, arg1, arg2, arg3, arg4, arg5) {
+  if (no(Obj)) return
+
+  var argN = arguments.length - 1
+
+  if (argN === 0) return new Obj()
+  if (argN === 1) return new Obj(arg1)
+  if (argN === 2) return new Obj(arg1, arg2)
+  if (argN === 3) return new Obj(arg1, arg2, arg3)
+  if (argN === 4) return new Obj(arg1, arg2, arg3, arg4)
+  if (argN === 5) return new Obj(arg1, arg2, arg3, arg4, arg5)
+  // If you have a constructor with more than 5 arguments ... think about refactoring or redesign it.
+}
+
+// Array
+
+exports['[]'] = function () { return [] }
+
+// console
+
+exports['console.error'] = console.error.bind(console)
+exports['console.log'] = console.log.bind(console)
+
+// Global
+
+exports['Infinity'] = function () { return Infinity }
+
+exports.NaN = function () { return NaN }
+
+exports['null'] = function () { return null }
+
+// Object
+
+exports['{}'] = function () { return {} }
+
+// Boolean
+
+exports.false = function () { return false }
+
+exports.true = function () { return true }
+
+// Date
+
+exports.now = function () { return new Date() }
+
+},{"not-defined":5}],16:[function(require,module,exports){
 var no = require('not-defined')
 var regexAccessor = require('../regex/accessor')
 
@@ -6385,7 +6556,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":23,"not-defined":5}],15:[function(require,module,exports){
+},{"../regex/accessor":30,"not-defined":5}],17:[function(require,module,exports){
 var no = require('not-defined')
 
 /**
@@ -6415,7 +6586,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{"not-defined":5}],16:[function(require,module,exports){
+},{"not-defined":5}],18:[function(require,module,exports){
 var regexArgument = require('../regex/argument')
 
 /**
@@ -6455,7 +6626,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":24}],17:[function(require,module,exports){
+},{"../regex/argument":31}],19:[function(require,module,exports){
 /**
  * If it contains an `=>`, escape single quotes and eval it.
  *
@@ -6492,7 +6663,7 @@ function arrowFunctions (funcs, task) {
 
 module.exports = arrowFunctions
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var no = require('not-defined')
 var regexDotOperator = require('../regex/dotOperator')
 
@@ -6589,7 +6760,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":26,"not-defined":5}],19:[function(require,module,exports){
+},{"../regex/dotOperator":33,"not-defined":5}],21:[function(require,module,exports){
 var no = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
@@ -6635,7 +6806,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../reservedKeys":29,"../walkGlobal":30,"not-defined":5}],20:[function(require,module,exports){
+},{"../reservedKeys":37,"../walkGlobal":39,"not-defined":5}],22:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -6666,7 +6837,7 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var regexReference = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
@@ -6715,7 +6886,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":28,"../walkGlobal":30}],22:[function(require,module,exports){
+},{"../regex/reference":35,"../walkGlobal":39}],24:[function(require,module,exports){
 var regexQuoted = require('../regex/quoted')
 
 /**
@@ -6746,27 +6917,181 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":27}],23:[function(require,module,exports){
+},{"../regex/quoted":34}],25:[function(require,module,exports){
+var inputPipes = require('./inputPipes')
+
+/**
+ * Retrieve input arguments of a task.
+ *
+ * @param {Object} outs
+ * @param {Object} pipe
+ * @param {String} taskKey
+ *
+ * @returns {Array} args
+ */
+
+function inputArgs (outs, pipe, taskKey) {
+  var args = []
+  var inputPipesOf = inputPipes.bind(null, pipe)
+
+  function populateArg (inputPipe) {
+    var index = inputPipe[2] || 0
+    var value = outs[inputPipe[0]]
+
+    args[index] = value
+  }
+
+  inputPipesOf(taskKey).forEach(populateArg)
+
+  return args
+}
+
+module.exports = inputArgs
+
+},{"./inputPipes":26}],26:[function(require,module,exports){
+/**
+ * Compute pipes that feed a task.
+ *
+ * @param {Object} pipe
+ * @param {String} taskKey
+ *
+ * @returns {Array} pipes
+ */
+
+function inputPipes (pipe, taskKey) {
+  var pipes = []
+
+  function pushPipe (key) {
+    pipes.push(pipe[key])
+  }
+
+  function ifIsInputPipe (key) {
+    return pipe[key][1] === taskKey
+  }
+
+  Object.keys(pipe).filter(ifIsInputPipe).forEach(pushPipe)
+
+  return pipes
+}
+
+module.exports = inputPipes
+
+},{}],27:[function(require,module,exports){
+var validate = require('./validate')
+
+/**
+ * Duct tape for dflow functions.
+ *
+ * @param {Function} f
+ *
+ * @returns {Boolean} ok, it looks like a dflowFun
+ */
+
+function isDflowFun (f) {
+  var isFunction = typeof f === 'function'
+  var hasGraphObject = typeof f.graph === 'object'
+  var hasFuncsObject = typeof f.funcs === 'object'
+  var hasValidGraph = true
+
+  if (isFunction && hasGraphObject && hasFuncsObject) {
+    try {
+      validate(f.graph, f.funcs)
+    } catch (ignore) {
+      hasValidGraph = false
+    }
+  }
+
+  return hasValidGraph
+}
+
+module.exports = isDflowFun
+
+},{"./validate":38}],28:[function(require,module,exports){
+var parents = require('./parents')
+
+/**
+ * Compute level of task.
+ *
+ * @param {Object} pipe
+ * @param {Object} cachedLevelOf
+ * @param {String} taskKey
+ *
+ * @returns {Number} taskLevel
+ */
+
+function level (pipe, cachedLevelOf, taskKey) {
+  var taskLevel = 0
+  var parentsOf = parents.bind(null, pipe)
+
+  if (typeof cachedLevelOf[taskKey] === 'number') {
+    return cachedLevelOf[taskKey]
+  }
+
+  function computeLevel (parentTaskKey) {
+                                 // ↓ Recursion here: the level of a task is the max level of its parents + 1.
+    taskLevel = Math.max(taskLevel, level(pipe, cachedLevelOf, parentTaskKey) + 1)
+  }
+
+  parentsOf(taskKey).forEach(computeLevel)
+
+  cachedLevelOf[taskKey] = taskLevel
+
+  return taskLevel
+}
+
+module.exports = level
+
+},{"./parents":29}],29:[function(require,module,exports){
+var inputPipes = require('./inputPipes')
+
+/**
+ * Compute parent tasks.
+ *
+ * @param {Array} pipes of graph
+ * @param {String} taskKey
+ *
+ * @returns {Array} parentTaskIds
+ */
+
+function parents (pipe, taskKey) {
+  var inputPipesOf = inputPipes.bind(null, pipe)
+  var parentTaskIds = []
+
+  function pushParentTaskId (pipe) {
+    parentTaskIds.push(pipe[0])
+  }
+
+  inputPipesOf(taskKey).forEach(pushParentTaskId)
+
+  return parentTaskIds
+}
+
+module.exports = parents
+
+},{"./inputPipes":26}],30:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
-},{}],24:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)]$/
 
-},{}],25:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 module.exports = /^\/\/.+$/
 
-},{}],26:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 exports.attrRead = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 exports.attrWrite = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)=$/
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],27:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],28:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 module.exports = /^&(.+)$/
 
-},{}],29:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
+module.exports = /^\/[\w][\w\d]+$/
+
+},{}],37:[function(require,module,exports){
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = [
   'arguments',
@@ -6778,7 +7103,176 @@ module.exports = [
   'this.graph'
 ]
 
-},{}],30:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
+var no = require('not-defined')
+var regexAccessor = require('./regex/accessor')
+var regexArgument = require('./regex/argument')
+var regexDotOperator = require('./regex/dotOperator')
+var regexReference = require('./regex/reference')
+var reservedKeys = require('./reservedKeys')
+var regexSubgraph = require('./regex/subgraph')
+
+/**
+ * Check graph consistency.
+ *
+ * @param {Object} graph
+ * @param {Object} [additionalFunctions]
+ *
+ * @returns {Boolean} ok if no exception is thrown
+ */
+
+function validate (graph, additionalFunctions) {
+  // Required properties.
+  var pipe = graph.pipe
+  var task = graph.task
+
+  // Optional properties.
+  var data = graph.data || {}
+  var func = graph.func || {}
+  var info = graph.info || {}
+
+  var seenPipe = {}
+
+  // Validate addition functions, if any.
+  // Check there are no reserved keys.
+
+  function throwIfEquals (taskName, reservedKey) {
+    if (taskName === reservedKey) {
+      throw new TypeError('Reserved function name: ' + taskName)
+    }
+  }
+
+  if (typeof additionalFunctions === 'object') {
+    for (var taskName in additionalFunctions) {
+      var throwIfEqualsTaskName = throwIfEquals.bind(null, taskName)
+
+      reservedKeys.forEach(throwIfEqualsTaskName)
+
+      if (regexArgument.test(taskName)) {
+        throw new TypeError('Reserved function name: ' + taskName)
+      }
+
+      if (regexAccessor.test(taskName)) {
+        throw new TypeError('Function name cannot start with "@": ' + taskName)
+      }
+
+      if (regexDotOperator.attrRead.test(taskName)) {
+        throw new TypeError('Function name cannot start with ".":' + taskName)
+      }
+
+      if (regexDotOperator.attrWrite.test(taskName)) {
+        throw new TypeError('Function name cannot start with "." and end with "=":' + taskName)
+      }
+
+      if (regexDotOperator.func.test(taskName)) {
+        throw new TypeError('Function name cannot start with "." and end with "()":' + taskName)
+      }
+
+      if (regexReference.test(taskName)) {
+        throw new TypeError('Function name cannot start with "&": ' + taskName)
+      }
+    }
+  }
+
+  // Check pipe and task are objects.
+
+  if (typeof pipe !== 'object') {
+    throw new TypeError('Not an object: pipe ' + pipe)
+  }
+
+  if (typeof task !== 'object') {
+    throw new TypeError('Not an object: task ' + task)
+  }
+
+  // Check optional data, func, info and view are objects.
+
+  if (typeof data !== 'object') {
+    throw new TypeError('Not an object: data ' + data)
+  }
+
+  if (typeof func !== 'object') {
+    throw new TypeError('Not an object: func ' + func)
+  }
+
+  if (typeof info !== 'object') {
+    throw new TypeError('Not an object: info ' + info)
+  }
+
+  function checkPipe (key) {
+    var arg = pipe[key][2] || 0
+    var from = pipe[key][0]
+    var to = pipe[key][1]
+
+    // Check types.
+
+    if (typeof arg !== 'number') {
+      throw new TypeError('Invalid pipe: ' + pipe[key])
+    }
+
+    if (typeof from !== 'string') {
+      throw new TypeError('Invalid pipe: ' + pipe[key])
+    }
+
+    if (typeof to !== 'string') {
+      throw new TypeError('Invalid pipe: ' + pipe[key])
+    }
+
+    // Check for orphan pipes.
+
+    if (no(task[from])) throw new Error('Orphan pipe: ' + pipe[key])
+
+    if (no(task[to])) throw new Error('Orphan pipe: ' + pipe[key])
+
+    // Remember pipes, avoid duplicates.
+
+    if (no(seenPipe[from])) seenPipe[from] = {}
+
+    if (no(seenPipe[from][to])) seenPipe[from][to] = []
+
+    if (no(seenPipe[from][to][arg])) seenPipe[from][to][arg] = true
+    else throw new Error('Duplicated pipe: ' + pipe[key])
+  }
+
+  Object.keys(pipe)
+        .forEach(checkPipe)
+
+  // Check that every subgraph referenced are defined.
+
+  function onlySubgraphs (key) {
+    var taskName = task[key]
+
+    return regexSubgraph.test(taskName)
+  }
+
+  function checkSubgraph (key) {
+    var taskName = task[key]
+
+    var funcName = taskName.substring(1)
+
+    if (no(func[funcName])) throw new Error('Undefined subgraph: ' + funcName)
+  }
+
+  Object.keys(task)
+        .filter(onlySubgraphs)
+        .forEach(checkSubgraph)
+
+  // Recursively check subgraphs in func property.
+
+  function checkFunc (key) {
+    validate(func[key], additionalFunctions)
+  }
+
+  if (typeof func === 'object') {
+    Object.keys(func)
+          .forEach(checkFunc)
+  }
+
+  return true
+}
+
+module.exports = validate
+
+},{"./regex/accessor":30,"./regex/argument":31,"./regex/dotOperator":33,"./regex/reference":35,"./regex/subgraph":36,"./reservedKeys":37,"not-defined":5}],39:[function(require,module,exports){
 (function (global){
 var regexComment = require('./regex/comment')
 var regexReference = require('./regex/reference')
@@ -6828,7 +7322,460 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./regex/comment":25,"./regex/quoted":27,"./regex/reference":28}],31:[function(require,module,exports){
+},{"./regex/comment":32,"./regex/quoted":34,"./regex/reference":35}],40:[function(require,module,exports){
+module.exports={"data":{"results":[{"args":[0],"expected":true}]},"pipe":{"6":["1","4"],"7":["2","4",1],"8":["3","4",2],"9":["4","5"]},"task":{"1":"&isFinite","2":"null","3":"arguments","4":"apply","5":"return"},"view":{"node":{"1":{"text":"&isFinite","x":26,"y":54,"outs":[{"name":"out"}],"task":"1"},"2":{"text":"null","x":161,"y":55,"outs":[{"name":"out"}],"task":"2"},"3":{"text":"arguments","x":235,"y":54,"outs":[{"name":"out"}],"task":"3"},"4":{"text":"apply","x":104,"y":140,"ins":[{"name":"in0"},{"name":"in1"},{"name":"in2"}],"outs":[{"name":"out"}],"task":"4"},"5":{"text":"return","x":76,"y":204,"ins":[{"name":"in"}],"task":"5"}},"link":{"6":{"from":["1",0],"to":["4",0],"id":"6"},"7":{"from":["2",0],"to":["4",1],"id":"7"},"8":{"from":["3",0],"to":["4",2],"id":"8"},"9":{"from":["4",0],"to":["5",0],"id":"9"}}}}
+},{}],41:[function(require,module,exports){
+module.exports={
+  "info": {
+    "context": "client"
+  },
+  "data": {
+    "results": []
+  },
+  "pipe": {
+    "7": [
+      "6",
+      "4",
+      1
+    ],
+    "10": [
+      "8",
+      "9"
+    ],
+    "13": [
+      "4",
+      "9",
+      1
+    ],
+    "15": [
+      "12",
+      "14"
+    ],
+    "17": [
+      "14",
+      "4"
+    ]
+  },
+  "task": {
+    "4": ".innerHTML",
+    "6": "'This is a paragraph'",
+    "8": "body",
+    "9": ".appendChild()",
+    "12": "document",
+    "14": ".createElement()"
+  },
+  "view": {
+    "node": {
+      "4": {
+        "text": ".innerHTML",
+        "x": 293,
+        "y": 338,
+        "ins": [
+          {
+            "name": "in0"
+          },
+          {
+            "name": "in1"
+          }
+        ],
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "4"
+      },
+      "6": {
+        "text": "'This is a paragraph'",
+        "x": 394,
+        "y": 227,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "6"
+      },
+      "8": {
+        "text": "body",
+        "x": 144,
+        "y": 379,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "8"
+      },
+      "9": {
+        "text": ".appendChild()",
+        "x": 145,
+        "y": 476,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "9",
+        "ins": [
+          {},
+          {}
+        ]
+      },
+      "12": {
+        "text": "document",
+        "x": 295,
+        "y": 69,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "12"
+      },
+      "14": {
+        "text": ".createElement()",
+        "x": 294,
+        "y": 173,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "14",
+        "ins": [
+          {},
+          {}
+        ]
+      }
+    },
+    "link": {
+      "7": {
+        "from": [
+          "6",
+          0
+        ],
+        "to": [
+          "4",
+          1
+        ],
+        "id": "7"
+      },
+      "10": {
+        "from": [
+          "8",
+          0
+        ],
+        "to": [
+          "9",
+          0
+        ],
+        "id": "10"
+      },
+      "13": {
+        "from": [
+          "4",
+          0
+        ],
+        "to": [
+          "9",
+          1
+        ],
+        "id": "13"
+      },
+      "15": {
+        "from": [
+          "12",
+          0
+        ],
+        "to": [
+          "14",
+          0
+        ],
+        "id": "15"
+      },
+      "17": {
+        "from": [
+          "14",
+          0
+        ],
+        "to": [
+          "4",
+          0
+        ],
+        "id": "17"
+      }
+    }
+  }
+}
+
+},{}],42:[function(require,module,exports){
+module.exports={
+  "task": {
+    "a": "arguments[0]",
+    "b": "Date.parse",
+    "c": "return"
+  },
+  "pipe": {
+    "1": [ "a", "b", 0 ],
+    "3": [ "b", "c" ]
+  },
+  "data": {
+    "results": [
+      {
+        "args": [ "Wed, 09 Aug 1995 00:00:00 GMT" ],
+        "expected": 807926400000
+      }
+    ]
+  }
+}
+
+},{}],43:[function(require,module,exports){
+module.exports={"data":{},"func":{},"info":{},"pipe":{"tot":["wtd","plu"],"lum":["plu","upu",1],"npz":["whk","upu"],"qpm":["qsf","plu",1]},"task":{"wtd":"h1","plu":".innerHTML=","upu":".appendChild()","maz":"// This is a comment","whk":"body","qsf":"'I ❤ dflow'"},"view":{"link":{"tot":{"from":["wtd",0],"to":["plu",0]},"lum":{"from":["plu",0],"to":["upu",1]},"npz":{"from":["whk",0],"to":["upu",0]},"qpm":{"from":["qsf",0],"to":["plu",1]}},"node":{"wtd":{"text":"h1","x":150,"y":113,"outs":["out"],"ins":["in"]},"plu":{"text":".innerHTML=","x":93,"y":198,"outs":["out"],"ins":["in1","in2"]},"upu":{"text":".appendChild()","x":49,"y":268,"outs":["out"],"ins":["in1","in2"]},"maz":{"text":"// This is a comment","x":145,"y":19},"whk":{"text":"body","x":61,"y":62,"outs":["out"]},"qsf":{"text":"'I ❤ dflow'","x":200,"y":66,"outs":["out"]}}}}
+},{}],44:[function(require,module,exports){
+// Do not use dynamic imports, for example importing the whole graph folder;
+// use explicit imports instead, otherwise browserify will not include graphs.
+exports['apply'] = require('./apply.json')
+exports.createParagraph = require('./createParagraph.json')
+exports.dateParse = require('./dateParse.json')
+
+exports['hello-world'] = require('./hello-world.json')
+exports.indexOf = require('./indexOf.json')
+exports['load-script-js'] = require('./loadScriptJS.json')
+
+exports.sum = require('./sum.json')
+exports.or = require('./or.json')
+exports.welcome = require('./welcome.json')
+
+// TODO
+// it works but I get an error when comparing results
+// AssertionError: expected 2016-02-01 00:00:00.000 -0500 deepEqual '2016-02-01 00:00:00.000 -0500'
+// exports['new'] = require('./new.json')
+
+// TODO fix it! exports.dotOperator = require('./dotOperator.json')
+
+},{"./apply.json":40,"./createParagraph.json":41,"./dateParse.json":42,"./hello-world.json":43,"./indexOf.json":45,"./loadScriptJS.json":46,"./or.json":47,"./sum.json":48,"./welcome.json":49}],45:[function(require,module,exports){
+module.exports={"data":{"results":[{"args":["abcd","b"],"expected":1},{"args":[[7,8,9],9],"expected":2}]},"info":{},"pipe":{"rhq":["cjb","dqf"],"ari":["ffv","dqf",1],"qae":["dqf","ozw"]},"task":{"dqf":".indexOf()","ozw":"console.log","cjb":"'abcd'","ffv":"'b'","jhv":"// 1"},"view":{"link":{"rhq":{"from":["cjb",0],"to":["dqf",0]},"ari":{"from":["ffv",0],"to":["dqf",1]},"qae":{"from":["dqf",0],"to":["ozw",0]}},"node":{"dqf":{"text":".indexOf()","x":50,"y":95,"outs":["out"],"ins":["in1","in2"]},"ozw":{"text":"console.log","x":36,"y":190,"ins":["in0"]},"cjb":{"text":"'abcd'","x":54,"y":35,"outs":["out"]},"ffv":{"text":"'b'","x":179,"y":26,"outs":["out"]},"jhv":{"text":"// 1","x":184,"y":191}}}}
+},{}],46:[function(require,module,exports){
+module.exports={"data":{},"func":{},"info":{},"pipe":{"kqo":["ied","zhr",1],"jce":["qba","zhr"],"pvf":["nrz","cyk"],"jke":["qba","cyk",1],"jdt":["ypc","qba"],"qot":["ygo","ypc"],"vpn":["tce","qba",1]},"task":{"qba":".src=","nrz":"body","zhr":".onload=","ygo":"'myid'","ied":"&console.log","cyk":"appendChild","ypc":"script","emw":"// safe version of .appendChild()","tce":"'script.js'"},"view":{"link":{"kqo":{"from":["ied",0],"to":["zhr",1]},"jce":{"from":["qba",0],"to":["zhr",0]},"pvf":{"from":["nrz",0],"to":["cyk",0]},"jke":{"from":["qba",0],"to":["cyk",1]},"jdt":{"from":["ypc",0],"to":["qba",0]},"qot":{"from":["ygo",0],"to":["ypc",0]},"vpn":{"from":["tce",0],"to":["qba",1]}},"node":{"qba":{"text":".src=","x":129,"y":179,"outs":["out"],"ins":["in1","in2"]},"nrz":{"text":"body","x":36,"y":214,"outs":["out"]},"zhr":{"text":".onload=","x":195,"y":269,"outs":["out"],"ins":["in1","in2"]},"ygo":{"text":"'myid'","x":24,"y":54,"outs":["out"]},"ied":{"text":"&console.log","x":262,"y":205,"outs":["out"]},"cyk":{"text":"appendChild","x":19,"y":304,"outs":["out"],"ins":["in1","in2"]},"ypc":{"text":"script","x":48,"y":120,"outs":["out"],"ins":["in"]},"emw":{"text":"// safe version of .appendChild()","x":18,"y":349},"tce":{"text":"'script.js'","x":148,"y":42,"outs":["out"]}}}}
+},{}],47:[function(require,module,exports){
+module.exports={
+  "task": {
+    "1": "arguments[0]",
+    "2": "arguments[1]",
+    "3": "||",
+    "4": "return"
+  },
+  "pipe": {
+    "5": [ "1", "3", 0 ],
+    "6": [ "2", "3", 1 ],
+    "7": [ "3", "4" ]
+  },
+  "data": {
+    "results": [
+      {
+        "args": [true, false],
+        "expected": true
+      }
+    ]
+  }
+}
+
+},{}],48:[function(require,module,exports){
+module.exports={"data":{},"info":{},"pipe":{"veg":["xvb","zmo"],"rbc":["vug","zmo",1],"zul":["zmo","uam"],"pjx":["zii","uam",1],"hsj":["uam","nef"]},"task":{"xvb":"1","vug":"2","zmo":"+","uam":"===","zii":"3","nef":"console.log"},"view":{"link":{"veg":{"from":["xvb",0],"to":["zmo",0]},"rbc":{"from":["vug",0],"to":["zmo",1]},"zul":{"from":["zmo",0],"to":["uam",0]},"pjx":{"from":["zii",0],"to":["uam",1]},"hsj":{"from":["uam",0],"to":["nef",0]}},"node":{"xvb":{"text":"1","x":116,"y":29,"outs":["out"]},"vug":{"text":"2","x":213,"y":40,"outs":["out"]},"zmo":{"text":"+","x":156,"y":112,"outs":["out"],"ins":["in1","in2"]},"uam":{"text":"===","x":107,"y":178,"outs":["out"],"ins":["in1","in2"]},"zii":{"text":"3","x":212,"y":136,"outs":["out"]},"nef":{"text":"console.log","x":79,"y":265,"ins":["in0"]}}}}
+},{}],49:[function(require,module,exports){
+module.exports={
+  "data": {
+    "results": []
+  },
+  "pipe": {
+    "4": [
+      "2",
+      "3"
+    ]
+  },
+  "task": {
+    "2": "arguments",
+    "3": "return"
+  },
+  "view": {
+    "node": {
+      "2": {
+        "text": "arguments",
+        "x": 456,
+        "y": 129,
+        "outs": [
+          {
+            "name": "out"
+          }
+        ],
+        "task": "2"
+      },
+      "3": {
+        "text": "return",
+        "x": 457,
+        "y": 219,
+        "ins": [
+          {
+            "name": "in"
+          }
+        ],
+        "task": "3"
+      }
+    },
+    "link": {
+      "4": {
+        "from": [
+          "2",
+          0
+        ],
+        "to": [
+          "3",
+          0
+        ],
+        "id": "4"
+      }
+    }
+  }
+}
+
+},{}],50:[function(require,module,exports){
+var emptyGraph = require('engine/emptyGraph.json')
+var validate = require('engine/validate')
+
+describe('emptyGraph', function () {
+  it('is a valid graph', function () {
+    validate(emptyGraph).should.be.ok
+  })
+})
+
+},{"engine/emptyGraph.json":13,"engine/validate":38}],51:[function(require,module,exports){
+var should = require('should')
+
+var fun = require('engine/fun')
+
+describe('fun', function () {
+  it('returns a function', function () {
+    var graph = {
+      task: {
+        '0': 'arguments[0]',
+        '1': 'arguments[1]',
+        '2': '/sum',
+        '3': '@three',
+        '4': '*',
+        '5': '@result',
+        '6': 'return',
+        '7': '// this is a comment',
+        // The following tasks do not contribute to result.
+        // They are added to test there are no conflicts with
+        // global tasks resolution.
+        'a': "'This is a string with a.dot'",
+        'b': '// This is a comment with a.dot',
+        'c': '&Math.cos',
+        'd': '1.2'
+      },
+      pipe: {
+        'a': [ '0', '2', 0 ],
+        'b': [ '1', '2', 1 ],
+        'c': [ '2', '4', 0 ],
+        'd': [ '3', '4', 1 ],
+        'e': [ '4', '5' ],
+        'f': [ '5', '6' ]
+      },
+      func: {
+        sum: {
+          pipe: {
+            'a': [ '0', '2', 0 ],
+            'b': [ '1', '2', 1 ],
+            'c': [ '2', '3' ]
+          },
+          task: {
+            '0': 'arguments[0]',
+            '1': 'arguments[1]',
+            '2': 'custom + operator',
+            '3': 'return'
+          }
+        }
+      },
+      data: {
+        three: 3
+      },
+      view: {}
+    }
+
+    var funcs = {
+      'custom + operator': function (a, b) { return a + b }
+    }
+
+    var f = fun(graph, funcs)
+
+    f.should.be.instanceOf(Function)
+    f(1, 2).should.eql(9)
+    f.graph.should.eql(graph)
+    f.graph.data.result.should.eql(9)
+  })
+
+  it('accepts an empty graph', function () {
+    var emptyGraph = {
+      task: {},
+      pipe: {}
+    }
+
+    var empty = fun(emptyGraph)
+
+    should.deepEqual(empty.graph, emptyGraph)
+  })
+
+  it('can use dflow functions as tasks', function () {
+    var graph = {
+      task: {
+        '1': 'dflow.fun',
+        '2': 'dflow.isDflowFun',
+        '3': 'dflow.validate'
+      },
+      pipe: {}
+    }
+
+    fun(graph)
+  })
+
+  it('throws if graph is not valid', function () {
+    ;(function () {
+      var graphWithOrphanPipe = {
+        task: {
+          '3': 'return'
+        },
+        pipe: {
+          '1': [ '2', '3' ]
+        }
+      }
+
+      fun(graphWithOrphanPipe)
+    }).should.throwError(/Orphan pipe:/)
+  })
+
+  it('throws if a task is not compiled', function () {
+    ;(function () {
+      var graphWithTaskNotFound = {
+        task: {
+          '2': 'available task',
+          '3': 'foo'
+        },
+        pipe: {
+          '1': [ '2', '3' ]
+        }
+      }
+
+      var funcs = {
+        'available task': function () { return 'ok' }
+      }
+
+      fun(graphWithTaskNotFound, funcs)
+    }).should.throwError(/Task not compiled:/)
+  })
+})
+
+},{"engine/fun":14,"should":12}],52:[function(require,module,exports){
 var injectAccessors = require('engine/inject/accessors')
 var should = require('should')
 
@@ -6890,7 +7837,7 @@ describe('injectAccessors', function () {
   })
 })
 
-},{"engine/inject/accessors":14,"should":13}],32:[function(require,module,exports){
+},{"engine/inject/accessors":16,"should":12}],53:[function(require,module,exports){
 var injectAdditionalFunctions = require('engine/inject/additionalFunctions')
 
 describe('injectAdditionalFunctions', function () {
@@ -6908,7 +7855,7 @@ describe('injectAdditionalFunctions', function () {
   })
 })
 
-},{"engine/inject/additionalFunctions":15}],33:[function(require,module,exports){
+},{"engine/inject/additionalFunctions":17}],54:[function(require,module,exports){
 var injectArguments = require('engine/inject/arguments')
 
 var funcs = {}
@@ -6942,7 +7889,7 @@ describe('injectArguments', function () {
   })
 })
 
-},{"engine/inject/arguments":16}],34:[function(require,module,exports){
+},{"engine/inject/arguments":18}],55:[function(require,module,exports){
 var injectArrowFunctions = require('engine/inject/arrowFunctions')
 
 describe('injectArrowFunctions', function () {
@@ -6966,8 +7913,7 @@ describe('injectArrowFunctions', function () {
   })
 })
 
-},{"engine/inject/arrowFunctions":17}],35:[function(require,module,exports){
-(function (process){
+},{"engine/inject/arrowFunctions":19}],56:[function(require,module,exports){
 var injectDotOperators = require('engine/inject/dotOperators')
 
 describe('injectDotOperators', function () {
@@ -7000,7 +7946,7 @@ describe('injectDotOperators', function () {
     getVersion(procezz).should.be.eql(procezz.version)
 
     // This will return a reference to procezz.exit, it should not call it.
-    exit(process).should.be.a.Function
+    exit(procezz).should.be.a.Function
   })
 
   it('modifies funcs object with dot operators attribute writers injected', function () {
@@ -7051,9 +7997,7 @@ describe('injectDotOperators', function () {
   })
 })
 
-}).call(this,require('_process'))
-},{"_process":6,"engine/inject/dotOperators":18}],36:[function(require,module,exports){
-(function (process){
+},{"engine/inject/dotOperators":20}],57:[function(require,module,exports){
 var injectGlobals = require('engine/inject/globals')
 
 describe('injectGlobals', function () {
@@ -7068,11 +8012,11 @@ describe('injectGlobals', function () {
 
   it('walks through taskName using dot operator syntax', function () {
     var funcs = {}
-    var task = { '1': 'process.version' }
+    var task = { '1': 'Math.cos' }
 
     injectGlobals(funcs, task)
 
-    funcs['process.version']().should.be.eql(process.version)
+    funcs['Math.cos'](0).should.be.eql(1)
   })
 
   it('works with global constants', function () {
@@ -7085,8 +8029,7 @@ describe('injectGlobals', function () {
   })
 })
 
-}).call(this,require('_process'))
-},{"_process":6,"engine/inject/globals":19}],37:[function(require,module,exports){
+},{"engine/inject/globals":21}],58:[function(require,module,exports){
 var injectNumbers = require('engine/inject/numbers')
 
 describe('injectNumbers', function () {
@@ -7110,7 +8053,7 @@ describe('injectNumbers', function () {
   })
 })
 
-},{"engine/inject/numbers":20}],38:[function(require,module,exports){
+},{"engine/inject/numbers":22}],59:[function(require,module,exports){
 var injectReferences = require('engine/inject/references')
 
 describe('injectReferences', function () {
@@ -7144,7 +8087,7 @@ describe('injectReferences', function () {
   })
 })
 
-},{"engine/inject/references":21}],39:[function(require,module,exports){
+},{"engine/inject/references":23}],60:[function(require,module,exports){
 var injectStrings = require('engine/inject/strings')
 
 describe('injectStrings', function () {
@@ -7164,4 +8107,573 @@ describe('injectStrings', function () {
   })
 })
 
-},{"engine/inject/strings":22}]},{},[31,32,33,34,35,36,37,38,39]);
+},{"engine/inject/strings":24}],61:[function(require,module,exports){
+var inputArgs = require('engine/inputArgs')
+
+var pipe = {
+  'a': [ '0', '1', 0 ],
+  'b': [ '1', '2', 0 ],
+  'c': [ '2', '3', 0 ],
+  'd': [ '1', '3', 1 ]
+}
+var outs = {
+  '0': 'foo',
+  '1': 'bar',
+  '2': 'quz'
+}
+
+var inputArgsOf = inputArgs.bind(null, outs, pipe)
+
+describe('inputArgs', function () {
+  it('returns input args of task', function () {
+    inputArgsOf('0').should.eql([])
+
+    inputArgsOf('1').should.eql(['foo'])
+
+    inputArgsOf('2').should.eql(['bar'])
+
+    inputArgsOf('3').should.eql(['quz', 'bar'])
+  })
+})
+
+},{"engine/inputArgs":25}],62:[function(require,module,exports){
+var inputPipes = require('engine/inputPipes')
+
+var pipe = {
+  'a': [ '0', '1' ],
+  'b': [ '1', '2' ],
+  'c': [ '1', '3' ],
+  'd': [ '2', '3' ]
+}
+
+var inputPipesOf = inputPipes.bind(null, pipe)
+
+describe('inputPipes', function () {
+  it('returns input pipes of task', function () {
+    inputPipesOf('0').should.eql([])
+
+    inputPipesOf('1').should.eql([pipe.a])
+
+    inputPipesOf('2').should.eql([pipe.b])
+
+    inputPipesOf('3').should.eql([pipe.c, pipe.d])
+  })
+})
+
+},{"engine/inputPipes":26}],63:[function(require,module,exports){
+var examples = require('examples/graphs')
+var fun = require('engine/fun')
+var isDflowFun = require('engine/isDflowFun')
+
+describe('isDflowFun', function () {
+  var context = (typeof window === 'object') ? 'client' : 'server'
+
+  describe('returns false if it', function () {
+    it('is a function, has graph and func properties but graph is not valid', function () {
+      function f () { /* not generated by dflow */ }
+
+      f.funcs = {}
+      f.graph = { task: {}, pipe: { '1': [ '1', '2', 'zero' ] } }
+
+      isDflowFun(f).should.be.ko
+    })
+
+    it('is a function but has not a graph property', function () {
+      function f () { /* not generated by dflow */ }
+
+      f.funcs = {}
+
+      isDflowFun(f).should.be.ko
+    })
+
+    it('is a function but has not a funcs property', function () {
+      function f () { /* not generated by dflow */ }
+
+      f.graph = {}
+
+      isDflowFun(f).should.be.ko
+    })
+
+    it('is a function but graph property is not an object', function () {
+      function f () { /* not generated by dflow */ }
+
+      f.funcs = {}
+      f.graph = 'not an object'
+
+      isDflowFun(f).should.be.ko
+    })
+  })
+
+  it('returns false if it is a function but funcs property is not an object', function () {
+    function f () { /* not generated by dflow */ }
+
+    f.funcs = 'not an object'
+    f.graph = {}
+
+    isDflowFun(f).should.be.ko
+  })
+
+  describe('returns true if', function () {
+    it('is a function generated by dflow', function () {
+      for (var exampleName in examples) {
+        var exampleGraph = examples[exampleName]
+
+        var graphInfo = exampleGraph.info || {}
+        var graphContext = graphInfo.context || 'universal'
+
+        if (graphContext === context) {
+          var f = fun(exampleGraph)
+
+          isDflowFun(f).should.be.ok
+        }
+      }
+    })
+  })
+
+  describe('returns false if', function () {
+    it('is not a function', function () {
+      isDflowFun('not a function').should.be.ko
+    })
+  })
+})
+
+},{"engine/fun":14,"engine/isDflowFun":27,"examples/graphs":44}],64:[function(require,module,exports){
+var level = require('engine/level')
+
+var pipe = {
+  'a': [ '0', '1' ],
+  'b': [ '1', '2' ],
+  'c': [ '1', '3' ],
+  'd': [ '2', '3' ]
+}
+
+var cachedLevelOf = {}
+var computeLevelOf = level.bind(null, pipe, cachedLevelOf)
+
+describe('level', function () {
+  it('returns level of task', function () {
+    computeLevelOf('0').should.eql(0)
+    computeLevelOf('1').should.eql(1)
+    computeLevelOf('2').should.eql(2)
+    computeLevelOf('3').should.eql(3)
+  })
+})
+
+},{"engine/level":28}],65:[function(require,module,exports){
+var parents = require('engine/parents')
+
+var pipe = {
+  'a': [ '0', '1' ],
+  'b': [ '1', '2' ],
+  'c': [ '1', '3' ],
+  'd': [ '2', '3' ]
+}
+
+var parentsOf = parents.bind(null, pipe)
+
+describe('parentsOf', function () {
+  it('returns parent tasks of task', function () {
+    parentsOf('0').should.eql([])
+
+    parentsOf('1').should.eql(['0'])
+
+    parentsOf('2').should.eql(['1'])
+
+    parentsOf('3').should.eql(['1', '2'])
+  })
+
+  it('does not count twice', function () {
+    pipe = {
+      'a': [ '0', '1', 0 ],
+      'b': [ '0', '1', 1 ]
+    }
+
+    parentsOf('1').should.eql(['0']) // not ['0', '0']
+  })
+})
+
+},{"engine/parents":29}],66:[function(require,module,exports){
+
+var accessor = require('engine/regex/accessor')
+var argument = require('engine/regex/argument')
+var comment = require('engine/regex/comment')
+var dotOperator = require('engine/regex/dotOperator')
+var reference = require('engine/regex/reference')
+var subgraph = require('engine/regex/subgraph')
+
+describe('regex', function () {
+  describe('accessor', function () {
+    it('matches @attributeName', function () {
+      accessor.test('@foo').should.be.true
+    })
+  })
+
+  describe('argument', function () {
+    it('matches arguments[N]', function () {
+      argument.test('arguments[0]').should.be.true
+      argument.test('arguments[1]').should.be.true
+      argument.test('arguments[2]').should.be.true
+      argument.test('arguments[3]').should.be.true
+    })
+  })
+
+  describe('dotOperator.attrRead', function () {
+    it('matches .validJavaScriptVariableName', function () {
+      dotOperator.attrRead.test('.foo').should.be.true
+      dotOperator.attrRead.test('.$foo').should.be.true
+      dotOperator.attrRead.test('._foo').should.be.true
+      dotOperator.attrRead.test('.f$oo').should.be.true
+      dotOperator.attrRead.test('.f_oo').should.be.true
+      dotOperator.attrRead.test('.1foo').should.be.false
+    })
+
+    it('does not match other dotOperator regexps', function () {
+      dotOperator.attrRead.test('.foo=').should.be.false
+      dotOperator.attrRead.test('.foo()').should.be.false
+    })
+  })
+
+  describe('dotOperator.attrWrite', function () {
+    it('matches .validJavaScriptVariableName=', function () {
+      dotOperator.attrWrite.test('.foo=').should.be.true
+      dotOperator.attrWrite.test('.$foo=').should.be.true
+      dotOperator.attrWrite.test('._foo=').should.be.true
+      dotOperator.attrWrite.test('.f$oo=').should.be.true
+      dotOperator.attrWrite.test('.f_oo=').should.be.true
+      dotOperator.attrWrite.test('.1foo=').should.be.false
+    })
+
+    it('does not match other dotOperator regexps', function () {
+      dotOperator.attrWrite.test('.foo').should.be.false
+      dotOperator.attrWrite.test('.foo()').should.be.false
+    })
+  })
+
+  describe('dotOperator.func', function () {
+    it('matches .validJavaScriptFunctionName()', function () {
+      dotOperator.func.test('.foo()').should.be.true
+      dotOperator.func.test('.$foo()').should.be.true
+      dotOperator.func.test('._foo()').should.be.true
+      dotOperator.func.test('.f$oo()').should.be.true
+      dotOperator.func.test('.f_oo()').should.be.true
+      dotOperator.func.test('.1foo()').should.be.false
+    })
+
+    it('does not match other dotOperator regexps', function () {
+      dotOperator.func.test('.foo').should.be.false
+      dotOperator.func.test('.foo=').should.be.false
+    })
+  })
+
+  describe('reference', function () {
+    it('matches &functionName', function () {
+      reference.test('&foo').should.be.true
+    })
+  })
+
+  describe('subgraph', function () {
+    it('matches /functionName', function () {
+      subgraph.test('/foo').should.be.true
+      subgraph.test('//comment').should.be.false
+      subgraph.test('// comment').should.be.false
+      subgraph.test('notStartingWithSlash').should.be.false
+    })
+  })
+
+  describe('comment', function () {
+    it('matches //comment', function () {
+      comment.test('//foo').should.be.true
+    })
+  })
+})
+
+
+},{"engine/regex/accessor":30,"engine/regex/argument":31,"engine/regex/comment":32,"engine/regex/dotOperator":33,"engine/regex/reference":35,"engine/regex/subgraph":36}],67:[function(require,module,exports){
+var fun = require('engine/fun')
+
+describe('runtime error', function () {
+  it('stops execution of next tasks', function () {
+    var count = 1
+    var err = 'ok'
+    var graph = {
+      task: {
+        a: 'throwError',
+        b: 'shouldNotRun'
+      },
+      pipe: {
+        c: ['a', 'b']
+      }
+    }
+
+    var additionalFunctions = {
+      throwError: function () {
+        throw new Error(err)
+      },
+      shouldNotRun: function () {
+        count++
+      }
+    }
+
+    var f = fun(graph, additionalFunctions)
+
+    ;(function () {
+      f()
+    }).should.throwError(err)
+
+    count.should.be.eql(1)
+  })
+
+  it('enrichs error with task info', function () {
+    var graph = {
+      task: {
+        a: 'throwError'
+      },
+      pipe: {}
+    }
+
+    var additionalFunctions = {
+      throwError: function () {
+        throw new Error()
+      }
+    }
+
+    var f = fun(graph, additionalFunctions)
+
+    try {
+      f()
+    } catch (err) {
+      err.taskKey.should.eql('a')
+      err.taskName.should.eql('throwError')
+    }
+  })
+})
+
+},{"engine/fun":14}],68:[function(require,module,exports){
+var should = require('should')
+var fun = require('engine/fun')
+
+describe('this', function () {
+  var graph = {
+    task: {
+      '1': 'this.graph',
+      '2': 'return'
+    },
+    pipe: {
+      'a': [ '1', '2' ]
+    }
+  }
+
+  var f = fun(graph)
+
+  it('is a dflow builtin that returns the function itself', function () {
+    should.deepEqual(f(), graph)
+  })
+})
+
+describe('this.graph', function () {
+  var graph = {
+    task: {
+      '1': 'this',
+      '2': 'return'
+    },
+    pipe: {
+      'a': [ '1', '2' ]
+    }
+  }
+
+  var f = fun(graph)
+
+  it('is a dflow builtin that returns the graph', function () {
+    f().should.be.a.Function
+
+    // Yep, f is a function that returns itself
+    should.deepEqual(f()(), f()()())
+  })
+})
+
+},{"engine/fun":14,"should":12}],69:[function(require,module,exports){
+var validate = require('engine/validate')
+
+describe('validate', function () {
+  it('is aware that undefined argIndex means 0', function () {
+    var graph = {
+      task: { '1': 'x', '2': 'x' },
+      pipe: {
+        'a': [ '1', '2' ] // pipe['a'][2] here defaults to 0
+      }
+    }
+
+    validate(graph).should.be.ok
+  })
+
+  it('throws if an additional function name is "return"', function () {
+    ;(function () {
+      var graph = {
+        task: {}, pipe: {}
+      }
+      var func = {
+        'return': Function.prototype
+      }
+
+      validate(graph, func)
+    }).should.throwError(/Reserved function name/)
+  })
+
+  it('throws if an additional function name is "arguments"', function () {
+    ;(function () {
+      var graph = {
+        task: {},
+        pipe: {}
+      }
+      var func = {
+        'arguments': Function.prototype
+      }
+
+      validate(graph, func)
+    }).should.throwError(/Reserved function name/)
+  })
+
+  it('throws if an additional function name is "argument[N]"', function () {
+    ;(function () {
+      validate({ task: {}, pipe: {} }, { 'arguments[0]': Function.prototype })
+    }).should.throwError(/Reserved function name/)
+
+    ;(function () {
+      validate({ task: {}, pipe: {} }, { 'arguments[1]': Function.prototype })
+    }).should.throwError(/Reserved function name/)
+  })
+
+  it('throws if an additional function name is "this"', function () {
+    ;(function () {
+      validate({ task: {}, pipe: {} }, { 'this': Function.prototype })
+    }).should.throwError(/Reserved function name/)
+  })
+
+  it('throws if an additional function name is "this.graph"', function () {
+    ;(function () {
+      validate({ task: {}, pipe: {} }, { 'this.graph': Function.prototype })
+    }).should.throwError(/Reserved function name/)
+  })
+
+  it('throws if an additional function name starts with a "@"', function () {
+    ;(function () {
+      validate({ task: {}, pipe: {} }, { '@foo': Function.prototype })
+    }).should.throwError(/Function name cannot start with "@"/)
+  })
+
+  it('throws if an additional function name starts with a "&"', function () {
+    ;(function () {
+      validate({ task: {}, pipe: {} }, { '&bar': Function.prototype })
+    }).should.throwError(/Function name cannot start with "&"/)
+  })
+
+  it('throws if an additional function name starts with a "."', function () {
+    ;(function () {
+      validate({ task: {}, pipe: {} }, { '.quz': Function.prototype })
+    }).should.throwError(/Function name cannot start with "\."/)
+
+    ;(function () {
+      validate({ task: {}, pipe: {} }, { '.quz()': Function.prototype })
+    }).should.throwError(/Function name cannot start with "\."/)
+  })
+
+  it('throws if pipe or task is not an object', function () {
+    ;(function () {
+      validate({ task: 'not an object', pipe: {} })
+    }).should.throwError(/Not an object: task/)
+
+    ;(function () {
+      validate({ pipe: 'not an object', task: {} })
+    }).should.throwError(/Not an object: pipe/)
+  })
+
+  it('throws if optional data, func or info is not an object', function () {
+    ;(function () {
+      validate({ task: {}, pipe: {}, data: 'not an object' })
+    }).should.throwError(/Not an object: data/)
+
+    ;(function () {
+      validate({ task: {}, pipe: {}, func: 'not an object' })
+    }).should.throwError(/Not an object: func/)
+
+    ;(function () {
+      validate({ task: {}, pipe: {}, info: 'not an object' })
+    }).should.throwError(/Not an object: info/)
+  })
+
+  it('throws if some pipe has invalid type', function () {
+    ;(function () {
+      validate({ task: {}, pipe: { '1': [ '1', '2', 'zero' ] } })
+    }).should.throwError(/Invalid pipe:/)
+
+    ;(function () {
+      validate({ task: {}, pipe: { '1': [ '1', 2, 0 ] } })
+    }).should.throwError(/Invalid pipe:/)
+
+    ;(function () {
+      validate({ task: {}, pipe: { '1': [ 1, '2', 0 ] } })
+    }).should.throwError(/Invalid pipe:/)
+  })
+
+  it('throws if pipe has duplicates', function () {
+    ;(function () {
+      validate({
+        task: { '1': 'foo', '2': 'bar' },
+        pipe: {
+          a: [ '1', '2', 1 ],
+          b: [ '1', '2', 1 ]
+        }
+      })
+    }).should.throwError(/Duplicated pipe:/)
+
+    ;(function () {
+      validate({
+        task: { '1': 'foo', '2': 'bar' },
+        pipe: {
+          a: [ '1', '2', 0 ],
+          b: [ '1', '2' ] // Since pipe['b'][2] defaults to 0, pipe['b'] is a duplicate.
+        }
+      })
+    }).should.throwError(/Duplicated pipe:/)
+  })
+
+  it('throws if some pipe is orphan', function () {
+    ;(function () {
+      validate({
+        task: {},
+        pipe: {
+          a: [ '1', '2', 0 ]
+        }
+      })
+    }).should.throwError(/Orphan pipe:/)
+  })
+
+  it('throws if some func is not a valid (sub)graph', function () {
+    ;(function () {
+      validate({
+        task: {},
+        pipe: {},
+        func: {
+          a: {
+            task: {},
+            pipe: {
+              b: [ '1', '2', 0 ]
+            }
+          }
+        }
+      })
+    }).should.throwError(/Orphan pipe:/)
+  })
+
+  it('throws if subgraph is not defined', function () {
+    ;(function () {
+      validate({
+        task: { '1': '/foo' },
+        pipe: {},
+        func: {}
+      })
+    }).should.throwError(/Undefined subgraph:/)
+  })
+})
+
+},{"engine/validate":38}]},{},[50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69]);

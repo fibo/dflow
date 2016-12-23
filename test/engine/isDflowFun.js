@@ -61,7 +61,7 @@ describe('isDflowFun', function () {
         if (graphContext === context) {
           var f = fun(exampleGraph)
 
-          isDflowFun(f).should.be.ko
+          isDflowFun(f).should.be.ok
         }
       }
     })

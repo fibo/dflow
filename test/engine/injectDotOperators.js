@@ -30,7 +30,7 @@ describe('injectDotOperators', function () {
     getVersion(procezz).should.be.eql(procezz.version)
 
     // This will return a reference to procezz.exit, it should not call it.
-    exit(process).should.be.a.Function
+    exit(procezz).should.be.a.Function
   })
 
   it('modifies funcs object with dot operators attribute writers injected', function () {

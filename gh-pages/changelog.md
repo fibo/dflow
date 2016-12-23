@@ -22,9 +22,15 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - find a smart way to show output values, it should be like vvvv debug you can apply it to a single task or the whole subgraph or graph
 - can edit subgraphs, canvas should be able to empty and show the subgraphwhile a navbat like   root / subgraph1 / subgraph2 with dropdowns let you navigate throw the tree.
 - Implement RUN_ONCE editor action (already there), add Run button and make it work.
+- Consider adding cool libraries like threejs and d3 as ready to add nodeswhich add them from CDN.
 
 
 ## [Unreleased]
+
+### Fixed
+
+- Move test/engine/inject/*js files up to test/engine
+- Fixed all tests client side, see http://g14n.info/dflow/test page
 
 ## [v0.19.0] - 2016-12-23
 

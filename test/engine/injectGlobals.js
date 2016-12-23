@@ -12,11 +12,11 @@ describe('injectGlobals', function () {
 
   it('walks through taskName using dot operator syntax', function () {
     var funcs = {}
-    var task = { '1': 'process.version' }
+    var task = { '1': 'Math.cos' }
 
     injectGlobals(funcs, task)
 
-    funcs['process.version']().should.be.eql(process.version)
+    funcs['Math.cos'](0).should.be.eql(1)
   })
 
   it('works with global constants', function () {
