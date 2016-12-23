@@ -54153,7 +54153,7 @@ function config (name) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.invalidNode = exports.enableAutorun = exports.disableAutorun = exports.deleteNode = exports.deleteLink = exports.createNode = exports.createLink = undefined;
+exports.runOnce = exports.invalidNode = exports.enableAutorun = exports.disableAutorun = exports.deleteNode = exports.deleteLink = exports.createNode = exports.createLink = undefined;
 exports.readGraphIfNeeded = readGraphIfNeeded;
 exports.updateGraph = updateGraph;
 
@@ -54232,6 +54232,12 @@ function readGraphIfNeeded() {
     }
   };
 }
+
+var runOnce = exports.runOnce = function runOnce() {
+  return {
+    type: 'RUN_ONCE'
+  };
+};
 
 function updateGraph(graph) {
   return function (dispatch) {
@@ -55164,7 +55170,7 @@ function autorunMiddleware(store) {
   };
 }
 
-},{"../../../engine/emptyGraph.json":350,"../../../engine/regex/subgraph":374,"not-defined":120}],329:[function(require,module,exports){
+},{"../../../engine/emptyGraph.json":350,"../../../engine/regex/subgraph":375,"not-defined":120}],329:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55202,7 +55208,7 @@ function autorunMiddleware(store) {
   };
 }
 
-},{"../../../engine/validate":376,"../actions":316}],330:[function(require,module,exports){
+},{"../../../engine/validate":377,"../actions":316}],330:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55492,7 +55498,7 @@ var additionalFunctions = Object.assign({}, _window2.default, {
 
 exports.default = additionalFunctions;
 
-},{"../../../engine/functions/window":353}],335:[function(require,module,exports){
+},{"../../../engine/functions/window":354}],335:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -55732,7 +55738,7 @@ function noInputTask(taskName) {
   return noInputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":352,"../../../engine/regex/argument":369,"../../../engine/regex/quoted":372,"../../../engine/regex/reference":373}],345:[function(require,module,exports){
+},{"../../../engine/functions/builtin":352,"../../../engine/regex/argument":370,"../../../engine/regex/quoted":373,"../../../engine/regex/reference":374}],345:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55765,7 +55771,7 @@ function noOutputForTask(taskName) {
   return noOutputTasks.indexOf(taskName) > -1;
 }
 
-},{"../../../engine/regex/comment":370}],346:[function(require,module,exports){
+},{"../../../engine/regex/comment":371}],346:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55784,6 +55790,10 @@ var _accessor2 = _interopRequireDefault(_accessor);
 var _dotOperator = require('../../../engine/regex/dotOperator');
 
 var _dotOperator2 = _interopRequireDefault(_dotOperator);
+
+var _window = require('../../../engine/functions/window');
+
+var _window2 = _interopRequireDefault(_window);
 
 var _walkGlobal = require('../../../engine/walkGlobal');
 
@@ -55811,10 +55821,10 @@ function singleInputTask(taskName) {
 
   var singleInputTasks = ['alert', 'return', 't'];
 
-  return singleInputTasks.indexOf(taskName) > -1;
+  return singleInputTasks.concat(_window2.default.availableTags()).indexOf(taskName) > -1;
 }
 
-},{"../../../engine/functions/builtin":352,"../../../engine/regex/accessor":368,"../../../engine/regex/dotOperator":371,"../../../engine/walkGlobal":377}],347:[function(require,module,exports){
+},{"../../../engine/functions/builtin":352,"../../../engine/functions/window":354,"../../../engine/regex/accessor":369,"../../../engine/regex/dotOperator":372,"../../../engine/walkGlobal":378}],347:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55860,6 +55870,14 @@ var _walkGlobal = require('../../../engine/walkGlobal');
 
 var _walkGlobal2 = _interopRequireDefault(_walkGlobal);
 
+var _process = require('../../../engine/functions/process');
+
+var _process2 = _interopRequireDefault(_process);
+
+var _window = require('../../../engine/functions/window');
+
+var _window2 = _interopRequireDefault(_window);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -55870,8 +55888,14 @@ function twoInputsTask(taskName) {
   if (_dotOperator2.default.func.test(taskName)) return true;
   if (_dotOperator2.default.attrWrite.test(taskName)) return true;
 
-  var builtin = _builtin2.default[taskName];
-  if (builtin) return builtin.length === 2;
+  var builtinFun = _builtin2.default[taskName];
+  if (builtinFun) return builtinFun.length === 2;
+
+  var processFun = _process2.default[taskName];
+  if (processFun) return processFun.length === 2;
+
+  var windowFun = _window2.default[taskName];
+  if (windowFun) return windowFun.length === 2;
 
   var globalTask = (0, _walkGlobal2.default)(taskName);
 
@@ -55882,7 +55906,7 @@ function twoInputsTask(taskName) {
   return false;
 }
 
-},{"../../../engine/functions/builtin":352,"../../../engine/regex/dotOperator":371,"../../../engine/walkGlobal":377}],349:[function(require,module,exports){
+},{"../../../engine/functions/builtin":352,"../../../engine/functions/process":353,"../../../engine/functions/window":354,"../../../engine/regex/dotOperator":372,"../../../engine/walkGlobal":378}],349:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55918,7 +55942,7 @@ function typeOfNode(node) {
   }
 }
 
-},{"../../../engine/regex/subgraph":374}],350:[function(require,module,exports){
+},{"../../../engine/regex/subgraph":375}],350:[function(require,module,exports){
 module.exports={
   "data": {},
   "func": {},
@@ -55951,6 +55975,7 @@ var no = require('not-defined');
 var regexArgument = require('./regex/argument');
 var regexComment = require('./regex/comment');
 var regexDotOperator = require('./regex/dotOperator');
+var regexReference = require('./regex/reference');
 var regexSubgraph = require('./regex/subgraph');
 var reservedKeys = require('./reservedKeys');
 var validate = require('./validate');
@@ -56063,6 +56088,9 @@ function fun(graph, additionalFunctions) {
     if (regexDotOperator.attrRead.test(taskName)) return;
     if (regexDotOperator.attrWrite.test(taskName)) return;
 
+    // Skip references
+    if (regexReference.exec(taskName)) return;
+
     // Skip globals.
     if (walkGlobal(taskName)) return;
 
@@ -56153,7 +56181,7 @@ function fun(graph, additionalFunctions) {
 
 module.exports = fun;
 
-},{"./functions/builtin":352,"./inject/accessors":354,"./inject/additionalFunctions":355,"./inject/arguments":356,"./inject/arrowFunctions":357,"./inject/dotOperators":358,"./inject/globals":359,"./inject/numbers":360,"./inject/references":361,"./inject/strings":362,"./inputArgs":363,"./isDflowFun":365,"./level":366,"./regex/argument":369,"./regex/comment":370,"./regex/dotOperator":371,"./regex/subgraph":374,"./reservedKeys":375,"./validate":376,"./walkGlobal":377,"not-defined":120}],352:[function(require,module,exports){
+},{"./functions/builtin":352,"./inject/accessors":355,"./inject/additionalFunctions":356,"./inject/arguments":357,"./inject/arrowFunctions":358,"./inject/dotOperators":359,"./inject/globals":360,"./inject/numbers":361,"./inject/references":362,"./inject/strings":363,"./inputArgs":364,"./isDflowFun":366,"./level":367,"./regex/argument":370,"./regex/comment":371,"./regex/dotOperator":372,"./regex/reference":374,"./regex/subgraph":375,"./reservedKeys":376,"./validate":377,"./walkGlobal":378,"not-defined":120}],352:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -56322,7 +56350,31 @@ exports.now = function () {
 };
 
 },{"not-defined":120}],353:[function(require,module,exports){
+(function (process){
 'use strict';
+
+function coreNodeModules() {
+  // TODO add more core node modules
+  return ['http', 'https', 'net', 'path', 'readline', 'zlib'];
+}
+
+exports.coreNodeModules = coreNodeModules;
+
+coreNodeModules().forEach(function (x) {
+  exports[x] = function () {
+    return require(x);
+  };
+});
+
+exports.process = function () {
+  return process;
+};
+
+}).call(this,require('_process'))
+},{"_process":126}],354:[function(require,module,exports){
+'use strict';
+
+var no = require('not-defined');
 
 var myAudioContext = null;
 
@@ -56338,6 +56390,47 @@ function audioContext() {
 
 exports.audioContext = audioContext;
 
+// Tash `.appendChild()` works but it is too dangerous!
+//
+// For example, inverting parent with child will delete parent.
+// For instance .appendChild(element, body) will erase body.
+//
+// Another issue is that appending a child that has an id must
+// be idempotent.
+//
+// It is worth to use this safe version.
+
+exports.appendChild = function (element, child) {
+  var protectedNodes = ['body', 'head'];
+
+  // Nothing to do if element or child is not provided.
+  if (arguments.length < 2) return;
+
+  // Prevent erase important DOM nodes.
+  protectedNodes.forEach(function (node) {
+    if (child === document[node]) {
+      throw new Error('cannot erase ' + node);
+    }
+  });
+
+  // Check arguments look like DOM nodes.
+  Array.prototype.slice.call(arguments).forEach(function (node) {
+    if (typeof node.appendChild !== 'function') {
+      throw new Error('Cannot appendChild, not an element:' + node);
+    }
+  });
+
+  // Be idempotent. It is required that child has an id.
+  var id = child.id;
+  if (no(id)) return;
+
+  var foundChild = document.getElementById(id);
+  if (foundChild) return foundChild;
+
+  // At this stage, child is a brand new element.
+  return element.appendChild(child);
+};
+
 exports.body = function () {
   return document.body;
 };
@@ -56350,12 +56443,29 @@ exports.head = function () {
   return document.head;
 };
 
-// TODO more tags
-var tags = ['a', 'div', 'link', 'p', 'script'];
+function availableTags() {
+  return ['a', 'article', 'aside', 'button', 'form', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'input', 'label', 'li', 'link', 'ol', 'nav', 'p', 'script', 'svg', 'textarea', 'ul'];
+}
 
-tags.forEach(function (x) {
-  exports[x] = function () {
-    return document.createElement(x);
+exports.availableTags = availableTags;
+
+availableTags().forEach(function (x) {
+  exports[x] = function (id) {
+    var element;
+
+    // If id is provided, it must be a string.
+    if (id && typeof id !== 'string') {
+      throw new TypeError('Element id must be a string:' + id);
+    }
+
+    element = document.getElementById(id);
+
+    if (!element) {
+      element = document.createElement(x);
+      element.id = id;
+    }
+
+    return element;
   };
 });
 
@@ -56363,7 +56473,7 @@ exports.window = function () {
   return window;
 };
 
-},{}],354:[function(require,module,exports){
+},{"not-defined":120}],355:[function(require,module,exports){
 'use strict';
 
 var no = require('not-defined');
@@ -56415,7 +56525,7 @@ function injectAccessors(funcs, graph) {
 
 module.exports = injectAccessors;
 
-},{"../regex/accessor":368,"not-defined":120}],355:[function(require,module,exports){
+},{"../regex/accessor":369,"not-defined":120}],356:[function(require,module,exports){
 'use strict';
 
 var no = require('not-defined');
@@ -56446,7 +56556,7 @@ function injectAdditionalFunctions(funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions;
 
-},{"not-defined":120}],356:[function(require,module,exports){
+},{"not-defined":120}],357:[function(require,module,exports){
 'use strict';
 
 var regexArgument = require('../regex/argument');
@@ -56489,7 +56599,7 @@ function injectArguments(funcs, task, args) {
 
 module.exports = injectArguments;
 
-},{"../regex/argument":369}],357:[function(require,module,exports){
+},{"../regex/argument":370}],358:[function(require,module,exports){
 'use strict';
 
 /**
@@ -56526,9 +56636,10 @@ function arrowFunctions(funcs, task) {
 
 module.exports = arrowFunctions;
 
-},{}],358:[function(require,module,exports){
+},{}],359:[function(require,module,exports){
 'use strict';
 
+var no = require('not-defined');
 var regexDotOperator = require('../regex/dotOperator');
 
 /**
@@ -56582,7 +56693,7 @@ function injectDotOperators(funcs, task) {
      */
 
     function dotOperatorAttributeWrite(attributeName, obj, attributeValue) {
-      if (arguments.length === 1) return;
+      if (no(obj)) return;
 
       obj[attributeName] = attributeValue;
 
@@ -56624,7 +56735,7 @@ function injectDotOperators(funcs, task) {
 
 module.exports = injectDotOperators;
 
-},{"../regex/dotOperator":371}],359:[function(require,module,exports){
+},{"../regex/dotOperator":372,"not-defined":120}],360:[function(require,module,exports){
 'use strict';
 
 var no = require('not-defined');
@@ -56671,7 +56782,7 @@ function injectGlobals(funcs, task) {
 
 module.exports = injectGlobals;
 
-},{"../reservedKeys":375,"../walkGlobal":377,"not-defined":120}],360:[function(require,module,exports){
+},{"../reservedKeys":376,"../walkGlobal":378,"not-defined":120}],361:[function(require,module,exports){
 "use strict";
 
 /**
@@ -56705,7 +56816,7 @@ function injectNumbers(funcs, task) {
 
 module.exports = injectNumbers;
 
-},{}],361:[function(require,module,exports){
+},{}],362:[function(require,module,exports){
 'use strict';
 
 var regexReference = require('../regex/reference');
@@ -56756,7 +56867,7 @@ function injectReferences(funcs, task) {
 
 module.exports = injectReferences;
 
-},{"../regex/reference":373,"../walkGlobal":377}],362:[function(require,module,exports){
+},{"../regex/reference":374,"../walkGlobal":378}],363:[function(require,module,exports){
 'use strict';
 
 var regexQuoted = require('../regex/quoted');
@@ -56788,7 +56899,7 @@ function injectStrings(funcs, task) {
 
 module.exports = injectStrings;
 
-},{"../regex/quoted":372}],363:[function(require,module,exports){
+},{"../regex/quoted":373}],364:[function(require,module,exports){
 'use strict';
 
 var inputPipes = require('./inputPipes');
@@ -56821,7 +56932,7 @@ function inputArgs(outs, pipe, taskKey) {
 
 module.exports = inputArgs;
 
-},{"./inputPipes":364}],364:[function(require,module,exports){
+},{"./inputPipes":365}],365:[function(require,module,exports){
 "use strict";
 
 /**
@@ -56851,7 +56962,7 @@ function inputPipes(pipe, taskKey) {
 
 module.exports = inputPipes;
 
-},{}],365:[function(require,module,exports){
+},{}],366:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -56885,7 +56996,7 @@ function isDflowFun(f) {
 
 module.exports = isDflowFun;
 
-},{"./validate":376}],366:[function(require,module,exports){
+},{"./validate":377}],367:[function(require,module,exports){
 'use strict';
 
 var parents = require('./parents');
@@ -56922,7 +57033,7 @@ function level(pipe, cachedLevelOf, taskKey) {
 
 module.exports = level;
 
-},{"./parents":367}],367:[function(require,module,exports){
+},{"./parents":368}],368:[function(require,module,exports){
 'use strict';
 
 var inputPipes = require('./inputPipes');
@@ -56951,50 +57062,50 @@ function parents(pipe, taskKey) {
 
 module.exports = parents;
 
-},{"./inputPipes":364}],368:[function(require,module,exports){
+},{"./inputPipes":365}],369:[function(require,module,exports){
 "use strict";
 
 module.exports = /^@[\w][\w\d]+$/;
 
-},{}],369:[function(require,module,exports){
+},{}],370:[function(require,module,exports){
 "use strict";
 
 module.exports = /^arguments\[(\d+)\]$/;
 
-},{}],370:[function(require,module,exports){
+},{}],371:[function(require,module,exports){
 "use strict";
 
 module.exports = /^\/\/.+$/;
 
-},{}],371:[function(require,module,exports){
+},{}],372:[function(require,module,exports){
 "use strict";
 
 exports.attrRead = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/;
 exports.attrWrite = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)=$/;
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/;
 
-},{}],372:[function(require,module,exports){
+},{}],373:[function(require,module,exports){
 "use strict";
 
 module.exports = /^'.+'$/;
 
-},{}],373:[function(require,module,exports){
+},{}],374:[function(require,module,exports){
 "use strict";
 
 module.exports = /^&(.+)$/;
 
-},{}],374:[function(require,module,exports){
+},{}],375:[function(require,module,exports){
 "use strict";
 
 module.exports = /^\/[\w][\w\d]+$/;
 
-},{}],375:[function(require,module,exports){
+},{}],376:[function(require,module,exports){
 'use strict';
 
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = ['arguments', 'dflow.fun', 'dflow.isDflowFun', 'dflow.validate', 'return', 'this', 'this.graph'];
 
-},{}],376:[function(require,module,exports){
+},{}],377:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -57162,12 +57273,14 @@ function validate(graph, additionalFunctions) {
 
 module.exports = validate;
 
-},{"./regex/accessor":368,"./regex/argument":369,"./regex/dotOperator":371,"./regex/reference":373,"./regex/subgraph":374,"./reservedKeys":375,"not-defined":120}],377:[function(require,module,exports){
+},{"./regex/accessor":369,"./regex/argument":370,"./regex/dotOperator":372,"./regex/reference":374,"./regex/subgraph":375,"./reservedKeys":376,"not-defined":120}],378:[function(require,module,exports){
 (function (global){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+var regexComment = require('./regex/comment');
+var regexReference = require('./regex/reference');
 var regexQuoted = require('./regex/quoted');
 
 var globalContext;
@@ -57193,9 +57306,15 @@ function walkGlobal(taskName) {
   // Skip dot operator and tasks that start with a dot.
   if (taskName.indexOf('.') === 0) return;
 
-  // Skip strings and numbers which may include dots.
-  if (regexQuoted.test(taskName)) return;
+  // Skip stuff that may include dots:
+  // * comments
+  // * strings
+  // * numbers
+  // * references
+  if (regexComment.test(taskName)) return;
   if (parseFloat(taskName)) return;
+  if (regexQuoted.test(taskName)) return;
+  if (regexReference.test(taskName)) return;
 
   function toNextProp(next, prop) {
     return next[prop];
@@ -57207,4 +57326,4 @@ function walkGlobal(taskName) {
 module.exports = walkGlobal;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./regex/quoted":372}]},{},[325]);
+},{"./regex/comment":371,"./regex/quoted":373,"./regex/reference":374}]},{},[325]);

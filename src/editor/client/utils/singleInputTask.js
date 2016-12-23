@@ -1,6 +1,7 @@
 import builtinFunctions from '../../../engine/functions/builtin'
 import regexAccessor from '../../../engine/regex/accessor'
 import regexDotOperator from '../../../engine/regex/dotOperator'
+import windowFunctions from '../../../engine/functions/window'
 import walkGlobal from '../../../engine/walkGlobal'
 
 /**
@@ -27,5 +28,7 @@ export default function singleInputTask (taskName) {
     't'
   ]
 
-  return singleInputTasks.indexOf(taskName) > -1
+  return singleInputTasks
+           .concat(windowFunctions.availableTags())
+           .indexOf(taskName) > -1
 }

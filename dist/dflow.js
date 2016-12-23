@@ -19,6 +19,7 @@ var no = require('not-defined')
 var regexArgument = require('./regex/argument')
 var regexComment = require('./regex/comment')
 var regexDotOperator = require('./regex/dotOperator')
+var regexReference = require('./regex/reference')
 var regexSubgraph = require('./regex/subgraph')
 var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
@@ -132,6 +133,9 @@ function fun (graph, additionalFunctions) {
     if (regexDotOperator.attrRead.test(taskName)) return
     if (regexDotOperator.attrWrite.test(taskName)) return
 
+    // Skip references
+    if (regexReference.exec(taskName)) return
+
     // Skip globals.
     if (walkGlobal(taskName)) return
 
@@ -223,7 +227,7 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./functions/builtin":3,"./inject/accessors":5,"./inject/additionalFunctions":6,"./inject/arguments":7,"./inject/arrowFunctions":8,"./inject/dotOperators":9,"./inject/globals":10,"./inject/numbers":11,"./inject/references":12,"./inject/strings":13,"./inputArgs":14,"./isDflowFun":16,"./level":17,"./regex/argument":20,"./regex/comment":21,"./regex/dotOperator":22,"./regex/subgraph":25,"./reservedKeys":26,"./validate":27,"./walkGlobal":28,"not-defined":1}],3:[function(require,module,exports){
+},{"./functions/builtin":3,"./inject/accessors":5,"./inject/additionalFunctions":6,"./inject/arguments":7,"./inject/arrowFunctions":8,"./inject/dotOperators":9,"./inject/globals":10,"./inject/numbers":11,"./inject/references":12,"./inject/strings":13,"./inputArgs":14,"./isDflowFun":16,"./level":17,"./regex/argument":20,"./regex/comment":21,"./regex/dotOperator":22,"./regex/reference":24,"./regex/subgraph":25,"./reservedKeys":26,"./validate":27,"./walkGlobal":28,"not-defined":1}],3:[function(require,module,exports){
 var no = require('not-defined')
 
 // Arithmetic operators
@@ -338,6 +342,8 @@ exports.true = function () { return true }
 exports.now = function () { return new Date() }
 
 },{"not-defined":1}],4:[function(require,module,exports){
+var no = require('not-defined')
+
 var myAudioContext = null
 
 function audioContext () {
@@ -352,34 +358,88 @@ function audioContext () {
 
 exports.audioContext = audioContext
 
-exports.body = function () {
-  return document.body
+// Tash `.appendChild()` works but it is too dangerous!
+//
+// For example, inverting parent with child will delete parent.
+// For instance .appendChild(element, body) will erase body.
+//
+// Another issue is that appending a child that has an id must
+// be idempotent.
+//
+// It is worth to use this safe version.
+
+exports.appendChild = function (element, child) {
+  var protectedNodes = ['body', 'head']
+
+  // Nothing to do if element or child is not provided.
+  if (arguments.length < 2) return
+
+  // Prevent erase important DOM nodes.
+  protectedNodes.forEach(function (node) {
+    if (child === document[node]) {
+      throw new Error('cannot erase ' + node)
+    }
+  })
+
+  // Check arguments look like DOM nodes.
+  Array.prototype.slice.call(arguments)
+       .forEach(function (node) {
+         if (typeof node.appendChild !== 'function') {
+           throw new Error('Cannot appendChild, not an element:' + node)
+         }
+       })
+
+  // Be idempotent. It is required that child has an id.
+  var id = child.id
+  if (no(id)) return
+
+  var foundChild = document.getElementById(id)
+  if (foundChild) return foundChild
+
+  // At this stage, child is a brand new element.
+  return element.appendChild(child)
 }
 
-exports.document = function () {
-  return document
+exports.body = function () { return document.body }
+
+exports.document = function () { return document }
+
+exports.head = function () { return document.head }
+
+function availableTags () {
+  return [
+    'a', 'article', 'aside', 'button', 'form', 'div',
+    'h1', 'h2', 'h3', 'h4', 'h5',
+    'input', 'label', 'li', 'link', 'ol', 'nav', 'p', 'script', 'svg',
+    'textarea', 'ul'
+  ]
 }
 
-exports.head = function () {
-  return document.head
-}
+exports.availableTags = availableTags
 
-// TODO more tags
-var tags = [
-  'a', 'div', 'link', 'p', 'script'
-]
+availableTags().forEach(function (x) {
+  exports[x] = function (id) {
+    var element
 
-tags.forEach(function (x) {
-  exports[x] = function () {
-    return document.createElement(x)
+    // If id is provided, it must be a string.
+    if (id && typeof id !== 'string') {
+      throw new TypeError('Element id must be a string:' + id)
+    }
+
+    element = document.getElementById(id)
+
+    if (!element) {
+      element = document.createElement(x)
+      element.id = id
+    }
+
+    return element
   }
 })
 
-exports.window = function () {
-  return window
-}
+exports.window = function () { return window }
 
-},{}],5:[function(require,module,exports){
+},{"not-defined":1}],5:[function(require,module,exports){
 var no = require('not-defined')
 var regexAccessor = require('../regex/accessor')
 
@@ -535,6 +595,7 @@ function arrowFunctions (funcs, task) {
 module.exports = arrowFunctions
 
 },{}],9:[function(require,module,exports){
+var no = require('not-defined')
 var regexDotOperator = require('../regex/dotOperator')
 
 /**
@@ -588,7 +649,7 @@ function injectDotOperators (funcs, task) {
      */
 
     function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
-      if (arguments.length === 1) return
+      if (no(obj)) return
 
       obj[attributeName] = attributeValue
 
@@ -630,7 +691,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":22}],10:[function(require,module,exports){
+},{"../regex/dotOperator":22,"not-defined":1}],10:[function(require,module,exports){
 var no = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
@@ -1144,6 +1205,8 @@ module.exports = validate
 
 },{"./regex/accessor":19,"./regex/argument":20,"./regex/dotOperator":22,"./regex/reference":24,"./regex/subgraph":25,"./reservedKeys":26,"not-defined":1}],28:[function(require,module,exports){
 (function (global){
+var regexComment = require('./regex/comment')
+var regexReference = require('./regex/reference')
 var regexQuoted = require('./regex/quoted')
 
 var globalContext
@@ -1169,9 +1232,15 @@ function walkGlobal (taskName) {
   // Skip dot operator and tasks that start with a dot.
   if (taskName.indexOf('.') === 0) return
 
-  // Skip strings and numbers which may include dots.
-  if (regexQuoted.test(taskName)) return
+  // Skip stuff that may include dots:
+  // * comments
+  // * strings
+  // * numbers
+  // * references
+  if (regexComment.test(taskName)) return
   if (parseFloat(taskName)) return
+  if (regexQuoted.test(taskName)) return
+  if (regexReference.test(taskName)) return
 
   function toNextProp (next, prop) {
     return next[prop]
@@ -1184,7 +1253,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./regex/quoted":23}],"dflow":[function(require,module,exports){
+},{"./regex/comment":21,"./regex/quoted":23,"./regex/reference":24}],"dflow":[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/dflow
  */

@@ -77,6 +77,7 @@ npm start
 ```
 
 which will clone repo, install deps, start the *dflow* cli and open your browser.
+Optionally, launch `npm run watch` to trigger build on source changes.
 
 ## Support and License
 

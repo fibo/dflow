@@ -1,3 +1,5 @@
+var no = require('not-defined')
+
 var myAudioContext = null
 
 function audioContext () {
@@ -12,10 +14,46 @@ function audioContext () {
 
 exports.audioContext = audioContext
 
-// .appendChild() works but it is too dangerous
-// it is worth to use this safe version
+// Tash `.appendChild()` works but it is too dangerous!
+//
+// For example, inverting parent with child will delete parent.
+// For instance .appendChild(element, body) will erase body.
+//
+// Another issue is that appending a child that has an id must
+// be idempotent.
+//
+// It is worth to use this safe version.
+
 exports.appendChild = function (element, child) {
-  console.log(element, child)
+  var protectedNodes = ['body', 'head']
+
+  // Nothing to do if element or child is not provided.
+  if (arguments.length < 2) return
+
+  // Prevent erase important DOM nodes.
+  protectedNodes.forEach(function (node) {
+    if (child === document[node]) {
+      throw new Error('cannot erase ' + node)
+    }
+  })
+
+  // Check arguments look like DOM nodes.
+  Array.prototype.slice.call(arguments)
+       .forEach(function (node) {
+         if (typeof node.appendChild !== 'function') {
+           throw new Error('Cannot appendChild, not an element:' + node)
+         }
+       })
+
+  // Be idempotent. It is required that child has an id.
+  var id = child.id
+  if (no(id)) return
+
+  var foundChild = document.getElementById(id)
+  if (foundChild) return foundChild
+
+  // At this stage, child is a brand new element.
+  return element.appendChild(child)
 }
 
 exports.body = function () { return document.body }
@@ -39,7 +77,8 @@ availableTags().forEach(function (x) {
   exports[x] = function (id) {
     var element
 
-    if (typeof id !== 'string') {
+    // If id is provided, it must be a string.
+    if (id && typeof id !== 'string') {
       throw new TypeError('Element id must be a string:' + id)
     }
 
@@ -47,12 +86,7 @@ availableTags().forEach(function (x) {
 
     if (!element) {
       element = document.createElement(x)
-
-      Object.defineProperty(element, 'id', {
-        configurable: false,
-        writable: false,
-        value: id
-      })
+      element.id = id
     }
 
     return element
