@@ -26,7 +26,7 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
-## [v0.18.4] - 2016-12-23
+## [v0.19.0] - 2016-12-23
 
 ### Fixed
 
