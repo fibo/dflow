@@ -15,6 +15,7 @@ var no = require('not-defined')
 var regexArgument = require('./regex/argument')
 var regexComment = require('./regex/comment')
 var regexDotOperator = require('./regex/dotOperator')
+var regexReference = require('./regex/reference')
 var regexSubgraph = require('./regex/subgraph')
 var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
@@ -127,6 +128,9 @@ function fun (graph, additionalFunctions) {
     if (regexDotOperator.func.test(taskName)) return
     if (regexDotOperator.attrRead.test(taskName)) return
     if (regexDotOperator.attrWrite.test(taskName)) return
+
+    // Skip references
+    if (regexReference.exec(taskName)) return
 
     // Skip globals.
     if (walkGlobal(taskName)) return

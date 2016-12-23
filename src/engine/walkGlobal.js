@@ -1,3 +1,5 @@
+var regexComment = require('./regex/comment')
+var regexReference = require('./regex/reference')
 var regexQuoted = require('./regex/quoted')
 
 var globalContext
@@ -23,9 +25,15 @@ function walkGlobal (taskName) {
   // Skip dot operator and tasks that start with a dot.
   if (taskName.indexOf('.') === 0) return
 
-  // Skip strings and numbers which may include dots.
-  if (regexQuoted.test(taskName)) return
+  // Skip stuff that may include dots:
+  // * comments
+  // * strings
+  // * numbers
+  // * references
+  if (regexComment.test(taskName)) return
   if (parseFloat(taskName)) return
+  if (regexQuoted.test(taskName)) return
+  if (regexReference.test(taskName)) return
 
   function toNextProp (next, prop) {
     return next[prop]
