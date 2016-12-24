@@ -29,7 +29,7 @@ A *graph* has the following properties
   * `this`: refers the *dflowFun* function.
   * `this.graph`: contains the graph itself.
   * `this.graph.data`: returns the graph data content.
-  * `@foo`: accessor to *graph.data.foo*.
+  * `@foo`: set/get *graph.data.foo* JSON data.
   * `&bar`: returns *bar* function.
   * dot-operator-like functions
     - `.quz`: returns an attribute reader function.
