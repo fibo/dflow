@@ -66,20 +66,6 @@ exports['==='] = function (a, b) { return (a === b) }
 
 exports['typeof'] = function (a) { return typeof a }
 
-exports['new'] = function (Obj, arg1, arg2, arg3, arg4, arg5) {
-  if (no(Obj)) return
-
-  var argN = arguments.length - 1
-
-  if (argN === 0) return new Obj()
-  if (argN === 1) return new Obj(arg1)
-  if (argN === 2) return new Obj(arg1, arg2)
-  if (argN === 3) return new Obj(arg1, arg2, arg3)
-  if (argN === 4) return new Obj(arg1, arg2, arg3, arg4)
-  if (argN === 5) return new Obj(arg1, arg2, arg3, arg4, arg5)
-  // If you have a constructor with more than 5 arguments ... think about refactoring or redesign it.
-}
-
 // Array
 
 exports['[]'] = function () { return [] }

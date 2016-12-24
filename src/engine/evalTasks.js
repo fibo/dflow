@@ -40,8 +40,13 @@ function evalTasks (funcs, task) {
     var taskName = task[taskKey]
 
     try {
-      var f = eval(taskName) // eslint-disable-line
-      funcs[taskName] = f
+      var e = eval(taskName) // eslint-disable-line
+
+      if (typeof e === 'function') {
+        funcs[taskName] = e
+      } else {
+        funcs[taskName] = function () { return e }
+      }
     } catch (err) {
       var msg = 'Task not compiled: ' + taskName + ' [' + taskKey + ']' + err
       throw new Error(msg)
