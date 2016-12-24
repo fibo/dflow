@@ -1,14 +1,14 @@
-var injectArrowFunctions = require('engine/inject/arrowFunctions')
+var evalTasks = require('engine/evalTasks')
 
-describe('injectArrowFunctions', function () {
-  it('modifies funcs object by injecting evaluated arrow functions', function () {
+describe('evalTasks', function () {
+  it('injects arrow functions', function () {
     var funcs = {}
     var task = {
       a: 'x => x * 2',
       b: "(str) => ( str + 'bbb' )"
     }
 
-    injectArrowFunctions(funcs, task)
+    evalTasks(funcs, task)
 
     var a = funcs['x => x * 2']
     var b = funcs[task.b]

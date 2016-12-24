@@ -1,7 +1,8 @@
 var builtinFunctions = require('./functions/builtin')
+var evalTasks = require('./evalTasks')
+var isDflowDSL = require('./isDflowDSL')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
 var injectArguments = require('./inject/arguments')
-var injectArrowFunctions = require('./inject/arrowFunctions')
 var injectAccessors = require('./inject/accessors')
 var injectDotOperators = require('./inject/dotOperators')
 var injectGlobals = require('./inject/globals')
@@ -12,10 +13,7 @@ var inputArgs = require('./inputArgs')
 var isDflowFun = require('./isDflowFun')
 var level = require('./level')
 var no = require('not-defined')
-var regexArgument = require('./regex/argument')
 var regexComment = require('./regex/comment')
-var regexDotOperator = require('./regex/dotOperator')
-var regexReference = require('./regex/reference')
 var regexSubgraph = require('./regex/subgraph')
 var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
@@ -59,7 +57,7 @@ function fun (graph, additionalFunctions) {
   injectReferences(funcs, task)
   injectStrings(funcs, task)
   injectNumbers(funcs, task)
-  injectArrowFunctions(funcs, task)
+  evalTasks(funcs, task)
 
   /**
    * Compiles a sub graph.
@@ -121,16 +119,8 @@ function fun (graph, additionalFunctions) {
       } else return
     }
 
-    // Skip arguments[0] ... arguments[N].
-    if (regexArgument.exec(taskName)) return
-
-    // Skip dot operator tasks.
-    if (regexDotOperator.func.test(taskName)) return
-    if (regexDotOperator.attrRead.test(taskName)) return
-    if (regexDotOperator.attrWrite.test(taskName)) return
-
-    // Skip references
-    if (regexReference.exec(taskName)) return
+    // Skip dflow DSL.
+    if (isDflowDSL(taskName)) return
 
     // Skip globals.
     if (walkGlobal(taskName)) return

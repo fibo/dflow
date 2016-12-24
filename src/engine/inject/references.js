@@ -11,6 +11,8 @@ var walkGlobal = require('../walkGlobal')
 function injectReferences (funcs, task) {
   /**
    * Inject task.
+   *
+   * @param {String} taskKey
    */
 
   function inject (taskKey) {

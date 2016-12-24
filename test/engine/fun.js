@@ -14,13 +14,18 @@ describe('fun', function () {
         '5': '@result',
         '6': 'return',
         '7': '// this is a comment',
+
         // The following tasks do not contribute to result.
-        // They are added to test there are no conflicts with
-        // global tasks resolution.
+
+        // Test there are no conflicts with global tasks resolution.
         'a': "'This is a string with a.dot'",
         'b': '// This is a comment with a.dot',
         'c': '&Math.cos',
-        'd': '1.2'
+        'd': '1.2',
+
+        // Test eval.
+        'e': 'x => x * 2',
+//        'f': 'new Date'
       },
       pipe: {
         'a': [ '0', '2', 0 ],
