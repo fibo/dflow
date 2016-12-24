@@ -15,6 +15,8 @@ function injectAccessors (funcs, graph) {
 
   /**
    * Inject accessor.
+   *
+   * @param {String} taskKey
    */
 
   function inject (taskKey) {
@@ -23,13 +25,23 @@ function injectAccessors (funcs, graph) {
 
     /**
      * Accessor-like function.
+     *
+     * @param {*} data that JSON can serialize
      */
 
-    function accessor () {
+    function accessor (data) {
+      // Behave like a setter if an argument is provided.
       if (arguments.length === 1) {
-        graph.data[accessorName] = arguments[0]
+        var json = JSON.stringify(data)
+
+        if (no(json)) {
+          throw new Error('JSON do not serialize data:' + data)
+        }
+
+        graph.data[accessorName] = data
       }
 
+      // Always behave also like a getter.
       return graph.data[accessorName]
     }
 

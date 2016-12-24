@@ -18,14 +18,18 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - Add drag node event to flow-view, otherwise no event is fired when moving nodes
 - Custom canvas node???
 - Fix toggle, make it work. It depends on blur event set by flow-view Inspector
-- accessor nodes should accept only valid JSON and displayed as custom nodes. If you click them, a modal is opened to edit them if they are not connected, they can also show a preview of their values
+- accessor nodes should complain when information that will lost is provided, for instance {a: Math.cos} will be stringifyied as '{}' by JSON.
+- accessor nodes displayed as custom nodes. If you click them, a modal is opened to edit them if they are not connected, they can also show a preview of their values
 - find a smart way to show output values, it should be like vvvv debug you can apply it to a single task or the whole subgraph or graph
 - can edit subgraphs, canvas should be able to empty and show the subgraphwhile a navbat like   root / subgraph1 / subgraph2 with dropdowns let you navigate throw the tree.
 - Implement RUN_ONCE editor action (already there), add Run button and make it work.
 - Consider adding cool libraries like threejs and d3 as ready to add nodeswhich add them from CDN.
 
-
 ## [Unreleased]
+
+### Added
+
+- accessor nodes do not accept a function, cause it will be not serialized by JSON
 
 ### Fixed
 

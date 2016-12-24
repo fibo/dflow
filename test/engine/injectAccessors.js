@@ -57,4 +57,45 @@ describe('injectAccessors', function () {
       quz: false
     })
   })
+
+  it('accepts only data that JSON can serialize', function () {
+    var funcs = {}
+    var graph = {
+      task: {
+        a: '@foo'
+      },
+      data: {}
+    }
+
+    injectAccessors(funcs, graph)
+
+    var foo = funcs['@foo']
+
+    // Data that can be serialized by JSON.
+
+    ;(foo(null) === null).should.be.ok
+
+    var a = ['array']
+    foo(a).should.deepEqual(a)
+
+    var d = new Date()
+    foo(d).should.deepEqual(d)
+
+    var n = 1.2
+    foo(n).should.eql(n)
+
+    var o = { ok: 1 }
+    foo(o).should.eql(o)
+
+    var s = '€'
+    foo(s).should.eql(s)
+
+    // Data that JSON will not serialize.
+
+    var f = function () {}
+    ;(JSON.stringify(f) === undefined).should.be.ok
+    ;(function () {
+      foo(f)
+    }).should.throwError(/JSON do not serialize data/)
+  })
 })
