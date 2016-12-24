@@ -34,6 +34,12 @@ exports['>='] = function (a, b) { return a >= b }
 
 exports['<='] = function (a, b) { return a <= b }
 
+// Eval is not allowed at run time
+
+exports.eval = function () {
+  throw new Error('eval is not allowed at run time')
+}
+
 // Other operators
 
 exports.apply = function (fun, thisArg, argsArray) {

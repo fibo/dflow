@@ -30,6 +30,7 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 ### Added
 
 - accessor nodes do not accept a function, cause it will be not serialized by JSON
+- eval is evil, but it so cool. Now you can do `new Date`.
 
 ### Fixed
 
