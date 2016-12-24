@@ -57,13 +57,17 @@ In order to avoid conflicts with *injected* functions, the optional collection o
   * cannot be the name of an injected function: `arguments[0]` ... `arguments[N]`, [reserver keys][reserved-keys] like `this` and `return` are not allowed.
   * cannot start with a *dot*, *ampersand* or *at sign*: names `@foo`, `&bar`, `.quz`, `.quuz=` and `.quuuz()` for an additional function are not allowed.
 
-### Arrow functions
+### Arrow functions and `new`
 
 If a task string does not match with some of the builtin functions above and
-neither some addition function provided, but it contains an arrow `=>` *dflow*
-engine will try to eval it.
-Yes, I know, *eval is evil* but think about using an arrow function. By adding
-this feature to the specification, you can create a task like `x => x * 2`.
+neither some addition function provided, but it contains an arrow `=>`
+the *dflow* engine will try to eval it.
+Yes, I know, *eval is evil* but think about using an arrow function.
+By adding this feature to the specification, you can create a task like `x => x * 2`.
+
+I admit I failed to resist the eval temptation, in deed there is also another
+type of tasks that uses it. If a task starts with the four characters *new *, i.e. `new` plus a space, it is evaluated. Yes, you can write `new Date`
+and it will return a date.
 
 Note that the evaluation is performed on compile time.
 
