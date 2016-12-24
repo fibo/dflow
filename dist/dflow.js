@@ -2,10 +2,71 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 module.exports=function(x){return (typeof x==='undefined')||(x === null)}
 
 },{}],2:[function(require,module,exports){
+var isDflowDSL = require('./isDflowDSL')
+var reservedTaskNames = require('./reservedTaskNames')
+
+function alreadyDefined (funcs, task) {
+  return function (taskKey) {
+    var taskName = task[taskKey]
+    return !(taskName in funcs)
+  }
+}
+
+function dflowDSL (task) {
+  return function (taskKey) {
+    var taskName = task[taskKey]
+    return !isDflowDSL(taskName)
+  }
+}
+
+function reserved (task) {
+  return function (taskKey) {
+    var taskName = task[taskKey]
+    return reservedTaskNames.indexOf(taskName) === -1
+  }
+}
+
+/**
+ * Inject evaluated tasks to functions.
+ *
+ * @param {Object} funcs reference
+ * @param {Object} task
+ */
+
+function evalTasks (funcs, task) {
+ /**
+  * Evaluate a single task and inject it.
+  *
+  * @param {String} taskKey
+  */
+
+  function inject (taskKey) {
+    var taskName = task[taskKey]
+
+    try {
+      var f = eval(taskName) // eslint-disable-line
+      funcs[taskName] = f
+    } catch (err) {
+      var msg = 'Task not compiled: ' + taskName + ' [' + taskKey + ']' + err
+      throw new Error(msg)
+    }
+  }
+
+  Object.keys(task)
+        .filter(reserved(task))
+        .filter(dflowDSL(task))
+        .filter(alreadyDefined(funcs, task))
+        .forEach(inject)
+}
+
+module.exports = evalTasks
+
+},{"./isDflowDSL":16,"./reservedTaskNames":28}],3:[function(require,module,exports){
 var builtinFunctions = require('./functions/builtin')
+var evalTasks = require('./evalTasks')
+var isDflowDSL = require('./isDflowDSL')
 var injectAdditionalFunctions = require('./inject/additionalFunctions')
 var injectArguments = require('./inject/arguments')
-var injectArrowFunctions = require('./inject/arrowFunctions')
 var injectAccessors = require('./inject/accessors')
 var injectDotOperators = require('./inject/dotOperators')
 var injectGlobals = require('./inject/globals')
@@ -16,10 +77,7 @@ var inputArgs = require('./inputArgs')
 var isDflowFun = require('./isDflowFun')
 var level = require('./level')
 var no = require('not-defined')
-var regexArgument = require('./regex/argument')
 var regexComment = require('./regex/comment')
-var regexDotOperator = require('./regex/dotOperator')
-var regexReference = require('./regex/reference')
 var regexSubgraph = require('./regex/subgraph')
 var reservedKeys = require('./reservedKeys')
 var validate = require('./validate')
@@ -63,7 +121,7 @@ function fun (graph, additionalFunctions) {
   injectReferences(funcs, task)
   injectStrings(funcs, task)
   injectNumbers(funcs, task)
-  injectArrowFunctions(funcs, task)
+  evalTasks(funcs, task)
 
   /**
    * Compiles a sub graph.
@@ -125,16 +183,8 @@ function fun (graph, additionalFunctions) {
       } else return
     }
 
-    // Skip arguments[0] ... arguments[N].
-    if (regexArgument.exec(taskName)) return
-
-    // Skip dot operator tasks.
-    if (regexDotOperator.func.test(taskName)) return
-    if (regexDotOperator.attrRead.test(taskName)) return
-    if (regexDotOperator.attrWrite.test(taskName)) return
-
-    // Skip references
-    if (regexReference.exec(taskName)) return
+    // Skip dflow DSL.
+    if (isDflowDSL(taskName)) return
 
     // Skip globals.
     if (walkGlobal(taskName)) return
@@ -227,7 +277,7 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./functions/builtin":3,"./inject/accessors":5,"./inject/additionalFunctions":6,"./inject/arguments":7,"./inject/arrowFunctions":8,"./inject/dotOperators":9,"./inject/globals":10,"./inject/numbers":11,"./inject/references":12,"./inject/strings":13,"./inputArgs":14,"./isDflowFun":16,"./level":17,"./regex/argument":20,"./regex/comment":21,"./regex/dotOperator":22,"./regex/reference":24,"./regex/subgraph":25,"./reservedKeys":26,"./validate":27,"./walkGlobal":28,"not-defined":1}],3:[function(require,module,exports){
+},{"./evalTasks":2,"./functions/builtin":4,"./inject/accessors":6,"./inject/additionalFunctions":7,"./inject/arguments":8,"./inject/dotOperators":9,"./inject/globals":10,"./inject/numbers":11,"./inject/references":12,"./inject/strings":13,"./inputArgs":14,"./isDflowDSL":16,"./isDflowFun":17,"./level":18,"./regex/comment":22,"./regex/subgraph":26,"./reservedKeys":27,"./validate":29,"./walkGlobal":30,"not-defined":1}],4:[function(require,module,exports){
 var no = require('not-defined')
 
 // Arithmetic operators
@@ -341,7 +391,7 @@ exports.true = function () { return true }
 
 exports.now = function () { return new Date() }
 
-},{"not-defined":1}],4:[function(require,module,exports){
+},{"not-defined":1}],5:[function(require,module,exports){
 var no = require('not-defined')
 
 var myAudioContext = null
@@ -439,7 +489,7 @@ availableTags().forEach(function (x) {
 
 exports.window = function () { return window }
 
-},{"not-defined":1}],5:[function(require,module,exports){
+},{"not-defined":1}],6:[function(require,module,exports){
 var no = require('not-defined')
 var regexAccessor = require('../regex/accessor')
 
@@ -457,6 +507,8 @@ function injectAccessors (funcs, graph) {
 
   /**
    * Inject accessor.
+   *
+   * @param {String} taskKey
    */
 
   function inject (taskKey) {
@@ -465,13 +517,23 @@ function injectAccessors (funcs, graph) {
 
     /**
      * Accessor-like function.
+     *
+     * @param {*} data that JSON can serialize
      */
 
-    function accessor () {
+    function accessor (data) {
+      // Behave like a setter if an argument is provided.
       if (arguments.length === 1) {
-        graph.data[accessorName] = arguments[0]
+        var json = JSON.stringify(data)
+
+        if (no(json)) {
+          throw new Error('JSON do not serialize data:' + data)
+        }
+
+        graph.data[accessorName] = data
       }
 
+      // Always behave also like a getter.
       return graph.data[accessorName]
     }
 
@@ -487,7 +549,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":19,"not-defined":1}],6:[function(require,module,exports){
+},{"../regex/accessor":20,"not-defined":1}],7:[function(require,module,exports){
 var no = require('not-defined')
 
 /**
@@ -517,7 +579,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{"not-defined":1}],7:[function(require,module,exports){
+},{"not-defined":1}],8:[function(require,module,exports){
 var regexArgument = require('../regex/argument')
 
 /**
@@ -557,44 +619,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":20}],8:[function(require,module,exports){
-/**
- * If it contains an `=>`, escape single quotes and eval it.
- *
- * @param {Object} funcs reference
- * @param {Object} task collection
- */
-
-function arrowFunctions (funcs, task) {
-  /**
-   * Filter tasks that contain an `=>`
-   */
-
-  function arrows (taskKey) {
-    return (task[taskKey].indexOf('=>') > -1)
-  }
-
-  /**
-   * Evaluate a task
-   */
-
-  function evalTask (taskKey) {
-    var taskName = task[taskKey]
-
-    try {
-      var f = eval(taskName) // eslint-disable-line
-      funcs[taskName] = f
-    } catch (ignore) {}
-  }
-
-  Object.keys(task)
-        .filter(arrows)
-        .forEach(evalTask)
-}
-
-module.exports = arrowFunctions
-
-},{}],9:[function(require,module,exports){
+},{"../regex/argument":21}],9:[function(require,module,exports){
 var no = require('not-defined')
 var regexDotOperator = require('../regex/dotOperator')
 
@@ -691,7 +716,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":22,"not-defined":1}],10:[function(require,module,exports){
+},{"../regex/dotOperator":23,"not-defined":1}],10:[function(require,module,exports){
 var no = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
@@ -737,7 +762,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../reservedKeys":26,"../walkGlobal":28,"not-defined":1}],11:[function(require,module,exports){
+},{"../reservedKeys":27,"../walkGlobal":30,"not-defined":1}],11:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -782,6 +807,8 @@ var walkGlobal = require('../walkGlobal')
 function injectReferences (funcs, task) {
   /**
    * Inject task.
+   *
+   * @param {String} taskKey
    */
 
   function inject (taskKey) {
@@ -817,7 +844,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":24,"../walkGlobal":28}],13:[function(require,module,exports){
+},{"../regex/reference":25,"../walkGlobal":30}],13:[function(require,module,exports){
 var regexQuoted = require('../regex/quoted')
 
 /**
@@ -848,7 +875,7 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":23}],14:[function(require,module,exports){
+},{"../regex/quoted":24}],14:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -908,6 +935,27 @@ function inputPipes (pipe, taskKey) {
 module.exports = inputPipes
 
 },{}],16:[function(require,module,exports){
+var regexArgument = require('./regex/argument')
+var regexComment = require('./regex/comment')
+var regexDotOperator = require('./regex/dotOperator')
+var regexReference = require('./regex/reference')
+var regexSubgraph = require('./regex/subgraph')
+
+function isDflowDSL (taskName) {
+  if (regexArgument.exec(taskName)) return true
+  if (regexComment.test(taskName)) return true
+  if (regexDotOperator.func.test(taskName)) return true
+  if (regexDotOperator.attrRead.test(taskName)) return true
+  if (regexDotOperator.attrWrite.test(taskName)) return true
+  if (regexReference.exec(taskName)) return true
+  if (regexSubgraph.test(taskName)) return true
+
+  return false
+}
+
+module.exports = isDflowDSL
+
+},{"./regex/argument":21,"./regex/comment":22,"./regex/dotOperator":23,"./regex/reference":25,"./regex/subgraph":26}],17:[function(require,module,exports){
 var validate = require('./validate')
 
 /**
@@ -937,7 +985,7 @@ function isDflowFun (f) {
 
 module.exports = isDflowFun
 
-},{"./validate":27}],17:[function(require,module,exports){
+},{"./validate":29}],18:[function(require,module,exports){
 var parents = require('./parents')
 
 /**
@@ -972,7 +1020,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 
 module.exports = level
 
-},{"./parents":18}],18:[function(require,module,exports){
+},{"./parents":19}],19:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -999,30 +1047,30 @@ function parents (pipe, taskKey) {
 
 module.exports = parents
 
-},{"./inputPipes":15}],19:[function(require,module,exports){
+},{"./inputPipes":15}],20:[function(require,module,exports){
 module.exports = /^@[\w][\w\d]+$/
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = /^arguments\[(\d+)]$/
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = /^\/\/.+$/
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 exports.attrRead = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
 exports.attrWrite = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)=$/
 exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = /^'.+'$/
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports = /^&(.+)$/
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports = /^\/[\w][\w\d]+$/
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = [
   'arguments',
@@ -1034,7 +1082,19 @@ module.exports = [
   'this.graph'
 ]
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
+var reservedTaskNames = [
+  'dflow.fun',
+  'dflow.isDflowFun',
+  'dflow.validate',
+  'this',
+  'this.data.graph',
+  'return'
+]
+
+module.exports = reservedTaskNames
+
+},{}],29:[function(require,module,exports){
 var no = require('not-defined')
 var regexAccessor = require('./regex/accessor')
 var regexArgument = require('./regex/argument')
@@ -1203,7 +1263,7 @@ function validate (graph, additionalFunctions) {
 
 module.exports = validate
 
-},{"./regex/accessor":19,"./regex/argument":20,"./regex/dotOperator":22,"./regex/reference":24,"./regex/subgraph":25,"./reservedKeys":26,"not-defined":1}],28:[function(require,module,exports){
+},{"./regex/accessor":20,"./regex/argument":21,"./regex/dotOperator":23,"./regex/reference":25,"./regex/subgraph":26,"./reservedKeys":27,"not-defined":1}],30:[function(require,module,exports){
 (function (global){
 var regexComment = require('./regex/comment')
 var regexReference = require('./regex/reference')
@@ -1253,7 +1313,7 @@ function walkGlobal (taskName) {
 module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./regex/comment":21,"./regex/quoted":23,"./regex/reference":24}],"dflow":[function(require,module,exports){
+},{"./regex/comment":22,"./regex/quoted":24,"./regex/reference":25}],"dflow":[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/dflow
  */
@@ -1275,4 +1335,4 @@ function funBrowser (graph) {
 
 exports.fun = funBrowser
 
-},{"../fun":2,"../functions/window":4}]},{},[]);
+},{"../fun":3,"../functions/window":5}]},{},[]);

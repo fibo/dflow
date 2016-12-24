@@ -19,4 +19,19 @@ describe('evalTasks', function () {
     b.should.be.instanceOf(Function)
     b('aaa').should.be.eql('aaabbb')
   })
+
+  it('injects `new Date`', function () {
+    var funcs = {}
+    var task = {
+      now: 'new Date'
+    }
+
+    evalTasks(funcs, task)
+
+    var now = funcs[task.now]
+
+    now.should.be.instanceOf(Function)
+
+    now().should.be.instanceOf.Date
+  })
 })
