@@ -74,7 +74,7 @@
     "visual"
   ],
   "dependencies": {
-    "debug": "^2.5.1",
+    "debug": "^2.6.0",
     "internal-ip": "1.x",
     "nopt": "4.x",
     "not-defined": "1.x",
@@ -85,7 +85,7 @@
   "devDependencies": {
     "brfs": "1.x",
     "dot-editorconfig": "^0.3.0",
-    "flow-view": "^2.8.1",
+    "flow-view": "^2.10.0",
     "isomorphic-fetch": "2.x",
     "istanbul": "^0.4.3",
     "mocha": "3.x",
@@ -99,6 +99,6 @@
     "standard": "8.x",
     "supertest": "^2.0.1",
     "uglify-js": "2.x",
-    "zeroconf-redux": "0.x"
+    "zeroconf-redux": "^0.10.0"
   }
 }
