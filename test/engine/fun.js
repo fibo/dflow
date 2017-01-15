@@ -24,7 +24,7 @@ describe('fun', function () {
         'd': '1.2',
 
         // Test eval.
-        'e': 'x => x * 2',
+        'e': 'x => x * 2'
 //        'f': 'new Date'
       },
       pipe: {
