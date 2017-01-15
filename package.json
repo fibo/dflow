@@ -75,30 +75,30 @@
   ],
   "dependencies": {
     "debug": "^2.6.0",
-    "internal-ip": "1.x",
-    "nopt": "4.x",
-    "not-defined": "1.x",
-    "opn": "4.x",
-    "read-file-utf8": "1.x",
-    "write-file-utf8": "1.x"
+    "internal-ip": "^1.2.0",
+    "nopt": "^4.0.1",
+    "not-defined": "^1.1.0",
+    "opn": "^4.0.2",
+    "read-file-utf8": "^1.1.1",
+    "write-file-utf8": "^1.2.0"
   },
   "devDependencies": {
-    "brfs": "1.x",
+    "brfs": "^1.4.3",
     "dot-editorconfig": "^0.3.0",
     "flow-view": "^2.10.0",
-    "isomorphic-fetch": "2.x",
+    "isomorphic-fetch": "^2.2.1",
     "istanbul": "^0.4.3",
-    "mocha": "3.x",
-    "mocha-lcov-reporter": "1.x",
-    "node-sass": "4.x",
+    "mocha": "^3.2.0",
+    "mocha-lcov-reporter": "^1.2.0",
+    "node-sass": "^4.3.0",
     "npm-watch": "^0.1.7",
-    "pre-commit": "1.x",
+    "pre-commit": "^1.2.2",
     "redux-thunk": "^2.1.0",
-    "sass-lint": "1.x",
-    "should": "11.x",
-    "standard": "8.x",
+    "sass-lint": "^1.10.2",
+    "should": "^11.1.2",
+    "standard": "^8.6.0",
     "supertest": "^2.0.1",
-    "uglify-js": "2.x",
-    "zeroconf-redux": "^0.10.0"
+    "uglify-js": "^2.7.5",
+    "zeroconf-redux": "^0.11.1"
   }
 }
