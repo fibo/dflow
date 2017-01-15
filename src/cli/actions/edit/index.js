@@ -35,7 +35,7 @@ const startServer = (graphPath, opt) => {
 
   const server = http.createServer(editorServer(graph))
 
-  server.listen(opt.port, () => {
+  const onListen = () => {
     const port = server.address().port
     const myIp = internalIp()
     const uri = `http://${myIp}:${port}`
@@ -43,7 +43,10 @@ const startServer = (graphPath, opt) => {
     debug(`editor server is listening on ${uri}`)
 
     if (opt.open) opn(uri)
-  })
+  }
+
+  if (opt.port) server.listen(opt.port, onListen)
+  else server.listen(onListen)
 }
 
 module.exports = (args) => {

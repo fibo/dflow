@@ -27,6 +27,8 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
+## [v0.20.0] - 2017-01-14
+
 ### Added
 
 - accessor nodes do not accept a function, cause it will be not serialized by JSON
@@ -36,12 +38,14 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 - Move test/engine/inject/*js files up to test/engine
 - Fixed all tests client side, see http://g14n.info/dflow/test page
+- Caret version deps
 
 ## [v0.19.0] - 2016-12-23
 
 ### Fixed
 
 - Graph.update() now is async, it caused a test to fail randomly
+- Port parameter, if not provided was crashing the editor server
 - Avoid conflict with global tasks, skip stuff that may contain dots
   * comments
   * numbers
