@@ -1,7 +1,6 @@
 import { Canvas } from 'flow-view'
 import dflow from 'dflow'
 import graphs from '../graphs'
-import Inspector from '../../editor/client/components/Inspector'
 import InvalidNode from '../../editor/client/components/InvalidNode'
 import ToggleNode from '../../editor/client/components/ToggleNode'
 import typeOfNode from '../../editor/client/utils/typeOfNode'
@@ -20,9 +19,6 @@ function renderExample (divId, example) {
   var graph = graphs[example]
 
   var canvas = new Canvas(divId, {
-    inspector: {
-      DefaultInspector: Inspector
-    },
     node: {
       DefaultNode: Node,
       InvalidNode,

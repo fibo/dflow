@@ -9,16 +9,31 @@ nav {
     list-style-type: none;
 
     li {
-      color: $white;
       display: inline-block;
       float: left;
       padding: $padding-top $padding-right;
-      text-align: center;
       transition: .3s;
 
       a {
         color: $white;
+        padding: 5px;
+        text-align: center;
         text-decoration: none;
+      }
+
+      button {
+        background-color: $black;
+        color: $white;
+        padding: 2px 8px;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      form {
+        label {
+          color: $white;
+          padding: 5px;
+        }
       }
     }
   }
