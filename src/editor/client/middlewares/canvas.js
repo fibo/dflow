@@ -1,7 +1,6 @@
 import { Canvas } from 'flow-view'
 import CanvasContainer from '../components/CanvasContainer'
 import CanvasNode from '../components/CanvasNode'
-import Inspector from '../components/Inspector'
 import InvalidNode from '../components/InvalidNode'
 import SubgraphNode from '../components/SubgraphNode'
 import ToggleNode from '../components/ToggleNode'
@@ -30,9 +29,6 @@ export default function canvasMiddleware (store) {
       const view = graph.view
 
       flowViewCanvas = new Canvas(CanvasContainer.defaultProps.id, {
-        inspector: {
-          DefaultInspector: Inspector
-        },
         node: {
           CanvasNode,
           DefaultNode: Node,

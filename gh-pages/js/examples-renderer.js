@@ -52056,73 +52056,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _components = require('flow-view/components');
-
-var _noInputTask = require('../utils/noInputTask');
-
-var _noInputTask2 = _interopRequireDefault(_noInputTask);
-
-var _singleInputTask = require('../utils/singleInputTask');
-
-var _singleInputTask2 = _interopRequireDefault(_singleInputTask);
-
-var _twoInputsTask = require('../utils/twoInputsTask');
-
-var _twoInputsTask2 = _interopRequireDefault(_twoInputsTask);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var DflowInspector = function (_Inspector) {
-  _inherits(DflowInspector, _Inspector);
-
-  function DflowInspector() {
-    _classCallCheck(this, DflowInspector);
-
-    return _possibleConstructorReturn(this, (DflowInspector.__proto__ || Object.getPrototypeOf(DflowInspector)).apply(this, arguments));
-  }
-
-  _createClass(DflowInspector, [{
-    key: 'renderInsControls',
-    value: function renderInsControls(nodeId, node) {
-      var taskName = node.text;
-
-      var noInput = (0, _noInputTask2.default)(taskName);
-      var oneInput = (0, _singleInputTask2.default)(taskName);
-      var twoInputs = (0, _twoInputsTask2.default)(taskName);
-
-      if (noInput || oneInput || twoInputs) return null;
-
-      return _get(DflowInspector.prototype.__proto__ || Object.getPrototypeOf(DflowInspector.prototype), 'renderInsControls', this).call(this, nodeId, node);
-    }
-  }, {
-    key: 'renderOutsControls',
-    value: function renderOutsControls() {
-      return null;
-    }
-  }]);
-
-  return DflowInspector;
-}(_components.Inspector);
-
-exports.default = DflowInspector;
-
-},{"../utils/noInputTask":289,"../utils/singleInputTask":290,"../utils/twoInputsTask":291,"flow-view/components":76}],286:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -52181,7 +52114,7 @@ var InvalidNode = function (_Node) {
 
 exports.default = InvalidNode;
 
-},{"flow-view/components":76,"react":269}],287:[function(require,module,exports){
+},{"flow-view/components":76,"react":269}],286:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52270,7 +52203,7 @@ var ToggleNode = function (_Node) {
 
 exports.default = ToggleNode;
 
-},{"../utils/ignoreEvent":288,"flow-view/components":76,"react":269}],288:[function(require,module,exports){
+},{"../utils/ignoreEvent":287,"flow-view/components":76,"react":269}],287:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -52283,162 +52216,7 @@ function ignoreEvent(e) {
   return false;
 }
 
-},{}],289:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = noInputTask;
-
-var _builtin = require('../../../engine/functions/builtin');
-
-var _builtin2 = _interopRequireDefault(_builtin);
-
-var _argument = require('../../../engine/regex/argument');
-
-var _argument2 = _interopRequireDefault(_argument);
-
-var _reference = require('../../../engine/regex/reference');
-
-var _reference2 = _interopRequireDefault(_reference);
-
-var _quoted = require('../../../engine/regex/quoted');
-
-var _quoted2 = _interopRequireDefault(_quoted);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * @param {String} taskName
- * @returns {Boolean}
- */
-function noInputTask(taskName) {
-  if (taskName.split('.')[0] === 'console') return false;
-
-  if (_argument2.default.test(taskName)) return true;
-  if (_reference2.default.test(taskName)) return true;
-  if (_quoted2.default.test(taskName)) return true;
-  if (!isNaN(parseFloat(taskName))) return true;
-
-  var builtin = _builtin2.default[taskName];
-  if (builtin) return builtin.length === 0;
-
-  var noInputTasks = ['arguments', 'body', 'document', 'Infinity'];
-
-  return noInputTasks.indexOf(taskName) > -1;
-}
-
-},{"../../../engine/functions/builtin":296,"../../../engine/regex/argument":314,"../../../engine/regex/quoted":317,"../../../engine/regex/reference":318}],290:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = singleInputTask;
-
-var _builtin = require('../../../engine/functions/builtin');
-
-var _builtin2 = _interopRequireDefault(_builtin);
-
-var _accessor = require('../../../engine/regex/accessor');
-
-var _accessor2 = _interopRequireDefault(_accessor);
-
-var _dotOperator = require('../../../engine/regex/dotOperator');
-
-var _dotOperator2 = _interopRequireDefault(_dotOperator);
-
-var _window = require('../../../engine/functions/window');
-
-var _window2 = _interopRequireDefault(_window);
-
-var _walkGlobal = require('../../../engine/walkGlobal');
-
-var _walkGlobal2 = _interopRequireDefault(_walkGlobal);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * @param {String} taskName
- * @returns {Boolean}
- */
-
-function singleInputTask(taskName) {
-  if (_accessor2.default.test(taskName)) return true;
-  if (_dotOperator2.default.attrRead.test(taskName)) return true;
-
-  var builtin = _builtin2.default[taskName];
-  if (builtin) return builtin.length === 1;
-
-  var globalTask = (0, _walkGlobal2.default)(taskName);
-
-  if (globalTask && typeof globalTask === 'function') {
-    return globalTask.length === 1;
-  }
-
-  var singleInputTasks = ['alert', 'return', 't'];
-
-  return singleInputTasks.concat(_window2.default.availableTags()).indexOf(taskName) > -1;
-}
-
-},{"../../../engine/functions/builtin":296,"../../../engine/functions/window":298,"../../../engine/regex/accessor":313,"../../../engine/regex/dotOperator":316,"../../../engine/walkGlobal":323}],291:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = twoInputsTask;
-
-var _builtin = require('../../../engine/functions/builtin');
-
-var _builtin2 = _interopRequireDefault(_builtin);
-
-var _dotOperator = require('../../../engine/regex/dotOperator');
-
-var _dotOperator2 = _interopRequireDefault(_dotOperator);
-
-var _walkGlobal = require('../../../engine/walkGlobal');
-
-var _walkGlobal2 = _interopRequireDefault(_walkGlobal);
-
-var _process = require('../../../engine/functions/process');
-
-var _process2 = _interopRequireDefault(_process);
-
-var _window = require('../../../engine/functions/window');
-
-var _window2 = _interopRequireDefault(_window);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * @param {String} taskName
- * @returns {Boolean}
- */
-function twoInputsTask(taskName) {
-  if (_dotOperator2.default.func.test(taskName)) return true;
-  if (_dotOperator2.default.attrWrite.test(taskName)) return true;
-
-  var builtinFun = _builtin2.default[taskName];
-  if (builtinFun) return builtinFun.length === 2;
-
-  var processFun = _process2.default[taskName];
-  if (processFun) return processFun.length === 2;
-
-  var windowFun = _window2.default[taskName];
-  if (windowFun) return windowFun.length === 2;
-
-  var globalTask = (0, _walkGlobal2.default)(taskName);
-
-  if (globalTask && typeof globalTask === 'function') {
-    return globalTask.length === 2;
-  }
-
-  return false;
-}
-
-},{"../../../engine/functions/builtin":296,"../../../engine/functions/process":297,"../../../engine/functions/window":298,"../../../engine/regex/dotOperator":316,"../../../engine/walkGlobal":323}],292:[function(require,module,exports){
+},{}],288:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52474,7 +52252,7 @@ function typeOfNode(node) {
   }
 }
 
-},{"../../../engine/regex/subgraph":319}],293:[function(require,module,exports){
+},{"../../../engine/regex/subgraph":314}],289:[function(require,module,exports){
 /**
  * @license MIT <Gianluca Casati> http://g14n.info/dflow
  */
@@ -52496,7 +52274,7 @@ function funBrowser (graph) {
 
 exports.fun = funBrowser
 
-},{"../fun":295,"../functions/window":298}],294:[function(require,module,exports){
+},{"../fun":291,"../functions/window":293}],290:[function(require,module,exports){
 var isDflowDSL = require('./isDflowDSL')
 var reservedTaskNames = require('./reservedTaskNames')
 
@@ -52561,7 +52339,7 @@ function evalTasks (funcs, task) {
 
 module.exports = evalTasks
 
-},{"./isDflowDSL":309,"./reservedTaskNames":321}],295:[function(require,module,exports){
+},{"./isDflowDSL":304,"./reservedTaskNames":316}],291:[function(require,module,exports){
 var builtinFunctions = require('./functions/builtin')
 var evalTasks = require('./evalTasks')
 var isDflowDSL = require('./isDflowDSL')
@@ -52777,206 +52555,128 @@ function fun (graph, additionalFunctions) {
 
 module.exports = fun
 
-},{"./evalTasks":294,"./functions/builtin":296,"./inject/accessors":299,"./inject/additionalFunctions":300,"./inject/arguments":301,"./inject/dotOperators":302,"./inject/globals":303,"./inject/numbers":304,"./inject/references":305,"./inject/strings":306,"./inputArgs":307,"./isDflowDSL":309,"./isDflowFun":310,"./level":311,"./regex/comment":315,"./regex/subgraph":319,"./reservedKeys":320,"./validate":322,"./walkGlobal":323,"not-defined":107}],296:[function(require,module,exports){
-'use strict';
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var no = require('not-defined');
+},{"./evalTasks":290,"./functions/builtin":292,"./inject/accessors":294,"./inject/additionalFunctions":295,"./inject/arguments":296,"./inject/dotOperators":297,"./inject/globals":298,"./inject/numbers":299,"./inject/references":300,"./inject/strings":301,"./inputArgs":302,"./isDflowDSL":304,"./isDflowFun":305,"./level":306,"./regex/comment":310,"./regex/subgraph":314,"./reservedKeys":315,"./validate":317,"./walkGlobal":318,"not-defined":107}],292:[function(require,module,exports){
+var no = require('not-defined')
 
 // Arithmetic operators
 
-exports['+'] = function (a, b) {
-  return a + b;
-};
+exports['+'] = function (a, b) { return a + b }
 
-exports['*'] = function (a, b) {
-  return a * b;
-};
+exports['*'] = function (a, b) { return a * b }
 
-exports['-'] = function (a, b) {
-  return a - b;
-};
+exports['-'] = function (a, b) { return a - b }
 
-exports['/'] = function (a, b) {
-  return a / b;
-};
+exports['/'] = function (a, b) { return a / b }
 
-exports['%'] = function (a, b) {
-  return a % b;
-};
+exports['%'] = function (a, b) { return a % b }
 
 // Logical operators
 
-exports['&&'] = function (a, b) {
-  return a && b;
-};
+exports['&&'] = function (a, b) { return a && b }
 
-exports['||'] = function (a, b) {
-  return a || b;
-};
+exports['||'] = function (a, b) { return a || b }
 
-exports['!'] = function (a) {
-  return !a;
-};
+exports['!'] = function (a) { return !a }
 
 // Comparison operators
 
-exports['==='] = function (a, b) {
-  return a === b;
-};
+exports['==='] = function (a, b) { return a === b }
 
-exports['!=='] = function (a, b) {
-  return a !== b;
-};
+exports['!=='] = function (a, b) { return a !== b }
 
-exports['>'] = function (a, b) {
-  return a > b;
-};
+exports['>'] = function (a, b) { return a > b }
 
-exports['<'] = function (a, b) {
-  return a < b;
-};
+exports['<'] = function (a, b) { return a < b }
 
-exports['>='] = function (a, b) {
-  return a >= b;
-};
+exports['>='] = function (a, b) { return a >= b }
 
-exports['<='] = function (a, b) {
-  return a <= b;
-};
+exports['<='] = function (a, b) { return a <= b }
 
 // Eval is not allowed at run time
 
 exports.eval = function () {
-  throw new Error('eval is not allowed at run time');
-};
+  throw new Error('eval is not allowed at run time')
+}
 
 // Other operators
 
 exports.apply = function (fun, thisArg, argsArray) {
-  if (no(fun)) return;
+  if (no(fun)) return
 
-  return fun.apply(thisArg, argsArray);
-};
+  return fun.apply(thisArg, argsArray)
+}
 
 // TODO try to import it in the editor, it seems to complain with
 // TypeError: Cannot read property '' of undefined(…)
 exports['.'] = function (obj, prop) {
-  if (no(obj) || no(prop)) return;
+  if (no(obj) || no(prop)) return
 
-  return obj[prop];
-};
+  return obj[prop]
+}
 
 exports['='] = function (a, b) {
-  if (no(a)) return;
+  if (no(a)) return
 
-  a = b;
+  a = b
 
-  return a;
-};
+  return a
+}
 
 /* eslint-disable */
-exports['=='] = function (a, b) {
-  return a == b;
-};
+exports['=='] = function (a, b) { return (a == b) }
 /* eslint-enable */
 
-exports['==='] = function (a, b) {
-  return a === b;
-};
+exports['==='] = function (a, b) { return (a === b) }
 
-exports['typeof'] = function (a) {
-  return typeof a === 'undefined' ? 'undefined' : _typeof(a);
-};
+exports['typeof'] = function (a) { return typeof a }
 
 // Array
 
-exports['[]'] = function () {
-  return [];
-};
+exports['[]'] = function () { return [] }
 
 // console
 
-exports['console.error'] = console.error.bind(console);
-exports['console.log'] = console.log.bind(console);
+exports['console.error'] = console.error.bind(console)
+exports['console.log'] = console.log.bind(console)
 
 // Global
 
-exports['Infinity'] = function () {
-  return Infinity;
-};
+exports['Infinity'] = function () { return Infinity }
 
-exports.NaN = function () {
-  return NaN;
-};
+exports.NaN = function () { return NaN }
 
-exports['null'] = function () {
-  return null;
-};
+exports['null'] = function () { return null }
 
 // Object
 
-exports['{}'] = function () {
-  return {};
-};
+exports['{}'] = function () { return {} }
 
 // Boolean
 
-exports.false = function () {
-  return false;
-};
+exports.false = function () { return false }
 
-exports.true = function () {
-  return true;
-};
+exports.true = function () { return true }
 
 // Date
 
-exports.now = function () {
-  return new Date();
-};
+exports.now = function () { return new Date() }
 
-},{"not-defined":107}],297:[function(require,module,exports){
-(function (process){
-'use strict';
+},{"not-defined":107}],293:[function(require,module,exports){
+var no = require('not-defined')
 
-function coreNodeModules() {
-  // TODO add more core node modules
-  return ['http', 'https', 'net', 'path', 'readline', 'zlib'];
-}
+var myAudioContext = null
 
-exports.coreNodeModules = coreNodeModules;
-
-coreNodeModules().forEach(function (x) {
-  exports[x] = function () {
-    return require(x);
-  };
-});
-
-exports.process = function () {
-  return process;
-};
-
-}).call(this,require('_process'))
-},{"_process":113}],298:[function(require,module,exports){
-'use strict';
-
-var no = require('not-defined');
-
-var myAudioContext = null;
-
-function audioContext() {
+function audioContext () {
   if (myAudioContext) {
-    return myAudioContext;
+    return myAudioContext
   } else {
-    var AudioContext = window.AudioContext || window.webkitAudioContext;
-    myAudioContext = new AudioContext();
-    return myAudioContext;
+    var AudioContext = window.AudioContext || window.webkitAudioContext
+    myAudioContext = new AudioContext()
+    return myAudioContext
   }
 }
 
-exports.audioContext = audioContext;
+exports.audioContext = audioContext
 
 // Tash `.appendChild()` works but it is too dangerous!
 //
@@ -52989,79 +52689,77 @@ exports.audioContext = audioContext;
 // It is worth to use this safe version.
 
 exports.appendChild = function (element, child) {
-  var protectedNodes = ['body', 'head'];
+  var protectedNodes = ['body', 'head']
 
   // Nothing to do if element or child is not provided.
-  if (arguments.length < 2) return;
+  if (arguments.length < 2) return
 
   // Prevent erase important DOM nodes.
   protectedNodes.forEach(function (node) {
     if (child === document[node]) {
-      throw new Error('cannot erase ' + node);
+      throw new Error('cannot erase ' + node)
     }
-  });
+  })
 
   // Check arguments look like DOM nodes.
-  Array.prototype.slice.call(arguments).forEach(function (node) {
-    if (typeof node.appendChild !== 'function') {
-      throw new Error('Cannot appendChild, not an element:' + node);
-    }
-  });
+  Array.prototype.slice.call(arguments)
+       .forEach(function (node) {
+         if (typeof node.appendChild !== 'function') {
+           throw new Error('Cannot appendChild, not an element:' + node)
+         }
+       })
 
   // Be idempotent. It is required that child has an id.
-  var id = child.id;
-  if (no(id)) return;
+  var id = child.id
+  if (no(id)) return
 
-  var foundChild = document.getElementById(id);
-  if (foundChild) return foundChild;
+  var foundChild = document.getElementById(id)
+  if (foundChild) return foundChild
 
   // At this stage, child is a brand new element.
-  return element.appendChild(child);
-};
-
-exports.body = function () {
-  return document.body;
-};
-
-exports.document = function () {
-  return document;
-};
-
-exports.head = function () {
-  return document.head;
-};
-
-function availableTags() {
-  return ['a', 'article', 'aside', 'button', 'form', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'input', 'label', 'li', 'link', 'ol', 'nav', 'p', 'script', 'svg', 'textarea', 'ul'];
+  return element.appendChild(child)
 }
 
-exports.availableTags = availableTags;
+exports.body = function () { return document.body }
+
+exports.document = function () { return document }
+
+exports.head = function () { return document.head }
+
+function availableTags () {
+  return [
+    'a', 'article', 'aside', 'button', 'form', 'div',
+    'h1', 'h2', 'h3', 'h4', 'h5',
+    'input', 'label', 'li', 'link', 'ol', 'nav', 'p', 'script', 'svg',
+    'textarea', 'ul'
+  ]
+}
+
+exports.availableTags = availableTags
 
 availableTags().forEach(function (x) {
   exports[x] = function (id) {
-    var element;
+    var element
 
     // If id is provided, it must be a string.
     if (id && typeof id !== 'string') {
-      throw new TypeError('Element id must be a string:' + id);
+      throw new TypeError('Element id must be a string:' + id)
     }
 
-    element = document.getElementById(id);
+    element = document.getElementById(id)
 
     if (!element) {
-      element = document.createElement(x);
-      element.id = id;
+      element = document.createElement(x)
+      element.id = id
     }
 
-    return element;
-  };
-});
+    return element
+  }
+})
 
-exports.window = function () {
-  return window;
-};
+exports.window = function () { return window }
 
-},{"not-defined":107}],299:[function(require,module,exports){
+},{"not-defined":107}],294:[function(require,module,exports){
 var no = require('not-defined')
 var regexAccessor = require('../regex/accessor')
 
@@ -53121,7 +52819,7 @@ function injectAccessors (funcs, graph) {
 
 module.exports = injectAccessors
 
-},{"../regex/accessor":313,"not-defined":107}],300:[function(require,module,exports){
+},{"../regex/accessor":308,"not-defined":107}],295:[function(require,module,exports){
 var no = require('not-defined')
 
 /**
@@ -53151,7 +52849,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
 
 module.exports = injectAdditionalFunctions
 
-},{"not-defined":107}],301:[function(require,module,exports){
+},{"not-defined":107}],296:[function(require,module,exports){
 var regexArgument = require('../regex/argument')
 
 /**
@@ -53191,7 +52889,7 @@ function injectArguments (funcs, task, args) {
 
 module.exports = injectArguments
 
-},{"../regex/argument":314}],302:[function(require,module,exports){
+},{"../regex/argument":309}],297:[function(require,module,exports){
 var no = require('not-defined')
 var regexDotOperator = require('../regex/dotOperator')
 
@@ -53288,7 +52986,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":316,"not-defined":107}],303:[function(require,module,exports){
+},{"../regex/dotOperator":311,"not-defined":107}],298:[function(require,module,exports){
 var no = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')
@@ -53334,7 +53032,7 @@ function injectGlobals (funcs, task) {
 
 module.exports = injectGlobals
 
-},{"../reservedKeys":320,"../walkGlobal":323,"not-defined":107}],304:[function(require,module,exports){
+},{"../reservedKeys":315,"../walkGlobal":318,"not-defined":107}],299:[function(require,module,exports){
 /**
  * Inject functions that return numbers.
  *
@@ -53365,7 +53063,7 @@ function injectNumbers (funcs, task) {
 
 module.exports = injectNumbers
 
-},{}],305:[function(require,module,exports){
+},{}],300:[function(require,module,exports){
 var regexReference = require('../regex/reference')
 var walkGlobal = require('../walkGlobal')
 
@@ -53416,7 +53114,7 @@ function injectReferences (funcs, task) {
 
 module.exports = injectReferences
 
-},{"../regex/reference":318,"../walkGlobal":323}],306:[function(require,module,exports){
+},{"../regex/reference":313,"../walkGlobal":318}],301:[function(require,module,exports){
 var regexQuoted = require('../regex/quoted')
 
 /**
@@ -53447,7 +53145,7 @@ function injectStrings (funcs, task) {
 
 module.exports = injectStrings
 
-},{"../regex/quoted":317}],307:[function(require,module,exports){
+},{"../regex/quoted":312}],302:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -53478,7 +53176,7 @@ function inputArgs (outs, pipe, taskKey) {
 
 module.exports = inputArgs
 
-},{"./inputPipes":308}],308:[function(require,module,exports){
+},{"./inputPipes":303}],303:[function(require,module,exports){
 /**
  * Compute pipes that feed a task.
  *
@@ -53506,7 +53204,7 @@ function inputPipes (pipe, taskKey) {
 
 module.exports = inputPipes
 
-},{}],309:[function(require,module,exports){
+},{}],304:[function(require,module,exports){
 var regexArgument = require('./regex/argument')
 var regexComment = require('./regex/comment')
 var regexDotOperator = require('./regex/dotOperator')
@@ -53527,7 +53225,7 @@ function isDflowDSL (taskName) {
 
 module.exports = isDflowDSL
 
-},{"./regex/argument":314,"./regex/comment":315,"./regex/dotOperator":316,"./regex/reference":318,"./regex/subgraph":319}],310:[function(require,module,exports){
+},{"./regex/argument":309,"./regex/comment":310,"./regex/dotOperator":311,"./regex/reference":313,"./regex/subgraph":314}],305:[function(require,module,exports){
 var validate = require('./validate')
 
 /**
@@ -53557,7 +53255,7 @@ function isDflowFun (f) {
 
 module.exports = isDflowFun
 
-},{"./validate":322}],311:[function(require,module,exports){
+},{"./validate":317}],306:[function(require,module,exports){
 var parents = require('./parents')
 
 /**
@@ -53592,7 +53290,7 @@ function level (pipe, cachedLevelOf, taskKey) {
 
 module.exports = level
 
-},{"./parents":312}],312:[function(require,module,exports){
+},{"./parents":307}],307:[function(require,module,exports){
 var inputPipes = require('./inputPipes')
 
 /**
@@ -53619,44 +53317,32 @@ function parents (pipe, taskKey) {
 
 module.exports = parents
 
-},{"./inputPipes":308}],313:[function(require,module,exports){
-"use strict";
+},{"./inputPipes":303}],308:[function(require,module,exports){
+module.exports = /^@[\w][\w\d]+$/
 
-module.exports = /^@[\w][\w\d]+$/;
+},{}],309:[function(require,module,exports){
+module.exports = /^arguments\[(\d+)]$/
+
+},{}],310:[function(require,module,exports){
+module.exports = /^\/\/.+$/
+
+},{}],311:[function(require,module,exports){
+exports.attrRead = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/
+exports.attrWrite = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)=$/
+exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/
+
+},{}],312:[function(require,module,exports){
+module.exports = /^'.+'$/
+
+},{}],313:[function(require,module,exports){
+module.exports = /^&(.+)$/
 
 },{}],314:[function(require,module,exports){
 "use strict";
 
-module.exports = /^arguments\[(\d+)]$/;
-
-},{}],315:[function(require,module,exports){
-"use strict";
-
-module.exports = /^\/\/.+$/;
-
-},{}],316:[function(require,module,exports){
-"use strict";
-
-exports.attrRead = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)$/;
-exports.attrWrite = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)=$/;
-exports.func = /^\.([a-zA-Z_$][0-9a-zA-Z_$]+)\(\)$/;
-
-},{}],317:[function(require,module,exports){
-"use strict";
-
-module.exports = /^'.+'$/;
-
-},{}],318:[function(require,module,exports){
-"use strict";
-
-module.exports = /^&(.+)$/;
-
-},{}],319:[function(require,module,exports){
-"use strict";
-
 module.exports = /^\/[\w][\w\d]+$/;
 
-},{}],320:[function(require,module,exports){
+},{}],315:[function(require,module,exports){
 // Also arguments[0] ... arguments[N] are reserved.
 module.exports = [
   'arguments',
@@ -53668,7 +53354,7 @@ module.exports = [
   'this.graph'
 ]
 
-},{}],321:[function(require,module,exports){
+},{}],316:[function(require,module,exports){
 var reservedTaskNames = [
   'dflow.fun',
   'dflow.isDflowFun',
@@ -53680,7 +53366,7 @@ var reservedTaskNames = [
 
 module.exports = reservedTaskNames
 
-},{}],322:[function(require,module,exports){
+},{}],317:[function(require,module,exports){
 var no = require('not-defined')
 var regexAccessor = require('./regex/accessor')
 var regexArgument = require('./regex/argument')
@@ -53849,24 +53535,20 @@ function validate (graph, additionalFunctions) {
 
 module.exports = validate
 
-},{"./regex/accessor":313,"./regex/argument":314,"./regex/dotOperator":316,"./regex/reference":318,"./regex/subgraph":319,"./reservedKeys":320,"not-defined":107}],323:[function(require,module,exports){
+},{"./regex/accessor":308,"./regex/argument":309,"./regex/dotOperator":311,"./regex/reference":313,"./regex/subgraph":314,"./reservedKeys":315,"not-defined":107}],318:[function(require,module,exports){
 (function (global){
-'use strict';
+var regexComment = require('./regex/comment')
+var regexReference = require('./regex/reference')
+var regexQuoted = require('./regex/quoted')
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var globalContext
 
-var regexComment = require('./regex/comment');
-var regexReference = require('./regex/reference');
-var regexQuoted = require('./regex/quoted');
-
-var globalContext;
-
-if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object') {
-  globalContext = window;
+if (typeof window === 'object') {
+  globalContext = window
 }
 
-if ((typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object') {
-  globalContext = global;
+if (typeof global === 'object') {
+  globalContext = global
 }
 
 /**
@@ -53878,33 +53560,34 @@ if ((typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object'
  * @returns {*} leaf
  */
 
-function walkGlobal(taskName) {
+function walkGlobal (taskName) {
   // Skip dot operator and tasks that start with a dot.
-  if (taskName.indexOf('.') === 0) return;
+  if (taskName.indexOf('.') === 0) return
 
   // Skip stuff that may include dots:
   // * comments
   // * strings
   // * numbers
   // * references
-  if (regexComment.test(taskName)) return;
-  if (parseFloat(taskName)) return;
-  if (regexQuoted.test(taskName)) return;
-  if (regexReference.test(taskName)) return;
+  if (regexComment.test(taskName)) return
+  if (parseFloat(taskName)) return
+  if (regexQuoted.test(taskName)) return
+  if (regexReference.test(taskName)) return
 
-  function toNextProp(next, prop) {
-    return next[prop];
+  function toNextProp (next, prop) {
+    return next[prop]
   }
 
-  return taskName.split('.').reduce(toNextProp, globalContext);
+  return taskName.split('.')
+                 .reduce(toNextProp, globalContext)
 }
 
-module.exports = walkGlobal;
+module.exports = walkGlobal
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./regex/comment":315,"./regex/quoted":317,"./regex/reference":318}],324:[function(require,module,exports){
+},{"./regex/comment":310,"./regex/quoted":312,"./regex/reference":313}],319:[function(require,module,exports){
 module.exports={"data":{"results":[{"args":[0],"expected":true}]},"pipe":{"6":["1","4"],"7":["2","4",1],"8":["3","4",2],"9":["4","5"]},"task":{"1":"&isFinite","2":"null","3":"arguments","4":"apply","5":"return"},"view":{"node":{"1":{"text":"&isFinite","x":26,"y":54,"outs":[{"name":"out"}],"task":"1"},"2":{"text":"null","x":161,"y":55,"outs":[{"name":"out"}],"task":"2"},"3":{"text":"arguments","x":235,"y":54,"outs":[{"name":"out"}],"task":"3"},"4":{"text":"apply","x":104,"y":140,"ins":[{"name":"in0"},{"name":"in1"},{"name":"in2"}],"outs":[{"name":"out"}],"task":"4"},"5":{"text":"return","x":76,"y":204,"ins":[{"name":"in"}],"task":"5"}},"link":{"6":{"from":["1",0],"to":["4",0],"id":"6"},"7":{"from":["2",0],"to":["4",1],"id":"7"},"8":{"from":["3",0],"to":["4",2],"id":"8"},"9":{"from":["4",0],"to":["5",0],"id":"9"}}}}
-},{}],325:[function(require,module,exports){
+},{}],320:[function(require,module,exports){
 module.exports={
   "info": {
     "context": "client"
@@ -54089,7 +53772,7 @@ module.exports={
   }
 }
 
-},{}],326:[function(require,module,exports){
+},{}],321:[function(require,module,exports){
 module.exports={
   "task": {
     "a": "arguments[0]",
@@ -54110,9 +53793,9 @@ module.exports={
   }
 }
 
-},{}],327:[function(require,module,exports){
+},{}],322:[function(require,module,exports){
 module.exports={"data":{},"func":{},"info":{},"pipe":{"tot":["wtd","plu"],"lum":["plu","upu",1],"npz":["whk","upu"],"qpm":["qsf","plu",1]},"task":{"wtd":"h1","plu":".innerHTML=","upu":".appendChild()","maz":"// This is a comment","whk":"body","qsf":"'I ❤ dflow'"},"view":{"link":{"tot":{"from":["wtd",0],"to":["plu",0]},"lum":{"from":["plu",0],"to":["upu",1]},"npz":{"from":["whk",0],"to":["upu",0]},"qpm":{"from":["qsf",0],"to":["plu",1]}},"node":{"wtd":{"text":"h1","x":150,"y":113,"outs":["out"],"ins":["in"]},"plu":{"text":".innerHTML=","x":93,"y":198,"outs":["out"],"ins":["in1","in2"]},"upu":{"text":".appendChild()","x":49,"y":268,"outs":["out"],"ins":["in1","in2"]},"maz":{"text":"// This is a comment","x":145,"y":19},"whk":{"text":"body","x":61,"y":62,"outs":["out"]},"qsf":{"text":"'I ❤ dflow'","x":200,"y":66,"outs":["out"]}}}}
-},{}],328:[function(require,module,exports){
+},{}],323:[function(require,module,exports){
 'use strict';
 
 // Do not use dynamic imports, for example importing the whole graph folder;
@@ -54136,11 +53819,11 @@ exports.welcome = require('./welcome.json');
 
 // TODO fix it! exports.dotOperator = require('./dotOperator.json')
 
-},{"./apply.json":324,"./createParagraph.json":325,"./dateParse.json":326,"./hello-world.json":327,"./indexOf.json":329,"./loadScriptJS.json":330,"./or.json":331,"./sum.json":332,"./welcome.json":333}],329:[function(require,module,exports){
+},{"./apply.json":319,"./createParagraph.json":320,"./dateParse.json":321,"./hello-world.json":322,"./indexOf.json":324,"./loadScriptJS.json":325,"./or.json":326,"./sum.json":327,"./welcome.json":328}],324:[function(require,module,exports){
 module.exports={"data":{"results":[{"args":["abcd","b"],"expected":1},{"args":[[7,8,9],9],"expected":2}]},"info":{},"pipe":{"rhq":["cjb","dqf"],"ari":["ffv","dqf",1],"qae":["dqf","ozw"]},"task":{"dqf":".indexOf()","ozw":"console.log","cjb":"'abcd'","ffv":"'b'","jhv":"// 1"},"view":{"link":{"rhq":{"from":["cjb",0],"to":["dqf",0]},"ari":{"from":["ffv",0],"to":["dqf",1]},"qae":{"from":["dqf",0],"to":["ozw",0]}},"node":{"dqf":{"text":".indexOf()","x":50,"y":95,"outs":["out"],"ins":["in1","in2"]},"ozw":{"text":"console.log","x":36,"y":190,"ins":["in0"]},"cjb":{"text":"'abcd'","x":54,"y":35,"outs":["out"]},"ffv":{"text":"'b'","x":179,"y":26,"outs":["out"]},"jhv":{"text":"// 1","x":184,"y":191}}}}
-},{}],330:[function(require,module,exports){
+},{}],325:[function(require,module,exports){
 module.exports={"data":{},"func":{},"info":{},"pipe":{"kqo":["ied","zhr",1],"jce":["qba","zhr"],"pvf":["nrz","cyk"],"jke":["qba","cyk",1],"jdt":["ypc","qba"],"qot":["ygo","ypc"],"vpn":["tce","qba",1]},"task":{"qba":".src=","nrz":"body","zhr":".onload=","ygo":"'myid'","ied":"&console.log","cyk":"appendChild","ypc":"script","emw":"// safe version of .appendChild()","tce":"'script.js'"},"view":{"link":{"kqo":{"from":["ied",0],"to":["zhr",1]},"jce":{"from":["qba",0],"to":["zhr",0]},"pvf":{"from":["nrz",0],"to":["cyk",0]},"jke":{"from":["qba",0],"to":["cyk",1]},"jdt":{"from":["ypc",0],"to":["qba",0]},"qot":{"from":["ygo",0],"to":["ypc",0]},"vpn":{"from":["tce",0],"to":["qba",1]}},"node":{"qba":{"text":".src=","x":129,"y":179,"outs":["out"],"ins":["in1","in2"]},"nrz":{"text":"body","x":36,"y":214,"outs":["out"]},"zhr":{"text":".onload=","x":195,"y":269,"outs":["out"],"ins":["in1","in2"]},"ygo":{"text":"'myid'","x":24,"y":54,"outs":["out"]},"ied":{"text":"&console.log","x":262,"y":205,"outs":["out"]},"cyk":{"text":"appendChild","x":19,"y":304,"outs":["out"],"ins":["in1","in2"]},"ypc":{"text":"script","x":48,"y":120,"outs":["out"],"ins":["in"]},"emw":{"text":"// safe version of .appendChild()","x":18,"y":349},"tce":{"text":"'script.js'","x":148,"y":42,"outs":["out"]}}}}
-},{}],331:[function(require,module,exports){
+},{}],326:[function(require,module,exports){
 module.exports={
   "task": {
     "1": "arguments[0]",
@@ -54163,9 +53846,9 @@ module.exports={
   }
 }
 
-},{}],332:[function(require,module,exports){
+},{}],327:[function(require,module,exports){
 module.exports={"data":{},"info":{},"pipe":{"veg":["xvb","zmo"],"rbc":["vug","zmo",1],"zul":["zmo","uam"],"pjx":["zii","uam",1],"hsj":["uam","nef"]},"task":{"xvb":"1","vug":"2","zmo":"+","uam":"===","zii":"3","nef":"console.log"},"view":{"link":{"veg":{"from":["xvb",0],"to":["zmo",0]},"rbc":{"from":["vug",0],"to":["zmo",1]},"zul":{"from":["zmo",0],"to":["uam",0]},"pjx":{"from":["zii",0],"to":["uam",1]},"hsj":{"from":["uam",0],"to":["nef",0]}},"node":{"xvb":{"text":"1","x":116,"y":29,"outs":["out"]},"vug":{"text":"2","x":213,"y":40,"outs":["out"]},"zmo":{"text":"+","x":156,"y":112,"outs":["out"],"ins":["in1","in2"]},"uam":{"text":"===","x":107,"y":178,"outs":["out"],"ins":["in1","in2"]},"zii":{"text":"3","x":212,"y":136,"outs":["out"]},"nef":{"text":"console.log","x":79,"y":265,"ins":["in0"]}}}}
-},{}],333:[function(require,module,exports){
+},{}],328:[function(require,module,exports){
 module.exports={
   "data": {
     "results": []
@@ -54221,11 +53904,11 @@ module.exports={
   }
 }
 
-},{}],334:[function(require,module,exports){
+},{}],329:[function(require,module,exports){
 // Cheating npm require.
 module.exports = require('../../../..')
 
-},{"../../../..":293}],"examples-renderer":[function(require,module,exports){
+},{"../../../..":289}],"examples-renderer":[function(require,module,exports){
 'use strict';
 
 var _flowView = require('flow-view');
@@ -54237,10 +53920,6 @@ var _dflow2 = _interopRequireDefault(_dflow);
 var _graphs = require('../graphs');
 
 var _graphs2 = _interopRequireDefault(_graphs);
-
-var _Inspector = require('../../editor/client/components/Inspector');
-
-var _Inspector2 = _interopRequireDefault(_Inspector);
 
 var _InvalidNode = require('../../editor/client/components/InvalidNode');
 
@@ -54271,9 +53950,6 @@ function renderExample(divId, example) {
   var graph = _graphs2.default[example];
 
   var canvas = new _flowView.Canvas(divId, {
-    inspector: {
-      DefaultInspector: _Inspector2.default
-    },
     node: {
       DefaultNode: _components.Node,
       InvalidNode: _InvalidNode2.default,
@@ -54289,4 +53965,4 @@ function renderExample(divId, example) {
 
 module.exports = renderExample;
 
-},{"../../editor/client/components/Inspector":285,"../../editor/client/components/InvalidNode":286,"../../editor/client/components/ToggleNode":287,"../../editor/client/utils/typeOfNode":292,"../graphs":328,"dflow":334,"flow-view":78,"flow-view/components":76}]},{},[]);
+},{"../../editor/client/components/InvalidNode":285,"../../editor/client/components/ToggleNode":286,"../../editor/client/utils/typeOfNode":288,"../graphs":323,"dflow":329,"flow-view":78,"flow-view/components":76}]},{},[]);

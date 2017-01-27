@@ -34,7 +34,7 @@
     "jekyll": "npm run homepage; npm run gh-pages:_data; cd gh-pages; jekyll build; cd ..",
     "lint": "for x in cli css engine editor test; do npm run lint_$x; done",
     "lint_cli": "cd src/cli; standard; standard dflow; cd -",
-    "lint_css": "sass-lint -v src/editor/client/sass/*",
+    "lint_css": "sass-lint -c ./src/editor/client/sass/.sass-lint.yml -v src/editor/client/sass/*",
     "lint_engine": "cd src/engine; standard; cd -",
     "lint_editor": "cd src/editor; standard; cd -",
     "lint_test": "cd test; standard --global describe --global it; cd -",
@@ -53,7 +53,6 @@
     "lint",
     "test"
   ],
-  "sasslintConfig": "src/editor/client/sass/.sass-lint.yml",
   "watch": {
     "browserify_editor": {
       "ignore": "src/editor/client/styles/",
@@ -63,7 +62,7 @@
       ]
     },
     "homepage": "README.md",
-    "sass": "src/editor/client/sass"
+    "sass": "src/editor/client/sass/"
   },
   "repository": {
     "type": "git",
