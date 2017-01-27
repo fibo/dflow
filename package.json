@@ -84,8 +84,8 @@
   },
   "devDependencies": {
     "brfs": "^1.4.3",
-    "dot-editorconfig": "^0.3.0",
-    "flow-view": "^2.10.0",
+    "dot-editorconfig": "^0.4.0",
+    "flow-view": "^2.11.0",
     "isomorphic-fetch": "^2.2.1",
     "istanbul": "^0.4.3",
     "mocha": "^3.2.0",
@@ -95,10 +95,10 @@
     "pre-commit": "^1.2.2",
     "redux-thunk": "^2.1.0",
     "sass-lint": "^1.10.2",
-    "should": "^11.1.2",
+    "should": "^11.2.0",
     "standard": "^8.6.0",
     "supertest": "^2.0.1",
     "uglify-js": "^2.7.5",
-    "zeroconf-redux": "^0.11.1"
+    "zeroconf-redux": "^0.12.3"
   }
 }
