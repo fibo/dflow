@@ -95,9 +95,9 @@
     "redux-thunk": "^2.1.0",
     "sass-lint": "^1.10.2",
     "should": "^11.2.0",
-    "standard": "^8.6.0",
-    "supertest": "^2.0.1",
-    "uglify-js": "^2.7.5",
+    "standard": "^9.0.0",
+    "supertest": "^3.0.0",
+    "uglify-js": "^2.8.5",
     "zeroconf-redux": "^0.12.3"
   }
 }
