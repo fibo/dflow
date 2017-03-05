@@ -27,6 +27,8 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## [Unreleased]
 
+## [v0.20.1] - 2017-03-05
+
 ### Added
 
 - Few css improvements
