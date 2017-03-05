@@ -8213,2008 +8213,1715 @@ if (process.env.NODE_ENV !== 'production') {
 module.exports = warning;
 }).call(this,require('_process'))
 },{"./emptyFunction":55,"_process":126}],71:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react', 'react-dom', './components/Frame', 'events', 'not-defined', './utils/randomString', 'svgx'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('react-dom'), require('./components/Frame'), require('events'), require('not-defined'), require('./utils/randomString'), require('svgx'));
+var EventEmitter = require('events');
+var inherits = require('inherits');
+var no = require('not-defined');
+var React = require('react');
+var ReactDOM = require('react-dom');
+var svgx = require('svgx');
+
+var Frame = require('./components/Frame');
+var randomString = require('./utils/randomString');
+
+var reactDOMServer = require('react-dom/server');
+
+var idLength = 3;
+var defaultItem = Frame.defaultProps.item;
+
+function Canvas(containerId, item) {
+  EventEmitter.apply(this, arguments);
+
+  if (no(item)) item = defaultItem;
+  if (no(item.link)) item.link = defaultItem.link;
+  if (no(item.link.DefaultLink)) item.link = defaultItem.link.DefaultLink;
+  if (no(item.node)) item.node = defaultItem.node;
+  if (no(item.node.DefaultNode)) item.node.DefaultNode = defaultItem.node.DefaultNode;
+  if (no(item.nodeList)) item.nodeList = defaultItem.nodeList;
+  if (no(item.util)) item.util = defaultItem.util;
+
+  this.item = item;
+
+  if (typeof containerId !== 'string') {
+    throw new TypeError('containerId must be a string', containerId);
+  }
+
+  if (typeof document !== 'undefined') {
+    var container = document.getElementById(containerId);
+
+    if (container === null) {
+      container = document.createElement('div');
+      container.id = containerId;
+
+      container.setAttribute('style', 'display: inline-block; height: 400px; width: 100%;');
+
+      document.body.appendChild(container);
+    }
+
+    this.container = container;
   } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports, global.react, global.reactDom, global.Frame, global.events, global.notDefined, global.randomString, global.svgx);
-    global.Canvas = mod.exports;
+    this.container = null;
   }
-})(this, function (module, exports, _react, _reactDom, _Frame, _events, _notDefined, _randomString, _svgx) {
-  'use strict';
+}
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
+inherits(Canvas, EventEmitter);
 
-  var _react2 = _interopRequireDefault(_react);
+function render(view, model, callback) {
+  var container = this.container;
+  var item = this.item;
 
-  var _Frame2 = _interopRequireDefault(_Frame);
+  var height;
+  var width;
 
-  var _events2 = _interopRequireDefault(_events);
+  if (container) {
+    var border = 1;
+    var rect = container.getBoundingClientRect();
 
-  var _notDefined2 = _interopRequireDefault(_notDefined);
-
-  var _randomString2 = _interopRequireDefault(_randomString);
-
-  var _svgx2 = _interopRequireDefault(_svgx);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
+    height = rect.height - 2 * border;
+    width = rect.width - 2 * border;
   }
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
+  if (no(view.height)) view.height = height;
+  if (no(view.link)) view.link = {};
+  if (no(view.node)) view.node = {};
+  if (no(view.width)) view.width = width;
+
+  var createInputPin = (nodeId, pin) => {
+    var ins = view.node[nodeId].ins;
+
+    if (no(ins)) view.node[nodeId].ins = ins = [];
+
+    var position = ins.length;
+
+    if (no(pin)) pin = 'in' + position;
+
+    this.emit('createInputPin', nodeId, position, pin);
+
+    view.node[nodeId].ins.push(pin);
+  };
+
+  var createOutputPin = (nodeId, pin) => {
+    var outs = view.node[nodeId].outs;
+
+    if (no(outs)) view.node[nodeId].outs = outs = [];
+
+    var position = outs.length;
+
+    if (no(pin)) pin = 'out' + position;
+
+    this.emit('createOutputPin', nodeId, position, pin);
+
+    view.node[nodeId].outs.push(pin);
+  };
+
+  var selectLink = id => {
+    this.emit('selectLink', id);
+  };
+
+  var selectNode = id => {
+    this.emit('selectNode', id);
+  };
+
+  function generateId() {
+    var id = randomString(idLength);
+
+    return view.link[id] || view.node[id] ? generateId() : id;
+  }
+
+  var createLink = link => {
+    var from = link.from;
+    var to = link.to;
+
+    var id = generateId();
+
+    if (no(to)) {
+      view.link[id] = { from: from };
+    } else {
+      view.link[id] = { from: from, to: to };
+
+      this.emit('createLink', { from: from, to: to }, id);
     }
-  }
 
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
+    return id;
+  };
+
+  var createNode = node => {
+    var id = generateId();
+
+    view.node[id] = node;
+
+    this.emit('createNode', node, id);
+
+    return id;
+  };
+
+  var deleteLink = id => {
+    this.emit('deleteLink', id);
+
+    delete view.link[id];
+  };
+
+  var deleteNode = id => {
+    Object.keys(view.link).forEach(linkId => {
+      var from = view.link[linkId].from;
+      var to = view.link[linkId].to;
+
+      if (from && from[0] === id) {
+        deleteLink(linkId);
       }
-    }
 
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
+      if (to && to[0] === id) {
+        deleteLink(linkId);
       }
     });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
 
-  // TODO find a better way to generate ids.
-  var idLength = 3;
+    delete view.node[id];
 
-  var Canvas = function (_EventEmitter) {
-    _inherits(Canvas, _EventEmitter);
+    this.emit('deleteNode', id);
+  };
 
-    function Canvas(containerId, item) {
-      _classCallCheck(this, Canvas);
+  var dragItems = (dragginDelta, draggedItems) => {
+    Object.keys(view.node).filter(id => draggedItems.indexOf(id) > -1).forEach(id => {
+      view.node[id].x += dragginDelta.x;
+      view.node[id].y += dragginDelta.y;
+    });
+  };
 
-      var _this = _possibleConstructorReturn(this, (Canvas.__proto__ || Object.getPrototypeOf(Canvas)).call(this));
+  var deleteInputPin = (nodeId, position) => {
+    var ins = view.node[nodeId].ins;
 
-      _this.container = null;
+    if (no(ins)) return;
+    if (ins.length === 0) return;
 
-      // Check that containerId is a string.
-      if (typeof containerId !== 'string') {
-        throw new TypeError('containerId must be a string', containerId);
-      }
+    if (no(position)) position = ins.length - 1;
 
-      // If we are in browser context, get the document element containing
-      // the canvas or create it.
-      if (typeof document !== 'undefined') {
-        var container = document.getElementById(containerId);
+    Object.keys(view.link).forEach(id => {
+      var to = view.link[id].to;
 
-        if (container === null) {
-          container = document.createElement('div');
-          container.id = containerId;
+      if (no(to)) return;
 
-          container.setAttribute('style', 'display: inline-block; height: 400px; width: 100%;');
-
-          document.body.appendChild(container);
-        }
-
-        _this.container = container;
-
-        _this.item = item;
-      }
-      return _this;
-    }
-
-    /**
-     * Render to SVG.
-     *
-     * @param {Object} view
-     * @param {Object} [model]
-     * @param {Function} [callback] run server side
-     */
-
-    _createClass(Canvas, [{
-      key: 'render',
-      value: function render(view, model, callback) {
-        var _this2 = this;
-
-        var container = this.container;
-
-        var defaultItem = _Frame2.default.defaultProps.item;
-
-        var DefaultLink = defaultItem.link.DefaultLink;
-        var DefaultNode = defaultItem.node.DefaultNode;
-        var typeOfNode = defaultItem.util.typeOfNode;
-
-        var item = Object.assign({}, { link: { DefaultLink: DefaultLink } }, { node: { DefaultNode: DefaultNode } }, { util: { typeOfNode: typeOfNode } }, this.item);
-
-        var height = view.height;
-        var width = view.width;
-
-        // Get height and width from container, if any.
-        if (container) {
-          var border = 1; // TODO could be configurable in style prop
-          var rect = container.getBoundingClientRect();
-
-          height = rect.height - 2 * border;
-          width = rect.width - 2 * border;
-        }
-
-        view = Object.assign({}, {
-          height: height,
-          link: {},
-          node: {},
-          width: width
-        }, view);
-
-        var createInputPin = function createInputPin(nodeId, pin) {
-          var ins = view.node[nodeId].ins;
-
-          if ((0, _notDefined2.default)(ins)) view.node[nodeId].ins = ins = [];
-
-          var position = ins.length;
-
-          if ((0, _notDefined2.default)(pin)) pin = 'in' + position;
-
-          _this2.emit('createInputPin', nodeId, position, pin);
-
-          view.node[nodeId].ins.push(pin);
-        };
-
-        var createOutputPin = function createOutputPin(nodeId, pin) {
-          var outs = view.node[nodeId].outs;
-
-          if ((0, _notDefined2.default)(outs)) view.node[nodeId].outs = outs = [];
-
-          var position = outs.length;
-
-          if ((0, _notDefined2.default)(pin)) pin = 'out' + position;
-
-          _this2.emit('createOutputPin', nodeId, position, pin);
-
-          view.node[nodeId].outs.push(pin);
-        };
-
-        function generateId() {
-          var id = (0, _randomString2.default)(idLength);
-
-          return view.link[id] || view.node[id] ? generateId() : id;
-        }
-
-        var createLink = function createLink(link) {
-          var from = link.from;
-          var to = link.to;
-
-          var id = generateId();
-
-          // Do not fire createLink event if it is a dragging link.
-          if ((0, _notDefined2.default)(to)) {
-            view.link[id] = { from: from };
-          } else {
-            view.link[id] = { from: from, to: to };
-
-            _this2.emit('createLink', { from: from, to: to }, id);
-          }
-
-          return id;
-        };
-
-        var createNode = function createNode(node) {
-          var id = generateId();
-
-          view.node[id] = node;
-
-          _this2.emit('createNode', node, id);
-
-          return id;
-        };
-
-        var deleteLink = function deleteLink(id) {
-          _this2.emit('deleteLink', id);
-
-          delete view.link[id];
-        };
-
-        var deleteNode = function deleteNode(id) {
-          // delete links connected to given node.
-          Object.keys(view.link).forEach(function (linkId) {
-            var from = view.link[linkId].from;
-            var to = view.link[linkId].to;
-
-            if (from && from[0] === id) {
-              deleteLink(linkId);
-            }
-
-            if (to && to[0] === id) {
-              deleteLink(linkId);
-            }
-          });
-
-          delete view.node[id];
-
-          _this2.emit('deleteNode', id);
-        };
-
-        var dragItems = function dragItems(dragginDelta, draggedItems) {
-          Object.keys(view.node).filter(function (id) {
-            return draggedItems.indexOf(id) > -1;
-          }).forEach(function (id) {
-            view.node[id].x += dragginDelta.x;
-            view.node[id].y += dragginDelta.y;
-          });
-        };
-
-        var deleteInputPin = function deleteInputPin(nodeId, position) {
-          var ins = view.node[nodeId].ins;
-
-          if ((0, _notDefined2.default)(ins)) view.node[nodeId].ins = ins = [];
-
-          if ((0, _notDefined2.default)(position)) position = ins.length - 1;
-
-          _this2.emit('deleteInputPin', nodeId, position);
-
-          view.node[nodeId].ins.splice(position, 1);
-        };
-
-        var deleteOutputPin = function deleteOutputPin(nodeId, position) {
-          var outs = view.node[nodeId].outs;
-
-          if ((0, _notDefined2.default)(outs)) view.node[nodeId].outs = outs = [];
-
-          if ((0, _notDefined2.default)(position)) position = outs.length - 1;
-
-          _this2.emit('deleteOutputPin', nodeId, position);
-
-          view.node[nodeId].outs.splice(position, 1);
-        };
-
-        var renameNode = function renameNode(nodeId, text) {
-          view.node[nodeId].text = text;
-        };
-
-        var updateLink = function updateLink(id, link) {
-          var to = link.to;
-          var from = link.from;
-
-          // Trigger a createLink event if it is a connected link.
-          if ((0, _notDefined2.default)(from)) {
-            view.link[id].to = to;
-
-            _this2.emit('createLink', view.link[id], id);
-          }
-        };
-
-        var component = _react2.default.createElement(_Frame2.default, {
-          createInputPin: createInputPin,
-          createOutputPin: createOutputPin,
-          createLink: createLink,
-          createNode: createNode,
-          deleteLink: deleteLink,
-          deleteInputPin: deleteInputPin,
-          deleteNode: deleteNode,
-          deleteOutputPin: deleteOutputPin,
-          dragItems: dragItems,
-          item: item,
-          model: model,
-          renameNode: renameNode,
-          updateLink: updateLink,
-          view: view
-        });
-
-        if (container) {
-          // Client side rendering.
-          (0, _reactDom.render)(component, container);
-        } else {
-          // Server side rendering.
-
-          var opts = { doctype: true, xmlns: true };
-          var jsx = _react2.default.createElement(_Frame2.default, {
-            item: item,
-            view: view
-          });
-
-          var outputSVG = (0, _svgx2.default)(jsx, opts);
-
-          if (typeof callback === 'function') {
-            callback(null, outputSVG);
-          }
-        }
-      }
-    }]);
-
-    return Canvas;
-  }(_events2.default);
-
-  exports.default = Canvas;
-  module.exports = exports['default'];
-});
-},{"./components/Frame":72,"./utils/randomString":81,"events":47,"not-defined":120,"react":297,"react-dom":127,"svgx":319}],72:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react', 'react-dom', '../utils/computeNodeWidth', './Link', './Node', './theme', '../utils/ignoreEvent', '../utils/xOfPin', './Selector'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('react-dom'), require('../utils/computeNodeWidth'), require('./Link'), require('./Node'), require('./theme'), require('../utils/ignoreEvent'), require('../utils/xOfPin'), require('./Selector'));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports, global.react, global.reactDom, global.computeNodeWidth, global.Link, global.Node, global.theme, global.ignoreEvent, global.xOfPin, global.Selector);
-    global.Frame = mod.exports;
-  }
-})(this, function (module, exports, _react, _reactDom, _computeNodeWidth, _Link, _Node, _theme, _ignoreEvent, _xOfPin, _Selector) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _react2 = _interopRequireDefault(_react);
-
-  var _computeNodeWidth2 = _interopRequireDefault(_computeNodeWidth);
-
-  var _Link2 = _interopRequireDefault(_Link);
-
-  var _Node2 = _interopRequireDefault(_Node);
-
-  var _theme2 = _interopRequireDefault(_theme);
-
-  var _ignoreEvent2 = _interopRequireDefault(_ignoreEvent);
-
-  var _xOfPin2 = _interopRequireDefault(_xOfPin);
-
-  var _Selector2 = _interopRequireDefault(_Selector);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
+      if (to[0] === nodeId && to[1] === position) {
+        deleteLink(id);
       }
     });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
 
-  var getTime = function getTime() {
-    return new Date() / 1;
+    this.emit('deleteInputPin', nodeId, position);
+
+    view.node[nodeId].ins.splice(position, 1);
   };
 
-  var Frame = function (_Component) {
-    _inherits(Frame, _Component);
-
-    function Frame(props) {
-      _classCallCheck(this, Frame);
-
-      var _this = _possibleConstructorReturn(this, (Frame.__proto__ || Object.getPrototypeOf(Frame)).call(this, props));
-
-      _this.state = {
-        dynamicView: { height: null, width: null },
-        draggedLinkId: null,
-        draggedItems: [],
-        offset: { x: 0, y: 0 },
-        pointer: null,
-        scroll: { x: 0, y: 0 },
-        showSelector: false,
-        selectedItems: [],
-        selectionBoundingBox: null,
-        whenUpdated: getTime() // this attribute is used to force React render.
-      };
-      return _this;
-    }
-
-    _createClass(Frame, [{
-      key: 'componentDidMount',
-      value: function componentDidMount() {
-        var setState = this.setState.bind(this);
-
-        var container = (0, _reactDom.findDOMNode)(this).parentNode;
-
-        window.addEventListener('scroll', function () {
-          setState({ scroll: {
-              x: window.scrollX,
-              y: window.scrollY
-            } });
-        });
-
-        window.addEventListener('resize', function () {
-          var rect = container.getBoundingClientRect();
-
-          setState({ dynamicView: {
-              height: rect.height,
-              width: rect.width
-            } });
-        });
-
-        var offset = {
-          x: container.offsetLeft,
-          y: container.offsetTop
-        };
-
-        var scroll = {
-          x: window.scrollX,
-          y: window.scrollY
-        };
-
-        setState({ offset: offset, scroll: scroll });
-      }
-    }, {
-      key: 'render',
-      value: function render() {
-        var _this2 = this;
-
-        var _props = this.props,
-            createInputPin = _props.createInputPin,
-            createLink = _props.createLink,
-            _createNode = _props.createNode,
-            createOutputPin = _props.createOutputPin,
-            deleteInputPin = _props.deleteInputPin,
-            deleteLink = _props.deleteLink,
-            deleteNode = _props.deleteNode,
-            deleteOutputPin = _props.deleteOutputPin,
-            dragItems = _props.dragItems,
-            fontSize = _props.fontSize,
-            item = _props.item,
-            model = _props.model,
-            theme = _props.theme,
-            updateLink = _props.updateLink,
-            view = _props.view;
-        var _state = this.state,
-            draggedItems = _state.draggedItems,
-            draggedLinkId = _state.draggedLinkId,
-            pointer = _state.pointer,
-            dynamicView = _state.dynamicView,
-            selectedItems = _state.selectedItems,
-            showSelector = _state.showSelector;
-        var frameBorder = theme.frameBorder,
-            fontFamily = theme.fontFamily,
-            lineWidth = theme.lineWidth,
-            nodeBodyHeight = theme.nodeBodyHeight,
-            pinSize = theme.pinSize;
-
-
-        var height = dynamicView.height || view.height;
-        var width = dynamicView.width || view.width;
-
-        var typeOfNode = item.util.typeOfNode;
-
-        var Link = item.link.DefaultLink;
-
-        var setState = this.setState.bind(this);
-
-        var coordinatesOfLink = function coordinatesOfLink(_ref) {
-          var from = _ref.from,
-              to = _ref.to;
-
-          var x1 = null;
-          var y1 = null;
-          var x2 = null;
-          var y2 = null;
-
-          var nodeIds = Object.keys(view.node);
-          var idEquals = function idEquals(x) {
-            return function (id) {
-              return id === x[0];
-            };
-          };
-          var sourceId = from ? nodeIds.find(idEquals(from)) : null;
-          var targetId = to ? nodeIds.find(idEquals(to)) : null;
-
-          var computedWidth = null;
-
-          if (sourceId) {
-            var source = view.node[sourceId];
-
-            computedWidth = (0, _computeNodeWidth2.default)({
-              bodyHeight: nodeBodyHeight,
-              pinSize: pinSize,
-              fontSize: fontSize,
-              node: source
-            });
-
-            x1 = source.x + (0, _xOfPin2.default)(pinSize, computedWidth, source.outs.length, from[1]);
-            y1 = source.y + pinSize + nodeBodyHeight;
-          }
-
-          if (targetId) {
-            var target = view.node[targetId];
-
-            computedWidth = (0, _computeNodeWidth2.default)({
-              bodyHeight: nodeBodyHeight,
-              pinSize: pinSize,
-              fontSize: fontSize,
-              node: target
-            });
-
-            x2 = target.x + (0, _xOfPin2.default)(pinSize, computedWidth, target.ins.length, to[1]);
-            y2 = target.y;
-          } else {
-            // FIXME at first, pointer is null. This trick works, but,
-            // it should be reviosioned when implementing creating links
-            // in the opposite direction.
-            x2 = pointer ? pointer.x - pinSize / 2 : x1;
-            y2 = pointer ? pointer.y - pinSize : y1;
-          }
-
-          return { x1: x1, y1: y1, x2: x2, y2: y2 };
-        };
-
-        var getCoordinates = function getCoordinates(e) {
-          var _state2 = _this2.state,
-              offset = _state2.offset,
-              scroll = _state2.scroll;
-
-
-          return {
-            x: e.clientX - offset.x + scroll.x,
-            y: e.clientY - offset.y + scroll.y
-          };
-        };
-
-        var onClick = function onClick(e) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          setState({ showSelector: false });
-        };
-
-        var onCreateLink = function onCreateLink(link) {
-          var draggedLinkId = createLink(link);
-
-          setState({ draggedLinkId: draggedLinkId });
-        };
-
-        var onUpdateLink = function onUpdateLink(id, link) {
-          updateLink(id, link);
-
-          var disconnectingLink = link.to === null;
-
-          if (disconnectingLink) {
-            link.id = id;
-
-            setState({ draggedLinkId: id });
-          } else {
-            setState({ draggedLinkId: null });
-          }
-        };
-
-        var onDoubleClick = function onDoubleClick(e) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          setState({
-            pointer: getCoordinates(e),
-            showSelector: true
-          });
-        };
-
-        var onMouseDown = function onMouseDown(e) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          // TODO Shift key for multiple selection.
-
-          setState({
-            selectedItems: []
-          });
-        };
-
-        var onMouseLeave = function onMouseLeave(e) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          var draggedLinkId = _this2.state.draggedLinkId;
-          if (draggedLinkId) delete view.link[draggedLinkId];
-
-          setState({
-            draggedItems: [],
-            draggedLinkId: null,
-            pointer: null,
-            showSelector: false
-          });
-        };
-
-        var onMouseMove = function onMouseMove(e) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          var nextPointer = getCoordinates(e);
-
-          setState({
-            pointer: nextPointer
-          });
-
-          var draggedItems = _this2.state.draggedItems;
-
-          if (draggedItems.length > 0) {
-            var draggingDelta = {
-              x: pointer ? nextPointer.x - pointer.x : 0,
-              y: pointer ? nextPointer.y - pointer.y : 0
-            };
-
-            dragItems(draggingDelta, draggedItems);
-          }
-        };
-
-        var onMouseUp = function onMouseUp(e) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          var draggedLinkId = _this2.state.draggedLinkId;
-
-          if (draggedLinkId) {
-            delete view.link[draggedLinkId];
-
-            setState({
-              draggedLinkId: null,
-              pointer: null
-            });
-          } else {
-            setState({
-              draggedItems: [],
-              selectedItems: [],
-              pointer: null
-            });
-          }
-        };
-
-        /**
-         * Bring up selected nodes.
-         */
-
-        var selectedFirst = function selectedFirst(a, b) {
-          // FIXME it works, but it would be nice if the selected
-          // items keep being up after deselection.
-          var aIsSelected = selectedItems.indexOf(a) > -1;
-          var bIsSelected = selectedItems.indexOf(b) > -1;
-
-          if (aIsSelected && bIsSelected) return 0;
-
-          if (aIsSelected) return 1;
-          if (bIsSelected) return -1;
-        };
-
-        var selectItem = function selectItem(id) {
-          return function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            var boundingBox = null;
-
-            // Do not select items when releasing a dragging link.
-
-            var draggedLinkId = _this2.state.draggedLinkId;
-
-            if (draggedLinkId) {
-              delete view.link[draggedLinkId];
-
-              setState({
-                draggedLinkId: null
-              });
-
-              return;
-            }
-
-            var selectedItems = Object.assign([], _this2.state.selectedItems);
-
-            var index = selectedItems.indexOf(id);
-
-            if (index === -1) {
-              // Shift key allows multiple selection.
-              if (e.shiftKey) {
-                // TODO it does not work.
-                selectedItems.push(id);
-              } else {
-                selectedItems = [id];
-              }
-            } else {
-              selectedItems.splice(index, 1);
-            }
-
-            selectedItems.forEach(function (id) {
-              var link = view.link[id];
-              var node = view.node[id];
-
-              if (node) {
-                var computedWidth = (0, _computeNodeWidth2.default)({
-                  bodyHeight: nodeBodyHeight,
-                  pinSize: pinSize,
-                  fontSize: fontSize,
-                  node: node
-                });
-
-                boundingBox = {
-                  x1: node.x,
-                  y1: node.y,
-                  x2: computedWidth + node.x,
-                  y2: nodeBodyHeight + node.y
-                };
-              }
-
-              if (link) {
-                boundingBox = coordinatesOfLink(link);
-              }
-            });
-
-            setState({
-              draggedItems: [],
-              selectedItems: selectedItems,
-              selectionBoundingBox: boundingBox
-            });
-          };
-        };
-
-        var startDraggingLinkTarget = function startDraggingLinkTarget(id) {
-          // Remember link source.
-          var from = view.link[id].from;
-
-          // Delete dragged link so the 'deleteLink' event is triggered.
-          deleteLink(id);
-
-          // Create a brand new link, this is the right choice to avoid
-          // conflicts, for example the user could start dragging the link
-          // target and then drop it again in the same target.
-          var draggedLinkId = createLink({ from: from });
-          setState({ draggedLinkId: draggedLinkId });
-        };
-
-        var willDragItem = function willDragItem(id) {
-          return function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            var draggedItems = Object.assign([], _this2.state.draggedItems);
-
-            var index = draggedItems.indexOf(id);
-
-            if (index === -1) {
-              // Shift key allows multiple selection.
-              if (e.shiftKey) {
-                // TODO it does not work.
-                draggedItems.push(id);
-              } else {
-                draggedItems = [id];
-              }
-            }
-
-            setState({
-              draggedItems: draggedItems,
-              selectedItems: []
-            });
-          };
-        };
-
-        return _react2.default.createElement(
-          'svg',
-          {
-            fontFamily: fontFamily,
-            fontSize: fontSize,
-            height: height,
-            onClick: onClick,
-            onDoubleClick: onDoubleClick,
-            onMouseDown: onMouseDown,
-            onMouseEnter: _ignoreEvent2.default,
-            onMouseLeave: onMouseLeave,
-            onMouseMove: onMouseMove,
-            onMouseUp: onMouseUp,
-            textAnchor: 'start',
-            style: { border: frameBorder },
-            width: width
-          },
-          Object.keys(view.node).sort(selectedFirst).map(function (id, i) {
-            var node = view.node[id];
-
-            var height = node.height,
-                ins = node.ins,
-                outs = node.outs,
-                text = node.text,
-                width = node.width,
-                x = node.x,
-                y = node.y;
-
-
-            var nodeType = typeOfNode(node);
-            var Node = item.node[nodeType];
-
-            return _react2.default.createElement(Node, { key: i,
-              createInputPin: createInputPin,
-              createOutputPin: createOutputPin,
-              dragged: draggedItems.indexOf(id) > -1,
-              draggedLinkId: draggedLinkId,
-              deleteInputPin: deleteInputPin,
-              deleteNode: deleteNode,
-              deleteOutputPin: deleteOutputPin,
-              fontSize: fontSize,
-              height: height,
-              id: id,
-              ins: ins,
-              model: model,
-              onCreateLink: onCreateLink,
-              outs: outs,
-              pinSize: pinSize,
-              selected: selectedItems.indexOf(id) > -1,
-              selectNode: selectItem(id),
-              text: text,
-              updateLink: onUpdateLink,
-              width: width,
-              willDragNode: willDragItem(id),
-              x: x,
-              y: y
-            });
-          }),
-          Object.keys(view.link).map(function (id, i) {
-            var _view$link$id = view.link[id],
-                from = _view$link$id.from,
-                to = _view$link$id.to;
-
-
-            var coord = coordinatesOfLink(view.link[id]);
-
-            return _react2.default.createElement(Link, {
-              key: i,
-              from: from,
-              lineWidth: lineWidth,
-              id: id,
-              onCreateLink: onCreateLink,
-              startDraggingLinkTarget: startDraggingLinkTarget,
-              pinSize: pinSize,
-              selected: selectedItems.indexOf(id) > -1,
-              selectLink: selectItem(id),
-              to: to,
-              x1: coord.x1,
-              y1: coord.y1,
-              x2: coord.x2,
-              y2: coord.y2
-            });
-          }),
-          _react2.default.createElement(_Selector2.default, {
-            createNode: function createNode(node) {
-              var id = _createNode(node);
-
-              setState({
-                selectedItems: [id],
-                showSelector: false,
-                whenUpdated: getTime()
-              });
-            },
-            pointer: pointer,
-            show: showSelector
-          })
-        );
-      }
-    }]);
-
-    return Frame;
-  }(_react.Component);
-
-  Frame.propTypes = {
-    createInputPin: _react.PropTypes.func.isRequired,
-    createOutputPin: _react.PropTypes.func.isRequired,
-    createLink: _react.PropTypes.func.isRequired,
-    createNode: _react.PropTypes.func.isRequired,
-    deleteLink: _react.PropTypes.func.isRequired,
-    deleteInputPin: _react.PropTypes.func.isRequired,
-    deleteNode: _react.PropTypes.func.isRequired,
-    deleteOutputPin: _react.PropTypes.func.isRequired,
-    dragItems: _react.PropTypes.func.isRequired,
-    fontSize: _react.PropTypes.number.isRequired,
-    item: _react.PropTypes.shape({
-      link: _react.PropTypes.object.isRequired,
-      node: _react.PropTypes.object.isRequired,
-      util: _react.PropTypes.shape({
-        typeOfNode: _react.PropTypes.func.isRequired
-      })
-    }).isRequired,
-    theme: _theme2.default.propTypes,
-    updateLink: _react.PropTypes.func.isRequired,
-    view: _react.PropTypes.shape({
-      height: _react.PropTypes.number.isRequired,
-      link: _react.PropTypes.object.isRequired,
-      node: _react.PropTypes.object.isRequired,
-      width: _react.PropTypes.number.isRequired
-    }).isRequired
+  var endDragging = selectNodes => {
+    var nodesCoordinates = {};
+
+    selectNodes.forEach(id => {
+      nodesCoordinates.id = {};
+      nodesCoordinates.id.x = view.node[id].x;
+      nodesCoordinates.id.y = view.node[id].y;
+    });
+
+    this.emit('endDragging', nodesCoordinates);
   };
 
-  Frame.defaultProps = {
-    createLink: Function.prototype,
-    createNode: Function.prototype,
-    createInputPin: Function.prototype,
-    createOutputPin: Function.prototype,
-    deleteInputPin: Function.prototype,
-    deleteLink: Function.prototype,
-    deleteNode: Function.prototype,
-    deleteOutputPin: Function.prototype,
-    dragItems: Function.prototype,
-    fontSize: 17, // FIXME fontSize seems to be ignored
-    item: {
-      link: { DefaultLink: _Link2.default },
-      node: { DefaultNode: _Node2.default },
-      util: {
-        typeOfNode: function typeOfNode(node) {
-          return 'DefaultNode';
-        }
-      }
-    },
-    theme: _theme2.default.defaultProps,
-    updateLink: Function.prototype,
-    view: {
-      link: {},
-      node: {}
-    }
-  };
+  var deleteOutputPin = (nodeId, position) => {
+    var outs = view.node[nodeId].outs;
 
-  exports.default = Frame;
-  module.exports = exports['default'];
-});
-},{"../utils/computeNodeWidth":79,"../utils/ignoreEvent":80,"../utils/xOfPin":82,"./Link":73,"./Node":74,"./Selector":75,"./theme":77,"react":297,"react-dom":127}],73:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react', '../utils/ignoreEvent', './theme'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('../utils/ignoreEvent'), require('./theme'));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports, global.react, global.ignoreEvent, global.theme);
-    global.Link = mod.exports;
-  }
-})(this, function (module, exports, _react, _ignoreEvent, _theme) {
-  'use strict';
+    if (no(outs)) return;
+    if (outs.length === 0) return;
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
+    if (no(position)) position = outs.length - 1;
 
-  var _react2 = _interopRequireDefault(_react);
+    Object.keys(view.link).forEach(id => {
+      var from = view.link[id].from;
 
-  var _ignoreEvent2 = _interopRequireDefault(_ignoreEvent);
+      if (no(from)) return;
 
-  var _theme2 = _interopRequireDefault(_theme);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
+      if (from[0] === nodeId && from[1] === position) {
+        deleteLink(id);
       }
     });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
 
-  var Link = function (_Component) {
-    _inherits(Link, _Component);
+    this.emit('deleteOutputPin', nodeId, position);
 
-    function Link() {
-      _classCallCheck(this, Link);
+    view.node[nodeId].outs.splice(position, 1);
+  };
 
-      return _possibleConstructorReturn(this, (Link.__proto__ || Object.getPrototypeOf(Link)).apply(this, arguments));
+  var renameNode = (nodeId, text) => {
+    view.node[nodeId].text = text;
+  };
+
+  var updateLink = (id, link) => {
+    var to = link.to;
+    var from = link.from;
+
+    if (no(from)) {
+      view.link[id].to = to;
+
+      this.emit('createLink', view.link[id], id);
     }
-
-    _createClass(Link, [{
-      key: 'render',
-      value: function render() {
-        var _props = this.props,
-            id = _props.id,
-            from = _props.from,
-            onCreateLink = _props.onCreateLink,
-            startDraggingLinkTarget = _props.startDraggingLinkTarget,
-            selected = _props.selected,
-            selectLink = _props.selectLink,
-            theme = _props.theme,
-            to = _props.to,
-            x1 = _props.x1,
-            y1 = _props.y1,
-            x2 = _props.x2,
-            y2 = _props.y2;
-        var highlightColor = theme.highlightColor,
-            linkColor = theme.linkColor,
-            lineWidth = theme.lineWidth,
-            pinSize = theme.pinSize;
-
-
-        var onSourceMouseDown = function onSourceMouseDown(e) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          onCreateLink({ from: from, to: null });
-        };
-
-        var onTargetMouseDown = function onTargetMouseDown(e) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          startDraggingLinkTarget(id);
-        };
-
-        var startX = x1 + pinSize / 2;
-        var startY = y1 + pinSize / 2;
-        var endX = x2 + pinSize / 2;
-        var endY = y2 + pinSize / 2;
-
-        var midPointY = (startY + endY) / 2;
-
-        var controlPointX1 = startX;
-        var controlPointY1 = to ? midPointY : startY;
-        var controlPointX2 = endX;
-        var controlPointY2 = to ? midPointY : endY;
-
-        return _react2.default.createElement(
-          'g',
-          {
-            onClick: _ignoreEvent2.default,
-            onDoubleClick: _ignoreEvent2.default
-          },
-          _react2.default.createElement('path', {
-            d: 'M ' + startX + ' ' + startY + ' C ' + controlPointX1 + ' ' + controlPointY1 + ', ' + controlPointX2 + ' ' + controlPointY2 + ' ,' + endX + ' ' + endY,
-            fill: 'transparent',
-            onMouseUp: selectLink,
-            stroke: selected ? highlightColor : linkColor,
-            strokeWidth: lineWidth
-          }),
-          _react2.default.createElement('rect', {
-            fill: linkColor,
-            height: pinSize,
-            onMouseDown: onSourceMouseDown,
-            width: pinSize,
-            x: x1,
-            y: y1
-          }),
-          to ? _react2.default.createElement('rect', {
-            fill: linkColor,
-            height: pinSize,
-            onMouseDown: onTargetMouseDown,
-            width: pinSize,
-            x: x2,
-            y: y2
-          }) : null
-        );
-      }
-    }]);
-
-    return Link;
-  }(_react.Component);
-
-  Link.propTypes = {
-    id: _react.PropTypes.string,
-    from: _react.PropTypes.array,
-    onCreateLink: _react.PropTypes.func.isRequired,
-    startDraggingLinkTarget: _react.PropTypes.func.isRequired,
-    pinSize: _react.PropTypes.number.isRequired,
-    selected: _react.PropTypes.bool.isRequired,
-    selectLink: _react.PropTypes.func.isRequired,
-    theme: _theme2.default.propTypes,
-    to: _react.PropTypes.array,
-    x1: _react.PropTypes.number.isRequired,
-    y1: _react.PropTypes.number.isRequired,
-    x2: _react.PropTypes.number.isRequired,
-    y2: _react.PropTypes.number.isRequired
   };
 
-  Link.defaultProps = {
-    onCreateLink: Function.prototype,
-    startDraggingLinkTarget: Function.prototype,
-    selected: false,
-    selectLink: Function.prototype,
-    theme: _theme2.default.defaultProps
-  };
-
-  exports.default = Link;
-  module.exports = exports['default'];
-});
-},{"../utils/ignoreEvent":80,"./theme":77,"react":297}],74:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react', '../utils/ignoreEvent', '../utils/xOfPin', '../utils/computeNodeWidth', './theme'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('../utils/ignoreEvent'), require('../utils/xOfPin'), require('../utils/computeNodeWidth'), require('./theme'));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports, global.react, global.ignoreEvent, global.xOfPin, global.computeNodeWidth, global.theme);
-    global.Node = mod.exports;
-  }
-})(this, function (module, exports, _react, _ignoreEvent, _xOfPin, _computeNodeWidth, _theme) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
+  var component = React.createElement(Frame, {
+    createInputPin: createInputPin,
+    createOutputPin: createOutputPin,
+    createLink: createLink,
+    createNode: createNode,
+    deleteLink: deleteLink,
+    deleteInputPin: deleteInputPin,
+    deleteNode: deleteNode,
+    deleteOutputPin: deleteOutputPin,
+    dragItems: dragItems,
+    endDragging: endDragging,
+    item: item,
+    model: model,
+    nodeList: item.nodeList,
+    renameNode: renameNode,
+    selectLink: selectLink,
+    selectNode: selectNode,
+    updateLink: updateLink,
+    view: view
   });
 
-  var _react2 = _interopRequireDefault(_react);
+  if (container) {
+    ReactDOM.render(component, container);
+  } else {
 
-  var _ignoreEvent2 = _interopRequireDefault(_ignoreEvent);
+    var opts = { doctype: true, xmlns: true };
 
-  var _xOfPin2 = _interopRequireDefault(_xOfPin);
-
-  var _computeNodeWidth2 = _interopRequireDefault(_computeNodeWidth);
-
-  var _theme2 = _interopRequireDefault(_theme);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
+    var jsx = React.createElement(Frame, {
+      item: item,
+      view: view
     });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
 
-  var Node = function (_Component) {
-    _inherits(Node, _Component);
+    var outputSVG = svgx(reactDOMServer.renderToStaticMarkup)(jsx, opts);
 
-    function Node() {
-      _classCallCheck(this, Node);
-
-      return _possibleConstructorReturn(this, (Node.__proto__ || Object.getPrototypeOf(Node)).apply(this, arguments));
+    if (typeof callback === 'function') {
+      callback(null, outputSVG);
     }
+  }
+}
 
-    _createClass(Node, [{
-      key: 'getBody',
-      value: function getBody() {
-        var _props = this.props,
-            fontSize = _props.fontSize,
-            theme = _props.theme,
-            text = _props.text;
-        var pinSize = theme.pinSize;
+Canvas.prototype.render = render;
 
+module.exports = exports.default = Canvas;
+},{"./components/Frame":72,"./utils/randomString":81,"events":47,"inherits":93,"not-defined":120,"react":297,"react-dom":127,"react-dom/server":257,"svgx":319}],72:[function(require,module,exports){
+var React = require('react');
+var inherits = require('inherits');
+var ReactDOM = require('react-dom');
+var no = require('not-defined');
 
-        var bodyHeight = this.props.bodyHeight || theme.nodeBodyHeight;
+var Component = React.Component;
+var PropTypes = React.PropTypes;
 
-        // Heuristic value, based on Courier font.
-        var margin = fontSize * 0.2;
+var computeNodeWidth = require('../utils/computeNodeWidth');
+var ignoreEvent = require('../utils/ignoreEvent');
+var xOfPin = require('../utils/xOfPin');
 
-        return _react2.default.createElement(
-          'text',
-          {
-            x: pinSize,
-            y: bodyHeight + pinSize - margin
-          },
-          _react2.default.createElement(
-            'tspan',
-            null,
-            text
-          )
-        );
-      }
-    }, {
-      key: 'render',
-      value: function render() {
-        var _props2 = this.props,
-            createInputPin = _props2.createInputPin,
-            createOutputPin = _props2.createOutputPin,
-            deleteInputPin = _props2.deleteInputPin,
-            deleteNode = _props2.deleteNode,
-            deleteOutputPin = _props2.deleteOutputPin,
-            dragged = _props2.dragged,
-            draggedLinkId = _props2.draggedLinkId,
-            fontSize = _props2.fontSize,
-            id = _props2.id,
-            ins = _props2.ins,
-            onCreateLink = _props2.onCreateLink,
-            outs = _props2.outs,
-            selected = _props2.selected,
-            selectNode = _props2.selectNode,
-            text = _props2.text,
-            theme = _props2.theme,
-            updateLink = _props2.updateLink,
-            width = _props2.width,
-            willDragNode = _props2.willDragNode,
-            x = _props2.x,
-            y = _props2.y;
-        var highlightColor = theme.highlightColor,
-            nodeBarColor = theme.nodeBarColor,
-            pinColor = theme.pinColor,
-            pinSize = theme.pinSize;
+var DefaultLink = require('./Link');
+var DefaultNode = require('./Node');
+var Selector = require('./Selector');
+var theme = require('./theme');
 
+var isShift = code => code === 'ShiftLeft' || code === 'ShiftRight';
 
-        var bodyHeight = this.props.bodyHeight || theme.nodeBodyHeight;
+function Frame() {
+  Component.apply(this, arguments);
 
-        var bodyContent = this.getBody();
-
-        var computedWidth = (0, _computeNodeWidth2.default)({
-          bodyHeight: bodyHeight,
-          pinSize: pinSize,
-          fontSize: fontSize,
-          node: { ins: ins, outs: outs, text: text, width: width }
-        });
-
-        return _react2.default.createElement(
-          'g',
-          {
-            onDoubleClick: _ignoreEvent2.default,
-            onMouseDown: willDragNode,
-            onMouseUp: selectNode,
-            style: {
-              cursor: dragged ? 'pointer' : 'default'
-            },
-            transform: 'translate(' + x + ',' + y + ')'
-          },
-          selected ? _react2.default.createElement('path', {
-            d: 'M 0 ' + pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize / 3 + ' V ' + pinSize + ' H ' + 2 * pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize + ' V ' + pinSize / 3 + ' H ' + 2 * pinSize / 3 + ' V ' + 0 + ' H ' + pinSize / 3 + ' V ' + pinSize / 3 + ' Z',
-            fill: highlightColor,
-            transform: 'translate(' + pinSize / 2 + ',' + pinSize / 2 + ') rotate(45) translate(' + -3 * pinSize / 2 + ',' + pinSize / 2 + ')',
-            onMouseDown: function onMouseDown() {
-              return deleteNode(id);
-            }
-          }) : null,
-          selected ? _react2.default.createElement('path', {
-            d: 'M 0 ' + pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize + ' V ' + pinSize / 3 + ' Z',
-            transform: 'translate(' + (computedWidth + 2) + ',0)',
-            onMouseDown: function onMouseDown() {
-              return deleteInputPin(id);
-            },
-            fill: highlightColor
-          }) : null,
-          selected ? _react2.default.createElement('path', {
-            d: 'M 0 ' + pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize / 3 + ' V ' + pinSize + ' H ' + 2 * pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize + ' V ' + pinSize / 3 + ' H ' + 2 * pinSize / 3 + ' V ' + 0 + ' H ' + pinSize / 3 + ' V ' + pinSize / 3 + ' Z',
-            transform: 'translate(' + (computedWidth + 4 + pinSize) + ',0)',
-            onMouseDown: function onMouseDown() {
-              return createInputPin(id);
-            },
-            fill: highlightColor
-          }) : null,
-          selected ? _react2.default.createElement('path', {
-            d: 'M 0 ' + pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize + ' V ' + pinSize / 3 + ' Z',
-            transform: 'translate(' + (computedWidth + 2) + ',' + (bodyHeight + pinSize) + ')',
-            onMouseDown: function onMouseDown() {
-              return deleteOutputPin(id);
-            },
-            fill: highlightColor
-          }) : null,
-          selected ? _react2.default.createElement('path', {
-            d: 'M 0 ' + pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize / 3 + ' V ' + pinSize + ' H ' + 2 * pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize + ' V ' + pinSize / 3 + ' H ' + 2 * pinSize / 3 + ' V ' + 0 + ' H ' + pinSize / 3 + ' V ' + pinSize / 3 + ' Z',
-            transform: 'translate(' + (computedWidth + 4 + pinSize) + ',' + (bodyHeight + pinSize) + ')',
-            onMouseDown: function onMouseDown() {
-              return createOutputPin(id);
-            },
-            fill: highlightColor
-          }) : null,
-          _react2.default.createElement('rect', {
-            fillOpacity: 0,
-            height: bodyHeight + 2 * pinSize,
-            stroke: selected || dragged ? highlightColor : nodeBarColor,
-            strokeWidth: 1,
-            width: computedWidth
-          }),
-          _react2.default.createElement('rect', {
-            fill: selected || dragged ? highlightColor : nodeBarColor,
-            height: pinSize,
-            width: computedWidth
-          }),
-          ins.map(function (pin, i, array) {
-            var x = (0, _xOfPin2.default)(pinSize, computedWidth, array.length, i);
-
-            var onMouseUp = function onMouseUp(e) {
-              e.preventDefault();
-              e.stopPropagation();
-
-              if (draggedLinkId) {
-                updateLink(draggedLinkId, { to: [id, i] });
-              }
-            };
-
-            return _react2.default.createElement('rect', {
-              key: i,
-              fill: pinColor,
-              height: pinSize,
-              onMouseDown: _ignoreEvent2.default,
-              onMouseUp: onMouseUp,
-              transform: 'translate(' + x + ',0)',
-              width: pinSize
-            });
-          }),
-          bodyContent,
-          _react2.default.createElement('rect', {
-            fill: selected || dragged ? highlightColor : nodeBarColor,
-            height: pinSize,
-            transform: 'translate(0,' + (pinSize + bodyHeight) + ')',
-            width: computedWidth
-          }),
-          outs.map(function (pin, i, array) {
-            var x = (0, _xOfPin2.default)(pinSize, computedWidth, array.length, i);
-
-            var onMouseDown = function onMouseDown(e) {
-              e.preventDefault();
-              e.stopPropagation();
-
-              onCreateLink({ from: [id, i], to: null });
-            };
-
-            return _react2.default.createElement('rect', {
-              key: i,
-              fill: pinColor,
-              height: pinSize,
-              onClick: _ignoreEvent2.default,
-              onMouseLeave: _ignoreEvent2.default,
-              onMouseDown: onMouseDown,
-              transform: 'translate(' + x + ',' + (pinSize + bodyHeight) + ')',
-              width: pinSize
-            });
-          })
-        );
-      }
-    }]);
-
-    return Node;
-  }(_react.Component);
-
-  Node.propTypes = {
-    bodyHeight: _react.PropTypes.number,
-    createInputPin: _react.PropTypes.func.isRequired,
-    createOutputPin: _react.PropTypes.func.isRequired,
-    deleteInputPin: _react.PropTypes.func.isRequired,
-    deleteNode: _react.PropTypes.func.isRequired,
-    deleteOutputPin: _react.PropTypes.func.isRequired,
-    dragged: _react.PropTypes.bool.isRequired,
-    draggedLinkId: _react.PropTypes.string,
-    fontSize: _react.PropTypes.number.isRequired,
-    id: _react.PropTypes.string,
-    ins: _react.PropTypes.array.isRequired,
-    outs: _react.PropTypes.array.isRequired,
-    onCreateLink: _react.PropTypes.func.isRequired,
-    selected: _react.PropTypes.bool.isRequired,
-    selectNode: _react.PropTypes.func.isRequired,
-    text: _react.PropTypes.string.isRequired,
-    theme: _theme2.default.propTypes,
-    updateLink: _react.PropTypes.func.isRequired,
-    width: _react.PropTypes.number,
-    willDragNode: _react.PropTypes.func.isRequired,
-    x: _react.PropTypes.number.isRequired,
-    y: _react.PropTypes.number.isRequired
-  };
-
-  Node.defaultProps = {
-    createInputPin: Function.prototype,
-    createOutputPin: Function.prototype,
-    deleteInputPin: Function.prototype,
-    deleteNode: Function.prototype,
-    deleteOutputPin: Function.prototype,
-    dragged: false, // TODO looks more like a state
+  this.state = {
+    dynamicView: { height: null, width: null },
     draggedLinkId: null,
-    ins: [],
-    onCreateLink: Function.prototype,
-    outs: [],
-    selected: false,
-    selectNode: Function.prototype,
-    text: 'Node',
-    theme: _theme2.default.defaultProps,
-    updateLink: Function.prototype,
-    willDragNode: Function.prototype
+    dragging: false,
+    dragMoved: false,
+    offset: { x: 0, y: 0 },
+    pointer: null,
+    scroll: { x: 0, y: 0 },
+    showSelector: false,
+    selectedItems: [],
+    shiftPressed: false
   };
+}
 
-  exports.default = Node;
-  module.exports = exports['default'];
-});
-},{"../utils/computeNodeWidth":79,"../utils/ignoreEvent":80,"../utils/xOfPin":82,"./theme":77,"react":297}],75:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports, global.react);
-    global.Selector = mod.exports;
-  }
-})(this, function (module, exports, _react) {
-  'use strict';
+inherits(Frame, Component);
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
+function componentDidMount() {
+  var _props = this.props,
+      createInputPin = _props.createInputPin,
+      createOutputPin = _props.createOutputPin,
+      deleteInputPin = _props.deleteInputPin,
+      deleteOutputPin = _props.deleteOutputPin,
+      dragItems = _props.dragItems,
+      view = _props.view;
 
-  var _react2 = _interopRequireDefault(_react);
 
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
+  var setState = this.setState.bind(this);
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
+  var container = ReactDOM.findDOMNode(this).parentNode;
+
+  document.addEventListener('keydown', event => {
+    var code = event.code;
+
+    var endDragging = this.props.endDragging;
+    var _state = this.state,
+        dragMoved = _state.dragMoved,
+        selectedItems = _state.selectedItems,
+        shiftPressed = _state.shiftPressed;
+
+
+    if (isShift(code)) {
+      setState({ shiftPressed: true });
     }
-  }
 
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
+    if (code === 'Escape') {
+      setState({ selectedItems: [] });
+    }
+
+    var selectedNodes = Object.keys(view.node).filter(id => selectedItems.indexOf(id) > -1);
+
+    if (selectedNodes.length > 0 && code.substring(0, 5) === 'Arrow') {
+      var draggingDelta = { x: 0, y: 0 };
+      var unit = shiftPressed ? 1 : 10;
+
+      if (code === 'ArrowLeft') draggingDelta.x = -unit;
+      if (code === 'ArrowRight') draggingDelta.x = unit;
+      if (code === 'ArrowUp') draggingDelta.y = -unit;
+      if (code === 'ArrowDown') draggingDelta.y = unit;
+
+      dragItems(draggingDelta, selectedNodes);
+
+      if (!dragMoved) {
+        setState({ dragMoved: true });
+      }
+
+      if (!shiftPressed) {
+        endDragging(selectedNodes);
+
+        setState({
+          dragMoved: false,
+          dragging: false
+        });
       }
     }
 
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
-
-  var hidden = { display: 'none', overflow: 'hidden' };
-  var visible = { display: 'inline', overflow: 'visible' };
-
-  var Selector = function (_Component) {
-    _inherits(Selector, _Component);
-
-    function Selector(props) {
-      _classCallCheck(this, Selector);
-
-      var _this = _possibleConstructorReturn(this, (Selector.__proto__ || Object.getPrototypeOf(Selector)).call(this, props));
-
-      _this.state = { text: '' };
-      return _this;
-    }
-
-    _createClass(Selector, [{
-      key: 'render',
-      value: function render() {
-        var _this2 = this;
-
-        var _props = this.props,
-            createNode = _props.createNode,
-            height = _props.height,
-            pointer = _props.pointer,
-            show = _props.show,
-            width = _props.width;
-
-
-        var text = this.state.text;
-
-        var onChange = function onChange(e) {
-          var text = e.target.value;
-          _this2.setState({ text: text });
-        };
-
-        var onKeyPress = function onKeyPress(e) {
-          var text = e.target.value.trim();
-          var pointer = _this2.props.pointer;
-
-          var pressedEnter = e.key === 'Enter';
-          var textIsNotBlank = text.length > 0;
-
-          if (pressedEnter) {
-            if (textIsNotBlank) {
-              createNode({
-                text: text,
-                x: pointer.x,
-                y: pointer.y
-              });
-            }
-
-            _this2.setState({ text: '' });
+    if (code === 'KeyI') {
+      selectedItems.forEach(id => {
+        if (view.node[id] && view.node[id].ins) {
+          if (shiftPressed) {
+            deleteInputPin(id);
+          } else {
+            createInputPin(id);
           }
-        };
+        }
+      });
+    }
 
-        return _react2.default.createElement(
-          'foreignObject',
-          {
-            height: height,
-            style: show ? visible : hidden,
-            width: width,
-            x: pointer ? pointer.x : 0,
-            y: pointer ? pointer.y : 0
-          },
-          _react2.default.createElement('input', {
-            type: 'text',
-            ref: function ref(input) {
-              if (input !== null) input.focus();
-            },
-            style: { outline: 'none' },
-            onChange: onChange,
-            onKeyPress: onKeyPress,
-            value: text
-          })
-        );
+    if (code === 'KeyO') {
+      selectedItems.forEach(id => {
+        if (view.node[id] && view.node[id].outs) {
+          if (shiftPressed) {
+            deleteOutputPin(id);
+          } else {
+            createOutputPin(id);
+          }
+        }
+      });
+    }
+
+    this.forceUpdate();
+  });
+
+  document.addEventListener('keyup', event => {
+    var code = event.code;
+
+    var endDragging = this.props.endDragging;
+    var _state2 = this.state,
+        dragMoved = _state2.dragMoved,
+        selectedItems = _state2.selectedItems;
+
+
+    var selectedNodes = Object.keys(view.node).filter(id => selectedItems.indexOf(id) > -1);
+
+    if (isShift(code)) {
+      setState({ shiftPressed: false });
+
+      if (dragMoved && selectedNodes) {
+        endDragging(selectedNodes);
+
+        setState({
+          dragging: false,
+          dragMoved: false
+        });
       }
-    }]);
-
-    return Selector;
-  }(_react.Component);
-
-  Selector.propTypes = {
-    createNode: _react.PropTypes.func.isRequired,
-    pointer: _react.PropTypes.shape({
-      x: _react.PropTypes.number.isRequired,
-      y: _react.PropTypes.number.isRequired
-    }),
-    show: _react.PropTypes.bool.isRequired
-  };
-
-  Selector.defaultProps = {
-    height: 20,
-    width: 200
-  };
-
-  exports.default = Selector;
-  module.exports = exports['default'];
-});
-},{"react":297}],76:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['exports', './Frame', './Link', './Node', './Selector'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require('./Frame'), require('./Link'), require('./Node'), require('./Selector'));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.Frame, global.Link, global.Node, global.Selector);
-    global.index = mod.exports;
-  }
-})(this, function (exports, _Frame, _Link, _Node, _Selector) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Selector = exports.Node = exports.Link = exports.Frame = undefined;
-
-  var _Frame2 = _interopRequireDefault(_Frame);
-
-  var _Link2 = _interopRequireDefault(_Link);
-
-  var _Node2 = _interopRequireDefault(_Node);
-
-  var _Selector2 = _interopRequireDefault(_Selector);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  exports.Frame = _Frame2.default;
-  exports.Link = _Link2.default;
-  exports.Node = _Node2.default;
-  exports.Selector = _Selector2.default;
-});
-},{"./Frame":72,"./Link":73,"./Node":74,"./Selector":75}],77:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'react'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports, global.react);
-    global.theme = mod.exports;
-  }
-})(this, function (module, exports, _react) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
+    }
   });
 
+  window.addEventListener('scroll', () => {
+    setState({ scroll: {
+        x: window.scrollX,
+        y: window.scrollY
+      } });
+  });
 
-  /*
-  
-  Palette from https://www.materialpalette.com/lime/grey
-  
-  Thanks to Tania and Lucilla.
-  
-  dark primary color #AFB42B
-  primary color #CDDC39
-  light primary color #F0F4C3
-  
-  accent color #9E9E9E
-  primary text #212121
-  secondary text #757575
-  
-  text / icons #212121
-  divider color #BDBDBD
-  */
+  window.addEventListener('resize', () => {
+    var rect = container.getBoundingClientRect();
 
-  var defaultProps = {
-    fontFamily: 'Courier',
-    frameBorder: '1px solid #F0F4C3',
-    highlightColor: '#CDDC39',
-    lineWidth: 3,
-    linkColor: '#757575',
-    nodeBarColor: '#BDBDBD',
-    nodeBodyHeight: 20,
-    pinColor: '#9E9E9E',
-    pinSize: 10
+    setState({ dynamicView: {
+        height: rect.height,
+        width: rect.width
+      } });
+  });
+
+  var offset = {
+    x: container.offsetLeft,
+    y: container.offsetTop
   };
 
-  var propTypes = _react.PropTypes.shape({
-    fontFamily: _react.PropTypes.string.isRequired,
-    highlightColor: _react.PropTypes.string.isRequired,
-    lineWidth: _react.PropTypes.number.isRequired,
-    linkColor: _react.PropTypes.string.isRequired,
-    nodeBarColor: _react.PropTypes.string.isRequired,
-    nodeBodyHeight: _react.PropTypes.number.isRequired,
-    pinColor: _react.PropTypes.string.isRequired,
-    pinSize: _react.PropTypes.number.isRequired
-  }).isRequired;
-
-  exports.default = {
-    defaultProps: defaultProps,
-    propTypes: propTypes
-  };
-  module.exports = exports['default'];
-});
-},{"react":297}],78:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['exports', './Canvas', './components'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require('./Canvas'), require('./components'));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.Canvas, global.components);
-    global.flowView = mod.exports;
-  }
-})(this, function (exports, _Canvas, _components) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.components = exports.Canvas = undefined;
-
-  var _Canvas2 = _interopRequireDefault(_Canvas);
-
-  var _components2 = _interopRequireDefault(_components);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  exports.Canvas = _Canvas2.default;
-  exports.components = _components2.default;
-});
-},{"./Canvas":71,"./components":76}],79:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["module", "exports"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports);
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports);
-    global.computeNodeWidth = mod.exports;
-  }
-})(this, function (module, exports) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  var computeNodeWidth = function computeNodeWidth(_ref) {
-    var bodyHeight = _ref.bodyHeight,
-        pinSize = _ref.pinSize,
-        fontSize = _ref.fontSize,
-        node = _ref.node;
-
-    var ins = node.ins || [];
-    var outs = node.outs || [];
-    var text = node.text;
-    var width = node.width;
-
-    // Node shape defaults to a square.
-    var defaultWidth = width || bodyHeight + pinSize * 2;
-
-    // Heuristic value, based on Courier font.
-    var fontAspectRatio = 0.64;
-
-    // The with required to fit the node text.
-    var textWidth = pinSize * 2 + text.length * fontSize * fontAspectRatio;
-
-    // The greatest number of pins, by type (ins or outs).
-    var numPins = Math.max(ins.length, outs.length);
-
-    // The width required to fit the most numerous pins.
-    var pinsWidth = numPins * pinSize * 2;
-
-    var dynamicWidth = Math.max(textWidth, pinsWidth);
-
-    var computedWidth = Math.max(defaultWidth, dynamicWidth);
-
-    return computedWidth;
+  var scroll = {
+    x: window.scrollX,
+    y: window.scrollY
   };
 
-  exports.default = computeNodeWidth;
-  module.exports = exports["default"];
-});
-},{}],80:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["module", "exports"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports);
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports);
-    global.ignoreEvent = mod.exports;
-  }
-})(this, function (module, exports) {
-  "use strict";
+  setState({ offset: offset, scroll: scroll });
+}
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  var ignoreEvent = function ignoreEvent(e) {
+Frame.prototype.componentDidMount = componentDidMount;
+
+function render() {
+  var _props2 = this.props,
+      createInputPin = _props2.createInputPin,
+      createLink = _props2.createLink,
+      createNode = _props2.createNode,
+      createOutputPin = _props2.createOutputPin,
+      deleteInputPin = _props2.deleteInputPin,
+      deleteLink = _props2.deleteLink,
+      deleteNode = _props2.deleteNode,
+      deleteOutputPin = _props2.deleteOutputPin,
+      dragItems = _props2.dragItems,
+      endDragging = _props2.endDragging,
+      fontSize = _props2.fontSize,
+      item = _props2.item,
+      model = _props2.model,
+      selectLink = _props2.selectLink,
+      selectNode = _props2.selectNode,
+      theme = _props2.theme,
+      updateLink = _props2.updateLink,
+      view = _props2.view;
+  var _state3 = this.state,
+      draggedLinkId = _state3.draggedLinkId,
+      pointer = _state3.pointer,
+      dynamicView = _state3.dynamicView,
+      selectedItems = _state3.selectedItems,
+      showSelector = _state3.showSelector;
+  var frameBorder = theme.frameBorder,
+      fontFamily = theme.fontFamily,
+      lineWidth = theme.lineWidth,
+      nodeBodyHeight = theme.nodeBodyHeight,
+      pinSize = theme.pinSize;
+
+
+  var height = dynamicView.height || view.height;
+  var width = dynamicView.width || view.width;
+
+  var border = 1;
+  height = height - 2 * border;
+  width = width - 2 * border;
+
+  var typeOfNode = item.util.typeOfNode;
+
+  var Link = item.link.DefaultLink;
+
+  var setState = this.setState.bind(this);
+
+  var coordinatesOfLink = link => {
+    var from = link.from;
+    var to = link.to;
+
+    var x1 = null;
+    var y1 = null;
+    var x2 = null;
+    var y2 = null;
+
+    var nodeIds = Object.keys(view.node);
+    var idEquals = x => id => id === x[0];
+    var sourceId = from ? nodeIds.find(idEquals(from)) : null;
+    var targetId = to ? nodeIds.find(idEquals(to)) : null;
+
+    var computedWidth = null;
+
+    if (sourceId) {
+      var source = view.node[sourceId];
+
+      if (no(source.outs)) source.outs = {};
+
+      computedWidth = computeNodeWidth({
+        bodyHeight: nodeBodyHeight,
+        pinSize: pinSize,
+        fontSize: fontSize,
+        node: source
+      });
+
+      x1 = source.x + xOfPin(pinSize, computedWidth, source.outs.length, from[1]);
+      y1 = source.y + pinSize + nodeBodyHeight;
+    }
+
+    if (targetId) {
+      var target = view.node[targetId];
+
+      if (no(target.ins)) target.ins = {};
+
+      computedWidth = computeNodeWidth({
+        bodyHeight: nodeBodyHeight,
+        pinSize: pinSize,
+        fontSize: fontSize,
+        node: target
+      });
+
+      x2 = target.x + xOfPin(pinSize, computedWidth, target.ins.length, to[1]);
+      y2 = target.y;
+    } else {
+      x2 = pointer ? pointer.x - pinSize / 2 : x1;
+      y2 = pointer ? pointer.y - pinSize : y1;
+    }
+
+    return { x1: x1, y1: y1, x2: x2, y2: y2 };
+  };
+
+  var getCoordinates = e => {
+    var _state4 = this.state,
+        offset = _state4.offset,
+        scroll = _state4.scroll;
+
+
+    return {
+      x: e.clientX - offset.x + scroll.x,
+      y: e.clientY - offset.y + scroll.y
+    };
+  };
+
+  var onClick = e => {
     e.preventDefault();
     e.stopPropagation();
+
+    setState({ showSelector: false });
   };
 
-  exports.default = ignoreEvent;
-  module.exports = exports["default"];
-});
-},{}],81:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['module', 'exports'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports);
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports);
-    global.randomString = mod.exports;
-  }
-})(this, function (module, exports) {
-  'use strict';
+  var onCreateLink = link => {
+    var draggedLinkId = createLink(link);
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  /**
-   * Generate random string [a-z].
-   *
-   * @param {Number} length of desired result
-   * @returns {String} result
-   */
+    setState({ draggedLinkId: draggedLinkId });
+  };
 
-  function randomString(length) {
-    var result = '';
+  var onUpdateLink = (id, link) => {
+    updateLink(id, link);
 
-    while (result.length < length) {
-      result += String.fromCharCode(97 + Math.floor(Math.random() * 26));
+    var disconnectingLink = link.to === null;
+
+    if (disconnectingLink) {
+      link.id = id;
+
+      setState({ draggedLinkId: id });
+    } else {
+      setState({ draggedLinkId: null });
+    }
+  };
+
+  var onDoubleClick = e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setState({
+      pointer: getCoordinates(e),
+      showSelector: true
+    });
+  };
+
+  var onMouseDown = e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setState({
+      selectedItems: []
+    });
+  };
+
+  var onMouseLeave = e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    var draggedLinkId = this.state.draggedLinkId;
+    if (draggedLinkId) delete view.link[draggedLinkId];
+
+    setState({
+      dragging: false,
+      draggedLinkId: null,
+      pointer: null,
+      showSelector: false
+    });
+  };
+
+  var onMouseMove = e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    var _state5 = this.state,
+        dragging = _state5.dragging,
+        dragMoved = _state5.dragMoved,
+        selectedItems = _state5.selectedItems;
+
+
+    var nextPointer = getCoordinates(e);
+
+    setState({
+      pointer: nextPointer
+    });
+
+    if (dragging && selectedItems.length > 0) {
+      var draggingDelta = {
+        x: pointer ? nextPointer.x - pointer.x : 0,
+        y: pointer ? nextPointer.y - pointer.y : 0
+      };
+
+      dragItems(draggingDelta, selectedItems);
+
+      if (!dragMoved) {
+        setState({ dragMoved: true });
+      }
+    }
+  };
+
+  var onMouseUp = e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    var _state6 = this.state,
+        draggedLinkId = _state6.draggedLinkId,
+        dragMoved = _state6.dragMoved,
+        selectedItems = _state6.selectedItems;
+
+
+    if (draggedLinkId) {
+      delete view.link[draggedLinkId];
+
+      setState({
+        draggedLinkId: null,
+        pointer: null
+      });
+    } else {
+      var selectedNodes = Object.keys(view.node).filter(id => selectedItems.indexOf(id) > -1);
+
+      if (dragMoved) {
+        endDragging(selectedNodes);
+
+        setState({
+          dragging: false,
+          dragMoved: false,
+          pointer: null
+        });
+      } else {
+        setState({
+          pointer: null
+        });
+      }
+    }
+  };
+
+  var selectedFirst = (a, b) => {
+    var aIsSelected = selectedItems.indexOf(a) > -1;
+    var bIsSelected = selectedItems.indexOf(b) > -1;
+
+    if (aIsSelected && bIsSelected) return 0;
+
+    if (aIsSelected) return 1;
+    if (bIsSelected) return -1;
+  };
+
+  var selectItem = id => e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    var _state7 = this.state,
+        draggedLinkId = _state7.draggedLinkId,
+        shiftPressed = _state7.shiftPressed;
+
+
+    if (draggedLinkId) {
+      delete view.link[draggedLinkId];
+
+      setState({ draggedLinkId: null });
+
+      return;
     }
 
-    return result;
-  }
+    var selectedItems = this.state.selectedItems.slice(0);
 
-  exports.default = randomString;
-  module.exports = exports['default'];
-});
-},{}],82:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["module", "exports"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports);
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports);
-    global.xOfPin = mod.exports;
-  }
-})(this, function (module, exports) {
-  "use strict";
+    var index = selectedItems.indexOf(id);
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  var xOfPin = function xOfPin(pinSize, width, numPins, position) {
-    if (position === 0) return 0;
+    var itemAlreadySelected = index > -1;
 
-    if (numPins > 1) return position * (width - pinSize) / (numPins - 1);
+    if (shiftPressed) {
+      if (itemAlreadySelected) {
+        selectedItems.splice(index, 1);
+      } else {
+        selectedItems.push(id);
+      }
+    } else {
+      if (!itemAlreadySelected) {
+        selectedItems = [id];
+      }
+    }
+
+    if (!itemAlreadySelected) {
+      if (Object.keys(view.node).indexOf(id) > -1) {
+        selectNode(id);
+      }
+
+      if (Object.keys(view.link).indexOf(id) > -1) {
+        selectLink(id);
+      }
+    }
+
+    setState({
+      dragging: true,
+      selectedItems: selectedItems
+    });
   };
 
-  exports.default = xOfPin;
-  module.exports = exports["default"];
-});
+  var startDraggingLinkTarget = id => {
+    var from = view.link[id].from;
+
+    deleteLink(id);
+
+    var draggedLinkId = createLink({ from: from });
+    setState({ draggedLinkId: draggedLinkId });
+  };
+
+  return React.createElement(
+    'svg',
+    {
+      fontFamily: fontFamily,
+      fontSize: fontSize,
+      height: height,
+      onClick: onClick,
+      onDoubleClick: onDoubleClick,
+      onMouseDown: onMouseDown,
+      onMouseEnter: ignoreEvent,
+      onMouseLeave: onMouseLeave,
+      onMouseMove: onMouseMove,
+      onMouseUp: onMouseUp,
+      textAnchor: 'start',
+      style: { border: frameBorder },
+      width: width
+    },
+    Object.keys(view.node).sort(selectedFirst).map((id, i) => {
+      var node = view.node[id];
+
+      var height = node.height,
+          ins = node.ins,
+          outs = node.outs,
+          text = node.text,
+          width = node.width,
+          x = node.x,
+          y = node.y;
+
+
+      var nodeType = typeOfNode(node);
+      var Node = item.node[nodeType];
+
+      return React.createElement(Node, { key: i,
+        createInputPin: createInputPin,
+        createOutputPin: createOutputPin,
+        draggedLinkId: draggedLinkId,
+        deleteInputPin: deleteInputPin,
+        deleteNode: deleteNode,
+        deleteOutputPin: deleteOutputPin,
+        fontSize: fontSize,
+        height: height,
+        id: id,
+        ins: ins,
+        model: model,
+        multiSelection: selectedItems.length > 1,
+        onCreateLink: onCreateLink,
+        outs: outs,
+        pinSize: pinSize,
+        selected: selectedItems.indexOf(id) > -1,
+        selectNode: selectItem(id),
+        text: text,
+        updateLink: onUpdateLink,
+        width: width,
+        x: x,
+        y: y
+      });
+    }),
+    Object.keys(view.link).map((id, i) => {
+      var _view$link$id = view.link[id],
+          from = _view$link$id.from,
+          to = _view$link$id.to;
+
+
+      var coord = coordinatesOfLink(view.link[id]);
+      var sourceSelected = from ? selectedItems.indexOf(from[0]) > -1 : false;
+      var targetSelected = to ? selectedItems.indexOf(to[0]) > -1 : false;
+
+      return React.createElement(Link, { key: i,
+        deleteLink: deleteLink,
+        from: from,
+        lineWidth: lineWidth,
+        id: id,
+        onCreateLink: onCreateLink,
+        startDraggingLinkTarget: startDraggingLinkTarget,
+        pinSize: pinSize,
+        selected: selectedItems.indexOf(id) > -1,
+        selectLink: selectItem(id),
+        sourceSelected: sourceSelected,
+        targetSelected: targetSelected,
+        to: to,
+        x1: coord.x1,
+        y1: coord.y1,
+        x2: coord.x2,
+        y2: coord.y2
+      });
+    }),
+    React.createElement(Selector, {
+      createNode: node => {
+        var id = createNode(node);
+
+        setState({
+          selectedItems: [id],
+          showSelector: false
+        });
+      },
+      nodeList: item.nodeList,
+      pointer: pointer,
+      show: showSelector
+    })
+  );
+}
+
+Frame.prototype.render = render;
+
+Frame.propTypes = {
+  createInputPin: PropTypes.func.isRequired,
+  createOutputPin: PropTypes.func.isRequired,
+  createLink: PropTypes.func.isRequired,
+  createNode: PropTypes.func.isRequired,
+  deleteLink: PropTypes.func.isRequired,
+  deleteInputPin: PropTypes.func.isRequired,
+  deleteNode: PropTypes.func.isRequired,
+  deleteOutputPin: PropTypes.func.isRequired,
+  dragItems: PropTypes.func.isRequired,
+  endDragging: PropTypes.func.isRequired,
+  fontSize: PropTypes.number.isRequired,
+  item: PropTypes.shape({
+    link: PropTypes.object.isRequired,
+    node: PropTypes.object.isRequired,
+    nodeList: PropTypes.array.isRequired,
+    util: PropTypes.shape({
+      typeOfNode: PropTypes.func.isRequired
+    })
+  }).isRequired,
+  selectLink: PropTypes.func.isRequired,
+  selectNode: PropTypes.func.isRequired,
+  theme: theme.propTypes,
+  updateLink: PropTypes.func.isRequired,
+  view: PropTypes.shape({
+    height: PropTypes.number.isRequired,
+    link: PropTypes.object.isRequired,
+    node: PropTypes.object.isRequired,
+    width: PropTypes.number.isRequired
+  }).isRequired
+};
+
+Frame.defaultProps = {
+  createLink: Function.prototype,
+  createNode: Function.prototype,
+  createInputPin: Function.prototype,
+  createOutputPin: Function.prototype,
+  deleteInputPin: Function.prototype,
+  deleteLink: Function.prototype,
+  deleteNode: Function.prototype,
+  deleteOutputPin: Function.prototype,
+  dragItems: Function.prototype,
+  endDragging: Function.prototype,
+  fontSize: 17,
+  item: {
+    link: { DefaultLink: DefaultLink },
+    node: { DefaultNode: DefaultNode },
+    nodeList: [],
+    util: {
+      typeOfNode: function (node) {
+        return 'DefaultNode';
+      }
+    }
+  },
+  theme: theme.defaultProps,
+  selectLink: Function.prototype,
+  selectNode: Function.prototype,
+  updateLink: Function.prototype,
+  view: {
+    link: {},
+    node: {}
+  }
+};
+
+module.exports = exports.default = Frame;
+},{"../utils/computeNodeWidth":79,"../utils/ignoreEvent":80,"../utils/xOfPin":82,"./Link":73,"./Node":74,"./Selector":75,"./theme":77,"inherits":93,"not-defined":120,"react":297,"react-dom":127}],73:[function(require,module,exports){
+var React = require('react');
+var inherits = require('inherits');
+
+var Component = React.Component;
+var PropTypes = React.PropTypes;
+
+var ignoreEvent = require('../utils/ignoreEvent');
+var theme = require('./theme');
+
+function Link() {
+  Component.apply(this, arguments);
+}
+
+inherits(Link, Component);
+
+function render() {
+  var _props = this.props,
+      id = _props.id,
+      deleteLink = _props.deleteLink,
+      from = _props.from,
+      onCreateLink = _props.onCreateLink,
+      startDraggingLinkTarget = _props.startDraggingLinkTarget,
+      selected = _props.selected,
+      selectLink = _props.selectLink,
+      sourceSelected = _props.sourceSelected,
+      targetSelected = _props.targetSelected,
+      theme = _props.theme,
+      to = _props.to,
+      x1 = _props.x1,
+      y1 = _props.y1,
+      x2 = _props.x2,
+      y2 = _props.y2;
+  var darkPrimaryColor = theme.darkPrimaryColor,
+      primaryColor = theme.primaryColor,
+      linkColor = theme.linkColor,
+      lineWidth = theme.lineWidth,
+      pinSize = theme.pinSize;
+
+
+  var onSourceMouseDown = e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    onCreateLink({ from: from, to: null });
+  };
+
+  var onTargetMouseDown = e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    startDraggingLinkTarget(id);
+  };
+
+  var startX = x1 + pinSize / 2;
+  var startY = y1 + pinSize / 2;
+  var endX = x2 + pinSize / 2;
+  var endY = y2 + pinSize / 2;
+
+  var midPointY = (startY + endY) / 2;
+
+  var controlPointX1 = startX;
+  var controlPointY1 = to ? midPointY : startY;
+  var controlPointX2 = endX;
+  var controlPointY2 = to ? midPointY : endY;
+
+  return React.createElement(
+    'g',
+    {
+      onClick: ignoreEvent,
+      onDoubleClick: ignoreEvent
+    },
+    React.createElement('path', {
+      d: 'M ' + startX + ' ' + startY + ' C ' + controlPointX1 + ' ' + controlPointY1 + ', ' + controlPointX2 + ' ' + controlPointY2 + ' ,' + endX + ' ' + endY,
+      fill: 'transparent',
+      onMouseDown: () => {
+        if (selected) deleteLink(id);
+      },
+      onMouseUp: selectLink,
+      stroke: selected ? primaryColor : linkColor,
+      strokeWidth: lineWidth
+    }),
+    React.createElement('rect', {
+      fill: selected || sourceSelected ? darkPrimaryColor : linkColor,
+      height: pinSize,
+      onMouseDown: onSourceMouseDown,
+      width: pinSize,
+      x: x1,
+      y: y1
+    }),
+    to ? React.createElement('rect', {
+      fill: selected || targetSelected ? darkPrimaryColor : linkColor,
+      height: pinSize,
+      onMouseDown: onTargetMouseDown,
+      width: pinSize,
+      x: x2,
+      y: y2
+    }) : null
+  );
+}
+
+Link.prototype.render = render;
+
+Link.propTypes = {
+  deleteLink: PropTypes.func.isRequired,
+  id: PropTypes.string,
+  from: PropTypes.array,
+  onCreateLink: PropTypes.func.isRequired,
+  startDraggingLinkTarget: PropTypes.func.isRequired,
+  pinSize: PropTypes.number.isRequired,
+  selected: PropTypes.bool.isRequired,
+  selectLink: PropTypes.func.isRequired,
+  sourceSelected: PropTypes.bool.isRequired,
+  targetSelected: PropTypes.bool.isRequired,
+  theme: theme.propTypes,
+  to: PropTypes.array,
+  x1: PropTypes.number.isRequired,
+  y1: PropTypes.number.isRequired,
+  x2: PropTypes.number.isRequired,
+  y2: PropTypes.number.isRequired
+};
+
+Link.defaultProps = {
+  deleteLink: Function.prototype,
+  onCreateLink: Function.prototype,
+  startDraggingLinkTarget: Function.prototype,
+  selected: false,
+  selectLink: Function.prototype,
+  sourceSelected: false,
+  targetSelected: false,
+  theme: theme.defaultProps
+};
+
+module.exports = exports.default = Link;
+},{"../utils/ignoreEvent":80,"./theme":77,"inherits":93,"react":297}],74:[function(require,module,exports){
+var inherits = require('inherits');
+var React = require('react');
+
+var Component = React.Component;
+var PropTypes = React.PropTypes;
+
+var no = require('not-defined');
+
+var computeNodeWidth = require('../utils/computeNodeWidth');
+var ignoreEvent = require('../utils/ignoreEvent');
+var xOfPin = require('../utils/xOfPin');
+var theme = require('./theme');
+
+var minus = pinSize => 'M 0 ' + pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize + ' V ' + pinSize / 3 + ' Z';
+
+var plus = pinSize => 'M 0 ' + pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize / 3 + ' V ' + pinSize + ' H ' + 2 * pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize + ' V ' + pinSize / 3 + ' H ' + 2 * pinSize / 3 + ' V ' + 0 + ' H ' + pinSize / 3 + ' V ' + pinSize / 3 + ' Z';
+
+function Node() {
+  Component.apply(this, arguments);
+}
+
+inherits(Node, Component);
+
+function getBody() {
+  var _props = this.props,
+      fontSize = _props.fontSize,
+      theme = _props.theme,
+      text = _props.text;
+  var pinSize = theme.pinSize;
+
+
+  var bodyHeight = this.getBodyHeight();
+
+  var margin = fontSize * 0.2;
+
+  return React.createElement(
+    'text',
+    {
+      x: pinSize,
+      y: bodyHeight + pinSize - margin
+    },
+    React.createElement(
+      'tspan',
+      null,
+      text
+    )
+  );
+}
+
+Node.prototype.getBody = getBody;
+
+function getBodyHeight() {
+  var _props2 = this.props,
+      bodyHeight = _props2.bodyHeight,
+      theme = _props2.theme;
+
+
+  return bodyHeight || theme.nodeBodyHeight;
+}
+
+Node.prototype.getBodyHeight = getBodyHeight;
+
+function getComputedWidth() {
+  var _props3 = this.props,
+      fontSize = _props3.fontSize,
+      ins = _props3.ins,
+      outs = _props3.outs,
+      text = _props3.text,
+      theme = _props3.theme,
+      width = _props3.width;
+  var pinSize = theme.pinSize;
+
+
+  var bodyHeight = this.getBodyHeight();
+
+  var computedWidth = computeNodeWidth({
+    bodyHeight: bodyHeight,
+    pinSize: pinSize,
+    fontSize: fontSize,
+    node: { ins: ins, outs: outs, text: text, width: width }
+  });
+
+  return computedWidth;
+}
+
+Node.prototype.getComputedWidth = getComputedWidth;
+
+function getDeleteButton() {
+  var _props4 = this.props,
+      deleteNode = _props4.deleteNode,
+      id = _props4.id,
+      multiSelection = _props4.multiSelection,
+      selected = _props4.selected,
+      theme = _props4.theme;
+  var primaryColor = theme.primaryColor,
+      pinSize = theme.pinSize;
+
+
+  if (selected === false || multiSelection) return null;
+
+  return React.createElement('path', {
+    d: 'M 0 ' + pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize / 3 + ' V ' + pinSize + ' H ' + 2 * pinSize / 3 + ' V ' + 2 * pinSize / 3 + ' H ' + pinSize + ' V ' + pinSize / 3 + ' H ' + 2 * pinSize / 3 + ' V ' + 0 + ' H ' + pinSize / 3 + ' V ' + pinSize / 3 + ' Z',
+    fill: primaryColor,
+    transform: 'translate(' + pinSize / 2 + ',' + pinSize / 2 + ') rotate(45) translate(' + -3 * pinSize / 2 + ',' + pinSize / 2 + ')',
+    onMouseDown: () => deleteNode(id)
+  });
+}
+
+Node.prototype.getDeleteButton = getDeleteButton;
+
+function getInputMinus() {
+  var _props5 = this.props,
+      deleteInputPin = _props5.deleteInputPin,
+      id = _props5.id,
+      ins = _props5.ins,
+      multiSelection = _props5.multiSelection,
+      selected = _props5.selected,
+      theme = _props5.theme;
+  var primaryColor = theme.primaryColor,
+      pinSize = theme.pinSize;
+
+
+  if (no(ins) || selected === false || multiSelection) return null;
+
+  var computedWidth = this.getComputedWidth();
+  var disabled = ins.length === 0;
+
+  return React.createElement('path', {
+    d: minus(pinSize),
+    fill: disabled ? 'transparent' : primaryColor,
+    onMouseDown: () => {
+      if (!disabled) deleteInputPin(id);
+    },
+    stroke: primaryColor,
+    transform: 'translate(' + (computedWidth + 2) + ',0)'
+  });
+}
+
+Node.prototype.getInputMinus = getInputMinus;
+
+function getInputPlus() {
+  var _props6 = this.props,
+      createInputPin = _props6.createInputPin,
+      id = _props6.id,
+      ins = _props6.ins,
+      multiSelection = _props6.multiSelection,
+      selected = _props6.selected,
+      theme = _props6.theme;
+  var primaryColor = theme.primaryColor,
+      pinSize = theme.pinSize;
+
+
+  if (no(ins) || selected === false || multiSelection) return null;
+
+  var computedWidth = this.getComputedWidth();
+
+  return React.createElement('path', {
+    d: plus(pinSize),
+    fill: primaryColor,
+    onMouseDown: () => createInputPin(id),
+    stroke: primaryColor,
+    transform: 'translate(' + (computedWidth + 4 + pinSize) + ',0)'
+  });
+}
+
+Node.prototype.getInputPlus = getInputPlus;
+
+function getOutputMinus() {
+  var _props7 = this.props,
+      deleteOutputPin = _props7.deleteOutputPin,
+      id = _props7.id,
+      multiSelection = _props7.multiSelection,
+      outs = _props7.outs,
+      selected = _props7.selected,
+      theme = _props7.theme;
+  var primaryColor = theme.primaryColor,
+      pinSize = theme.pinSize;
+
+
+  if (no(outs) || selected === false || multiSelection) return null;
+
+  var bodyHeight = this.getBodyHeight();
+  var computedWidth = this.getComputedWidth();
+  var disabled = outs.length === 0;
+
+  return React.createElement('path', {
+    d: minus(pinSize),
+    fill: disabled ? 'transparent' : primaryColor,
+    onMouseDown: () => {
+      if (!disabled) deleteOutputPin(id);
+    },
+    stroke: primaryColor,
+    transform: 'translate(' + (computedWidth + 2) + ',' + (bodyHeight + pinSize) + ')'
+  });
+}
+
+Node.prototype.getOutputMinus = getOutputMinus;
+
+function getOutputPlus() {
+  var _props8 = this.props,
+      createOutputPin = _props8.createOutputPin,
+      id = _props8.id,
+      multiSelection = _props8.multiSelection,
+      outs = _props8.outs,
+      selected = _props8.selected,
+      theme = _props8.theme;
+  var primaryColor = theme.primaryColor,
+      pinSize = theme.pinSize;
+
+
+  if (no(outs) || selected === false || multiSelection) return null;
+
+  var bodyHeight = this.getBodyHeight();
+  var computedWidth = this.getComputedWidth();
+
+  return React.createElement('path', {
+    d: plus(pinSize),
+    fill: primaryColor,
+    onMouseDown: () => createOutputPin(id),
+    stroke: primaryColor,
+    transform: 'translate(' + (computedWidth + 4 + pinSize) + ',' + (bodyHeight + pinSize) + ')'
+  });
+}
+
+Node.prototype.getOutputPlus = getOutputPlus;
+
+function render() {
+  var _props9 = this.props,
+      dragging = _props9.dragging,
+      draggedLinkId = _props9.draggedLinkId,
+      id = _props9.id,
+      ins = _props9.ins,
+      onCreateLink = _props9.onCreateLink,
+      outs = _props9.outs,
+      selected = _props9.selected,
+      selectNode = _props9.selectNode,
+      theme = _props9.theme,
+      updateLink = _props9.updateLink,
+      x = _props9.x,
+      y = _props9.y;
+  var darkPrimaryColor = theme.darkPrimaryColor,
+      nodeBarColor = theme.nodeBarColor,
+      pinColor = theme.pinColor,
+      pinSize = theme.pinSize,
+      primaryColor = theme.primaryColor;
+
+
+  var bodyContent = this.getBody();
+  var bodyHeight = this.getBodyHeight();
+  var computedWidth = this.getComputedWidth();
+
+  return React.createElement(
+    'g',
+    {
+      onDoubleClick: ignoreEvent,
+      onMouseDown: selectNode,
+      style: {
+        cursor: dragging ? 'pointer' : 'default'
+      },
+      transform: 'translate(' + x + ',' + y + ')'
+    },
+    this.getDeleteButton(),
+    this.getInputMinus(),
+    this.getInputPlus(),
+    this.getOutputMinus(),
+    this.getOutputPlus(),
+    React.createElement('rect', {
+      fillOpacity: 0,
+      height: bodyHeight + 2 * pinSize,
+      stroke: selected ? primaryColor : nodeBarColor,
+      strokeWidth: 1,
+      width: computedWidth
+    }),
+    React.createElement('rect', {
+      fill: selected ? primaryColor : nodeBarColor,
+      height: pinSize,
+      width: computedWidth
+    }),
+    ins && ins.map((pin, i, array) => {
+      var x = xOfPin(pinSize, computedWidth, array.length, i);
+
+      var onMouseUp = e => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (draggedLinkId) {
+          updateLink(draggedLinkId, { to: [id, i] });
+        }
+      };
+
+      return React.createElement('rect', {
+        key: i,
+        fill: selected ? darkPrimaryColor : pinColor,
+        height: pinSize,
+        onMouseDown: ignoreEvent,
+        onMouseUp: onMouseUp,
+        transform: 'translate(' + x + ',0)',
+        width: pinSize
+      });
+    }),
+    bodyContent,
+    React.createElement('rect', {
+      fill: selected ? primaryColor : nodeBarColor,
+      height: pinSize,
+      transform: 'translate(0,' + (pinSize + bodyHeight) + ')',
+      width: computedWidth
+    }),
+    outs && outs.map((pin, i, array) => {
+      var x = xOfPin(pinSize, computedWidth, array.length, i);
+
+      var onMouseDown = e => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        onCreateLink({ from: [id, i], to: null });
+      };
+
+      return React.createElement('rect', {
+        key: i,
+        fill: selected ? darkPrimaryColor : pinColor,
+        height: pinSize,
+        onClick: ignoreEvent,
+        onMouseLeave: ignoreEvent,
+        onMouseDown: onMouseDown,
+        transform: 'translate(' + x + ',' + (pinSize + bodyHeight) + ')',
+        width: pinSize
+      });
+    })
+  );
+}
+
+Node.prototype.render = render;
+
+Node.propTypes = {
+  bodyHeight: PropTypes.number,
+  createInputPin: PropTypes.func.isRequired,
+  createOutputPin: PropTypes.func.isRequired,
+  deleteInputPin: PropTypes.func.isRequired,
+  deleteNode: PropTypes.func.isRequired,
+  deleteOutputPin: PropTypes.func.isRequired,
+  dragging: PropTypes.bool.isRequired,
+  draggedLinkId: PropTypes.string,
+  fontSize: PropTypes.number.isRequired,
+  id: PropTypes.string,
+  ins: PropTypes.array,
+  multiSelection: PropTypes.bool.isRequired,
+  outs: PropTypes.array,
+  onCreateLink: PropTypes.func.isRequired,
+  selected: PropTypes.bool.isRequired,
+  selectNode: PropTypes.func.isRequired,
+  text: PropTypes.string.isRequired,
+  theme: theme.propTypes,
+  updateLink: PropTypes.func.isRequired,
+  width: PropTypes.number,
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired
+};
+
+Node.defaultProps = {
+  createInputPin: Function.prototype,
+  createOutputPin: Function.prototype,
+  deleteInputPin: Function.prototype,
+  deleteNode: Function.prototype,
+  deleteOutputPin: Function.prototype,
+  dragging: false,
+  draggedLinkId: null,
+  multiSelection: false,
+  onCreateLink: Function.prototype,
+  selected: false,
+  selectNode: Function.prototype,
+  text: 'Node',
+  theme: theme.defaultProps,
+  updateLink: Function.prototype
+};
+
+module.exports = exports.default = Node;
+},{"../utils/computeNodeWidth":79,"../utils/ignoreEvent":80,"../utils/xOfPin":82,"./theme":77,"inherits":93,"not-defined":120,"react":297}],75:[function(require,module,exports){
+var inherits = require('inherits');
+var React = require('react');
+
+var Component = React.Component;
+var PropTypes = React.PropTypes;
+
+var hidden = { display: 'none', overflow: 'hidden' };
+var visible = { display: 'inline', overflow: 'visible' };
+
+function Selector() {
+  Component.apply(this, arguments);
+
+  this.state = { text: '' };
+}
+
+inherits(Selector, Component);
+
+function render() {
+  var _props = this.props,
+      createNode = _props.createNode,
+      height = _props.height,
+      nodeList = _props.nodeList,
+      pointer = _props.pointer,
+      show = _props.show,
+      width = _props.width;
+
+
+  var text = this.state.text;
+
+  var onChange = e => {
+    var text = e.target.value;
+
+    this.setState({ text: text });
+  };
+
+  var onKeyPress = e => {
+    var text = e.target.value.trim();
+    var pointer = this.props.pointer;
+
+    var pressedEnter = e.key === 'Enter';
+    var textIsNotBlank = text.length > 0;
+
+    if (pressedEnter) {
+      if (textIsNotBlank) {
+        createNode({
+          ins: [],
+          outs: [],
+          text: text,
+          x: pointer.x,
+          y: pointer.y
+        });
+      }
+
+      this.setState({ text: '' });
+    }
+  };
+
+  return React.createElement(
+    'foreignObject',
+    {
+      height: height,
+      style: show ? visible : hidden,
+      width: width,
+      x: pointer ? pointer.x : 0,
+      y: pointer ? pointer.y : 0
+    },
+    React.createElement('input', {
+      list: 'nodes',
+      type: 'text',
+      ref: input => {
+        if (input !== null) input.focus();
+      },
+      style: { outline: 'none' },
+      onChange: onChange,
+      onKeyPress: onKeyPress,
+      value: text
+    }),
+    nodeList ? React.createElement(
+      'datalist',
+      {
+        id: 'nodes',
+        onChange: onChange
+      },
+      nodeList.map((item, i) => React.createElement('option', { key: i, value: item }))
+    ) : null
+  );
+}
+
+Selector.prototype.render = render;
+
+Selector.propTypes = {
+  createNode: PropTypes.func.isRequired,
+  nodelist: PropTypes.array,
+  pointer: PropTypes.shape({
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired
+  }),
+  show: PropTypes.bool.isRequired
+};
+
+Selector.defaultProps = {
+  height: 20,
+  width: 200
+};
+
+module.exports = exports.default = Selector;
+},{"inherits":93,"react":297}],76:[function(require,module,exports){
+var Frame = require('./Frame')
+var Link = require('./Link')
+var Node = require('./Node')
+var Selector = require('./Selector')
+
+module.exports = exports.default = {
+  Frame,
+  Link,
+  Node,
+  Selector
+}
+
+},{"./Frame":72,"./Link":73,"./Node":74,"./Selector":75}],77:[function(require,module,exports){
+var React = require('react')
+
+var PropTypes = React.PropTypes
+
+/*
+Palette from https://www.materialpalette.com/lime/grey
+
+Thanks to Tania and Lucilla.
+
+dark primary color #AFB42B
+primary color #CDDC39
+light primary color #F0F4C3
+
+accent color #9E9E9E
+primary text #212121
+secondary text #757575
+
+text / icons #212121
+divider color #BDBDBD
+*/
+
+var defaultProps = {
+  fontFamily: 'Courier',
+  frameBorder: '1px solid #F0F4C3',
+  darkPrimaryColor: '#AFB42B',
+  primaryColor: '#CDDC39',
+  lineWidth: 3,
+  nodeBarColor: '#BDBDBD',
+  nodeBodyHeight: 20,
+  pinColor: '#757575',
+  linkColor: '#9E9E9E',
+  pinSize: 10
+}
+
+var propTypes = PropTypes.shape({
+  fontFamily: PropTypes.string.isRequired,
+  primaryColor: PropTypes.string.isRequired,
+  lineWidth: PropTypes.number.isRequired,
+  linkColor: PropTypes.string.isRequired,
+  nodeBarColor: PropTypes.string.isRequired,
+  nodeBodyHeight: PropTypes.number.isRequired,
+  pinColor: PropTypes.string.isRequired,
+  pinSize: PropTypes.number.isRequired
+}).isRequired
+
+module.exports = exports.default = {
+  defaultProps,
+  propTypes
+}
+
+},{"react":297}],78:[function(require,module,exports){
+var Canvas = require('./Canvas')
+var components = require('./components')
+
+module.exports = exports.default = { Canvas, components }
+
+},{"./Canvas":71,"./components":76}],79:[function(require,module,exports){
+function computeNodeWidth (arg) {
+  var bodyHeight = arg.bodyHeight // It is used only to make shapes default to square.
+  var pinSize = arg.pinSize
+  var fontSize = arg.fontSize
+  var node = arg.node
+
+  var ins = node.ins || []
+  var outs = node.outs || []
+  var text = node.text
+  var width = node.width
+
+  // Node shape defaults to a square.
+  var defaultWidth = width || bodyHeight + (pinSize * 2)
+
+  // Heuristic value, based on Courier font.
+  var fontAspectRatio = 0.64
+
+  // The with required to fit the node text.
+  var textWidth = (pinSize * 2) + (text.length * fontSize * fontAspectRatio)
+
+  // The greatest number of pins, by type (ins or outs).
+  var numPins = Math.max(ins.length, outs.length)
+
+  // The width required to fit the most numerous pins.
+  var pinsWidth = numPins * pinSize * 2
+
+  var dynamicWidth = Math.max(textWidth, pinsWidth)
+
+  var computedWidth = Math.max(defaultWidth, dynamicWidth)
+
+  return computedWidth
+}
+
+module.exports = exports.default = computeNodeWidth
+
+},{}],80:[function(require,module,exports){
+function ignoreEvent (e) {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
+module.exports = exports.default = ignoreEvent
+
+},{}],81:[function(require,module,exports){
+/**
+ * Generate random string [a-z].
+ *
+ * @param {Number} length of desired result
+ * @returns {String} result
+ */
+
+function randomString (length) {
+  var result = ''
+
+  while (result.length < length) {
+    result += String.fromCharCode(97 + Math.floor(Math.random() * 26))
+  }
+
+  return result
+}
+
+module.exports = exports.default = randomString
+
+},{}],82:[function(require,module,exports){
+function xOfPin (pinSize, width, numPins, position) {
+  if (position === 0) return 0
+
+  if (numPins > 1) return position * (width - pinSize) / (numPins - 1)
+}
+
+module.exports = exports.default = xOfPin
+
 },{}],83:[function(require,module,exports){
 /**
  * Copyright 2015, Yahoo! Inc.
@@ -46885,13 +46592,7 @@ exports.default = undefined;
 
 var _react = require('react');
 
-var _Subscription = require('../utils/Subscription');
-
-var _Subscription2 = _interopRequireDefault(_Subscription);
-
-var _storeShape = require('../utils/storeShape');
-
-var _storeShape2 = _interopRequireDefault(_storeShape);
+var _PropTypes = require('../utils/PropTypes');
 
 var _warning = require('../utils/warning');
 
@@ -46954,16 +46655,16 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 Provider.propTypes = {
-  store: _storeShape2.default.isRequired,
+  store: _PropTypes.storeShape.isRequired,
   children: _react.PropTypes.element.isRequired
 };
 Provider.childContextTypes = {
-  store: _storeShape2.default.isRequired,
-  storeSubscription: _react.PropTypes.instanceOf(_Subscription2.default)
+  store: _PropTypes.storeShape.isRequired,
+  storeSubscription: _PropTypes.subscriptionShape
 };
 Provider.displayName = 'Provider';
 }).call(this,require('_process'))
-},{"../utils/Subscription":268,"../utils/storeShape":270,"../utils/warning":272,"_process":126,"react":297}],259:[function(require,module,exports){
+},{"../utils/PropTypes":268,"../utils/warning":272,"_process":126,"react":297}],259:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -46987,9 +46688,7 @@ var _Subscription = require('../utils/Subscription');
 
 var _Subscription2 = _interopRequireDefault(_Subscription);
 
-var _storeShape = require('../utils/storeShape');
-
-var _storeShape2 = _interopRequireDefault(_storeShape);
+var _PropTypes = require('../utils/PropTypes');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -47002,6 +46701,29 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 var hotReloadingVersion = 0;
+var dummyState = {};
+function noop() {}
+function makeSelectorStateful(sourceSelector, store) {
+  // wrap the selector in an object that tracks its results between runs.
+  var selector = {
+    run: function runComponentSelector(props) {
+      try {
+        var nextProps = sourceSelector(store.getState(), props);
+        if (nextProps !== selector.props || selector.error) {
+          selector.shouldComponentUpdate = true;
+          selector.props = nextProps;
+          selector.error = null;
+        }
+      } catch (error) {
+        selector.shouldComponentUpdate = true;
+        selector.error = error;
+      }
+    }
+  };
+
+  return selector;
+}
+
 function connectAdvanced(
 /*
   selectorFactory is a func that is responsible for returning the selector function used to
@@ -47040,11 +46762,11 @@ selectorFactory) {
   var subscriptionKey = storeKey + 'Subscription';
   var version = hotReloadingVersion++;
 
-  var contextTypes = (_contextTypes = {}, _contextTypes[storeKey] = _storeShape2.default, _contextTypes[subscriptionKey] = _react.PropTypes.instanceOf(_Subscription2.default), _contextTypes);
-  var childContextTypes = (_childContextTypes = {}, _childContextTypes[subscriptionKey] = _react.PropTypes.instanceOf(_Subscription2.default), _childContextTypes);
+  var contextTypes = (_contextTypes = {}, _contextTypes[storeKey] = _PropTypes.storeShape, _contextTypes[subscriptionKey] = _PropTypes.subscriptionShape, _contextTypes);
+  var childContextTypes = (_childContextTypes = {}, _childContextTypes[subscriptionKey] = _PropTypes.subscriptionShape, _childContextTypes);
 
   return function wrapWithConnect(WrappedComponent) {
-    (0, _invariant2.default)(typeof WrappedComponent == 'function', 'You must pass a component to the function returned by ' + ('connect. Instead received ' + WrappedComponent));
+    (0, _invariant2.default)(typeof WrappedComponent == 'function', 'You must pass a component to the function returned by ' + ('connect. Instead received ' + JSON.stringify(WrappedComponent)));
 
     var wrappedComponentName = WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
@@ -47073,16 +46795,11 @@ selectorFactory) {
         _this.version = version;
         _this.state = {};
         _this.renderCount = 0;
-        _this.store = _this.props[storeKey] || _this.context[storeKey];
-        _this.parentSub = props[subscriptionKey] || context[subscriptionKey];
-
+        _this.store = props[storeKey] || context[storeKey];
+        _this.propsMode = Boolean(props[storeKey]);
         _this.setWrappedInstance = _this.setWrappedInstance.bind(_this);
 
-        (0, _invariant2.default)(_this.store, 'Could not find "' + storeKey + '" in either the context or ' + ('props of "' + displayName + '". ') + 'Either wrap the root component in a <Provider>, ' + ('or explicitly pass "' + storeKey + '" as a prop to "' + displayName + '".'));
-
-        // make sure `getState` is properly bound in order to avoid breaking
-        // custom store implementations that rely on the store's context
-        _this.getState = _this.store.getState.bind(_this.store);
+        (0, _invariant2.default)(_this.store, 'Could not find "' + storeKey + '" in either the context or props of ' + ('"' + displayName + '". Either wrap the root component in a <Provider>, ') + ('or explicitly pass "' + storeKey + '" as a prop to "' + displayName + '".'));
 
         _this.initSelector();
         _this.initSubscription();
@@ -47092,7 +46809,12 @@ selectorFactory) {
       Connect.prototype.getChildContext = function getChildContext() {
         var _ref2;
 
-        return _ref2 = {}, _ref2[subscriptionKey] = this.subscription || this.parentSub, _ref2;
+        // If this component received store from props, its subscription should be transparent
+        // to any descendants receiving store+subscription from context; it passes along
+        // subscription passed to it. Otherwise, it shadows the parent subscription, which allows
+        // Connect to control ordering of notifications to flow top-down.
+        var subscription = this.propsMode ? null : this.subscription;
+        return _ref2 = {}, _ref2[subscriptionKey] = subscription || this.context[subscriptionKey], _ref2;
       };
 
       Connect.prototype.componentDidMount = function componentDidMount() {
@@ -47119,12 +46841,11 @@ selectorFactory) {
 
       Connect.prototype.componentWillUnmount = function componentWillUnmount() {
         if (this.subscription) this.subscription.tryUnsubscribe();
-        // these are just to guard against extra memory leakage if a parent element doesn't
-        // dereference this instance properly, such as an async callback that never finishes
         this.subscription = null;
+        this.notifyNestedSubs = noop;
         this.store = null;
-        this.parentSub = null;
-        this.selector.run = function () {};
+        this.selector.run = noop;
+        this.selector.shouldComponentUpdate = false;
       };
 
       Connect.prototype.getWrappedInstance = function getWrappedInstance() {
@@ -47137,55 +46858,47 @@ selectorFactory) {
       };
 
       Connect.prototype.initSelector = function initSelector() {
-        var dispatch = this.store.dispatch;
-        var getState = this.getState;
-
-        var sourceSelector = selectorFactory(dispatch, selectorFactoryOptions);
-
-        // wrap the selector in an object that tracks its results between runs
-        var selector = this.selector = {
-          shouldComponentUpdate: true,
-          props: sourceSelector(getState(), this.props),
-          run: function runComponentSelector(props) {
-            try {
-              var nextProps = sourceSelector(getState(), props);
-              if (selector.error || nextProps !== selector.props) {
-                selector.shouldComponentUpdate = true;
-                selector.props = nextProps;
-                selector.error = null;
-              }
-            } catch (error) {
-              selector.shouldComponentUpdate = true;
-              selector.error = error;
-            }
-          }
-        };
+        var sourceSelector = selectorFactory(this.store.dispatch, selectorFactoryOptions);
+        this.selector = makeSelectorStateful(sourceSelector, this.store);
+        this.selector.run(this.props);
       };
 
       Connect.prototype.initSubscription = function initSubscription() {
-        var _this2 = this;
+        if (!shouldHandleStateChanges) return;
 
-        if (shouldHandleStateChanges) {
-          (function () {
-            var subscription = _this2.subscription = new _Subscription2.default(_this2.store, _this2.parentSub);
-            var dummyState = {};
+        // parentSub's source should match where store came from: props vs. context. A component
+        // connected to the store via props shouldn't use subscription from context, or vice versa.
+        var parentSub = (this.propsMode ? this.props : this.context)[subscriptionKey];
+        this.subscription = new _Subscription2.default(this.store, parentSub, this.onStateChange.bind(this));
 
-            subscription.onStateChange = function onStateChange() {
-              this.selector.run(this.props);
+        // `notifyNestedSubs` is duplicated to handle the case where the component is  unmounted in
+        // the middle of the notification loop, where `this.subscription` will then be null. An
+        // extra null check every change can be avoided by copying the method onto `this` and then
+        // replacing it with a no-op on unmount. This can probably be avoided if Subscription's
+        // listeners logic is changed to not call listeners that have been unsubscribed in the
+        // middle of the notification loop.
+        this.notifyNestedSubs = this.subscription.notifyNestedSubs.bind(this.subscription);
+      };
 
-              if (!this.selector.shouldComponentUpdate) {
-                subscription.notifyNestedSubs();
-              } else {
-                this.componentDidUpdate = function componentDidUpdate() {
-                  this.componentDidUpdate = undefined;
-                  subscription.notifyNestedSubs();
-                };
+      Connect.prototype.onStateChange = function onStateChange() {
+        this.selector.run(this.props);
 
-                this.setState(dummyState);
-              }
-            }.bind(_this2);
-          })();
+        if (!this.selector.shouldComponentUpdate) {
+          this.notifyNestedSubs();
+        } else {
+          this.componentDidUpdate = this.notifyNestedSubsOnComponentDidUpdate;
+          this.setState(dummyState);
         }
+      };
+
+      Connect.prototype.notifyNestedSubsOnComponentDidUpdate = function notifyNestedSubsOnComponentDidUpdate() {
+        // `componentDidUpdate` is conditionally implemented when `onStateChange` determines it
+        // needs to notify nested subs. Once called, it unimplements itself until further state
+        // changes occur. Doing it this way vs having a permanent `componentDidMount` that does
+        // a boolean check every time avoids an extra method call most of the time, resulting
+        // in some perf boost.
+        this.componentDidUpdate = undefined;
+        this.notifyNestedSubs();
       };
 
       Connect.prototype.isSubscribed = function isSubscribed() {
@@ -47193,7 +46906,7 @@ selectorFactory) {
       };
 
       Connect.prototype.addExtraProps = function addExtraProps(props) {
-        if (!withRef && !renderCountProp) return props;
+        if (!withRef && !renderCountProp && !(this.propsMode && this.subscription)) return props;
         // make a shallow copy so that fields added don't leak to the original selector.
         // this is especially important for 'ref' since that's a reference back to the component
         // instance. a singleton memoized selector would then be holding a reference to the
@@ -47201,6 +46914,7 @@ selectorFactory) {
         var withExtras = _extends({}, props);
         if (withRef) withExtras.ref = this.setWrappedInstance;
         if (renderCountProp) withExtras[renderCountProp] = this.renderCount++;
+        if (this.propsMode && this.subscription) withExtras[subscriptionKey] = this.subscription;
         return withExtras;
       };
 
@@ -47242,7 +46956,7 @@ selectorFactory) {
   };
 }
 }).call(this,require('_process'))
-},{"../utils/Subscription":268,"../utils/storeShape":270,"_process":126,"hoist-non-react-statics":83,"invariant":94,"react":297}],260:[function(require,module,exports){
+},{"../utils/PropTypes":268,"../utils/Subscription":269,"_process":126,"hoist-non-react-statics":83,"invariant":94,"react":297}],260:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -47371,7 +47085,7 @@ function createConnect() {
 }
 
 exports.default = createConnect();
-},{"../components/connectAdvanced":259,"../utils/shallowEqual":269,"./mapDispatchToProps":261,"./mapStateToProps":262,"./mergeProps":263,"./selectorFactory":264}],261:[function(require,module,exports){
+},{"../components/connectAdvanced":259,"../utils/shallowEqual":270,"./mapDispatchToProps":261,"./mapStateToProps":262,"./mergeProps":263,"./selectorFactory":264}],261:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -47682,10 +47396,12 @@ function wrapMapToPropsFunc(mapToProps, methodName) {
       return proxy.dependsOnOwnProps ? proxy.mapToProps(stateOrDispatch, ownProps) : proxy.mapToProps(stateOrDispatch);
     };
 
-    proxy.dependsOnOwnProps = getDependsOnOwnProps(mapToProps);
+    // allow detectFactoryAndVerify to get ownProps
+    proxy.dependsOnOwnProps = true;
 
     proxy.mapToProps = function detectFactoryAndVerify(stateOrDispatch, ownProps) {
       proxy.mapToProps = mapToProps;
+      proxy.dependsOnOwnProps = getDependsOnOwnProps(mapToProps);
       var props = proxy(stateOrDispatch, ownProps);
 
       if (typeof props === 'function') {
@@ -47727,6 +47443,26 @@ exports.Provider = _Provider2.default;
 exports.connectAdvanced = _connectAdvanced2.default;
 exports.connect = _connect2.default;
 },{"./components/Provider":258,"./components/connectAdvanced":259,"./connect/connect":260}],268:[function(require,module,exports){
+'use strict';
+
+exports.__esModule = true;
+exports.storeShape = exports.subscriptionShape = undefined;
+
+var _react = require('react');
+
+var subscriptionShape = exports.subscriptionShape = _react.PropTypes.shape({
+  trySubscribe: _react.PropTypes.func.isRequired,
+  tryUnsubscribe: _react.PropTypes.func.isRequired,
+  notifyNestedSubs: _react.PropTypes.func.isRequired,
+  isSubscribed: _react.PropTypes.func.isRequired
+});
+
+var storeShape = exports.storeShape = _react.PropTypes.shape({
+  subscribe: _react.PropTypes.func.isRequired,
+  dispatch: _react.PropTypes.func.isRequired,
+  getState: _react.PropTypes.func.isRequired
+});
+},{"react":297}],269:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -47776,11 +47512,12 @@ function createListenerCollection() {
 }
 
 var Subscription = function () {
-  function Subscription(store, parentSub) {
+  function Subscription(store, parentSub, onStateChange) {
     _classCallCheck(this, Subscription);
 
     this.store = store;
     this.parentSub = parentSub;
+    this.onStateChange = onStateChange;
     this.unsubscribe = null;
     this.listeners = nullListeners;
   }
@@ -47800,7 +47537,6 @@ var Subscription = function () {
 
   Subscription.prototype.trySubscribe = function trySubscribe() {
     if (!this.unsubscribe) {
-      // this.onStateChange is set by connectAdvanced.initSubscription()
       this.unsubscribe = this.parentSub ? this.parentSub.addNestedSub(this.onStateChange) : this.store.subscribe(this.onStateChange);
 
       this.listeners = createListenerCollection();
@@ -47820,43 +47556,42 @@ var Subscription = function () {
 }();
 
 exports.default = Subscription;
-},{}],269:[function(require,module,exports){
-"use strict";
+},{}],270:[function(require,module,exports){
+'use strict';
 
 exports.__esModule = true;
 exports.default = shallowEqual;
 var hasOwn = Object.prototype.hasOwnProperty;
 
-function shallowEqual(a, b) {
-  if (a === b) return true;
-
-  var countA = 0;
-  var countB = 0;
-
-  for (var key in a) {
-    if (hasOwn.call(a, key) && a[key] !== b[key]) return false;
-    countA++;
+function is(x, y) {
+  if (x === y) {
+    return x !== 0 || y !== 0 || 1 / x === 1 / y;
+  } else {
+    return x !== x && y !== y;
   }
-
-  for (var _key in b) {
-    if (hasOwn.call(b, _key)) countB++;
-  }
-
-  return countA === countB;
 }
-},{}],270:[function(require,module,exports){
-'use strict';
 
-exports.__esModule = true;
+function shallowEqual(objA, objB) {
+  if (is(objA, objB)) return true;
 
-var _react = require('react');
+  if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) {
+    return false;
+  }
 
-exports.default = _react.PropTypes.shape({
-  subscribe: _react.PropTypes.func.isRequired,
-  dispatch: _react.PropTypes.func.isRequired,
-  getState: _react.PropTypes.func.isRequired
-});
-},{"react":297}],271:[function(require,module,exports){
+  var keysA = Object.keys(objA);
+  var keysB = Object.keys(objB);
+
+  if (keysA.length !== keysB.length) return false;
+
+  for (var i = 0; i < keysA.length; i++) {
+    if (!hasOwn.call(objB, keysA[i]) || !is(objA[keysA[i]], objB[keysA[i]])) {
+      return false;
+    }
+  }
+
+  return true;
+}
+},{}],271:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -53967,63 +53702,37 @@ function base64DetectIncompleteChar(buffer) {
 }
 
 },{"buffer":5}],319:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'cheerio', 'react-dom/server'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('cheerio'), require('react-dom/server'));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports, global.cheerio, global.server);
-    global.svgx = mod.exports;
-  }
-})(this, function (module, exports, _cheerio, _server) {
-  'use strict';
+var dom = require('cheerio')
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
+var doctype = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
 
-  var _cheerio2 = _interopRequireDefault(_cheerio);
+function svgx (render) {
+  return function (jsx, opts) {
+    if (!opts) opts = {}
 
-  var _server2 = _interopRequireDefault(_server);
+    var svg = render(jsx)
 
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
+    var $ = dom.load(svg, { xmlMode: true })
 
-  var doctype = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n';
-  var render = function render(jsx) {
-    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    var svgx = _server2.default.renderToStaticMarkup(jsx);
-
-    var $ = _cheerio2.default.load(svgx, { xmlMode: true });
-
-    var $svg = $('svg');
+    var $svg = $('svg')
 
     // Currently, React strips off namespace attributes.
     if (opts.xmlns) {
-      $svg.attr('xmlns', 'http://www.w3.org/2000/svg');
-      $svg.attr('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+      $svg.attr('xmlns', 'http://www.w3.org/2000/svg')
+      $svg.attr('xmlns:xlink', 'http://www.w3.org/1999/xlink')
     }
 
-    var result = $.html();
+    var result = $.html()
 
-    if (opts.doctype) result = doctype + result;
+    if (opts.doctype) result = doctype + result
 
-    return result;
-  };
+    return result
+  }
+}
 
-  exports.default = render;
-  module.exports = exports['default'];
-});
+module.exports = exports.default = svgx
 
-},{"cheerio":6,"react-dom/server":257}],320:[function(require,module,exports){
+},{"cheerio":6}],320:[function(require,module,exports){
 module.exports = require('./lib/index');
 
 },{"./lib/index":321}],321:[function(require,module,exports){
@@ -54240,7 +53949,10 @@ function config (name) {
       headers.forEach(function(value, name) {
         this.append(name, value)
       }, this)
-
+    } else if (Array.isArray(headers)) {
+      headers.forEach(function(header) {
+        this.append(header[0], header[1])
+      }, this)
     } else if (headers) {
       Object.getOwnPropertyNames(headers).forEach(function(name) {
         this.append(name, headers[name])

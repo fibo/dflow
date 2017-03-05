@@ -6,89 +6,96 @@ var dotOperator = require('engine/regex/dotOperator')
 var reference = require('engine/regex/reference')
 var subgraph = require('engine/regex/subgraph')
 
+var attrRead = dotOperator.attrRead
+var attrWrite = dotOperator.attrWrite
+var func = dotOperator.func
+
 describe('regex', function () {
   describe('accessor', function () {
     it('matches @attributeName', function () {
-      accessor.test('@foo').should.be.true
+      '@foo'.should.match(accessor)
     })
   })
 
   describe('argument', function () {
     it('matches arguments[N]', function () {
-      argument.test('arguments[0]').should.be.true
-      argument.test('arguments[1]').should.be.true
-      argument.test('arguments[2]').should.be.true
-      argument.test('arguments[3]').should.be.true
+      'arguments[0]'.should.match(argument)
+      'arguments[1]'.should.match(argument)
+      'arguments[2]'.should.match(argument)
+      'arguments[3]'.should.match(argument)
     })
   })
 
   describe('dotOperator.attrRead', function () {
     it('matches .validJavaScriptVariableName', function () {
-      dotOperator.attrRead.test('.foo').should.be.true
-      dotOperator.attrRead.test('.$foo').should.be.true
-      dotOperator.attrRead.test('._foo').should.be.true
-      dotOperator.attrRead.test('.f$oo').should.be.true
-      dotOperator.attrRead.test('.f_oo').should.be.true
-      dotOperator.attrRead.test('.1foo').should.be.false
+      '.foo'.should.match(attrRead)
+      '.$foo'.should.match(attrRead)
+      '._foo'.should.match(attrRead)
+      '.f$oo'.should.match(attrRead)
+      '.f_oo'.should.match(attrRead)
+      '.1foo'.should.not.match(attrRead)
     })
 
     it('does not match other dotOperator regexps', function () {
-      dotOperator.attrRead.test('.foo=').should.be.false
-      dotOperator.attrRead.test('.foo()').should.be.false
+      '.foo='.should.not.match(attrRead)
+      '.foo()'.should.not.match(attrRead)
     })
   })
 
   describe('dotOperator.attrWrite', function () {
     it('matches .validJavaScriptVariableName=', function () {
-      dotOperator.attrWrite.test('.foo=').should.be.true
-      dotOperator.attrWrite.test('.$foo=').should.be.true
-      dotOperator.attrWrite.test('._foo=').should.be.true
-      dotOperator.attrWrite.test('.f$oo=').should.be.true
-      dotOperator.attrWrite.test('.f_oo=').should.be.true
-      dotOperator.attrWrite.test('.1foo=').should.be.false
+      '.foo='.should.match(attrWrite)
+      '.$foo='.should.match(attrWrite)
+      '._foo='.should.match(attrWrite)
+      '.f$oo='.should.match(attrWrite)
+      '.f_oo='.should.match(attrWrite)
+      '.1foo='.should.not.match(attrWrite)
     })
 
     it('does not match other dotOperator regexps', function () {
-      dotOperator.attrWrite.test('.foo').should.be.false
-      dotOperator.attrWrite.test('.foo()').should.be.false
+      '.foo'.should.not.match(dotOperator.attrWrite)
+      '.foo()'.should.not.match(dotOperator.attrWrite)
     })
   })
 
   describe('dotOperator.func', function () {
     it('matches .validJavaScriptFunctionName()', function () {
-      dotOperator.func.test('.foo()').should.be.true
-      dotOperator.func.test('.$foo()').should.be.true
-      dotOperator.func.test('._foo()').should.be.true
-      dotOperator.func.test('.f$oo()').should.be.true
-      dotOperator.func.test('.f_oo()').should.be.true
-      dotOperator.func.test('.1foo()').should.be.false
+      '.foo()'.should.match(func)
+      '.$foo()'.should.match(func)
+      '._foo()'.should.match(func)
+      '.f$oo()'.should.match(func)
+      '.f_oo()'.should.match(func)
+      '.1foo()'.should.not.match(func)
     })
 
     it('does not match other dotOperator regexps', function () {
-      dotOperator.func.test('.foo').should.be.false
-      dotOperator.func.test('.foo=').should.be.false
+      '.foo'.should.not.match(func)
+      '.foo='.should.not.match(func)
     })
   })
 
   describe('reference', function () {
     it('matches &functionName', function () {
-      reference.test('&foo').should.be.true
+      '&foo'.should.match(reference)
     })
   })
 
   describe('subgraph', function () {
     it('matches /functionName', function () {
-      subgraph.test('/foo').should.be.true
-      subgraph.test('//comment').should.be.false
-      subgraph.test('// comment').should.be.false
-      subgraph.test('notStartingWithSlash').should.be.false
+      '/foo'.should.match(subgraph)
+      'notStartingWithSlash'.should.not.match(subgraph)
+    })
+
+    it('does not match comments', function () {
+      '//comment'.should.not.match(subgraph)
+      '// comment'.should.not.match(subgraph)
     })
   })
 
   describe('comment', function () {
     it('matches //comment', function () {
-      comment.test('//foo').should.be.true
+      '//foo'.should.match(comment)
+      '// foo'.should.match(comment)
     })
   })
 })
-

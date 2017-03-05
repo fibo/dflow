@@ -4,7 +4,7 @@
 
 body {
   background: #fdfdfd;
-  font-family: "Helvetica", "Arial", sans-serif;
+  font-family: 'Helvetica', 'Arial', sans-serif;
   margin: 0 auto; }
 
 nav {
@@ -19,13 +19,13 @@ nav {
       transition: .3s; }
       nav ul li a {
         color: #fdfdfd;
-        padding: 5px 5px;
+        padding: 5px;
         text-align: center;
         text-decoration: none; }
       nav ul li button {
         background-color: #333;
         color: #fdfdfd;
-        padding: 5px 5px;
+        padding: 2px 8px;
         text-align: center;
         text-decoration: none; }
       nav ul li form label {

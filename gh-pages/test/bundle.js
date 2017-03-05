@@ -2755,6 +2755,7 @@ defaultFormat.pad0 = pad0;
 defaultFormat.functionName = functionName;
 defaultFormat.constructorName = constructorName;
 defaultFormat.formatPlainObjectKey = formatPlainObjectKey;
+defaultFormat.formatPlainObject = formatPlainObject;
 defaultFormat.typeAdaptorForEachFormat = typeAdaptorForEachFormat;
 // adding primitive types
 Formatter.addType(new t.Type(t.UNDEFINED), function() {
