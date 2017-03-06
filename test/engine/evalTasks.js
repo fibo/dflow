@@ -32,6 +32,6 @@ describe('evalTasks', function () {
 
     now.should.be.instanceOf(Function)
 
-    now().should.be.instanceOf.Date
+    now().should.be.instanceOf(Date)
   })
 })

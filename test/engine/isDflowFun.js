@@ -12,7 +12,7 @@ describe('isDflowFun', function () {
       f.funcs = {}
       f.graph = { task: {}, pipe: { '1': [ '1', '2', 'zero' ] } }
 
-      isDflowFun(f).should.be.ko
+      isDflowFun(f).should.be.False()
     })
 
     it('is a function but has not a graph property', function () {
@@ -20,7 +20,7 @@ describe('isDflowFun', function () {
 
       f.funcs = {}
 
-      isDflowFun(f).should.be.ko
+      isDflowFun(f).should.be.False()
     })
 
     it('is a function but has not a funcs property', function () {
@@ -28,7 +28,7 @@ describe('isDflowFun', function () {
 
       f.graph = {}
 
-      isDflowFun(f).should.be.ko
+      isDflowFun(f).should.be.False()
     })
 
     it('is a function but graph property is not an object', function () {
@@ -37,7 +37,7 @@ describe('isDflowFun', function () {
       f.funcs = {}
       f.graph = 'not an object'
 
-      isDflowFun(f).should.be.ko
+      isDflowFun(f).should.be.False()
     })
   })
 
@@ -47,7 +47,7 @@ describe('isDflowFun', function () {
     f.funcs = 'not an object'
     f.graph = {}
 
-    isDflowFun(f).should.be.ko
+    isDflowFun(f).should.be.False()
   })
 
   describe('returns true if', function () {
@@ -61,7 +61,7 @@ describe('isDflowFun', function () {
         if (graphContext === context) {
           var f = fun(exampleGraph)
 
-          isDflowFun(f).should.be.ok
+          isDflowFun(f).should.be.False()
         }
       }
     })
@@ -69,7 +69,7 @@ describe('isDflowFun', function () {
 
   describe('returns false if', function () {
     it('is not a function', function () {
-      isDflowFun('not a function').should.be.ko
+      isDflowFun('not a function').should.be.False()
     })
   })
 })

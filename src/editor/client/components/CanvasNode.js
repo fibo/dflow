@@ -1,4 +1,5 @@
 import React from 'react'
+import no from 'not-defined'
 import { Node } from 'flow-view/components'
 import { ignoreEvent } from 'flow-view/utils/ignoreEvent'
 
@@ -19,8 +20,7 @@ class CanvasNode extends Node {
 
     const element = document.getElementById(id)
 
-    if (model.task[id]) return
-    else model.task[id] = () => element
+    if (no(model.task[id])) model.task[id] = () => element
   }
 
   getBody () {

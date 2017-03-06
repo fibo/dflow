@@ -27,6 +27,6 @@ describe('injectReferences', function () {
 
     ref.should.be.instanceOf(Function)
 
-    ref()(10).should.be.true
+    ref()(10).should.be.True()
   })
 })
