@@ -9,7 +9,7 @@ describe('validate', function () {
       }
     }
 
-    validate(graph).should.be.ok
+    validate(graph).should.be.ok()
   })
 
   it('throws if an additional function name is "return"', function () {

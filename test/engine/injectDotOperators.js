@@ -24,13 +24,13 @@ describe('injectDotOperators', function () {
     var getVersion = funcs['.version']
     var exit = funcs['.exit']
 
-    getVersion.should.be.a.Function
-    exit.should.be.a.Function
+    getVersion.should.be.a.Function()
+    exit.should.be.a.Function()
 
     getVersion(procezz).should.be.eql(procezz.version)
 
     // This will return a reference to procezz.exit, it should not call it.
-    exit(procezz).should.be.a.Function
+    exit(procezz).should.be.a.Function()
   })
 
   it('modifies funcs object with dot operators attribute writers injected', function () {
@@ -45,7 +45,7 @@ describe('injectDotOperators', function () {
 
     var setFoo = funcs['.foo=']
 
-    setFoo.should.be.a.Function
+    setFoo.should.be.a.Function()
 
     var obj = {}
     var obj2 = setFoo(obj, 'bar')
@@ -68,7 +68,7 @@ describe('injectDotOperators', function () {
     var foo = funcs['.foo()']
     var sum = funcs['.sum()']
 
-    foo.should.be.a.Function
+    foo.should.be.a.Function()
 
     var Obj = {
       foo: function () { return 1 },

@@ -10,9 +10,11 @@ var validate = require('./validate')
 
 function isDflowFun (f) {
   var isFunction = typeof f === 'function'
-  var hasGraphObject = typeof f.graph === 'object'
   var hasFuncsObject = typeof f.funcs === 'object'
+  var hasGraphObject = typeof f.graph === 'object'
   var hasValidGraph = true
+
+  if (!isFunction || !hasFuncsObject || !hasGraphObject) return false
 
   if (isFunction && hasGraphObject && hasFuncsObject) {
     try {

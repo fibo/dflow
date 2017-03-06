@@ -73,7 +73,7 @@ describe('injectAccessors', function () {
 
     // Data that can be serialized by JSON.
 
-    ;(foo(null) === null).should.be.ok
+    ;(foo(null) === null).should.be.True()
 
     var a = ['array']
     foo(a).should.deepEqual(a)
@@ -93,7 +93,7 @@ describe('injectAccessors', function () {
     // Data that JSON will not serialize.
 
     var f = function () {}
-    ;(JSON.stringify(f) === undefined).should.be.ok
+    ;(JSON.stringify(f) === undefined).should.be.True()
     ;(function () {
       foo(f)
     }).should.throwError(/JSON do not serialize data/)

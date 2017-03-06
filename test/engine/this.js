@@ -33,7 +33,7 @@ describe('this.graph', function () {
   var f = fun(graph)
 
   it('is a dflow builtin that returns the graph', function () {
-    f().should.be.a.Function
+    f().should.be.a.Function()
 
     // Yep, f is a function that returns itself
     should.deepEqual(f()(), f()()())

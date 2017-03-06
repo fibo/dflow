@@ -15,9 +15,7 @@ function injectNumbers (funcs, task) {
 
     var num = parseFloat(taskName)
 
-    if (isNaN(num)) {
-      return
-    } else {
+    if (!isNaN(num)) {
       funcs[taskName] = function () { return num }
     }
   }
