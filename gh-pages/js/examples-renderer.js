@@ -52731,9 +52731,7 @@ function injectNumbers (funcs, task) {
 
     var num = parseFloat(taskName)
 
-    if (isNaN(num)) {
-      return
-    } else {
+    if (!isNaN(num)) {
       funcs[taskName] = function () { return num }
     }
   }
@@ -52919,9 +52917,11 @@ var validate = require('./validate')
 
 function isDflowFun (f) {
   var isFunction = typeof f === 'function'
-  var hasGraphObject = typeof f.graph === 'object'
   var hasFuncsObject = typeof f.funcs === 'object'
+  var hasGraphObject = typeof f.graph === 'object'
   var hasValidGraph = true
+
+  if (!isFunction || !hasFuncsObject || !hasGraphObject) return false
 
   if (isFunction && hasGraphObject && hasFuncsObject) {
     try {
@@ -53002,7 +53002,7 @@ module.exports = parents
 module.exports = /^@[\w][\w\d]+$/
 
 },{}],309:[function(require,module,exports){
-module.exports = /^arguments\[(\d+)]$/
+module.exports = /^arguments\[(\d+)\]$/
 
 },{}],310:[function(require,module,exports){
 module.exports = /^\/\/.+$/
