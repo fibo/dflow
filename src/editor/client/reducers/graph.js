@@ -98,6 +98,9 @@ export default function (state = initialState, action) {
 
       return Object.assign({}, graph, { view })
 
+    case 'OPEN_EXAMPLE':
+      return action.graph
+
     case 'READ_GRAPH_FAILURE':
       return graph
 

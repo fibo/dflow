@@ -1,5 +1,24 @@
 import React, { PropTypes, Component } from 'react'
 
+const examples = [
+  {
+    name: 'Hello World',
+    json: require('../../../examples/graphs/hello-world.json')
+  }, {
+    name: 'Sum',
+    json: require('../../../examples/graphs/sum.json')
+  }, {
+    name: 'Load JS',
+    json: require('../../../examples/graphs/loadScriptJS.json')
+  }, {
+    name: 'indexOf()',
+    json: require('../../../examples/graphs/indexOf.json')
+  }, {
+    name: 'apply()',
+    json: require('../../../examples/graphs/apply.json')
+  }
+]
+
 class Nav extends Component {
   render () {
     const {
@@ -7,12 +26,29 @@ class Nav extends Component {
       editor,
       enableAutorun,
       graph,
+      openExample,
       updateGraph
     } = this.props
 
     return (
       <nav>
         <ul>
+          <li>
+            <span>
+              Examples
+              <ul>
+                {examples.map((example) => (
+                  <li>
+                    <span
+                      onClick={() => openExample(example.json)}
+                    >
+                      {example.name}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </span>
+          </li>
           <li>
             <a
               download='graph.json'
@@ -51,6 +87,7 @@ Nav.propTypes = {
     autorun: PropTypes.bool.isRequired
   }).isRequired,
   enableAutorun: PropTypes.func.isRequired,
+  openExample: PropTypes.func.isRequired,
   updateGraph: PropTypes.func.isRequired
 }
 

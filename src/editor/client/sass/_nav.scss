@@ -3,6 +3,7 @@ $padding-right: 16px;
 
 nav {
   background-color: $transparent-black;
+  color: $white;
   height: 3em;
 
   ul {
@@ -36,6 +37,26 @@ nav {
         }
       }
     }
+
+    ul {
+      display: none;
+    }
+  }
+
+  li:hover ul {
+    background-color: $transparent-black;
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    z-index: 1000;
+
+
+    li {
+      clear: left;
+      float: left;
+    }
   }
 }
-

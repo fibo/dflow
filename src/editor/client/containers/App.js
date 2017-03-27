@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import {
   disableAutorun,
   enableAutorun,
+  openExample,
   readGraphIfNeeded,
   updateGraph
 } from '../actions'
@@ -16,6 +17,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators({
     disableAutorun,
     enableAutorun,
+    openExample,
     readGraphIfNeeded,
     updateGraph
   }, dispatch)

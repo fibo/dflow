@@ -11,6 +11,7 @@ class Root extends Component {
       editor,
       enableAutorun,
       graph,
+      openExample,
       readGraphIfNeeded,
       updateGraph
     } = this.props
@@ -22,6 +23,7 @@ class Root extends Component {
           editor={editor}
           enableAutorun={enableAutorun}
           graph={graph}
+          openExample={openExample}
           updateGraph={updateGraph}
         />
         <CanvasContainer

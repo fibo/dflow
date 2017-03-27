@@ -54331,7 +54331,7 @@ function config (name) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.runOnce = exports.invalidNode = exports.enableAutorun = exports.disableAutorun = exports.deleteNode = exports.deleteLink = exports.createNode = exports.createLink = undefined;
+exports.runOnce = exports.openExample = exports.invalidNode = exports.enableAutorun = exports.disableAutorun = exports.deleteNode = exports.deleteLink = exports.createNode = exports.createLink = undefined;
 exports.readGraphIfNeeded = readGraphIfNeeded;
 exports.updateGraph = updateGraph;
 
@@ -54390,6 +54390,13 @@ var invalidNode = exports.invalidNode = function invalidNode(nodeId, error) {
     type: 'INVALID_NODE',
     nodeId: nodeId,
     error: error
+  };
+};
+
+var openExample = exports.openExample = function openExample(graph) {
+  return {
+    type: 'OPEN_EXAMPLE',
+    graph: graph
   };
 };
 
@@ -54706,6 +54713,23 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var examples = [{
+  name: 'Hello World',
+  json: require('../../../examples/graphs/hello-world.json')
+}, {
+  name: 'Sum',
+  json: require('../../../examples/graphs/sum.json')
+}, {
+  name: 'Load JS',
+  json: require('../../../examples/graphs/loadScriptJS.json')
+}, {
+  name: 'indexOf()',
+  json: require('../../../examples/graphs/indexOf.json')
+}, {
+  name: 'apply()',
+  json: require('../../../examples/graphs/apply.json')
+}];
+
 var Nav = function (_Component) {
   _inherits(Nav, _Component);
 
@@ -54723,6 +54747,7 @@ var Nav = function (_Component) {
           editor = _props.editor,
           enableAutorun = _props.enableAutorun,
           graph = _props.graph,
+          openExample = _props.openExample,
           updateGraph = _props.updateGraph;
 
 
@@ -54732,6 +54757,34 @@ var Nav = function (_Component) {
         _react2.default.createElement(
           'ul',
           null,
+          _react2.default.createElement(
+            'li',
+            null,
+            _react2.default.createElement(
+              'span',
+              null,
+              'Examples',
+              _react2.default.createElement(
+                'ul',
+                null,
+                examples.map(function (example) {
+                  return _react2.default.createElement(
+                    'li',
+                    null,
+                    _react2.default.createElement(
+                      'span',
+                      {
+                        onClick: function onClick() {
+                          return openExample(example.json);
+                        }
+                      },
+                      example.name
+                    )
+                  );
+                })
+              )
+            )
+          ),
           _react2.default.createElement(
             'li',
             null,
@@ -54792,12 +54845,13 @@ Nav.propTypes = {
     autorun: _react.PropTypes.bool.isRequired
   }).isRequired,
   enableAutorun: _react.PropTypes.func.isRequired,
+  openExample: _react.PropTypes.func.isRequired,
   updateGraph: _react.PropTypes.func.isRequired
 };
 
 exports.default = Nav;
 
-},{"react":297}],330:[function(require,module,exports){
+},{"../../../examples/graphs/apply.json":389,"../../../examples/graphs/hello-world.json":390,"../../../examples/graphs/indexOf.json":391,"../../../examples/graphs/loadScriptJS.json":392,"../../../examples/graphs/sum.json":393,"react":297}],330:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54845,6 +54899,7 @@ var Root = function (_Component) {
           editor = _props.editor,
           enableAutorun = _props.enableAutorun,
           graph = _props.graph,
+          openExample = _props.openExample,
           readGraphIfNeeded = _props.readGraphIfNeeded,
           updateGraph = _props.updateGraph;
 
@@ -54857,6 +54912,7 @@ var Root = function (_Component) {
           editor: editor,
           enableAutorun: enableAutorun,
           graph: graph,
+          openExample: openExample,
           updateGraph: updateGraph
         }),
         _react2.default.createElement(_CanvasContainer2.default, {
@@ -55081,6 +55137,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return (0, _redux.bindActionCreators)({
     disableAutorun: _actions.disableAutorun,
     enableAutorun: _actions.enableAutorun,
+    openExample: _actions.openExample,
     readGraphIfNeeded: _actions.readGraphIfNeeded,
     updateGraph: _actions.updateGraph
   }, dispatch);
@@ -55286,6 +55343,17 @@ function canvasMiddleware(store) {
           case 'TODO_ACTION':
             // TODO flowViewCanvas.doSomething()
             // for example set node state to error to make it red.
+            break;
+
+          case 'OPEN_EXAMPLE':
+            var exampleGraph = action.graph;
+
+            flowViewCanvas.render(exampleGraph.view, {
+              data: exampleGraph.data,
+              pipe: exampleGraph.pipe,
+              task: exampleGraph.task
+            });
+
             break;
         }
       }
@@ -55515,6 +55583,9 @@ exports.default = function () {
       view.node[nodeId].error = error;
 
       return Object.assign({}, graph, { view: view });
+
+    case 'OPEN_EXAMPLE':
+      return action.graph;
 
     case 'READ_GRAPH_FAILURE':
       return graph;
@@ -57508,4 +57579,14 @@ function walkGlobal(taskName) {
 module.exports = walkGlobal;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./regex/comment":380,"./regex/quoted":382,"./regex/reference":383}]},{},[334]);
+},{"./regex/comment":380,"./regex/quoted":382,"./regex/reference":383}],389:[function(require,module,exports){
+module.exports={"data":{"results":[{"args":[0],"expected":true}]},"pipe":{"6":["1","4"],"7":["2","4",1],"8":["3","4",2],"9":["4","5"]},"task":{"1":"&isFinite","2":"null","3":"arguments","4":"apply","5":"return"},"view":{"node":{"1":{"text":"&isFinite","x":26,"y":54,"outs":[{"name":"out"}],"task":"1"},"2":{"text":"null","x":161,"y":55,"outs":[{"name":"out"}],"task":"2"},"3":{"text":"arguments","x":235,"y":54,"outs":[{"name":"out"}],"task":"3"},"4":{"text":"apply","x":104,"y":140,"ins":[{"name":"in0"},{"name":"in1"},{"name":"in2"}],"outs":[{"name":"out"}],"task":"4"},"5":{"text":"return","x":76,"y":204,"ins":[{"name":"in"}],"task":"5"}},"link":{"6":{"from":["1",0],"to":["4",0],"id":"6"},"7":{"from":["2",0],"to":["4",1],"id":"7"},"8":{"from":["3",0],"to":["4",2],"id":"8"},"9":{"from":["4",0],"to":["5",0],"id":"9"}}}}
+},{}],390:[function(require,module,exports){
+module.exports={"data":{},"func":{},"info":{},"pipe":{"tot":["wtd","plu"],"lum":["plu","upu",1],"npz":["whk","upu"],"qpm":["qsf","plu",1]},"task":{"wtd":"h1","plu":".innerHTML=","upu":".appendChild()","maz":"// This is a comment","whk":"body","qsf":"'I ❤ dflow'"},"view":{"link":{"tot":{"from":["wtd",0],"to":["plu",0]},"lum":{"from":["plu",0],"to":["upu",1]},"npz":{"from":["whk",0],"to":["upu",0]},"qpm":{"from":["qsf",0],"to":["plu",1]}},"node":{"wtd":{"text":"h1","x":150,"y":113,"outs":["out"],"ins":["in"]},"plu":{"text":".innerHTML=","x":93,"y":198,"outs":["out"],"ins":["in1","in2"]},"upu":{"text":".appendChild()","x":49,"y":268,"outs":["out"],"ins":["in1","in2"]},"maz":{"text":"// This is a comment","x":145,"y":19},"whk":{"text":"body","x":61,"y":62,"outs":["out"]},"qsf":{"text":"'I ❤ dflow'","x":200,"y":66,"outs":["out"]}}}}
+},{}],391:[function(require,module,exports){
+module.exports={"data":{"results":[{"args":["abcd","b"],"expected":1},{"args":[[7,8,9],9],"expected":2}]},"info":{},"pipe":{"rhq":["cjb","dqf"],"ari":["ffv","dqf",1],"qae":["dqf","ozw"]},"task":{"dqf":".indexOf()","ozw":"console.log","cjb":"'abcd'","ffv":"'b'","jhv":"// 1"},"view":{"link":{"rhq":{"from":["cjb",0],"to":["dqf",0]},"ari":{"from":["ffv",0],"to":["dqf",1]},"qae":{"from":["dqf",0],"to":["ozw",0]}},"node":{"dqf":{"text":".indexOf()","x":50,"y":95,"outs":["out"],"ins":["in1","in2"]},"ozw":{"text":"console.log","x":36,"y":190,"ins":["in0"]},"cjb":{"text":"'abcd'","x":54,"y":35,"outs":["out"]},"ffv":{"text":"'b'","x":179,"y":26,"outs":["out"]},"jhv":{"text":"// 1","x":184,"y":191}}}}
+},{}],392:[function(require,module,exports){
+module.exports={"data":{},"func":{},"info":{},"pipe":{"kqo":["ied","zhr",1],"jce":["qba","zhr"],"pvf":["nrz","cyk"],"jke":["qba","cyk",1],"jdt":["ypc","qba"],"qot":["ygo","ypc"],"vpn":["tce","qba",1]},"task":{"qba":".src=","nrz":"body","zhr":".onload=","ygo":"'myid'","ied":"&console.log","cyk":"appendChild","ypc":"script","emw":"// safe version of .appendChild()","tce":"'script.js'"},"view":{"link":{"kqo":{"from":["ied",0],"to":["zhr",1]},"jce":{"from":["qba",0],"to":["zhr",0]},"pvf":{"from":["nrz",0],"to":["cyk",0]},"jke":{"from":["qba",0],"to":["cyk",1]},"jdt":{"from":["ypc",0],"to":["qba",0]},"qot":{"from":["ygo",0],"to":["ypc",0]},"vpn":{"from":["tce",0],"to":["qba",1]}},"node":{"qba":{"text":".src=","x":129,"y":179,"outs":["out"],"ins":["in1","in2"]},"nrz":{"text":"body","x":36,"y":214,"outs":["out"]},"zhr":{"text":".onload=","x":195,"y":269,"outs":["out"],"ins":["in1","in2"]},"ygo":{"text":"'myid'","x":24,"y":54,"outs":["out"]},"ied":{"text":"&console.log","x":262,"y":205,"outs":["out"]},"cyk":{"text":"appendChild","x":19,"y":304,"outs":["out"],"ins":["in1","in2"]},"ypc":{"text":"script","x":48,"y":120,"outs":["out"],"ins":["in"]},"emw":{"text":"// safe version of .appendChild()","x":18,"y":349},"tce":{"text":"'script.js'","x":148,"y":42,"outs":["out"]}}}}
+},{}],393:[function(require,module,exports){
+module.exports={"data":{},"info":{},"pipe":{"veg":["xvb","zmo"],"rbc":["vug","zmo",1],"zul":["zmo","uam"],"pjx":["zii","uam",1],"hsj":["uam","nef"]},"task":{"xvb":"1","vug":"2","zmo":"+","uam":"===","zii":"3","nef":"console.log"},"view":{"link":{"veg":{"from":["xvb",0],"to":["zmo",0]},"rbc":{"from":["vug",0],"to":["zmo",1]},"zul":{"from":["zmo",0],"to":["uam",0]},"pjx":{"from":["zii",0],"to":["uam",1]},"hsj":{"from":["uam",0],"to":["nef",0]}},"node":{"xvb":{"text":"1","x":116,"y":29,"outs":["out"]},"vug":{"text":"2","x":213,"y":40,"outs":["out"]},"zmo":{"text":"+","x":156,"y":112,"outs":["out"],"ins":["in1","in2"]},"uam":{"text":"===","x":107,"y":178,"outs":["out"],"ins":["in1","in2"]},"zii":{"text":"3","x":212,"y":136,"outs":["out"]},"nef":{"text":"console.log","x":79,"y":265,"ins":["in0"]}}}}
+},{}]},{},[334]);

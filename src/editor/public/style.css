@@ -9,6 +9,7 @@ body {
 
 nav {
   background-color: rgba(20, 20, 20, 0.9);
+  color: #fdfdfd;
   height: 3em; }
   nav ul {
     list-style-type: none; }
@@ -31,7 +32,17 @@ nav {
       nav ul li form label {
         color: #fdfdfd;
         padding: 5px; }
-
-.dflow-root {
-  height: 80vh;
-  width: 100%; }
+    nav ul ul {
+      display: none; }
+  nav li:hover ul {
+    background-color: rgba(20, 20, 20, 0.9);
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    z-index: 1000; }
+    nav li:hover ul li {
+      clear: left;
+      float: left; }

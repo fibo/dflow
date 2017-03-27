@@ -29,10 +29,15 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 ### Added
 
 - Nav component
+- Can open examples on menu
 
 ### Fixed
 
 - Toggle
+
+### Removed
+
+- sass-lint is to strict and configuration seems not working
 
 ## [v0.20.1] - 2017-03-05
 

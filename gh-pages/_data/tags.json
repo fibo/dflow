@@ -1,5 +1,14 @@
 [
   {
+    "name": "v0.20.1",
+    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.20.1",
+    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.20.1",
+    "commit": {
+      "sha": "dd2a25ddef47eafd701241285efb9a8b235371b3",
+      "url": "https://api.github.com/repos/fibo/dflow/commits/dd2a25ddef47eafd701241285efb9a8b235371b3"
+    }
+  },
+  {
     "name": "v0.20.0",
     "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.20.0",
     "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.20.0",
@@ -258,15 +267,6 @@
     "commit": {
       "sha": "a4c8b50be6ae14debd07457489ba4f5a16a4c818",
       "url": "https://api.github.com/repos/fibo/dflow/commits/a4c8b50be6ae14debd07457489ba4f5a16a4c818"
-    }
-  },
-  {
-    "name": "v0.8.7",
-    "zipball_url": "https://api.github.com/repos/fibo/dflow/zipball/v0.8.7",
-    "tarball_url": "https://api.github.com/repos/fibo/dflow/tarball/v0.8.7",
-    "commit": {
-      "sha": "9e69bc3839d085a21878113a9f085b60188a7273",
-      "url": "https://api.github.com/repos/fibo/dflow/commits/9e69bc3839d085a21878113a9f085b60188a7273"
     }
   }
 ]
