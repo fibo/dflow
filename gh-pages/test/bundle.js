@@ -5977,6 +5977,9 @@ var matchingAssertions = function(should, Assertion) {
 
           this.assert(notMatchedProps.length === 0);
         } // should we try to convert to String and exec?
+        else {
+          this.assert(false);
+        }
       } else if (typeof other == 'function') {
         var res;
 
@@ -6958,9 +6961,7 @@ function injectNumbers (funcs, task) {
 
     var num = parseFloat(taskName)
 
-    if (isNaN(num)) {
-      return
-    } else {
+    if (!isNaN(num)) {
       funcs[taskName] = function () { return num }
     }
   }
@@ -7146,9 +7147,11 @@ var validate = require('./validate')
 
 function isDflowFun (f) {
   var isFunction = typeof f === 'function'
-  var hasGraphObject = typeof f.graph === 'object'
   var hasFuncsObject = typeof f.funcs === 'object'
+  var hasGraphObject = typeof f.graph === 'object'
   var hasValidGraph = true
+
+  if (!isFunction || !hasFuncsObject || !hasGraphObject) return false
 
   if (isFunction && hasGraphObject && hasFuncsObject) {
     try {
@@ -7229,7 +7232,7 @@ module.exports = parents
 module.exports = /^@[\w][\w\d]+$/
 
 },{}],32:[function(require,module,exports){
-module.exports = /^arguments\[(\d+)]$/
+module.exports = /^arguments\[(\d+)\]$/
 
 },{}],33:[function(require,module,exports){
 module.exports = /^\/\/.+$/
@@ -7814,7 +7817,7 @@ var validate = require('engine/validate')
 
 describe('emptyGraph', function () {
   it('is a valid graph', function () {
-    validate(emptyGraph).should.be.ok
+    validate(emptyGraph).should.be.True()
   })
 })
 
@@ -7853,7 +7856,7 @@ describe('evalTasks', function () {
 
     now.should.be.instanceOf(Function)
 
-    now().should.be.instanceOf.Date
+    now().should.be.instanceOf(Date)
   })
 })
 
@@ -8064,7 +8067,7 @@ describe('injectAccessors', function () {
 
     // Data that can be serialized by JSON.
 
-    ;(foo(null) === null).should.be.ok
+    ;(foo(null) === null).should.be.True()
 
     var a = ['array']
     foo(a).should.deepEqual(a)
@@ -8084,7 +8087,7 @@ describe('injectAccessors', function () {
     // Data that JSON will not serialize.
 
     var f = function () {}
-    ;(JSON.stringify(f) === undefined).should.be.ok
+    ;(JSON.stringify(f) === undefined).should.be.True()
     ;(function () {
       foo(f)
     }).should.throwError(/JSON do not serialize data/)
@@ -8170,13 +8173,13 @@ describe('injectDotOperators', function () {
     var getVersion = funcs['.version']
     var exit = funcs['.exit']
 
-    getVersion.should.be.a.Function
-    exit.should.be.a.Function
+    getVersion.should.be.a.Function()
+    exit.should.be.a.Function()
 
     getVersion(procezz).should.be.eql(procezz.version)
 
     // This will return a reference to procezz.exit, it should not call it.
-    exit(procezz).should.be.a.Function
+    exit(procezz).should.be.a.Function()
   })
 
   it('modifies funcs object with dot operators attribute writers injected', function () {
@@ -8191,7 +8194,7 @@ describe('injectDotOperators', function () {
 
     var setFoo = funcs['.foo=']
 
-    setFoo.should.be.a.Function
+    setFoo.should.be.a.Function()
 
     var obj = {}
     var obj2 = setFoo(obj, 'bar')
@@ -8214,7 +8217,7 @@ describe('injectDotOperators', function () {
     var foo = funcs['.foo()']
     var sum = funcs['.sum()']
 
-    foo.should.be.a.Function
+    foo.should.be.a.Function()
 
     var Obj = {
       foo: function () { return 1 },
@@ -8313,7 +8316,7 @@ describe('injectReferences', function () {
 
     ref.should.be.instanceOf(Function)
 
-    ref()(10).should.be.true
+    ref()(10).should.be.True()
   })
 })
 
@@ -8405,7 +8408,7 @@ describe('isDflowFun', function () {
       f.funcs = {}
       f.graph = { task: {}, pipe: { '1': [ '1', '2', 'zero' ] } }
 
-      isDflowFun(f).should.be.ko
+      isDflowFun(f).should.be.False()
     })
 
     it('is a function but has not a graph property', function () {
@@ -8413,7 +8416,7 @@ describe('isDflowFun', function () {
 
       f.funcs = {}
 
-      isDflowFun(f).should.be.ko
+      isDflowFun(f).should.be.False()
     })
 
     it('is a function but has not a funcs property', function () {
@@ -8421,7 +8424,7 @@ describe('isDflowFun', function () {
 
       f.graph = {}
 
-      isDflowFun(f).should.be.ko
+      isDflowFun(f).should.be.False()
     })
 
     it('is a function but graph property is not an object', function () {
@@ -8430,7 +8433,7 @@ describe('isDflowFun', function () {
       f.funcs = {}
       f.graph = 'not an object'
 
-      isDflowFun(f).should.be.ko
+      isDflowFun(f).should.be.False()
     })
   })
 
@@ -8440,7 +8443,7 @@ describe('isDflowFun', function () {
     f.funcs = 'not an object'
     f.graph = {}
 
-    isDflowFun(f).should.be.ko
+    isDflowFun(f).should.be.False()
   })
 
   describe('returns true if', function () {
@@ -8454,7 +8457,7 @@ describe('isDflowFun', function () {
         if (graphContext === context) {
           var f = fun(exampleGraph)
 
-          isDflowFun(f).should.be.ok
+          isDflowFun(f).should.be.False()
         }
       }
     })
@@ -8462,7 +8465,7 @@ describe('isDflowFun', function () {
 
   describe('returns false if', function () {
     it('is not a function', function () {
-      isDflowFun('not a function').should.be.ko
+      isDflowFun('not a function').should.be.False()
     })
   })
 })
@@ -8531,92 +8534,99 @@ var dotOperator = require('engine/regex/dotOperator')
 var reference = require('engine/regex/reference')
 var subgraph = require('engine/regex/subgraph')
 
+var attrRead = dotOperator.attrRead
+var attrWrite = dotOperator.attrWrite
+var func = dotOperator.func
+
 describe('regex', function () {
   describe('accessor', function () {
     it('matches @attributeName', function () {
-      accessor.test('@foo').should.be.true
+      '@foo'.should.match(accessor)
     })
   })
 
   describe('argument', function () {
     it('matches arguments[N]', function () {
-      argument.test('arguments[0]').should.be.true
-      argument.test('arguments[1]').should.be.true
-      argument.test('arguments[2]').should.be.true
-      argument.test('arguments[3]').should.be.true
+      'arguments[0]'.should.match(argument)
+      'arguments[1]'.should.match(argument)
+      'arguments[2]'.should.match(argument)
+      'arguments[3]'.should.match(argument)
     })
   })
 
   describe('dotOperator.attrRead', function () {
     it('matches .validJavaScriptVariableName', function () {
-      dotOperator.attrRead.test('.foo').should.be.true
-      dotOperator.attrRead.test('.$foo').should.be.true
-      dotOperator.attrRead.test('._foo').should.be.true
-      dotOperator.attrRead.test('.f$oo').should.be.true
-      dotOperator.attrRead.test('.f_oo').should.be.true
-      dotOperator.attrRead.test('.1foo').should.be.false
+      '.foo'.should.match(attrRead)
+      '.$foo'.should.match(attrRead)
+      '._foo'.should.match(attrRead)
+      '.f$oo'.should.match(attrRead)
+      '.f_oo'.should.match(attrRead)
+      '.1foo'.should.not.match(attrRead)
     })
 
     it('does not match other dotOperator regexps', function () {
-      dotOperator.attrRead.test('.foo=').should.be.false
-      dotOperator.attrRead.test('.foo()').should.be.false
+      '.foo='.should.not.match(attrRead)
+      '.foo()'.should.not.match(attrRead)
     })
   })
 
   describe('dotOperator.attrWrite', function () {
     it('matches .validJavaScriptVariableName=', function () {
-      dotOperator.attrWrite.test('.foo=').should.be.true
-      dotOperator.attrWrite.test('.$foo=').should.be.true
-      dotOperator.attrWrite.test('._foo=').should.be.true
-      dotOperator.attrWrite.test('.f$oo=').should.be.true
-      dotOperator.attrWrite.test('.f_oo=').should.be.true
-      dotOperator.attrWrite.test('.1foo=').should.be.false
+      '.foo='.should.match(attrWrite)
+      '.$foo='.should.match(attrWrite)
+      '._foo='.should.match(attrWrite)
+      '.f$oo='.should.match(attrWrite)
+      '.f_oo='.should.match(attrWrite)
+      '.1foo='.should.not.match(attrWrite)
     })
 
     it('does not match other dotOperator regexps', function () {
-      dotOperator.attrWrite.test('.foo').should.be.false
-      dotOperator.attrWrite.test('.foo()').should.be.false
+      '.foo'.should.not.match(dotOperator.attrWrite)
+      '.foo()'.should.not.match(dotOperator.attrWrite)
     })
   })
 
   describe('dotOperator.func', function () {
     it('matches .validJavaScriptFunctionName()', function () {
-      dotOperator.func.test('.foo()').should.be.true
-      dotOperator.func.test('.$foo()').should.be.true
-      dotOperator.func.test('._foo()').should.be.true
-      dotOperator.func.test('.f$oo()').should.be.true
-      dotOperator.func.test('.f_oo()').should.be.true
-      dotOperator.func.test('.1foo()').should.be.false
+      '.foo()'.should.match(func)
+      '.$foo()'.should.match(func)
+      '._foo()'.should.match(func)
+      '.f$oo()'.should.match(func)
+      '.f_oo()'.should.match(func)
+      '.1foo()'.should.not.match(func)
     })
 
     it('does not match other dotOperator regexps', function () {
-      dotOperator.func.test('.foo').should.be.false
-      dotOperator.func.test('.foo=').should.be.false
+      '.foo'.should.not.match(func)
+      '.foo='.should.not.match(func)
     })
   })
 
   describe('reference', function () {
     it('matches &functionName', function () {
-      reference.test('&foo').should.be.true
+      '&foo'.should.match(reference)
     })
   })
 
   describe('subgraph', function () {
     it('matches /functionName', function () {
-      subgraph.test('/foo').should.be.true
-      subgraph.test('//comment').should.be.false
-      subgraph.test('// comment').should.be.false
-      subgraph.test('notStartingWithSlash').should.be.false
+      '/foo'.should.match(subgraph)
+      'notStartingWithSlash'.should.not.match(subgraph)
+    })
+
+    it('does not match comments', function () {
+      '//comment'.should.not.match(subgraph)
+      '// comment'.should.not.match(subgraph)
     })
   })
 
   describe('comment', function () {
     it('matches //comment', function () {
-      comment.test('//foo').should.be.true
+      '//foo'.should.match(comment)
+      '// foo'.should.match(comment)
     })
   })
 })
-
 
 },{"engine/regex/accessor":31,"engine/regex/argument":32,"engine/regex/comment":33,"engine/regex/dotOperator":34,"engine/regex/reference":36,"engine/regex/subgraph":37}],69:[function(require,module,exports){
 var fun = require('engine/fun')
@@ -8714,7 +8724,7 @@ describe('this.graph', function () {
   var f = fun(graph)
 
   it('is a dflow builtin that returns the graph', function () {
-    f().should.be.a.Function
+    f().should.be.a.Function()
 
     // Yep, f is a function that returns itself
     should.deepEqual(f()(), f()()())
@@ -8733,7 +8743,7 @@ describe('validate', function () {
       }
     }
 
-    validate(graph).should.be.ok
+    validate(graph).should.be.ok()
   })
 
   it('throws if an additional function name is "return"', function () {
