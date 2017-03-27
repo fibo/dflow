@@ -1,7 +1,7 @@
 {
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
-  "version": "0.20.0",
+  "version": "0.20.1",
   "homepage": "http://g14n.info/dflow",
   "author": {
     "name": "Gianluca Casati",
@@ -15,7 +15,7 @@
     "build": "NODE_ENV=production npm test && npm run sass && npm run browserify && npm run minify && npm run svg && npm run jekyll; npm run git_add-f; git status",
     "browserify": "for x in dist editor examples test_engine; do npm run browserify_$x; done",
     "browserify_dist": "browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
-    "browserify_editor": "npm run lint_editor && browserify -t babelify src/editor/client/index.js -o src/editor/public/bundle.js",
+    "browserify_editor": "browserify -t babelify -t brfs src/editor/client/index.js -o src/editor/public/bundle.js",
     "browserify_examples": "browserify -t babelify -r ./src/examples/renderer/client-side.js:examples-renderer -o gh-pages/js/examples-renderer.js",
     "browserify_test_engine": "NODE_PATH=src browserify test/engine/*.js -o gh-pages/test/bundle.js",
     "coverage": "npm run istanbul && npm run coveralls",
@@ -32,9 +32,8 @@
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > gh-pages/index.md; cat README.md >> gh-pages/index.md",
     "istanbul": "istanbul cover _mocha -- --recursive",
     "jekyll": "npm run homepage; npm run gh-pages:_data; cd gh-pages; jekyll build; cd ..",
-    "lint": "for x in cli css engine editor test; do npm run lint_$x; done",
+    "lint": "for x in cli engine editor test; do npm run lint_$x; done",
     "lint_cli": "cd src/cli; standard; standard dflow; cd -",
-    "lint_css": "sass-lint -c ./src/editor/client/sass/.sass-lint.yml -v src/editor/client/sass/*",
     "lint_engine": "cd src/engine; standard; cd -",
     "lint_editor": "cd src/editor; standard; cd -",
     "lint_test": "cd test; standard --global describe --global it; cd -",
@@ -73,7 +72,7 @@
     "visual"
   ],
   "dependencies": {
-    "debug": "^2.6.1",
+    "debug": "^2.6.3",
     "internal-ip": "^1.2.0",
     "nopt": "^4.0.1",
     "not-defined": "^1.1.0",
@@ -89,17 +88,16 @@
     "istanbul": "^0.4.3",
     "mocha": "^3.2.0",
     "mocha-lcov-reporter": "^1.3.0",
-    "node-sass": "^4.5.0",
+    "node-sass": "^4.5.1",
     "npm-watch": "^0.1.8",
     "pre-commit": "^1.2.2",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "redux-thunk": "^2.1.0",
-    "sass-lint": "^1.10.2",
-    "should": "^11.2.0",
-    "standard": "^9.0.0",
+    "should": "^11.2.1",
+    "standard": "^9.0.2",
     "supertest": "^3.0.0",
-    "uglify-js": "^2.8.7",
+    "uglify-js": "^2.8.16",
     "zeroconf-redux": "^0.12.3"
   }
 }

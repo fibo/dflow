@@ -64,6 +64,17 @@ export default function canvasMiddleware (store) {
           // TODO flowViewCanvas.doSomething()
           // for example set node state to error to make it red.
           break
+
+        case 'OPEN_EXAMPLE':
+          const exampleGraph = action.graph
+
+          flowViewCanvas.render(exampleGraph.view, {
+            data: exampleGraph.data,
+            pipe: exampleGraph.pipe,
+            task: exampleGraph.task
+          })
+
+          break
       }
     }
 

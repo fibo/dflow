@@ -42,6 +42,11 @@ export const invalidNode = (nodeId, error) => ({
   error
 })
 
+export const openExample = (graph) => ({
+  type: 'OPEN_EXAMPLE',
+  graph
+})
+
 function readGraph () {
   return (dispatch) => {
     const { receiveData, responseFailure } = prepareRequest(dispatch, 'READ_GRAPH')
