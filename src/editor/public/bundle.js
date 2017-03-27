@@ -55008,15 +55008,15 @@ var ToggleNode = function (_Node) {
     key: 'getBody',
     value: function getBody() {
       var _props = this.props,
-          bodyHeight = _props.bodyHeight,
           model = _props.model,
           id = _props.id,
           pinSize = _props.pinSize;
-
-
       var toggle = this.state.toggle;
 
+
       var setState = this.setState.bind(this);
+
+      var bodyHeight = this.getBodyHeight();
 
       var onMouseDown = function onMouseDown(e) {
         e.preventDefault();

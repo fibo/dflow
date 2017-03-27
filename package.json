@@ -15,7 +15,7 @@
     "build": "NODE_ENV=production npm test && npm run sass && npm run browserify && npm run minify && npm run svg && npm run jekyll; npm run git_add-f; git status",
     "browserify": "for x in dist editor examples test_engine; do npm run browserify_$x; done",
     "browserify_dist": "browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
-    "browserify_editor": "npm run lint_editor && browserify -t babelify src/editor/client/index.js -o src/editor/public/bundle.js",
+    "browserify_editor": "browserify -t babelify src/editor/client/index.js -o src/editor/public/bundle.js",
     "browserify_examples": "browserify -t babelify -r ./src/examples/renderer/client-side.js:examples-renderer -o gh-pages/js/examples-renderer.js",
     "browserify_test_engine": "NODE_PATH=src browserify test/engine/*.js -o gh-pages/test/bundle.js",
     "coverage": "npm run istanbul && npm run coveralls",
