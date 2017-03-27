@@ -11,15 +11,16 @@ class ToggleNode extends Node {
 
   getBody () {
     const {
-      bodyHeight,
       model,
       id,
       pinSize
     } = this.props
 
-    const toggle = this.state.toggle
+    const { toggle } = this.state
 
     const setState = this.setState.bind(this)
+
+    const bodyHeight = this.getBodyHeight()
 
     const onMouseDown = (e) => {
       e.preventDefault()
