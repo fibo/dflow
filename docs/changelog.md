@@ -32,10 +32,12 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - Can open examples on menu
 - Updated deps
 - Moved gh-pages/ to docs/ folder
+- React prop-types package
 
 ### Fixed
 
-- Toggle
+- Toggle node
+- Do not version dist/dflow.js
 
 ### Removed
 

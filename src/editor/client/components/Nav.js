@@ -1,4 +1,5 @@
-import React, { PropTypes, Component } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 
 const examples = [
   {
@@ -19,7 +20,7 @@ const examples = [
   }
 ]
 
-class Nav extends Component {
+class Nav extends React.Component {
   render () {
     const {
       disableAutorun,
@@ -37,8 +38,8 @@ class Nav extends Component {
             <span>
               Examples
               <ul>
-                {examples.map((example) => (
-                  <li>
+                {examples.map((example, i) => (
+                  <li key={i}>
                     <span
                       onClick={() => openExample(example.json)}
                     >

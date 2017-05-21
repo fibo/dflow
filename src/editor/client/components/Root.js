@@ -1,10 +1,11 @@
-import React, { PropTypes, Component } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 import CanvasContainer from './CanvasContainer'
 import Nav from './Nav'
 
 // TODO see how to create a modal http://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_modal
 
-class Root extends Component {
+class Root extends React.Component {
   render () {
     const {
       disableAutorun,
