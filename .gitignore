@@ -4,9 +4,12 @@
 node_modules
 npm-debug.log
 
+# Build
+dist/dflow.js
+
 # Jekyll stuff
 Gemfile*
-gh-pages/_site
+docs/_site
 
 # Running dflow cli with no arguments will create this file
 graph.json

@@ -1,6 +1,7 @@
-import React, { Component, PropTypes } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 
-class CanvasContainer extends Component {
+class CanvasContainer extends React.Component {
   componentDidMount () {
     this.props.readGraphIfNeeded()
   }

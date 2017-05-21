@@ -1,6 +1,6 @@
 .*
 coverage
 dist/
-gh-pages
+docs
 npm-debug.log
 bower.json
