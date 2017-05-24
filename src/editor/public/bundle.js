@@ -54953,7 +54953,7 @@ function config (name) {
 module.exports={
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
-  "version": "0.22.0",
+  "version": "0.22.1",
   "homepage": "http://g14n.info/dflow",
   "author": {
     "name": "Gianluca Casati",
