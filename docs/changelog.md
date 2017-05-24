@@ -24,7 +24,13 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - Implement RUN_ONCE editor action (already there), add Run button and make it work.
 - Consider adding cool libraries like threejs and d3 as ready to add nodeswhich add them from CDN.
 
-## [v0.21.0] 2017-05-21
+## UNRELESEAD
+
+### Added
+
+- Input radio checked animation
+
+## [v0.22.0] 2017-05-21
 
 ### Added
 
