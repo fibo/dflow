@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import pkg from '../../../../package.json'
 
 const examples = [
   {
@@ -34,6 +35,12 @@ class Nav extends React.Component {
     return (
       <nav>
         <ul>
+          <li>
+            <a
+              href={pkg.homepage}
+              target='_blank'
+            >Website</a>
+          </li>
           <li>
             <span>
               Examples

@@ -8,14 +8,14 @@ Thank you very much if you want to contribute to *dflow*: every feedback is welc
 
 ## Specification
 
-If you want to propose enhancements in the specification, edit [specification.md](https://github.com/fibo/dflow/blob/master/gh-pages/specification.md).
+If you want to propose enhancements in the specification, edit [specification.md](https://github.com/fibo/dflow/blob/master/docs/specification.md).
 The design goals are:
 
 * Keep it as simple as possible.
 * The implementation should be easy to port to other languages.
 * The graph must fit in a plain JSON.
 
-You may also improve the [CLI](https://github.com/fibo/dflow/blob/master/gh-pages/cli.md).
+You may also improve the [CLI](https://github.com/fibo/dflow/blob/master/docs/cli.md).
 
 ## Development workflow
 

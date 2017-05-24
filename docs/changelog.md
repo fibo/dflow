@@ -29,6 +29,12 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 ### Added
 
 - Input radio checked animation
+- Link to web site in navbar
+
+### Fixed
+
+- Broken links pointing to old gh-pages/ folder
+- Missing items in docs navbar
 
 ## [v0.22.0] 2017-05-21
 
