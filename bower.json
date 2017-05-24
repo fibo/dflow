@@ -18,7 +18,7 @@
   "license": "MIT",
   "ignore": [
     "**/.*",
-    "gh-pages",
+    "docs",
     "index.js",
     "node_modules",
     "npm-debug.log",

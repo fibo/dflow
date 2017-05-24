@@ -5,11 +5,12 @@
 [![Join the chat at https://gitter.im/fibo/dflow](https://badges.gitter.im/fibo/dflow.svg)](https://gitter.im/fibo/dflow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [Installation](#installation) |
-[Examples](http://g14n.info/dflow/examples) |
+[Examples] |
+[CLI] |
 [Editor][editor] |
-[Api](http://g14n.info/dflow/api) |
-[Specification][specification]
-[Contributing](http://g14n.info/dflow/contributing) |
+[API] |
+[Specification][specification] |
+[Contributing] |
 [Support and license](#support-and-license)
 
 [![NPM version](https://badge.fury.io/js/dflow.svg)](http://badge.fury.io/js/dflow)
@@ -97,9 +98,13 @@ My goal is to say to a *dflow* user:
 > Mamma mia! Did you achieve that with dflow?
 
 [bower]: http://bower.io "bower"
+[API]: http://g14n.info/dflow/api "dflow API"
 [CDNJS]: https://cdnjs.com/libraries/dflow "dflow on CDNJS"
 [dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
+[CLI]: http://g14n.info/dflow/cli "dflow CLI"
 [editor]: http://g14n.info/dflow/cli#edit "dflow editor"
+[Examples]: http://g14n.info/dflow/examples "dflow examples"
 [specification]: http://g14n.info/dflow/specification "dflow specification"
+[Contributing]: http://g14n.info/dflow/contributing "Contributing to dflow"
 [hello-world]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
 
