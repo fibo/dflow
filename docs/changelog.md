@@ -26,6 +26,8 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## UNRELESEAD
 
+## [v0.22.1] 2017-05-24
+
 ### Added
 
 - Input radio checked animation
