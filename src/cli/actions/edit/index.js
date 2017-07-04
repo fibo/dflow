@@ -37,12 +37,17 @@ const startServer = (graphPath, opt) => {
 
   const onListen = () => {
     const port = server.address().port
-    const myIp = internalIp()
-    const uri = `http://${myIp}:${port}`
 
-    debug(`editor server is listening on ${uri}`)
+    internalIp.v4().then((myIp) => {
+      const uri = `http://${myIp}:${port}`
 
-    if (opt.open) opn(uri)
+      debug(`editor server is listening on URI ${uri}`)
+
+      if (opt.open) opn(uri)
+    }).catch((ignore) => {
+      debug('Could not get internal IP')
+      debug(`editor server is listening on port ${port}`)
+    })
   }
 
   if (opt.port) server.listen(opt.port, onListen)
