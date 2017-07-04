@@ -405,7 +405,7 @@ function audioContext () {
 
 exports.audioContext = audioContext
 
-// Tash `.appendChild()` works but it is too dangerous!
+// The `.appendChild()` task works but it is too dangerous!
 //
 // For example, inverting parent with child will delete parent.
 // For instance .appendChild(element, body) will erase body.

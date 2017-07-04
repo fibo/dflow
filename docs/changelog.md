@@ -26,6 +26,18 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## UNRELESEAD
 
+## [v0.22.2] 2017-07-04
+
+### Added
+
+- Updated internal-ip to v2 and other minor dependencies updates.
+- package-lock.json
+
+### Fixed
+
+- Prop view.height in SVG server side rendered examples.
+- Preamble option in uglify-js v3.
+
 ## [v0.22.1] 2017-05-24
 
 ### Added
