@@ -16,10 +16,11 @@ defaults:
       path: ""
       type: "pages"
     values:
-      layout: page
+      layout: common/page
 
-# Custom vars
-
-google-analytics:
-  id: UA-12635045-12
-
+nav:
+  Examples: /examples
+  API: /api
+  CLI: /cli
+  Specification: /specification
+  Contributing: /contributing
