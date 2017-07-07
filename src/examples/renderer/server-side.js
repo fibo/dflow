@@ -7,6 +7,9 @@ const graphName = process.argv[2]
 const view = require(path.join(__dirname, '..', 'graphs', `${graphName}.json`)).view
 const svgFile = path.join(__dirname, '..', '..', '..', 'docs', 'svg', `${graphName}.svg`)
 
+// Overwrite view height
+view.height = 355
+
 const canvas = new Canvas('drawing')
 
 canvas.render(view, null, function (err, outputSVG) {
