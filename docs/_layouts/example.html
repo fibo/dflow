@@ -1,31 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+{% if site.lang %}
+  <html lang="{{ site.lang }}">
+{% else %}
+  <html lang="en">
+{% endif %}
 <head>
-{% include header.html %}
+  {% include common/meta.html %}
+  {% include common/favicon.html %}
+  {% include common/cookieconsent.html %}
+  {% include common/style.html %}
 </head>
 <body>
-{% include navbar.html %}
+  {% include common/nav.html %}
 
-  <div class="container">
+  <main>
     <h1>{{ page.title }}</h1>
     <blockquote>{{ page.description }}</blockquote>
-    {{ content }}
-  </div>
 
-  <div class="container">
+    {{ content }}
+
     <div id="example-graph"
          class="dflow-graph"
          style="height: {{ page.graph.height }}px;"
     ></div>
-  </div>
+  </main>
 
-  <script type="text/javascript" src="../js/examples-renderer.js"></script>
-  <script type="text/javascript">
-    require('examples-renderer')('example-graph', '{{ page.graph.name }}')
-  </script>
-
-{% include footer.html %}
-
-{% include common/analytics.html %}
+  {% include common/footer.html %}
+  {% include common/analytics.html %}
+  {% include common/js-bundle.html %}
 </body>
-</html>
