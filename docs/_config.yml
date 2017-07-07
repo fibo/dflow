@@ -19,8 +19,8 @@ defaults:
       layout: common/page
 
 nav:
-  Examples: /examples
-  API: /api
-  CLI: /cli
-  Specification: /specification
-  Contributing: /contributing
+  Examples: dflow/examples
+  API: dflow/api
+  CLI: dflow/cli
+  Specification: dflow/specification
+  Contributing: dflow/contributing
