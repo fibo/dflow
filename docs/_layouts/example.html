@@ -25,6 +25,11 @@
     ></div>
   </main>
 
+  <script type="text/javascript" src="../js/examples-renderer.js"></script>
+  <script type="text/javascript">
+    require('examples-renderer')('example-graph', '{{ page.graph.name }}')
+  </script>
+
   {% include common/footer.html %}
   {% include common/analytics.html %}
   {% include common/js-bundle.html %}
