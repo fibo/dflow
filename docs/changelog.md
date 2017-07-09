@@ -16,7 +16,6 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 ## TODO
 
 - Add drag node event to flow-view, otherwise no event is fired when moving nodes
-- Custom canvas node???
 - accessor nodes should complain when information that will lost is provided, for instance {a: Math.cos} will be stringifyied as '{}' by JSON.
 - accessor nodes displayed as custom nodes. If you click them, a modal is opened to edit them if they are not connected, they can also show a preview of their values
 - find a smart way to show output values, it should be like vvvv debug you can apply it to a single task or the whole subgraph or graph
@@ -25,6 +24,10 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 - Consider adding cool libraries like threejs and d3 as ready to add nodeswhich add them from CDN.
 
 ## UNRELESEAD
+
+### Added
+
+- Bit operators
 
 ## [v0.22.2] 2017-07-04
 

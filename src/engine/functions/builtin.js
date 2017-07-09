@@ -34,6 +34,22 @@ exports['>='] = function (a, b) { return a >= b }
 
 exports['<='] = function (a, b) { return a <= b }
 
+// Bit operators
+
+exports['&'] = function (a, b) { return a & b }
+
+exports['|'] = function (a, b) { return a | b }
+
+exports['~'] = function (a) { return ~a }
+
+exports['^'] = function (a, b) { return a ^ b }
+
+exports['<<'] = function (a, b) { return a << b }
+
+exports['>>'] = function (a, b) { return a >> b }
+
+exports['>>>'] = function (a, b) { return a >>> b }
+
 // Eval is not allowed at run time
 
 exports.eval = function () {
