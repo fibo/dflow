@@ -4,6 +4,12 @@
 
 [![Join the chat at https://gitter.im/fibo/dflow](https://badges.gitter.im/fibo/dflow.svg)](https://gitter.im/fibo/dflow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+**Quick start**: start editing your first graph! With [npx](https://www.npmjs.com/package/npx) launch
+
+```bash
+npx dflow -o
+```
+
 [Installation](#installation) |
 [Examples] |
 [CLI] |
