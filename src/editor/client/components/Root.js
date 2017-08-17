@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import CanvasContainer from './CanvasContainer'
 import Nav from './Nav'
 
@@ -34,12 +33,5 @@ class Root extends React.Component {
     )
   }
 }
-
-Root.propTypes = Object.assign({},
-  Nav.propTypes,
-  {
-    readGraphIfNeeded: PropTypes.func.isRequired
-  }
-)
 
 export default Root

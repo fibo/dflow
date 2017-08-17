@@ -1,5 +1,5 @@
 import React from 'react'
-import { Node } from 'flow-view/components'
+import { Node } from 'flow-view'
 
 class InvalidNode extends Node {
   getBody () {

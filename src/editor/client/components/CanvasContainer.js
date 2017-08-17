@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 class CanvasContainer extends React.Component {
   componentDidMount () {
@@ -21,11 +20,6 @@ class CanvasContainer extends React.Component {
       />
     )
   }
-}
-
-CanvasContainer.propTypes = {
-  fetchGraphIfNeeded: PropTypes.func.isRequired,
-  id: PropTypes.string.isRequired
 }
 
 CanvasContainer.defaultProps = {

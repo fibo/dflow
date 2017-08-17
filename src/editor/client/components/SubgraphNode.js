@@ -1,6 +1,6 @@
 import React from 'react'
 import ignoreEvent from '../utils/ignoreEvent'
-import { Node } from 'flow-view/components'
+import { Node } from 'flow-view'
 
 class SubgraphNode extends Node {
   getBody () {

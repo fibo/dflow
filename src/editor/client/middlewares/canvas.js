@@ -1,10 +1,9 @@
 import { Canvas } from 'flow-view'
 import CanvasContainer from '../components/CanvasContainer'
-import CanvasNode from '../components/CanvasNode'
 import InvalidNode from '../components/InvalidNode'
 import SubgraphNode from '../components/SubgraphNode'
 import ToggleNode from '../components/ToggleNode'
-import { Node } from 'flow-view/components'
+import { Node } from 'flow-view'
 import {
   createLink,
   createNode,

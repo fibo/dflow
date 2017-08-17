@@ -221,7 +221,7 @@ function from (value, encodingOrOffset, length) {
     throw new TypeError('"value" argument must not be a number')
   }
 
-  if (value instanceof ArrayBuffer) {
+  if (isArrayBuffer(value)) {
     return fromArrayBuffer(value, encodingOrOffset, length)
   }
 
@@ -481,7 +481,7 @@ function byteLength (string, encoding) {
   if (Buffer.isBuffer(string)) {
     return string.length
   }
-  if (isArrayBufferView(string) || string instanceof ArrayBuffer) {
+  if (isArrayBufferView(string) || isArrayBuffer(string)) {
     return string.byteLength
   }
   if (typeof string !== 'string') {
@@ -1813,6 +1813,14 @@ function blitBuffer (src, dst, offset, length) {
   return i
 }
 
+// ArrayBuffers from another context (i.e. an iframe) do not pass the `instanceof` check
+// but they should be treated as valid. See: https://github.com/feross/buffer/issues/166
+function isArrayBuffer (obj) {
+  return obj instanceof ArrayBuffer ||
+    (obj != null && obj.constructor != null && obj.constructor.name === 'ArrayBuffer' &&
+      typeof obj.byteLength === 'number')
+}
+
 // Node 0.10 supports `ArrayBuffer` but lacks `ArrayBuffer.isView`
 function isArrayBufferView (obj) {
   return (typeof ArrayBuffer.isView === 'function') && ArrayBuffer.isView(obj)
@@ -1909,7 +1917,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 }
 
 },{}],4:[function(require,module,exports){
-module.exports=function(x){return (typeof x==='undefined')||(x === null)}
+module.exports=function(x){return typeof x==='undefined'||x === null}
 
 },{}],5:[function(require,module,exports){
 'use strict';
@@ -6508,6 +6516,22 @@ exports['<'] = function (a, b) { return a < b }
 exports['>='] = function (a, b) { return a >= b }
 
 exports['<='] = function (a, b) { return a <= b }
+
+// Bit operators
+
+exports['&'] = function (a, b) { return a & b }
+
+exports['|'] = function (a, b) { return a | b }
+
+exports['~'] = function (a) { return ~a }
+
+exports['^'] = function (a, b) { return a ^ b }
+
+exports['<<'] = function (a, b) { return a << b }
+
+exports['>>'] = function (a, b) { return a >> b }
+
+exports['>>>'] = function (a, b) { return a >>> b }
 
 // Eval is not allowed at run time
 
