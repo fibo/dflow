@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import pkg from '../../../../package.json'
 
 const examples = [
@@ -87,16 +86,6 @@ class Nav extends React.Component {
       </nav>
     )
   }
-}
-
-Nav.propTypes = {
-  disableAutorun: PropTypes.func.isRequired,
-  editor: PropTypes.shape({
-    autorun: PropTypes.bool.isRequired
-  }).isRequired,
-  enableAutorun: PropTypes.func.isRequired,
-  openExample: PropTypes.func.isRequired,
-  updateGraph: PropTypes.func.isRequired
 }
 
 export default Nav

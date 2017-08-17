@@ -1,6 +1,5 @@
 import React from 'react'
-import { Node } from 'flow-view/components'
-import ignoreEvent from '../utils/ignoreEvent'
+import { Node } from 'flow-view'
 
 class ToggleNode extends Node {
   constructor (props) {
@@ -44,9 +43,7 @@ class ToggleNode extends Node {
       <rect
         fill={toggle ? 'limegreen' : 'tomato'}
         height={bodyHeight}
-        onClick={ignoreEvent}
         onMouseDown={onMouseDown}
-        onMouseUp={ignoreEvent}
         x={pinSize}
         y={pinSize}
         width={bodyHeight}

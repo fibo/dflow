@@ -27,7 +27,12 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ### Added
 
-- Bit operators
+- Bit operators.
+- Updated deps.
+
+### Removed
+
+- Removed prop-types.
 
 ## [v0.22.2] 2017-07-04
 
