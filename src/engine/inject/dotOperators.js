@@ -1,4 +1,3 @@
-var no = require('not-defined')
 var regexDotOperator = require('../regex/dotOperator')
 
 /**
@@ -52,8 +51,6 @@ function injectDotOperators (funcs, task) {
      */
 
     function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
-      if (no(obj)) return
-
       obj[attributeName] = attributeValue
 
       return obj

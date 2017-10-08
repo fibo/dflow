@@ -25,6 +25,8 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## UNRELESEAD
 
+## [v0.22.3] 2017-10-07
+
 ### Added
 
 - Bit operators.
