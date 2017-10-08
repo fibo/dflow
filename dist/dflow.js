@@ -1,5 +1,5 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports=function(x){return typeof x==='undefined'||x === null}
+module.exports=function(x){return x == null||(x.length<1 && typeof x != 'function')||(typeof x == 'object'&& Object.keys(x).length<1)}
 
 },{}],2:[function(require,module,exports){
 var isDflowDSL = require('./isDflowDSL')
@@ -633,7 +633,6 @@ function injectArguments (funcs, task, args) {
 module.exports = injectArguments
 
 },{"../regex/argument":21}],9:[function(require,module,exports){
-var no = require('not-defined')
 var regexDotOperator = require('../regex/dotOperator')
 
 /**
@@ -687,8 +686,6 @@ function injectDotOperators (funcs, task) {
      */
 
     function dotOperatorAttributeWrite (attributeName, obj, attributeValue) {
-      if (no(obj)) return
-
       obj[attributeName] = attributeValue
 
       return obj
@@ -729,7 +726,7 @@ function injectDotOperators (funcs, task) {
 
 module.exports = injectDotOperators
 
-},{"../regex/dotOperator":23,"not-defined":1}],10:[function(require,module,exports){
+},{"../regex/dotOperator":23}],10:[function(require,module,exports){
 var no = require('not-defined')
 var reservedKeys = require('../reservedKeys')
 var walkGlobal = require('../walkGlobal')

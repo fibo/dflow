@@ -3,7 +3,6 @@ import CanvasContainer from '../components/CanvasContainer'
 import InvalidNode from '../components/InvalidNode'
 import SubgraphNode from '../components/SubgraphNode'
 import ToggleNode from '../components/ToggleNode'
-import { Node } from 'flow-view'
 import {
   createLink,
   createNode,
@@ -29,8 +28,6 @@ export default function canvasMiddleware (store) {
 
       flowViewCanvas = new Canvas(CanvasContainer.defaultProps.id, {
         node: {
-          CanvasNode,
-          DefaultNode: Node,
           InvalidNode,
           SubgraphNode,
           ToggleNode
@@ -59,11 +56,6 @@ export default function canvasMiddleware (store) {
 
     if (flowViewCanvas) {
       switch (action.type) {
-        case 'TODO_ACTION':
-          // TODO flowViewCanvas.doSomething()
-          // for example set node state to error to make it red.
-          break
-
         case 'OPEN_EXAMPLE':
           const exampleGraph = action.graph
 

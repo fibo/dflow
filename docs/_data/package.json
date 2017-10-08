@@ -67,30 +67,29 @@
     "visual"
   ],
   "dependencies": {
-    "debug": "^3.0.0",
-    "internal-ip": "^2.0.0",
+    "debug": "^3.1.0",
+    "internal-ip": "^3.0.0",
     "nopt": "^4.0.1",
-    "not-defined": "^1.1.0",
+    "not-defined": "^2.0.1",
     "opn": "^5.1.0",
     "read-file-utf8": "^1.1.1",
-    "watchify-middleware": "^1.6.0",
     "write-file-utf8": "^1.2.0"
   },
   "devDependencies": {
     "brfs": "^1.4.3",
     "dot-editorconfig": "^1.0.1",
-    "flow-view": "^2.15.0",
+    "flow-view": "^2.16.0",
     "isomorphic-fetch": "^2.2.1",
     "istanbul": "^0.4.3",
-    "mocha": "^3.5.0",
+    "mocha": "^4.0.1",
     "mocha-lcov-reporter": "^1.3.0",
-    "npm-watch": "^0.2.0",
+    "npm-watch": "^0.3.0",
     "pre-commit": "^1.2.2",
     "redux-thunk": "^2.2.0",
-    "should": "^11.2.1",
+    "should": "^13.1.1",
     "standard": "^10.0.3",
     "supertest": "^3.0.0",
-    "uglify-js": "^3.0.27",
-    "zeroconf-redux": "^2.0.0"
+    "uglify-js": "^3.1.3",
+    "zeroconf-redux": "^2.0.1"
   }
 }
