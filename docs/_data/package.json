@@ -1,7 +1,7 @@
 {
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "homepage": "http://g14n.info/dflow",
   "author": {
     "name": "Gianluca Casati",
@@ -68,7 +68,7 @@
   ],
   "dependencies": {
     "debug": "^3.1.0",
-    "internal-ip": "^3.0.0",
+    "internal-ip": "^3.0.1",
     "nopt": "^4.0.1",
     "not-defined": "^2.0.1",
     "opn": "^5.1.0",
@@ -78,7 +78,7 @@
   "devDependencies": {
     "brfs": "^1.4.3",
     "dot-editorconfig": "^1.0.1",
-    "flow-view": "^2.16.0",
+    "flow-view": "^2.17.0",
     "isomorphic-fetch": "^2.2.1",
     "istanbul": "^0.4.3",
     "mocha": "^4.0.1",
@@ -86,10 +86,10 @@
     "npm-watch": "^0.3.0",
     "pre-commit": "^1.2.2",
     "redux-thunk": "^2.2.0",
-    "should": "^13.1.1",
+    "should": "^13.1.2",
     "standard": "^10.0.3",
     "supertest": "^3.0.0",
-    "uglify-js": "^3.1.3",
+    "uglify-js": "^3.1.4",
     "zeroconf-redux": "^2.0.1"
   }
 }

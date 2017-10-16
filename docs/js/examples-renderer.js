@@ -8077,6 +8077,17 @@ var Frame = function (_React$Component) {
       this.setState({ offset: offset, scroll: scroll });
     }
   }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      var container = _reactDom2.default.findDOMNode(this).parentNode;
+
+      document.removeEventListener('keydown', this.onDocumentKeydown);
+      document.removeEventListener('keyup', this.onDocumentKeyup);
+
+      window.removeEventListener('scroll', this.onWindowScroll);
+      window.removeEventListener('resize', this.onWindowResize(container));
+    }
+  }, {
     key: 'connectLinkToTarget',
     value: function connectLinkToTarget(linkId, target) {
       var view = Object.assign({}, this.state.view);
@@ -8394,6 +8405,9 @@ var Frame = function (_React$Component) {
           view = _state3.view;
 
 
+      var selectedLinks = this.selectedLinks();
+      var thereAreSelectedLinks = selectedLinks.length > 0;
+
       var selectedNodes = this.selectedNodes();
       var thereAreSelectedNodes = selectedNodes.length > 0;
 
@@ -8418,9 +8432,14 @@ var Frame = function (_React$Component) {
           break;
 
         case 'Backspace':
+          if (thereAreSelectedLinks) {
+            selectedLinks.forEach(this.deleteLink);
+          }
+
           if (thereAreSelectedNodes) {
             selectedNodes.forEach(this.deleteNode);
           }
+
           break;
 
         case 'Escape':
@@ -8661,11 +8680,25 @@ var Frame = function (_React$Component) {
       this.setState({ scroll: scroll });
     }
   }, {
-    key: 'selectedNodes',
-    value: function selectedNodes() {
+    key: 'selectedLinks',
+    value: function selectedLinks() {
       var _state7 = this.state,
           view = _state7.view,
           selectedItems = _state7.selectedItems;
+
+
+      var selectedLinks = Object.keys(view.link).filter(function (id) {
+        return selectedItems.indexOf(id) > -1;
+      });
+
+      return selectedLinks;
+    }
+  }, {
+    key: 'selectedNodes',
+    value: function selectedNodes() {
+      var _state8 = this.state,
+          view = _state8.view,
+          selectedItems = _state8.selectedItems;
 
 
       var selectedNodes = Object.keys(view.node).filter(function (id) {
@@ -8694,14 +8727,14 @@ var Frame = function (_React$Component) {
           model = _props.model,
           responsive = _props.responsive,
           theme = _props.theme;
-      var _state8 = this.state,
-          draggedLinkId = _state8.draggedLinkId,
-          dynamicView = _state8.dynamicView,
-          pointer = _state8.pointer,
-          rectangularSelection = _state8.rectangularSelection,
-          selectedItems = _state8.selectedItems,
-          showSelector = _state8.showSelector,
-          view = _state8.view;
+      var _state9 = this.state,
+          draggedLinkId = _state9.draggedLinkId,
+          dynamicView = _state9.dynamicView,
+          pointer = _state9.pointer,
+          rectangularSelection = _state9.rectangularSelection,
+          selectedItems = _state9.selectedItems,
+          showSelector = _state9.showSelector,
+          view = _state9.view;
       var frameBorder = theme.frameBorder,
           fontFamily = theme.fontFamily,
           fontSize = theme.fontSize,
@@ -8748,6 +8781,35 @@ var Frame = function (_React$Component) {
         rectangularSelection ? _react2.default.createElement(_RectangularSelection2.default, _extends({
           color: primaryColor
         }, rectangularSelection)) : null,
+        Object.keys(view.link).map(function (id, i) {
+          var _view$link$id = view.link[id],
+              from = _view$link$id.from,
+              to = _view$link$id.to;
+
+
+          var coord = _this7.coordinatesOfLink(view.link[id]);
+          var sourceSelected = from ? selectedItems.indexOf(from[0]) > -1 : false;
+          var targetSelected = to ? selectedItems.indexOf(to[0]) > -1 : false;
+
+          return _react2.default.createElement(_Link2.default, { key: i,
+            deleteLink: _this7.deleteLink,
+            from: from,
+            lineWidth: lineWidth,
+            id: id,
+            createLink: _this7.createLink,
+            startDraggingLinkTarget: _this7.startDraggingLinkTarget,
+            pinSize: pinSize,
+            selected: selectedItems.indexOf(id) > -1,
+            selectLink: _this7.selectItem(id),
+            sourceSelected: sourceSelected,
+            targetSelected: targetSelected,
+            to: to,
+            x1: coord.x1,
+            y1: coord.y1,
+            x2: coord.x2,
+            y2: coord.y2
+          });
+        }),
         Object.keys(view.node).sort(selectedFirst).map(function (id, i) {
           var node = view.node[id];
 
@@ -8788,35 +8850,6 @@ var Frame = function (_React$Component) {
             y: y
           });
         }),
-        Object.keys(view.link).map(function (id, i) {
-          var _view$link$id = view.link[id],
-              from = _view$link$id.from,
-              to = _view$link$id.to;
-
-
-          var coord = _this7.coordinatesOfLink(view.link[id]);
-          var sourceSelected = from ? selectedItems.indexOf(from[0]) > -1 : false;
-          var targetSelected = to ? selectedItems.indexOf(to[0]) > -1 : false;
-
-          return _react2.default.createElement(_Link2.default, { key: i,
-            deleteLink: _this7.deleteLink,
-            from: from,
-            lineWidth: lineWidth,
-            id: id,
-            createLink: _this7.createLink,
-            startDraggingLinkTarget: _this7.startDraggingLinkTarget,
-            pinSize: pinSize,
-            selected: selectedItems.indexOf(id) > -1,
-            selectLink: _this7.selectItem(id),
-            sourceSelected: sourceSelected,
-            targetSelected: targetSelected,
-            to: to,
-            x1: coord.x1,
-            y1: coord.y1,
-            x2: coord.x2,
-            y2: coord.y2
-          });
-        }),
         _react2.default.createElement(_Selector2.default, {
           createNode: this.selectorCreateNode,
           nodeList: item.nodeList,
@@ -8834,9 +8867,9 @@ var Frame = function (_React$Component) {
         event.preventDefault();
         event.stopPropagation();
 
-        var _state9 = _this8.state,
-            draggedLinkId = _state9.draggedLinkId,
-            shiftPressed = _state9.shiftPressed;
+        var _state10 = _this8.state,
+            draggedLinkId = _state10.draggedLinkId,
+            shiftPressed = _state10.shiftPressed;
 
 
         var selectedItems = [].concat(_toConsumableArray(_this8.state.selectedItems));
@@ -8963,6 +8996,12 @@ var InputPin = function (_React$Component) {
   }
 
   _createClass(InputPin, [{
+    key: 'onMouseDown',
+    value: function onMouseDown(event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }, {
     key: 'onMouseUp',
     value: function onMouseUp(event) {
       event.preventDefault();
@@ -8970,15 +9009,19 @@ var InputPin = function (_React$Component) {
 
       var _props = this.props,
           connectLinkToTarget = _props.connectLinkToTarget,
+          draggedLinkId = _props.draggedLinkId,
           nodeIdAndPosition = _props.nodeIdAndPosition;
 
 
-      connectLinkToTarget(nodeIdAndPosition);
+      if (draggedLinkId) {
+        connectLinkToTarget(draggedLinkId, nodeIdAndPosition);
+      }
     }
   }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(_Pin2.default, _extends({}, this.props, {
+        onMouseDown: this.onMouseDown,
         onMouseUp: this.onMouseUp
       }));
     }
@@ -8988,7 +9031,8 @@ var InputPin = function (_React$Component) {
 }(_react2.default.Component);
 
 InputPin.defaultProps = {
-  connectLinkToTarget: Function.prototype
+  connectLinkToTarget: Function.prototype,
+  draggedLinkId: null
 };
 exports.default = InputPin;
 },{"./Pin":77,"bindme":2,"react":360}],72:[function(require,module,exports){
@@ -9352,6 +9396,7 @@ var Node = function (_React$Component) {
           y = _props3.y;
       var darkPrimaryColor = theme.darkPrimaryColor,
           nodeBarColor = theme.nodeBarColor,
+          nodeBodyColor = theme.nodeBodyColor,
           pinColor = theme.pinColor,
           pinSize = theme.pinSize,
           primaryColor = theme.primaryColor;
@@ -9376,7 +9421,7 @@ var Node = function (_React$Component) {
         this.renderOutputMinus(),
         this.renderOutputPlus(),
         _react2.default.createElement('rect', {
-          fillOpacity: 0,
+          fill: nodeBodyColor,
           height: bodyHeight + 2 * pinSize,
           stroke: selected ? primaryColor : nodeBarColor,
           strokeWidth: 1,
@@ -9392,8 +9437,9 @@ var Node = function (_React$Component) {
 
           return _react2.default.createElement(_InputPin2.default, { key: i,
             color: selected ? darkPrimaryColor : pinColor,
+            draggedLinkId: draggedLinkId,
             nodeIdAndPosition: [id, i],
-            connectLinkToTarget: draggedLinkId ? connectLinkToTarget.bind(null, draggedLinkId) : null,
+            connectLinkToTarget: connectLinkToTarget,
             size: pinSize,
             x: x,
             y: 0
@@ -10111,6 +10157,7 @@ var defaultTheme = exports.defaultTheme = {
   primaryColor: '#CDDC39',
   lineWidth: 3,
   nodeBarColor: '#BDBDBD',
+  nodeBodyColor: '#FFFFFF',
   nodeBodyHeight: 20,
   pinColor: '#757575',
   linkColor: '#9E9E9E',
