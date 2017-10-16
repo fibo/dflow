@@ -28,7 +28,7 @@
     "git_add-f_dist": "git add -f dist/",
     "git_add-f_test_bundle": "git add -f docs/test/bundle.js",
     "homepage": "echo \"---\ntitle: $npm_package_name\n---\" > docs/index.md; cat README.md >> docs/index.md",
-    "istanbul": "istanbul cover _mocha -- --recursive",
+    "istanbul": "NODE_PATH=src istanbul cover _mocha -- --recursive",
     "jekyll": "npm run homepage; npm run docs:_data; cd docs; jekyll build; cd ..",
     "lint": "for x in cli engine editor test; do npm run lint_$x; done",
     "lint_cli": "cd src/cli; standard; standard dflow; cd -",
