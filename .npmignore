@@ -3,4 +3,3 @@ coverage
 dist/
 docs
 npm-debug.log
-bower.json
