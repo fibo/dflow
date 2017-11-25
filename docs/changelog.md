@@ -25,9 +25,14 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## UNRELESEAD
 
+### Added
+
+- Using budo livereload instead of *npm watch*.
+
 ### Removed
 
 - Removed bower, it is not supported anymore :(
+- Removed test page.
 
 ## [v0.22.3] 2017-10-07
 
