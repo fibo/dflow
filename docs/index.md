@@ -47,19 +47,13 @@ The following simple graph is executed client side by *dflow* engine.
 
 [![Badge size](https://badge-size.herokuapp.com/fibo/dflow/master/dist/dflow.min.js)](https://github.com/fibo/dflow/blob/master/dist/dflow.min.js)
 
-If you have some [graphs][specification] ready to run on client side, you can install dflow engine with [bower]
-
-```bash
-bower install dflow
-```
-
-or use RawGit CDN adding this to your HTML page
+You can use RawGit CDN, add this to your HTML page
 
 ```html
 <script src="https://cdn.rawgit.com/fibo/dflow/master/dist/dflow.min.js"></script>
 ```
 
-If you want to get a specific dflow engine version, get it on [CDNJS]!
+If you want to get a specific dflow engine version, you can get it also on [CDNJS]!
 Awesome thanks to [LboAnn](https://github.com/extend1994) and [Peter Dave Hello](https://github.com/PeterDaveHello). 多謝
 
 ### Server side
@@ -103,7 +97,6 @@ My goal is to say to a *dflow* user:
 
 > Mamma mia! Did you achieve that with dflow?
 
-[bower]: http://bower.io "bower"
 [API]: http://g14n.info/dflow/api "dflow API"
 [CDNJS]: https://cdnjs.com/libraries/dflow "dflow on CDNJS"
 [dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"

@@ -25,6 +25,10 @@ Changelog format adheres to [Keep a Changelog](http://keepachangelog.com/)</sub>
 
 ## UNRELESEAD
 
+### Removed
+
+- Removed bower, it is not supported anymore :(
+
 ## [v0.22.3] 2017-10-07
 
 ### Added
