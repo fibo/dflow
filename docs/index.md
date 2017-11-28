@@ -70,17 +70,6 @@ However, if you need to require the *dflow* engine in your package, or you need 
 npm install dflow
 ```
 
-If you want start hacking on *dflow* run
-
-```bash
-git clone https://github.com/fibo/dflow.git
-cd dflow
-npm install
-npm start
-```
-
-which will clone repo, install deps, start the *dflow* cli and open your browser.
-
 ## Support and License
 
 *dflow* is [MIT](http://g14n.info/mit-license) licensed, yes you can use it to build a product on top of it!
