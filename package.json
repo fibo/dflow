@@ -28,33 +28,21 @@
     "istanbul": "NODE_PATH=src istanbul cover _mocha -- --recursive",
     "jekyll": "npm run homepage; npm run docs:_data; cd docs; jekyll build; cd ..",
     "lint": "for x in cli engine editor test; do npm run lint_$x; done",
-    "lint_cli": "cd src/cli; standard; standard dflow; cd -",
-    "lint_engine": "cd src/engine; standard; cd -",
-    "lint_editor": "cd src/editor; standard; cd -",
-    "lint_test": "cd test; standard --global describe --global it; cd -",
+    "lint_cli": "cd src/cli; standa --fix; standa --fix dflow; cd -",
+    "lint_engine": "cd src/engine; standa --fix; cd -",
+    "lint_editor": "cd src/editor; standa --fix; cd -",
+    "lint_test": "cd test; standa --fix --global describe --global it; cd -",
     "minify": "cd dist; uglifyjs ${npm_package_name}.js --source-map --output ${npm_package_name}.min.js --compress --mangle -b beautify=false,preamble='\"// http://g14n.info/dflow\"'; cd -",
     "postbuild": "npm outdated",
     "postversion": "git push origin v${npm_package_version}; npm publish; git push origin master",
     "start": "DEBUG=dflow node src/cli/dflow --open",
     "svg": "for x in apply hello-world indexOf loadScriptJS sum; do node src/examples/renderer/server-side.js $x; done",
-    "test": "NODE_PATH=src mocha",
-    "watch": "npm-watch"
+    "test": "NODE_PATH=src mocha"
   },
   "pre-commit": [
     "lint",
     "test"
   ],
-  "watch": {
-    "browserify_editor": {
-      "ignore": "src/editor/public/bundle.js",
-      "patterns": [
-        "src/editor/client/",
-        "src/editor/public/",
-        "src/engine/"
-      ]
-    },
-    "homepage": "README.md"
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com/fibo/dflow.git"
@@ -75,19 +63,16 @@
   "devDependencies": {
     "brfs": "^1.4.3",
     "coveralls": "^3.0.0",
-    "dot-editorconfig": "^1.0.1",
+    "dot-editorconfig": "^1.1.0",
     "flow-view": "^2.18.0",
     "isomorphic-fetch": "^2.2.1",
     "istanbul": "^0.4.3",
     "mocha": "^4.0.1",
     "mocha-lcov-reporter": "^1.3.0",
-    "npm-watch": "^0.3.0",
     "pre-commit": "^1.2.2",
-    "redux-thunk": "^2.2.0",
     "should": "^13.1.3",
-    "standard": "^10.0.3",
+    "standa": "^2.0.2",
     "supertest": "^3.0.0",
-    "uglify-js": "^3.1.10",
-    "zeroconf-redux": "^2.1.2"
+    "uglify-js": "^3.1.10"
   }
 }
