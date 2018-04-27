@@ -9,7 +9,7 @@ function funProcess (graph) {
   }
 
   Object.keys(processFunctions)
-        .forEach(inject)
+    .forEach(inject)
 
   return fun(graph, additionalFunctions)
 }

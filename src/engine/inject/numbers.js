@@ -21,7 +21,7 @@ function injectNumbers (funcs, task) {
   }
 
   Object.keys(task)
-        .forEach(inject)
+    .forEach(inject)
 }
 
 module.exports = injectNumbers

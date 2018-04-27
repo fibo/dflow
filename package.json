@@ -15,8 +15,8 @@
     "build": "NODE_ENV=production npm test && npm run browserify && npm run minify && npm run svg && npm run jekyll; npm run git_add-f; git status",
     "browserify": "for x in dist editor examples; do npm run browserify_$x; done",
     "browserify_dist": "browserify -r ./src/engine/context/client-window.js:${npm_package_name} -o dist/${npm_package_name}.js",
-    "browserify_editor": "browserify -t babelify -t brfs src/editor/client/index.js -o src/editor/public/bundle.js",
-    "browserify_examples": "browserify -t babelify -r ./src/examples/renderer/client-side.js:examples-renderer -o docs/js/examples-renderer.js",
+    "browserify_editor": "browserify -t brfs src/editor/client/index.js -o src/editor/public/bundle.js",
+    "browserify_examples": "browserify -r ./src/examples/renderer/client-side.js:examples-renderer -o docs/js/examples-renderer.js",
     "coverage": "npm run istanbul && npm run coveralls",
     "coveralls": "cat ./coverage/lcov.info | coveralls --verbose",
     "cp_package.json": "cp package.json docs/_data/",
@@ -62,6 +62,7 @@
   },
   "devDependencies": {
     "brfs": "^1.4.3",
+    "browserify": "^16.2.0",
     "coveralls": "^3.0.0",
     "dot-editorconfig": "^1.1.0",
     "flow-view": "^2.18.0",

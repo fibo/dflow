@@ -28,10 +28,10 @@ module.exports = (args) => {
   }
 
   const graphPath = opt.argv
-                       .remain
-                       .filter(dotJson)
-                       .map(appendCwd)
-                       .shift()
+    .remain
+    .filter(dotJson)
+    .map(appendCwd)
+    .shift()
 
   if (no(graphPath)) {
     console.error('No path/to/graph.json provided')

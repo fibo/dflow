@@ -40,7 +40,7 @@ function walkGlobal (taskName) {
   }
 
   return taskName.split('.')
-                 .reduce(toNextProp, globalContext)
+    .reduce(toNextProp, globalContext)
 }
 
 module.exports = walkGlobal

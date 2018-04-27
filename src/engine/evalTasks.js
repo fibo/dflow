@@ -30,7 +30,7 @@ function reserved (task) {
  */
 
 function evalTasks (funcs, task) {
- /**
+  /**
   * Evaluate a single task and inject it.
   *
   * @param {String} taskKey
@@ -54,10 +54,10 @@ function evalTasks (funcs, task) {
   }
 
   Object.keys(task)
-        .filter(reserved(task))
-        .filter(dflowDSL(task))
-        .filter(alreadyDefined(funcs, task))
-        .forEach(inject)
+    .filter(reserved(task))
+    .filter(dflowDSL(task))
+    .filter(alreadyDefined(funcs, task))
+    .forEach(inject)
 }
 
 module.exports = evalTasks

@@ -8,8 +8,8 @@ function prepend (prefix) {
 }
 
 var actionList = Object.keys(actions)
-                       .map(prepend(' * '))
-                       .join('\n')
+  .map(prepend(' * '))
+  .join('\n')
 
 module.exports = `
 Usage:

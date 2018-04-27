@@ -32,7 +32,7 @@ function injectArguments (funcs, task, args) {
   }
 
   Object.keys(task)
-        .forEach(inject)
+    .forEach(inject)
 }
 
 module.exports = injectArguments

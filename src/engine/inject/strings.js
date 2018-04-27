@@ -23,7 +23,7 @@ function injectStrings (funcs, task) {
   }
 
   Object.keys(task)
-        .forEach(inject)
+    .forEach(inject)
 }
 
 module.exports = injectStrings

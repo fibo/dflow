@@ -128,7 +128,7 @@ function validate (graph, additionalFunctions) {
   }
 
   Object.keys(pipe)
-        .forEach(checkPipe)
+    .forEach(checkPipe)
 
   // Check that every subgraph referenced are defined.
 
@@ -147,8 +147,8 @@ function validate (graph, additionalFunctions) {
   }
 
   Object.keys(task)
-        .filter(onlySubgraphs)
-        .forEach(checkSubgraph)
+    .filter(onlySubgraphs)
+    .forEach(checkSubgraph)
 
   // Recursively check subgraphs in func property.
 
@@ -158,7 +158,7 @@ function validate (graph, additionalFunctions) {
 
   if (typeof func === 'object') {
     Object.keys(func)
-          .forEach(checkFunc)
+      .forEach(checkFunc)
   }
 
   return true
