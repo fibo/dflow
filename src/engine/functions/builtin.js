@@ -12,6 +12,8 @@ exports['/'] = function (a, b) { return a / b }
 
 exports['%'] = function (a, b) { return a % b }
 
+exports['**'] = function (a, b) { return a ** b }
+
 // Logical operators
 
 exports['&&'] = function (a, b) { return a && b }
