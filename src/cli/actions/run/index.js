@@ -28,8 +28,8 @@ module.exports = (args) => {
   if ((opt.help) || (remain.length === 0)) showUsage()
 
   const graphPath = remain.filter(dotJson)
-                          .map(appendCwd)
-                          .shift()
+    .map(appendCwd)
+    .shift()
 
   if (no(graphPath)) showUsage()
 

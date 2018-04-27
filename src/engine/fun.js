@@ -93,7 +93,7 @@ function fun (graph, additionalFunctions) {
 
   // Compile each subgraph.
   Object.keys(func)
-        .forEach(compileSubgraph)
+    .forEach(compileSubgraph)
 
   /**
    * Throw if a task is not compiled.
@@ -135,8 +135,8 @@ function fun (graph, additionalFunctions) {
 
   // Check if there is some missing task.
   Object.keys(task)
-        .filter(comments)
-        .forEach(checkTaskIsCompiled)
+    .filter(comments)
+    .forEach(checkTaskIsCompiled)
 
   /**
    * Here we are, this is the ❤ of dflow.
@@ -197,9 +197,9 @@ function fun (graph, additionalFunctions) {
     // Run every graph task, sorted by level.
 
     Object.keys(task)
-          .filter(comments)
-          .sort(byLevel)
-          .forEach(run)
+      .filter(comments)
+      .sort(byLevel)
+      .forEach(run)
 
     return returnValue
   }

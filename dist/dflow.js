@@ -1,5 +1,5 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports=function(x){return x == null||(x.length<1 && typeof x != 'function')||(typeof x == 'object'&& Object.keys(x).length<1)}
+require=(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+module.exports=function(x){return x==null||(x.length<1&&typeof x!='function')||(typeof x=='object'&&Object.keys(x).length<1)}
 
 },{}],2:[function(require,module,exports){
 var isDflowDSL = require('./isDflowDSL')
@@ -34,7 +34,7 @@ function reserved (task) {
  */
 
 function evalTasks (funcs, task) {
- /**
+  /**
   * Evaluate a single task and inject it.
   *
   * @param {String} taskKey
@@ -58,10 +58,10 @@ function evalTasks (funcs, task) {
   }
 
   Object.keys(task)
-        .filter(reserved(task))
-        .filter(dflowDSL(task))
-        .filter(alreadyDefined(funcs, task))
-        .forEach(inject)
+    .filter(reserved(task))
+    .filter(dflowDSL(task))
+    .filter(alreadyDefined(funcs, task))
+    .forEach(inject)
 }
 
 module.exports = evalTasks
@@ -162,7 +162,7 @@ function fun (graph, additionalFunctions) {
 
   // Compile each subgraph.
   Object.keys(func)
-        .forEach(compileSubgraph)
+    .forEach(compileSubgraph)
 
   /**
    * Throw if a task is not compiled.
@@ -204,8 +204,8 @@ function fun (graph, additionalFunctions) {
 
   // Check if there is some missing task.
   Object.keys(task)
-        .filter(comments)
-        .forEach(checkTaskIsCompiled)
+    .filter(comments)
+    .forEach(checkTaskIsCompiled)
 
   /**
    * Here we are, this is the ❤ of dflow.
@@ -266,9 +266,9 @@ function fun (graph, additionalFunctions) {
     // Run every graph task, sorted by level.
 
     Object.keys(task)
-          .filter(comments)
-          .sort(byLevel)
-          .forEach(run)
+      .filter(comments)
+      .sort(byLevel)
+      .forEach(run)
 
     return returnValue
   }
@@ -296,6 +296,8 @@ exports['-'] = function (a, b) { return a - b }
 exports['/'] = function (a, b) { return a / b }
 
 exports['%'] = function (a, b) { return a % b }
+
+exports['**'] = function (a, b) { return a ** b }
 
 // Logical operators
 
@@ -446,11 +448,11 @@ exports.appendChild = function (element, child) {
 
   // Check arguments look like DOM nodes.
   Array.prototype.slice.call(arguments)
-       .forEach(function (node) {
-         if (typeof node.appendChild !== 'function') {
-           throw new Error('Cannot appendChild, not an element:' + node)
-         }
-       })
+    .forEach(function (node) {
+      if (typeof node.appendChild !== 'function') {
+        throw new Error('Cannot appendChild, not an element:' + node)
+      }
+    })
 
   // Be idempotent. It is required that child has an id.
   var id = child.id
@@ -587,7 +589,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
   }
 
   Object.keys(additionalFunctions)
-        .forEach(injectAdditionalFunction)
+    .forEach(injectAdditionalFunction)
 }
 
 module.exports = injectAdditionalFunctions
@@ -627,7 +629,7 @@ function injectArguments (funcs, task, args) {
   }
 
   Object.keys(task)
-        .forEach(inject)
+    .forEach(inject)
 }
 
 module.exports = injectArguments
@@ -671,7 +673,7 @@ function injectDotOperators (funcs, task) {
     }
 
     if (regexDotOperator.func.test(taskName)) {
-                                                   // .foo() -> foo
+      // .foo() -> foo
       funcs[taskName] = dotOperatorFunc.bind(null, taskName.substring(1, taskName.length - 2))
     }
 
@@ -692,7 +694,7 @@ function injectDotOperators (funcs, task) {
     }
 
     if (regexDotOperator.attrWrite.test(taskName)) {
-                                                             // .foo= -> foo
+      // .foo= -> foo
       funcs[taskName] = dotOperatorAttributeWrite.bind(null, taskName.substring(1, taskName.length - 1))
     }
 
@@ -716,7 +718,7 @@ function injectDotOperators (funcs, task) {
     }
 
     if (regexDotOperator.attrRead.test(taskName)) {
-                                                            // .foo -> foo
+      // .foo -> foo
       funcs[taskName] = dotOperatorAttributeRead.bind(null, taskName.substring(1))
     }
   }
@@ -767,7 +769,7 @@ function injectGlobals (funcs, task) {
   }
 
   Object.keys(task)
-        .forEach(inject)
+    .forEach(inject)
 }
 
 module.exports = injectGlobals
@@ -796,7 +798,7 @@ function injectNumbers (funcs, task) {
   }
 
   Object.keys(task)
-        .forEach(inject)
+    .forEach(inject)
 }
 
 module.exports = injectNumbers
@@ -878,7 +880,7 @@ function injectStrings (funcs, task) {
   }
 
   Object.keys(task)
-        .forEach(inject)
+    .forEach(inject)
 }
 
 module.exports = injectStrings
@@ -1017,7 +1019,7 @@ function level (pipe, cachedLevelOf, taskKey) {
   }
 
   function computeLevel (parentTaskKey) {
-                                 // ↓ Recursion here: the level of a task is the max level of its parents + 1.
+    // ↓ Recursion here: the level of a task is the max level of its parents + 1.
     taskLevel = Math.max(taskLevel, level(pipe, cachedLevelOf, parentTaskKey) + 1)
   }
 
@@ -1235,7 +1237,7 @@ function validate (graph, additionalFunctions) {
   }
 
   Object.keys(pipe)
-        .forEach(checkPipe)
+    .forEach(checkPipe)
 
   // Check that every subgraph referenced are defined.
 
@@ -1254,8 +1256,8 @@ function validate (graph, additionalFunctions) {
   }
 
   Object.keys(task)
-        .filter(onlySubgraphs)
-        .forEach(checkSubgraph)
+    .filter(onlySubgraphs)
+    .forEach(checkSubgraph)
 
   // Recursively check subgraphs in func property.
 
@@ -1265,7 +1267,7 @@ function validate (graph, additionalFunctions) {
 
   if (typeof func === 'object') {
     Object.keys(func)
-          .forEach(checkFunc)
+      .forEach(checkFunc)
   }
 
   return true
@@ -1317,7 +1319,7 @@ function walkGlobal (taskName) {
   }
 
   return taskName.split('.')
-                 .reduce(toNextProp, globalContext)
+    .reduce(toNextProp, globalContext)
 }
 
 module.exports = walkGlobal

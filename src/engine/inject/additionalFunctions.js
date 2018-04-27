@@ -22,7 +22,7 @@ function injectAdditionalFunctions (funcs, additionalFunctions) {
   }
 
   Object.keys(additionalFunctions)
-        .forEach(injectAdditionalFunction)
+    .forEach(injectAdditionalFunction)
 }
 
 module.exports = injectAdditionalFunctions

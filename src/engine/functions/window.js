@@ -39,11 +39,11 @@ exports.appendChild = function (element, child) {
 
   // Check arguments look like DOM nodes.
   Array.prototype.slice.call(arguments)
-       .forEach(function (node) {
-         if (typeof node.appendChild !== 'function') {
-           throw new Error('Cannot appendChild, not an element:' + node)
-         }
-       })
+    .forEach(function (node) {
+      if (typeof node.appendChild !== 'function') {
+        throw new Error('Cannot appendChild, not an element:' + node)
+      }
+    })
 
   // Be idempotent. It is required that child has an id.
   var id = child.id

@@ -66,11 +66,11 @@ module.exports = (args) => {
 
   if (remain.length === 0) {
     graphPath = ['graph.json'].map(appendCwd)
-                              .shift()
+      .shift()
   } else {
     graphPath = remain.filter(dotJson)
-                      .map(appendCwd)
-                      .shift()
+      .map(appendCwd)
+      .shift()
   }
 
   fs.stat(graphPath, (err, stats) => {
