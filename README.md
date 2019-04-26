@@ -43,6 +43,10 @@ git subtree --prefix=docs/_includes/common/ pull common_includes master
 
 Contains Google Analytics tag.
 
+### fontawesome.html
+
+Includes FontAwesome Pro, it only works on *g14n.info* domain.
+
 ### footer.html
 
 Copyright, license.
