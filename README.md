@@ -47,10 +47,6 @@ Contains Google Analytics tag.
 
 Includes FontAwesome Pro, it only works on *g14n.info* domain.
 
-### footer.html
-
-Copyright, license.
-
 ### meta.html
 
 Requires `page.title` and *_data/package.json* file with the following entries:
