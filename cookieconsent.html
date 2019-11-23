@@ -5,16 +5,19 @@
 <script>
   window.addEventListener('load', function(){
     window.cookieconsent.initialise({
+      dismissOnScroll: true,
+      dismissOnTimeout: 7100,
+      dismissOnWindowClick: true,
       palette: {
         popup: {
-          background: '#000'
+          background: '#343434'
         },
         button: {
-          background: '#f1d600'
+          background: '#fdfdfd'
         }
       },
       theme: 'classic',
-      position: 'top'
+      position: 'bottom'
     })
   })
 </script>
