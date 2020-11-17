@@ -11,7 +11,6 @@ title: dflow
 [Editor][editor] |
 [API] |
 [Specification][specification] |
-[Contributing] |
 [Support and license](#support-and-license)
 
 **Quick start**: start editing your first graph! With [npx](https://www.npmjs.com/package/npx) launch
@@ -90,6 +89,5 @@ My goal is to say to a *dflow* user:
 [editor]: http://g14n.info/dflow/cli#edit "dflow editor"
 [Examples]: http://g14n.info/dflow/examples "dflow examples"
 [specification]: http://g14n.info/dflow/specification "dflow specification"
-[Contributing]: http://g14n.info/dflow/contributing "Contributing to dflow"
 [hello-world]: http://g14n.info/dflow/examples/hello-world.html "Hello World"
 
