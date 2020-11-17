@@ -43,9 +43,13 @@ git subtree --prefix=docs/_includes/common/ pull common_includes master
 
 Contains Google Analytics tag.
 
-### footer.html
+### anathema.html
 
-Copyright, license.
+Displays Apollonian Gasket animation.
+
+### fontawesome.html
+
+Includes FontAwesome Pro, it only works on *g14n.info* domain.
 
 ### meta.html
 
