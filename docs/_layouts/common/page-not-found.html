@@ -5,16 +5,16 @@
   <html lang="en">
 {% endif %}
 <head>
-  {% include common/meta.html %}
   {% include common/favicon.html %}
   {% include common/fontawesome.html %}
-  {% include common/cookieconsent.html %}
   {% include common/style.html %}
 </head>
 <body>
   {% include common/nav.html %}
 
-  <main>{{ content }}</main>
+  {% include anathema.html %}
+
+  <main class="page-not-found">{{ content }}</main>
 
   <load-html src="/common/footer.html"></load-html>
 
