@@ -23,7 +23,6 @@ npx dflow -o
 [![Coverage Status](https://coveralls.io/repos/fibo/dflow/badge.svg?branch=master)](https://coveralls.io/r/fibo/dflow?branch=master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![CDNJS version](https://img.shields.io/cdnjs/v/dflow.svg)](https://cdnjs.com/libraries/dflow)
-[![Change log](https://img.shields.io/badge/change-log-blue.svg)](http://g14n.info/dflow/changelog)
 
 [![Whatchers](http://g14n.info/svg/github/watchers/dflow.svg)](https://github.com/fibo/dflow/watchers) [![Stargazers](http://g14n.info/svg/github/stars/dflow.svg)](https://github.com/fibo/dflow/stargazers) [![Forks](http://g14n.info/svg/github/forks/dflow.svg)](https://github.com/fibo/dflow/network/members)
 
