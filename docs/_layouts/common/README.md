@@ -4,19 +4,20 @@
 
 ## Microsite
 
-By **microsite** I mean a subset of a website. For example `http://example.org/my-microsite`.
+By **microsite** I mean a subset of a website. For example
+`http://example.org/my-microsite`.
 
 ## Setup
 
 First of all, make sure you have already imported [g14n.info-jekyll-includes].
 
-Assuming that you are using the *docs/* folder for GitHub Pages, do
+Assuming that you are using the _docs/_ folder for GitHub Pages, do
 
 1. [Add remote](#add-remote)
 2. [Add subtree](#add-subtree)
 
 Then you can use the layouts contained in this repo, by prexifing it with
-*common/* folder, for example
+_common/_ folder, for example
 
 ```yaml
 ---
@@ -51,15 +52,17 @@ git subtree --prefix=docs/_layouts/common/ pull common_layouts master
 
 ### page
 
-Use it for every [microsite](#microsite) basic page. See [example page][page_template].
+Use it for every [microsite](#microsite) basic page. See
+[example page][page_template].
 
 Requires the following.
 
-* Variable `page.title`, or `site.data.package.name`
-* List of `keywords` in `page` or `site.data.package`.
-* Variable `description` in `page` or `site.data.package`.
-* Optional variable `site.lang`, defaults to *en*.
-* A `nav` hash with menu items. If `page.nav` is not found, it will look for `site.nav`.
+- Variable `page.title`, or `site.data.package.name`
+- List of `keywords` in `page` or `site.data.package`.
+- Variable `description` in `page` or `site.data.package`.
+- Optional variable `site.lang`, defaults to _en_.
+- A `nav` hash with menu items. If `page.nav` is not found, it will look for
+  `site.nav`.
 
 Follows a sample YAML frontmatter
 
@@ -77,7 +80,7 @@ nav:
 
 ## page-not-found
 
-To be used only for 404 page, create a file *404.html* like this
+To be used only for 404 page, create a file _404.html_ like this
 
 ```
 ---
