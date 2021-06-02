@@ -3,17 +3,3 @@
 .*.swp
 node_modules
 npm-debug.log
-
-# Build
-dist/dflow.js
-
-# Jekyll stuff
-Gemfile*
-docs/_site
-
-# Running dflow cli with no arguments will create this file
-graph.json
-
-# Test coverage
-coverage
-.coveralls.yml

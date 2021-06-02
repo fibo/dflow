@@ -18,8 +18,3 @@ defaults:
     values:
       layout: common/page
 
-nav:
-  Examples: /dflow/examples
-  API: /dflow/api
-  CLI: /dflow/cli
-  Specification: /dflow/specification
