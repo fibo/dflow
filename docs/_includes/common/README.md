@@ -4,12 +4,12 @@
 
 ## Setup
 
-Assuming that you are using the *docs/* folder for GitHub Pages, do
+Assuming that you are using the _docs/_ folder for GitHub Pages, do
 
 1. [Add remote](#add-remote)
 2. [Add subtree](#add-subtree)
 
-Then use the includes as usual, for example in *docs/_layouts/page.html*
+Then use the includes as usual, for example in _docs/_layouts/page.html_
 
 ```
 {% include common/analytics.html %}
@@ -49,20 +49,21 @@ Displays Apollonian Gasket animation.
 
 ### fontawesome.html
 
-Includes FontAwesome Pro, it only works on *g14n.info* domain.
+Includes FontAwesome Pro, it only works on _g14n.info_ domain.
 
 ### meta.html
 
-Requires `page.title` and *_data/package.json* file with the following entries:
+Requires `page.title` and __data/package.json_ file with the following entries:
 
-* description
-* keywords
-* author.name
+- description
+- keywords
+- author.name
 
 ### nav.html
 
-Implments nav bar: project `repository_url` and `url` are grabbed from [github-metadata].
-It looks into `page.nav` or `site.nav` variable, if any, for example
+Implments nav bar: project `repository_url` and `url` are grabbed from
+[github-metadata]. It looks into `page.nav` or `site.nav` variable, if any, for
+example
 
 ```yaml
 nav:
@@ -71,7 +72,8 @@ nav:
   Mandolino: //g14n.info
 ```
 
-Home page is added by default, link to repo is added only if *_data/package.json* `private` attribute is not true.
+Home page is added by default, link to repo is added only if
+__data/package.json_ `private` attribute is not true.
 
 ### js-bundle.html
 
