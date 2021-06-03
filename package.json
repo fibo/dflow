@@ -10,8 +10,8 @@
   "license": "MIT",
   "scripts": {
     "fmt": "deno fmt",
-    "lint": "deno lint",
-    "test": "deno test --importmap=import_map.json"
+    "lint": "deno lint --unstable",
+    "test": "deno test"
   },
   "repository": {
     "type": "git",
