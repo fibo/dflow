@@ -44,6 +44,30 @@ Deno.test("addEdge", () => {
   assertEquals(edgeId1, edge1?.id);
 });
 
+Deno.test("addInput", () => {
+  const nodeId1 = "n1";
+  const inputId1 = "i1";
+  const dflow = new DflowHost();
+  dflow.addNode({ id: nodeId1, kind: "MyNode" });
+  dflow.addInput(nodeId1, { id: inputId1 });
+
+  const node1 = dflow.graph.nodes.get(nodeId1);
+  const input1 = node1?.inputs.get(inputId1);
+  assertEquals(inputId1, input1?.id);
+});
+
+Deno.test("addOutput", () => {
+  const nodeId1 = "n1";
+  const outputId1 = "i1";
+  const dflow = new DflowHost();
+  dflow.addNode({ id: nodeId1, kind: "MyNode" });
+  dflow.addOutput(nodeId1, { id: outputId1 });
+
+  const node1 = dflow.graph.nodes.get(nodeId1);
+  const output1 = node1?.outputs.get(outputId1);
+  assertEquals(outputId1, output1?.id);
+});
+
 Deno.test("clearGraph", () => {
   const { dflow } = sample01();
   dflow.clearGraph();

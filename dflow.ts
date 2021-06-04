@@ -2,12 +2,23 @@ export type DflowId = string;
 
 export type DflowPinKind = "input" | "output";
 
+// Stolen from https://github.com/sindresorhus/type-fest/blob/main/source/basic.d.ts
+type JsonObject = { [Key in string]?: JsonValue };
+interface JsonArray extends Array<JsonValue> {}
+type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+export type DflowPinData = JsonValue;
+
 export interface DflowItemSerialized {
   id: string;
 }
 
 export interface DflowNodeSerialized extends DflowItemSerialized {
   kind: string;
+}
+
+export interface DflowPinSerialized {
+  id: DflowId;
+  data?: DflowPinData;
 }
 
 export interface DflowPinPathSerialized {
@@ -26,10 +37,26 @@ export interface DflowGraphSerialized {
   edges: DflowEdgeSerialized[];
 }
 
+export class DflowPin {
+  readonly id: DflowId;
+  data?: DflowPinData;
+
+  constructor({ id, data }: DflowPinSerialized) {
+    this.id = id;
+    this.data = data;
+  }
+
+  toJSON(): string {
+    return JSON.stringify({ id: this.id });
+  }
+}
+
 export class DflowNode {
   readonly graph: DflowGraph;
-  readonly id: string;
+  readonly id: DflowId;
   readonly kind: string;
+  readonly inputs: Map<DflowId, DflowPin> = new Map();
+  readonly outputs: Map<DflowId, DflowPin> = new Map();
 
   constructor(graph: DflowGraph, { id, kind }: DflowNodeSerialized) {
     this.graph = graph;
@@ -38,7 +65,12 @@ export class DflowNode {
   }
 
   toJSON(): string {
-    return JSON.stringify({ id: this.id, kind: this.kind });
+    const inputs = Object.values(this.inputs).map((input) => input.toJSON());
+    const outputs = Object.values(this.outputs).map((output) =>
+      output.toJSON()
+    );
+
+    return JSON.stringify({ id: this.id, kind: this.kind, inputs, outputs });
   }
 }
 
@@ -81,6 +113,18 @@ export class DflowHost {
   addEdge(edgeJson: DflowEdgeSerialized) {
     const edge = new DflowEdge(edgeJson);
     this.graph.edges.set(edge.id, edge);
+  }
+
+  addInput(nodeId: DflowId, pinJson: DflowPinSerialized) {
+    const pin = new DflowPin(pinJson);
+    const node = this.graph.nodes.get(nodeId);
+    node?.inputs.set(pinJson.id, pin);
+  }
+
+  addOutput(nodeId: DflowId, pinJson: DflowPinSerialized) {
+    const pin = new DflowPin(pinJson);
+    const node = this.graph.nodes.get(nodeId);
+    node?.outputs.set(pinJson.id, pin);
   }
 
   clearGraph() {
