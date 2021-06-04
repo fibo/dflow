@@ -21,6 +21,11 @@ export interface DflowEdgeSerialized extends DflowItemSerialized {
   target: Omit<DflowPinPathSerialized, "pinKind">;
 }
 
+export interface DflowGraphSerialized {
+  nodes: DflowNodeSerialized[];
+  edges: DflowEdgeSerialized[];
+}
+
 export class DflowNode {
   readonly graph: DflowGraph;
   readonly id: string;

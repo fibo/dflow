@@ -3,12 +3,14 @@
   "description": "is a minimal Dataflow programming engine",
   "version": "0.24.0",
   "homepage": "http://g14n.info/dflow",
+  "main": "docs/dflow.js",
   "author": {
     "name": "Gianluca Casati",
     "url": "http://g14n.info"
   },
   "license": "MIT",
   "scripts": {
+    "bundle": "deno bundle dflow.ts | esbuild --minify > docs/dflow.js",
     "fmt": "deno fmt",
     "lint": "deno lint --unstable",
     "test": "deno test"
