@@ -12,7 +12,7 @@
   "scripts": {
     "bundle": "deno bundle dflow.ts | esbuild --minify > docs/dflow.js",
     "fmt": "deno fmt",
-    "lint": "deno lint --unstable",
+    "lint": "deno lint",
     "test": "deno test"
   },
   "repository": {
