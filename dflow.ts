@@ -59,8 +59,9 @@ export class DflowGraph {
 
   toJSON(): string {
     const nodes = Object.values(this.nodes).map((node) => node.toJSON());
+    const edges = Object.values(this.edges).map((edge) => edge.toJSON());
 
-    return JSON.stringify({ nodes, edges: [] });
+    return JSON.stringify({ nodes, edges });
   }
 }
 
@@ -75,5 +76,10 @@ export class DflowHost {
   addEdge(edgeJson: DflowEdgeSerialized) {
     const edge = new DflowEdge(edgeJson);
     this.graph.edges.set(edge.id, edge);
+  }
+
+  clearGraph() {
+    this.graph.nodes.clear();
+    this.graph.edges.clear();
   }
 }
