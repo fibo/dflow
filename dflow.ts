@@ -1,19 +1,22 @@
 export type DflowId = string;
+export type DflowNodeKind = string;
 
 export type DflowPinKind = "input" | "output";
 
 // Stolen from https://github.com/sindresorhus/type-fest/blob/main/source/basic.d.ts
 type JsonObject = { [Key in string]?: JsonValue };
-interface JsonArray extends Array<JsonValue> {}
+type JsonArray = Array<JsonValue>;
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
 export type DflowPinData = JsonValue;
 
+export type DflowNodesCatalog = Record<DflowNodeKind, typeof DflowNode>;
+
 export interface DflowItemSerialized {
-  id: string;
+  id: DflowId;
 }
 
 export interface DflowNodeSerialized extends DflowItemSerialized {
-  kind: string;
+  kind: DflowNodeKind;
 }
 
 export interface DflowPinSerialized {
@@ -69,8 +72,15 @@ export class DflowNode {
     const outputs = Object.values(this.outputs).map((output) =>
       output.toJSON()
     );
-
     return JSON.stringify({ id: this.id, kind: this.kind, inputs, outputs });
+  }
+}
+
+export class DflowUnknownNode extends DflowNode {
+  static kind = "Unknown";
+
+  constructor(graph: DflowGraph, nodeJson: DflowNodeSerialized) {
+    super(graph, { ...nodeJson, kind: DflowUnknownNode.kind });
   }
 }
 
@@ -97,16 +107,21 @@ export class DflowGraph {
   toJSON(): string {
     const nodes = Object.values(this.nodes).map((node) => node.toJSON());
     const edges = Object.values(this.edges).map((edge) => edge.toJSON());
-
     return JSON.stringify({ nodes, edges });
   }
 }
 
 export class DflowHost {
   readonly graph = new DflowGraph();
+  readonly #nodesCatalog: DflowNodesCatalog;
+
+  constructor(nodesCatalog: DflowNodesCatalog = {}) {
+    this.#nodesCatalog = nodesCatalog;
+  }
 
   addNode(nodeJson: DflowNodeSerialized) {
-    const node = new DflowNode(this.graph, nodeJson);
+    const NodeClass = this.#nodesCatalog[nodeJson.kind] ?? DflowUnknownNode;
+    const node = new NodeClass(this.graph, nodeJson);
     this.graph.nodes.set(node.id, node);
   }
 
