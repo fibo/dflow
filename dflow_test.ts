@@ -3,7 +3,15 @@ import {
   assertObjectMatch,
 } from "https://deno.land/std@0.97.0/testing/asserts.ts";
 
-import { DflowHost } from "./dflow.ts";
+import { DflowHost, DflowNode } from "./dflow.ts";
+
+class MyNode extends DflowNode {
+  static kind = "MyNode";
+}
+
+const nodesCatalog1 = {
+  [MyNode.kind]: MyNode,
+};
 
 function sample01() {
   const nodeId1 = "n1";
@@ -12,8 +20,8 @@ function sample01() {
   const pinId2 = "p2";
   const edgeId1 = "e2";
   const dflow = new DflowHost();
-  dflow.addNode({ id: nodeId1, kind: "MyNode" });
-  dflow.addNode({ id: nodeId2, kind: "MyNode" });
+  dflow.addNode({ id: nodeId1, kind: MyNode.kind });
+  dflow.addNode({ id: nodeId2, kind: MyNode.kind });
   dflow.addEdge({
     id: edgeId1,
     source: { nodeId: nodeId1, pinId: pinId1 },
@@ -30,11 +38,12 @@ Deno.test("empty graph", () => {
 
 Deno.test("addNode", () => {
   const nodeId1 = "n1";
-  const dflow = new DflowHost();
-  dflow.addNode({ id: nodeId1, kind: "MyNode" });
+  const dflow = new DflowHost(nodesCatalog1);
+  dflow.addNode({ id: nodeId1, kind: MyNode.kind });
 
   const node1 = dflow.graph.nodes.get(nodeId1);
   assertEquals(nodeId1, node1?.id);
+  assertEquals(MyNode.kind, node1?.kind);
 });
 
 Deno.test("addEdge", () => {
