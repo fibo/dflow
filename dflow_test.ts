@@ -20,9 +20,9 @@ function sample01() {
   const pinId2 = "p2";
   const edgeId1 = "e2";
   const dflow = new DflowHost();
-  dflow.addNode({ id: nodeId1, kind: MyNode.kind });
-  dflow.addNode({ id: nodeId2, kind: MyNode.kind });
-  dflow.addEdge({
+  dflow.newNode({ id: nodeId1, kind: MyNode.kind });
+  dflow.newNode({ id: nodeId2, kind: MyNode.kind });
+  dflow.newEdge({
     id: edgeId1,
     source: { nodeId: nodeId1, pinId: pinId1 },
     target: { nodeId: nodeId2, pinId: pinId2 },
@@ -36,41 +36,41 @@ Deno.test("empty graph", () => {
   assertObjectMatch(JSON.parse(dflow.graph.toJSON()), { nodes: [], edges: [] });
 });
 
-Deno.test("addNode", () => {
+Deno.test("newNode", () => {
   const nodeId1 = "n1";
   const dflow = new DflowHost(nodesCatalog1);
-  dflow.addNode({ id: nodeId1, kind: MyNode.kind });
+  dflow.newNode({ id: nodeId1, kind: MyNode.kind });
 
   const node1 = dflow.graph.nodes.get(nodeId1);
   assertEquals(nodeId1, node1?.id);
   assertEquals(MyNode.kind, node1?.kind);
 });
 
-Deno.test("addEdge", () => {
+Deno.test("newEdge", () => {
   const { dflow, edgeId1 } = sample01();
 
   const edge1 = dflow.graph.edges.get(edgeId1);
   assertEquals(edgeId1, edge1?.id);
 });
 
-Deno.test("addInput", () => {
+Deno.test("newInput", () => {
   const nodeId1 = "n1";
   const inputId1 = "i1";
   const dflow = new DflowHost();
-  dflow.addNode({ id: nodeId1, kind: "MyNode" });
-  dflow.addInput(nodeId1, { id: inputId1 });
+  dflow.newNode({ id: nodeId1, kind: "MyNode" });
+  dflow.newInput(nodeId1, { id: inputId1 });
 
   const node1 = dflow.graph.nodes.get(nodeId1);
   const input1 = node1?.inputs.get(inputId1);
   assertEquals(inputId1, input1?.id);
 });
 
-Deno.test("addOutput", () => {
+Deno.test("newOutput", () => {
   const nodeId1 = "n1";
   const outputId1 = "i1";
   const dflow = new DflowHost();
-  dflow.addNode({ id: nodeId1, kind: "MyNode" });
-  dflow.addOutput(nodeId1, { id: outputId1 });
+  dflow.newNode({ id: nodeId1, kind: "MyNode" });
+  dflow.newOutput(nodeId1, { id: outputId1 });
 
   const node1 = dflow.graph.nodes.get(nodeId1);
   const output1 = node1?.outputs.get(outputId1);

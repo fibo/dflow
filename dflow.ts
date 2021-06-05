@@ -67,6 +67,10 @@ export class DflowNode {
     this.kind = kind;
   }
 
+  run():void{
+    throw new Error(`${this.constructor.name} does not implement a run() method`)
+  }
+
   toJSON(): string {
     const inputs = Object.values(this.inputs).map((input) => input.toJSON());
     const outputs = Object.values(this.outputs).map((output) =>
@@ -82,6 +86,8 @@ export class DflowUnknownNode extends DflowNode {
   constructor(graph: DflowGraph, nodeJson: DflowSerializedNode) {
     super(graph, { ...nodeJson, kind: DflowUnknownNode.kind });
   }
+
+  run(): void {}
 }
 
 export class DflowEdge {
@@ -119,31 +125,31 @@ export class DflowHost {
     this.#nodesCatalog = nodesCatalog;
   }
 
-  addNode(nodeJson: DflowSerializedNode) {
+  clearGraph() {
+    this.graph.nodes.clear();
+    this.graph.edges.clear();
+  }
+
+  newNode(nodeJson: DflowSerializedNode) {
     const NodeClass = this.#nodesCatalog[nodeJson.kind] ?? DflowUnknownNode;
     const node = new NodeClass(this.graph, nodeJson);
     this.graph.nodes.set(node.id, node);
   }
 
-  addEdge(edgeJson: DflowSerializedEdge) {
+  newEdge(edgeJson: DflowSerializedEdge) {
     const edge = new DflowEdge(edgeJson);
     this.graph.edges.set(edge.id, edge);
   }
 
-  addInput(nodeId: DflowId, pinJson: DflowSerializedPin) {
+  newInput(nodeId: DflowId, pinJson: DflowSerializedPin) {
     const pin = new DflowPin(pinJson);
     const node = this.graph.nodes.get(nodeId);
     node?.inputs.set(pinJson.id, pin);
   }
 
-  addOutput(nodeId: DflowId, pinJson: DflowSerializedPin) {
+  newOutput(nodeId: DflowId, pinJson: DflowSerializedPin) {
     const pin = new DflowPin(pinJson);
     const node = this.graph.nodes.get(nodeId);
     node?.outputs.set(pinJson.id, pin);
-  }
-
-  clearGraph() {
-    this.graph.nodes.clear();
-    this.graph.edges.clear();
   }
 }
