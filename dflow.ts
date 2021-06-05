@@ -11,40 +11,40 @@ export type DflowPinData = JsonValue;
 
 export type DflowNodesCatalog = Record<DflowNodeKind, typeof DflowNode>;
 
-export interface DflowItemSerialized {
+export interface DflowSerializedItem {
   id: DflowId;
 }
 
-export interface DflowNodeSerialized extends DflowItemSerialized {
+export interface DflowSerializedNode extends DflowSerializedItem {
   kind: DflowNodeKind;
 }
 
-export interface DflowPinSerialized {
+export interface DflowSerializedPin {
   id: DflowId;
   data?: DflowPinData;
 }
 
-export interface DflowPinPathSerialized {
+export interface DflowSerializedPinPath {
   nodeId: DflowId;
   pinId: DflowId;
   pinKind: DflowPinKind;
 }
 
-export interface DflowEdgeSerialized extends DflowItemSerialized {
-  source: Omit<DflowPinPathSerialized, "pinKind">;
-  target: Omit<DflowPinPathSerialized, "pinKind">;
+export interface DflowSerializedEdge extends DflowSerializedItem {
+  source: Omit<DflowSerializedPinPath, "pinKind">;
+  target: Omit<DflowSerializedPinPath, "pinKind">;
 }
 
-export interface DflowGraphSerialized {
-  nodes: DflowNodeSerialized[];
-  edges: DflowEdgeSerialized[];
+export interface DflowSerializedGraph {
+  nodes: DflowSerializedNode[];
+  edges: DflowSerializedEdge[];
 }
 
 export class DflowPin {
   readonly id: DflowId;
   data?: DflowPinData;
 
-  constructor({ id, data }: DflowPinSerialized) {
+  constructor({ id, data }: DflowSerializedPin) {
     this.id = id;
     this.data = data;
   }
@@ -61,7 +61,7 @@ export class DflowNode {
   readonly inputs: Map<DflowId, DflowPin> = new Map();
   readonly outputs: Map<DflowId, DflowPin> = new Map();
 
-  constructor(graph: DflowGraph, { id, kind }: DflowNodeSerialized) {
+  constructor(graph: DflowGraph, { id, kind }: DflowSerializedNode) {
     this.graph = graph;
     this.id = id;
     this.kind = kind;
@@ -79,17 +79,17 @@ export class DflowNode {
 export class DflowUnknownNode extends DflowNode {
   static kind = "Unknown";
 
-  constructor(graph: DflowGraph, nodeJson: DflowNodeSerialized) {
+  constructor(graph: DflowGraph, nodeJson: DflowSerializedNode) {
     super(graph, { ...nodeJson, kind: DflowUnknownNode.kind });
   }
 }
 
 export class DflowEdge {
   readonly id: string;
-  readonly source: DflowPinPathSerialized;
-  readonly target: DflowPinPathSerialized;
+  readonly source: DflowSerializedPinPath;
+  readonly target: DflowSerializedPinPath;
 
-  constructor({ id, source, target }: DflowEdgeSerialized) {
+  constructor({ id, source, target }: DflowSerializedEdge) {
     this.id = id;
     this.source = { ...source, pinKind: "output" };
     this.target = { ...target, pinKind: "input" };
@@ -119,24 +119,24 @@ export class DflowHost {
     this.#nodesCatalog = nodesCatalog;
   }
 
-  addNode(nodeJson: DflowNodeSerialized) {
+  addNode(nodeJson: DflowSerializedNode) {
     const NodeClass = this.#nodesCatalog[nodeJson.kind] ?? DflowUnknownNode;
     const node = new NodeClass(this.graph, nodeJson);
     this.graph.nodes.set(node.id, node);
   }
 
-  addEdge(edgeJson: DflowEdgeSerialized) {
+  addEdge(edgeJson: DflowSerializedEdge) {
     const edge = new DflowEdge(edgeJson);
     this.graph.edges.set(edge.id, edge);
   }
 
-  addInput(nodeId: DflowId, pinJson: DflowPinSerialized) {
+  addInput(nodeId: DflowId, pinJson: DflowSerializedPin) {
     const pin = new DflowPin(pinJson);
     const node = this.graph.nodes.get(nodeId);
     node?.inputs.set(pinJson.id, pin);
   }
 
-  addOutput(nodeId: DflowId, pinJson: DflowPinSerialized) {
+  addOutput(nodeId: DflowId, pinJson: DflowSerializedPin) {
     const pin = new DflowPin(pinJson);
     const node = this.graph.nodes.get(nodeId);
     node?.outputs.set(pinJson.id, pin);
