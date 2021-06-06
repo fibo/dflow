@@ -4,6 +4,7 @@
   "version": "0.24.0",
   "homepage": "http://g14n.info/dflow",
   "main": "docs/dflow.js",
+  "types": "dflow.ts",
   "author": {
     "name": "Gianluca Casati",
     "url": "http://g14n.info"
