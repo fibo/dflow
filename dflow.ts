@@ -37,6 +37,8 @@ export interface DflowSerializedGraph {
   edges: DflowSerializedEdge[];
 }
 
+const _missingString = (stringName: string) => `${stringName} must be a string`;
+
 export class DflowPin {
   readonly id: DflowId;
   readonly kind: DflowPinKind;
@@ -52,6 +54,12 @@ export class DflowPin {
   connectTo(pin: DflowPin) {
     if (this.kind === "input") {
       this.#source = pin;
+    }
+  }
+
+  disconnect() {
+    if (this.kind === "input") {
+      this.#source = undefined;
     }
   }
 
@@ -87,7 +95,6 @@ export class DflowPin {
 }
 
 export class DflowNode {
-  readonly graph: DflowGraph;
   readonly id: DflowId;
   readonly kind: string;
   readonly isAsync: boolean;
@@ -97,13 +104,12 @@ export class DflowNode {
   readonly #outputPosition: DflowId[] = [];
 
   constructor(
-    graph: DflowGraph,
     { id, kind, inputs = [], outputs = [] }: DflowSerializedNode,
+    isAsync = false,
   ) {
-    this.graph = graph;
     this.id = id;
     this.kind = kind;
-    this.isAsync = false;
+    this.isAsync = isAsync;
 
     for (const serializedPin of inputs) {
       this.newInput(serializedPin);
@@ -114,10 +120,38 @@ export class DflowNode {
     }
   }
 
+  getInputById(pinId: DflowId): DflowPin {
+    if (typeof pinId !== "string") {
+      throw new TypeError(_missingString("inputId"));
+    }
+
+    const pin = this.inputs.get(pinId);
+
+    if (pin instanceof DflowPin) {
+      return pin;
+    } else {
+      throw new Error(`DflowPin not found, id=${pinId}, kind={input}`);
+    }
+  }
+
   getInputByPosition(position: number): DflowPin | null {
     const inputId = this.#inputPosition[position];
     if (typeof inputId === "undefined") return null;
     return this.inputs.get(inputId) ?? null;
+  }
+
+  getOutputById(pinId: DflowId): DflowPin {
+    if (typeof pinId !== "string") {
+      throw new TypeError(_missingString("outputId"));
+    }
+
+    const pin = this.outputs.get(pinId);
+
+    if (pin instanceof DflowPin) {
+      return pin;
+    } else {
+      throw new Error(`DflowPin not found, id=${pinId}, kind={output}`);
+    }
   }
 
   getOutputByPosition(position: number): DflowPin | null {
@@ -170,8 +204,8 @@ export class DflowNode {
 export class DflowUnknownNode extends DflowNode {
   static kind = "Unknown";
 
-  constructor(graph: DflowGraph, serializedNode: DflowSerializedNode) {
-    super(graph, { ...serializedNode, kind: DflowUnknownNode.kind });
+  constructor(serializedNode: DflowSerializedNode) {
+    super({ ...serializedNode, kind: DflowUnknownNode.kind });
   }
 
   run() {}
@@ -184,6 +218,24 @@ export class DflowEdge {
 
   constructor({ id, source, target }: DflowSerializedEdge) {
     this.id = id;
+
+    // 1. Read source and target.
+    const [sourceNodeId, sourcePinId] = source;
+    const [targetNodeId, targetPinId] = target;
+    // 2. Check their types.
+    if (typeof sourceNodeId !== "string") {
+      throw new TypeError(_missingString("sourceNodeId"));
+    }
+    if (typeof sourcePinId !== "string") {
+      throw new TypeError(_missingString("sourcePinId"));
+    }
+    if (typeof targetNodeId !== "string") {
+      throw new TypeError(_missingString("targetNodeId"));
+    }
+    if (typeof targetPinId !== "string") {
+      throw new TypeError(_missingString("targetPinId"));
+    }
+    // 3. Store in memory.
     this.source = source;
     this.target = target;
   }
@@ -213,6 +265,20 @@ export class DflowGraph {
   clear() {
     this.nodes.clear();
     this.edges.clear();
+  }
+
+  getNodeById(nodeId: DflowId): DflowNode {
+    if (typeof nodeId !== "string") {
+      throw new TypeError(_missingString("nodeId"));
+    }
+
+    const node = this.nodes.get(nodeId);
+
+    if (node instanceof DflowNode) {
+      return node;
+    } else {
+      throw new Error(`DflowNode not found, id=${nodeId}`);
+    }
   }
 
   async run() {
@@ -256,7 +322,7 @@ export class DflowHost {
   newNode(serializedNode: DflowSerializedNode): DflowNode {
     const NodeClass = this.#nodesCatalog[serializedNode.kind] ??
       DflowUnknownNode;
-    const node = new NodeClass(this.graph, serializedNode);
+    const node = new NodeClass(serializedNode);
     this.graph.nodes.set(node.id, node);
     return node;
   }
@@ -267,13 +333,12 @@ export class DflowHost {
 
     const [sourceNodeId, sourcePinId] = edge.source;
     const [targetNodeId, targetPinId] = edge.target;
-    const sourceNode = this.graph.nodes.get(sourceNodeId);
-    const targetNode = this.graph.nodes.get(targetNodeId);
-    const sourcePin = sourceNode?.outputs.get(sourcePinId);
-    const targetPin = targetNode?.inputs.get(targetPinId);
-    if (typeof sourcePin !== "undefined" && typeof targetPin !== "undefined") {
-      targetPin.connectTo(sourcePin);
-    }
+
+    const sourceNode = this.graph.getNodeById(sourceNodeId);
+    const targetNode = this.graph.getNodeById(targetNodeId);
+    const sourcePin = sourceNode.getOutputById(sourcePinId);
+    const targetPin = targetNode.getInputById(targetPinId);
+    targetPin.connectTo(sourcePin);
 
     return edge;
   }
