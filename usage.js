@@ -1,14 +1,5 @@
-# dflow
-
-> is a minimal [Dataflow programming][dataflow-wikipedia] engine
-
-## Usage
-
-This is a trivial sample graph that will run `2 + 2 = 4` computation. You can
-run the following code, cloning this repo and launching `node usage.js`.
-
-```js
-import { DflowHost, DflowNode } from "dflow";
+// Keep in sync with README
+import { DflowHost, DflowNode } from "./docs/dflow.js";
 
 class NumNode extends DflowNode {
   static kind = "Num";
@@ -100,6 +91,3 @@ async function runGraph() {
 }
 
 runGraph();
-```
-
-[dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
