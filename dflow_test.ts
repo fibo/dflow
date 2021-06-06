@@ -3,7 +3,12 @@ import {
   assertObjectMatch,
 } from "https://deno.land/std@0.97.0/testing/asserts.ts";
 
-import { DflowHost, DflowNode, DflowPin } from "./dflow.ts";
+import {
+  DflowHost,
+  DflowNode,
+  DflowPin,
+  DflowSerializedNode,
+} from "./dflow.ts";
 
 class EmptyNode extends DflowNode {
   static kind = "Empty";
@@ -35,6 +40,27 @@ class SumNode extends DflowNode {
   }
 }
 
+function sleep(seconds = 1) {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, seconds * 1000);
+  });
+}
+
+class SleepNode extends DflowNode {
+  static kind = "Sleep";
+  static isAsync = true;
+
+  constructor(serializedNode: DflowSerializedNode) {
+    super(serializedNode, SleepNode.isAsync);
+  }
+
+  async run() {
+    await sleep();
+  }
+}
+
 const nodesCatalog1 = {
   [EmptyNode.kind]: EmptyNode,
 };
@@ -51,8 +77,16 @@ function sample01() {
   const pinId2 = "p2";
   const edgeId1 = "e2";
   const dflow = new DflowHost(nodesCatalog1);
-  dflow.newNode({ id: nodeId1, kind: EmptyNode.kind });
-  dflow.newNode({ id: nodeId2, kind: EmptyNode.kind });
+  dflow.newNode({
+    id: nodeId1,
+    kind: EmptyNode.kind,
+    outputs: [{ id: pinId1 }],
+  });
+  dflow.newNode({
+    id: nodeId2,
+    kind: EmptyNode.kind,
+    inputs: [{ id: pinId2 }],
+  });
   dflow.newEdge({
     id: edgeId1,
     source: [nodeId1, pinId1],
@@ -118,27 +152,34 @@ Deno.test("DflowGraph#clear()", () => {
 
 Deno.test("DflowGraph#run()", () => {
   const dflow = new DflowHost(nodesCatalog2);
+
+  // Num#out=2 -> Sum#in1 |
+  //                      |-> Sum#out=4
+  // Num#out=2 -> Sum#in2 |
   dflow.newNode({
     id: "num",
     kind: NumNode.kind,
-    outputs: [{ id: "out1", data: 2 }],
+    outputs: [{ id: "out", data: 2 }],
   });
   const sumNode = dflow.newNode({
     id: "sum",
     kind: SumNode.kind,
     inputs: [{ id: "in1" }, { id: "in2" }],
-    outputs: [{ id: "out1" }],
+    outputs: [{ id: "out" }],
   });
   dflow.newEdge({
     id: "e1",
-    source: ["num", "out1"],
+    source: ["num", "out"],
     target: ["sum", "in1"],
   });
   dflow.newEdge({
     id: "e2",
-    source: ["num", "out1"],
+    source: ["num", "out"],
     target: ["sum", "in2"],
   });
+
+  // Add also an async node.
+  // dflow.newNode({id:'sleep', kind: SleepNode.kind})
 
   dflow.graph.run();
 
