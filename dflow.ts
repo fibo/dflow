@@ -260,8 +260,40 @@ export class DflowGraph {
   readonly edges: Map<DflowId, DflowEdge> = new Map();
   #runStatus: DflowGraphRunStatus = "success";
 
-  static sort(nodeIds: DflowId[]): DflowId[] {
-    return nodeIds;
+  static sort(
+    nodeIds: DflowId[],
+    nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
+  ): DflowId[] {
+    const levelOf: Record<DflowId, number> = {};
+
+    const parentsOfNodeId = (
+      nodeId: DflowId,
+    ) => (nodeConnections.filter(({ targetId }) => (nodeId === targetId)).map((
+      { sourceId },
+    ) => (sourceId)));
+
+    const levelOfNodeId = (nodeId: DflowId) => {
+      const parentsNodeIds = parentsOfNodeId(nodeId);
+      // 1. A node with no parent as level zero.
+      if (parentsNodeIds.length === 0) {
+        return 0;
+      }
+      // 2. Otherwise its level is the max level of its parents plus one.
+      let maxLevel = 0;
+      for (const parentNodeId of parentsNodeIds) {
+        const level = levelOfNodeId(parentNodeId);
+        maxLevel = Math.max(level, maxLevel);
+      }
+      return maxLevel + 1;
+    };
+
+    for (const nodeId of nodeIds) {
+      levelOf[nodeId] = levelOfNodeId(nodeId);
+    }
+
+    return nodeIds.slice().sort((a, b) => (
+      levelOf[a] <= levelOf[b] ? -1 : 1
+    ));
   }
 
   clear() {
@@ -303,7 +335,14 @@ export class DflowGraph {
       this.#runStatus = "waiting";
     }
 
-    const nodeIds = DflowGraph.sort([...this.nodes.keys()]);
+    // Get nodeIds sorted by graph hierarchy.
+    const nodeIds = DflowGraph.sort(
+      [...this.nodes.keys()],
+      [...this.edges.values()].map((edge) => ({
+        sourceId: edge.source[0],
+        targetId: edge.target[0],
+      })),
+    );
 
     for (const nodeId of nodeIds) {
       const node = this.nodes.get(nodeId) as DflowNode;
