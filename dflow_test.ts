@@ -57,7 +57,9 @@ class SleepNode extends DflowNode {
   }
 
   async run() {
+    console.log("sleep node start");
     await sleep();
+    console.log("sleep node end");
   }
 }
 
@@ -68,6 +70,7 @@ const nodesCatalog1 = {
 const nodesCatalog2 = {
   [NumNode.kind]: NumNode,
   [SumNode.kind]: SumNode,
+  [SleepNode.kind]: SleepNode,
 };
 
 function sample01() {
@@ -150,7 +153,7 @@ Deno.test("DflowGraph#clear()", () => {
   assertEquals(dflow.graph.edges.size, 0);
 });
 
-Deno.test("DflowGraph#run()", () => {
+Deno.test("DflowGraph#run()", async () => {
   const dflow = new DflowHost(nodesCatalog2);
 
   // Num#out=2 -> Sum#in1 |
@@ -179,9 +182,9 @@ Deno.test("DflowGraph#run()", () => {
   });
 
   // Add also an async node.
-  // dflow.newNode({id:'sleep', kind: SleepNode.kind})
+  dflow.newNode({ id: "sleep", kind: SleepNode.kind });
 
-  dflow.graph.run();
+  await dflow.graph.run();
 
   const sum = sumNode.getOutputByPosition(0) as DflowPin;
   assertEquals(sum.getData(), 4);
