@@ -121,6 +121,19 @@ Deno.test("DflowHost#newEdge()", () => {
   assertEquals(edgeId1, edge1?.id);
 });
 
+Deno.test("DflowHost#deleteNode()", () => {
+  const { dflow, nodeId1, edgeId1 } = sample01();
+  dflow.deleteNode(nodeId1);
+  assertEquals(dflow.graph.nodes.has(nodeId1), false);
+  assertEquals(dflow.graph.edges.has(edgeId1), false);
+});
+
+Deno.test("DflowHost#deleteEdge()", () => {
+  const { dflow, edgeId1 } = sample01();
+  dflow.deleteEdge(edgeId1);
+  assertEquals(dflow.graph.edges.has(edgeId1), false);
+});
+
 Deno.test("DflowHost#newInput()", () => {
   const nodeId1 = "n1";
   const inputId1 = "i1";
