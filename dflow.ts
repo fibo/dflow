@@ -1,6 +1,7 @@
 export type DflowId = string;
 export type DflowNodeKind = string;
 export type DflowPinKind = "input" | "output";
+export type DflowGraphRunStatus = "waiting" | "success" | "failure";
 
 // Stolen from https://github.com/sindresorhus/type-fest/blob/main/source/basic.d.ts
 type JsonObject = { [Key in string]?: JsonValue };
@@ -257,6 +258,7 @@ export class DflowEdge {
 export class DflowGraph {
   readonly nodes: Map<DflowId, DflowNode> = new Map();
   readonly edges: Map<DflowId, DflowEdge> = new Map();
+  #runStatus: DflowGraphRunStatus = "success";
 
   static sort(nodeIds: DflowId[]): DflowId[] {
     return nodeIds;
@@ -296,6 +298,11 @@ export class DflowGraph {
   }
 
   async run() {
+    // Set runStatus to waiting if there was some unhandled error in a previous run.
+    if (this.runStatusIsSuccess) {
+      this.#runStatus = "waiting";
+    }
+
     const nodeIds = DflowGraph.sort([...this.nodes.keys()]);
 
     for (const nodeId of nodeIds) {
@@ -309,8 +316,27 @@ export class DflowGraph {
         }
       } catch (error) {
         console.error(error);
+
+        this.#runStatus = "failure";
       }
     }
+
+    // Set runStatus to success if there was no error.
+    if (this.runStatusIsWaiting) {
+      this.#runStatus = "success";
+    }
+  }
+
+  get runStatusIsSuccess() {
+    return this.#runStatus === "success";
+  }
+
+  get runStatusIsWaiting() {
+    return this.#runStatus === "waiting";
+  }
+
+  get runStatusIsFailure() {
+    return this.#runStatus === "failure";
   }
 
   toJSON(): string {

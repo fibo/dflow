@@ -166,6 +166,16 @@ Deno.test("DflowGraph#clear()", () => {
   assertEquals(dflow.graph.edges.size, 0);
 });
 
+Deno.test("DflowGraph#runStatusIsSuccess", () => {
+  const dflow = new DflowHost();
+  assertEquals(dflow.graph.runStatusIsSuccess, true);
+
+  dflow.newNode({ id: "n1", kind: "EmptyNode" });
+  dflow.graph.run();
+
+  assertEquals(dflow.graph.runStatusIsSuccess, true);
+});
+
 Deno.test("DflowGraph#run()", async () => {
   const dflow = new DflowHost(nodesCatalog2);
 
