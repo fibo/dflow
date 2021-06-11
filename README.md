@@ -35,8 +35,8 @@ async function runGraph() {
   await dflow.graph.run();
 
   // Get sinNode output.
-  const sum = sinNode.getOutputByPosition(0);
-  console.log(sum.getData()); // 1 = sin(π / 2)
+  const sin = sinNode.getOutputByPosition(0);
+  console.log(sin.getData()); // 1 = sin(π / 2)
 }
 
 runGraph();
