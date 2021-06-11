@@ -2,15 +2,14 @@
 import { catalog as coreNodes, DflowHost } from "../dflow.js";
 
 async function runGraph() {
+  // Use builtin nodes.
   const dflow = new DflowHost(coreNodes);
 
   // Create two nodes.
   const numNode = dflow.newNode({
-    id: "num",
     kind: coreNodes.num.kind,
   });
   const sinNode = dflow.newNode({
-    id: "sin",
     kind: coreNodes.mathSin.kind,
   });
 

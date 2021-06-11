@@ -1,4 +1,5 @@
 export type DflowId = string;
+export type DflowNewItem<Item> = Omit<Item, "id"> & { id?: DflowId };
 export type DflowNodeKind = string;
 export type DflowPinKind = "input" | "output";
 export type DflowPinType =
@@ -388,6 +389,16 @@ export class DflowGraph {
     }
   }
 
+  generateEdgeId(i = this.edges.size): DflowId {
+    const id = `e${i}`;
+    return this.edges.has(id) ? this.generateEdgeId(i + 1) : id;
+  }
+
+  generateNodeId(i = this.nodes.size): DflowId {
+    const id = `n${i}`;
+    return this.nodes.has(id) ? this.generateNodeId(i + 1) : id;
+  }
+
   async run() {
     // Set runStatus to waiting if there was some unhandled error in a previous run.
     if (this.runStatusIsSuccess) {
@@ -460,7 +471,7 @@ export class DflowHost {
   connect(sourceNode: DflowNode, sourcePosition = 0) {
     return {
       to: (targetNode: DflowNode, targetPosition = 0) => {
-        const edgeId = `e${this.graph.edges.size + 1}`;
+        const edgeId = this.graph.generateEdgeId();
 
         const sourcePin = sourceNode.getOutputByPosition(sourcePosition);
 
@@ -520,10 +531,13 @@ export class DflowHost {
     }
   }
 
-  newNode(serializedNode: DflowSerializedNode): DflowNode {
-    const NodeClass = this.#nodesCatalog[serializedNode.kind] ??
+  newNode(arg: DflowNewItem<DflowSerializedNode>): DflowNode {
+    const NodeClass = this.#nodesCatalog[arg.kind] ??
       DflowUnknownNode;
-    const node = new NodeClass(serializedNode);
+    const id = typeof arg.id === "string"
+      ? arg.id
+      : this.graph.generateNodeId();
+    const node = new NodeClass({ ...arg, id });
 
     if (this.graph.nodes.has(node.id)) {
       throw new Error(`Cannot overwrite DflowNode, id=${node.id}`);
@@ -534,8 +548,11 @@ export class DflowHost {
     return node;
   }
 
-  newEdge(serializedEdge: DflowSerializedEdge): DflowEdge {
-    const edge = new DflowEdge(serializedEdge);
+  newEdge(arg: DflowNewItem<DflowSerializedEdge>): DflowEdge {
+    const id = typeof arg.id === "string"
+      ? arg.id
+      : this.graph.generateEdgeId();
+    const edge = new DflowEdge({ ...arg, id });
 
     if (this.graph.edges.has(edge.id)) {
       throw new Error(`Cannot overwrite DflowEdge, id=${edge.id}`);
@@ -556,12 +573,12 @@ export class DflowHost {
   }
 
   newInput(nodeId: DflowId, serializedPin: DflowSerializedPin) {
-    const node = this.graph.nodes.get(nodeId);
-    node?.newInput(serializedPin);
+    const node = this.graph.getNodeById(nodeId);
+    node.newInput(serializedPin);
   }
 
   newOutput(nodeId: DflowId, serializedPin: DflowSerializedPin) {
-    const node = this.graph.nodes.get(nodeId);
-    node?.newOutput(serializedPin);
+    const node = this.graph.getNodeById(nodeId);
+    node.newOutput(serializedPin);
   }
 }
