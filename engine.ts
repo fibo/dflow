@@ -1,6 +1,13 @@
 export type DflowId = string;
 export type DflowNodeKind = string;
 export type DflowPinKind = "input" | "output";
+export type DflowPinType =
+  | "string"
+  | "number"
+  | "boolean"
+  | "null"
+  | "object"
+  | "array";
 export type DflowRunStatus = "waiting" | "success" | "failure";
 
 // Stolen from https://github.com/sindresorhus/type-fest/blob/main/source/basic.d.ts
@@ -24,6 +31,7 @@ export interface DflowSerializedNode extends DflowSerializedItem {
 export interface DflowSerializedPin {
   id: DflowId;
   data?: DflowPinData;
+  types?: DflowPinType[];
 }
 
 export type DflowSerializedPinPath = [nodeId: DflowId, pinId: DflowId];
@@ -53,12 +61,16 @@ const _missingPinById = (nodeId: DflowId, kind: DflowPinKind, pinId: DflowId) =>
 export class DflowPin {
   readonly id: DflowId;
   readonly kind: DflowPinKind;
+  readonly types?: DflowPinType[];
   #data?: DflowPinData;
   #source?: DflowPin;
 
-  constructor(kind: DflowPinKind, { id, data }: DflowSerializedPin) {
+  constructor(kind: DflowPinKind, { id, data, types }: DflowSerializedPin) {
     this.kind = kind;
     this.id = id;
+
+    // Set types first, then set data.
+    this.types = types;
     this.setData(data);
   }
 
@@ -87,8 +99,32 @@ export class DflowPin {
   }
 
   setData(data?: DflowPinData) {
+    const types = this.types ?? [];
+
     if (typeof data !== "undefined") {
-      this.#data = data;
+      const isArray = Array.isArray(data);
+      const isNull = data === null;
+      const isObject = typeof data === "object" && !isNull && !isArray;
+
+      switch (true) {
+        case typeof this.types === "undefined":
+        case typeof data === "string" && types.includes("string"):
+        case typeof data === "number" && types.includes("number"):
+        case typeof data === "boolean" && types.includes("boolean"):
+        case isNull && types.includes("null"):
+        case isObject && types.includes("object"):
+        case isArray && types.includes("array"): {
+          this.#data = data;
+          break;
+        }
+        default: {
+          throw new Error(
+            `could not set data pinKind=${this.kind} pinTypes=${
+              JSON.stringify(this.types)
+            } typeof=${typeof data}`,
+          );
+        }
+      }
     }
   }
 
@@ -231,8 +267,8 @@ export class DflowNode {
 export class DflowUnknownNode extends DflowNode {
   static kind = "Unknown";
 
-  constructor(serializedNode: DflowSerializedNode) {
-    super({ ...serializedNode, kind: DflowUnknownNode.kind });
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, kind: DflowUnknownNode.kind });
   }
 
   run() {}

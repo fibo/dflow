@@ -1,19 +1,25 @@
-import { DflowNode, DflowSerializedNode } from "../engine.ts";
+import {
+  DflowNode,
+  DflowSerializedNode,
+  DflowSerializedPin,
+} from "../engine.ts";
 
-export class DflowAbstractZeroInOneOut extends DflowNode {
-  constructor({ id, kind }: DflowSerializedNode) {
-    super({ id, kind, outputs: [{ id: "out" }] });
+export const inNum = (): DflowSerializedPin => ({
+  id: "in",
+  types: ["number"],
+});
+
+export const outNum = (data?: number): DflowSerializedPin => ({
+  id: "out",
+  types: ["number"],
+  data,
+});
+
+export class DflowAbstractUnaryNumericOperator extends DflowNode {
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, inputs: [inNum()], outputs: [outNum()] });
   }
-}
 
-export class DflowAbstractOneInOneOut extends DflowNode {
-  constructor({ id, kind }: DflowSerializedNode) {
-    super({ id, kind, inputs: [{ id: "in" }], outputs: [{ id: "out" }] });
-  }
-}
-
-export class DflowAbstractUnaryNumericOperator
-  extends DflowAbstractOneInOneOut {
   operation(_num: number): number {
     throw new Error(`Unimplemented operation nodeKind=${this.kind}`);
   }

@@ -1,5 +1,5 @@
 import { DflowNode, DflowSerializedNode } from "../engine.ts";
-import { DflowAbstractUnaryNumericOperator } from "./abstract.ts";
+import { DflowAbstractUnaryNumericOperator, outNum } from "./abstract.ts";
 
 export class DflowMathCos extends DflowAbstractUnaryNumericOperator {
   static kind = "mathCos";
@@ -20,8 +20,8 @@ export class DflowMathCosh extends DflowAbstractUnaryNumericOperator {
 export class DflowMathPI extends DflowNode {
   static kind = "mathPI";
 
-  constructor({ id, kind }: DflowSerializedNode) {
-    super({ id, kind, outputs: [{ id: "out", data: Math.PI }] });
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, outputs: [outNum(Math.PI)] });
   }
 }
 
