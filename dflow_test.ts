@@ -1,7 +1,4 @@
-import {
-  assertEquals,
-  assertObjectMatch,
-} from "https://deno.land/std@0.97.0/testing/asserts.ts";
+import { assertEquals, assertObjectMatch } from "std/testing/asserts.ts";
 
 import {
   DflowHost,

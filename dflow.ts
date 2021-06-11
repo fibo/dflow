@@ -1,7 +1,7 @@
 export type DflowId = string;
 export type DflowNodeKind = string;
 export type DflowPinKind = "input" | "output";
-export type DflowGraphRunStatus = "waiting" | "success" | "failure";
+export type DflowRunStatus = "waiting" | "success" | "failure";
 
 // Stolen from https://github.com/sindresorhus/type-fest/blob/main/source/basic.d.ts
 type JsonObject = { [Key in string]?: JsonValue };
@@ -258,7 +258,7 @@ export class DflowEdge {
 export class DflowGraph {
   readonly nodes: Map<DflowId, DflowNode> = new Map();
   readonly edges: Map<DflowId, DflowEdge> = new Map();
-  #runStatus: DflowGraphRunStatus = "success";
+  #runStatus: DflowRunStatus = "success";
 
   static sort(
     nodeIds: DflowId[],
@@ -266,11 +266,10 @@ export class DflowGraph {
   ): DflowId[] {
     const levelOf: Record<DflowId, number> = {};
 
-    const parentsOfNodeId = (
-      nodeId: DflowId,
-    ) => (nodeConnections.filter(({ targetId }) => (nodeId === targetId)).map((
-      { sourceId },
-    ) => (sourceId)));
+    const parentsOfNodeId = (nodeId: DflowId) =>
+      nodeConnections
+        .filter(({ targetId }) => nodeId === targetId)
+        .map(({ sourceId }) => sourceId);
 
     const levelOfNodeId = (nodeId: DflowId) => {
       const parentsNodeIds = parentsOfNodeId(nodeId);
@@ -291,9 +290,7 @@ export class DflowGraph {
       levelOf[nodeId] = levelOfNodeId(nodeId);
     }
 
-    return nodeIds.slice().sort((a, b) => (
-      levelOf[a] <= levelOf[b] ? -1 : 1
-    ));
+    return nodeIds.slice().sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
   }
 
   clear() {
@@ -428,7 +425,10 @@ export class DflowHost {
     if (node instanceof DflowNode) {
       // 1. Delete all edges connected to node.
       for (const edge of this.graph.edges.values()) {
-        const { source: [sourceNodeId], target: [targetNodeId] } = edge;
+        const {
+          source: [sourceNodeId],
+          target: [targetNodeId],
+        } = edge;
         if (sourceNodeId === node.id || targetNodeId === node.id) {
           this.deleteEdge(edge.id);
         }

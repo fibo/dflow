@@ -1,3 +1,6 @@
 .*
-docs
-!docs/dflow.js
+_config.yml
+_includes
+_layouts
+*.md
+usage.js

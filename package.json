@@ -4,7 +4,7 @@
   "version": "0.25.0",
   "homepage": "http://g14n.info/dflow",
   "type": "module",
-  "main": "docs/dflow.js",
+  "main": "dflow.js",
   "types": "dflow.ts",
   "engines": {
     "node": ">=14",
@@ -16,10 +16,11 @@
   },
   "license": "MIT",
   "scripts": {
-    "bundle": "deno bundle dflow.ts | esbuild --minify > docs/dflow.js",
-    "fmt": "deno fmt --ignore=docs/dflow.js",
+    "bundle": "run-p bundle:*",
+    "bundle:dflow": "deno bundle dflow.ts | esbuild --minify > dflow.js",
+    "fmt": "deno fmt --ignore=/.*\\.js/",
     "lint": "deno lint",
-    "test": "deno test"
+    "test": "deno test --unstable --importmap=import_map.json"
   },
   "repository": {
     "type": "git",
