@@ -1,5 +1,4 @@
-// Keep in sync with README
-import { DflowHost, DflowNode } from "./docs/dflow.js";
+import { DflowHost, DflowNode } from "../dflow.js";
 
 class NumNode extends DflowNode {
   static kind = "Num";

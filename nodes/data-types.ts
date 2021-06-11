@@ -1,7 +1,7 @@
 import { DflowAbstractZeroInOneOut } from "./abstract.ts";
 
 export class DflowNum extends DflowAbstractZeroInOneOut {
-  static kind: "Num";
+  static kind = "num";
 
   run() {}
 }

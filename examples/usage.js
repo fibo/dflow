@@ -1,15 +1,5 @@
-# dflow
-
-> is a minimal [Dataflow programming][dataflow-wikipedia] engine
-
-## Usage
-
-This is a trivial sample graph that will run `sin(π / 2) = 1` computation. You
-can run the following code, cloning this repo and launching
-`node examples/usage.js`.
-
-```js
-import { DflowHost, nodesCatalog as coreNodes } from "dflow";
+// Keep in sync with README
+import { catalog as coreNodes, DflowHost } from "../dflow.js";
 
 async function runGraph() {
   const dflow = new DflowHost(coreNodes);
@@ -40,6 +30,3 @@ async function runGraph() {
 }
 
 runGraph();
-```
-
-[dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
