@@ -39,6 +39,16 @@ export interface DflowSerializedGraph {
 }
 
 const _missingString = (stringName: string) => `${stringName} must be a string`;
+const _missingNumber = (numberName: string) => `${numberName} must be a number`;
+const _missingPin = (nodeId: DflowId, kind: DflowPinKind) =>
+  `${kind} pin not found nodeId=${nodeId}`;
+const _missingPinAtPosition = (
+  nodeId: DflowId,
+  kind: DflowPinKind,
+  position: number,
+) => `${_missingPin(nodeId, kind)} position=${position}`;
+const _missingPinById = (nodeId: DflowId, kind: DflowPinKind, pinId: DflowId) =>
+  `${_missingPin(nodeId, kind)} pinId=${pinId}`;
 
 export class DflowPin {
   readonly id: DflowId;
@@ -135,10 +145,18 @@ export class DflowNode {
     }
   }
 
-  getInputByPosition(position: number): DflowPin | null {
-    const inputId = this.#inputPosition[position];
-    if (typeof inputId === "undefined") return null;
-    return this.inputs.get(inputId) ?? null;
+  getInputByPosition(position: number): DflowPin {
+    if (typeof position !== "number") {
+      throw new TypeError(_missingNumber("position"));
+    }
+
+    const pinId = this.#inputPosition[position];
+
+    if (typeof pinId === "undefined") {
+      throw new Error(_missingPinAtPosition(this.id, "input", position));
+    }
+
+    return this.getInputById(pinId);
   }
 
   getOutputById(pinId: DflowId): DflowPin {
@@ -151,14 +169,22 @@ export class DflowNode {
     if (pin instanceof DflowPin) {
       return pin;
     } else {
-      throw new Error(`DflowPin not found, id=${pinId}, kind={output}`);
+      throw new Error(_missingPinById(this.id, "input", pinId));
     }
   }
 
-  getOutputByPosition(position: number): DflowPin | null {
-    const outputId = this.#outputPosition[position];
-    if (typeof outputId === "undefined") return null;
-    return this.outputs.get(outputId) ?? null;
+  getOutputByPosition(position: number): DflowPin {
+    if (typeof position !== "number") {
+      throw new TypeError(_missingNumber("position"));
+    }
+
+    const pinId = this.#outputPosition[position];
+
+    if (typeof pinId === "undefined") {
+      throw new Error(_missingPinAtPosition(this.id, "output", position));
+    }
+
+    return this.getOutputById(pinId);
   }
 
   newInput(serializedPin: DflowSerializedPin): void {
@@ -393,6 +419,24 @@ export class DflowHost {
 
   constructor(nodesCatalog: DflowNodesCatalog = {}) {
     this.#nodesCatalog = nodesCatalog;
+  }
+
+  connect(sourceNode: DflowNode, sourcePosition = 0) {
+    return {
+      to: (targetNode: DflowNode, targetPosition = 0) => {
+        const edgeId = `e${this.graph.edges.size + 1}`;
+
+        const sourcePin = sourceNode.getOutputByPosition(sourcePosition);
+
+        const targetPin = targetNode.getInputByPosition(targetPosition);
+
+        this.newEdge({
+          id: edgeId,
+          source: [sourceNode.id, sourcePin.id],
+          target: [targetNode.id, targetPin.id],
+        });
+      },
+    };
   }
 
   deleteEdge(edgeId: DflowId) {
