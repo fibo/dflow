@@ -21,6 +21,7 @@
     "bundle:engine": "deno bundle engine.ts | esbuild --minify > engine.js",
     "fmt": "deno fmt --ignore=./dflow.js,./engine.js",
     "lint": "deno lint --ignore=./dflow.js,./engine.js",
+    "postversion": "git push origin v${npm_package_version}; npm publish",
     "test": "deno test --unstable --importmap=import_map.json"
   },
   "repository": {
