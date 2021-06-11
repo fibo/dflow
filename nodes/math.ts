@@ -1,11 +1,18 @@
-import { DflowNode } from "../dflow.ts";
+import { DflowAbstractNumericUnaryOperator } from "./abstract.ts";
 
-export class MathSin extends DflowNode {
+export class DflowMathSin extends DflowAbstractNumericUnaryOperator {
   static kind = "Math.sin";
 
-  run() {}
+  run() {
+    const num = this.getInputData();
+    console.log("num", num);
+
+    if (typeof num === "number") {
+      this.setOutputData(Math.sin(num));
+    }
+  }
 }
 
 export const catalog = {
-  [MathSin.kind]: MathSin,
+  [DflowMathSin.kind]: DflowMathSin,
 };

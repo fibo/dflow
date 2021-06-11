@@ -18,7 +18,7 @@
   "scripts": {
     "bundle": "run-p bundle:*",
     "bundle:dflow": "deno bundle dflow.ts | esbuild --minify > dflow.js",
-    "fmt": "deno fmt --ignore=/.*\\.js/",
+    "fmt": "deno fmt --ignore=./dflow.js",
     "lint": "deno lint",
     "test": "deno test --unstable --importmap=import_map.json"
   },
