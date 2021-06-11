@@ -1,14 +1,13 @@
-import { DflowAbstractNumericUnaryOperator } from "./abstract.ts";
+import { DflowAbstractOneInOneOut } from "./abstract.ts";
 
-export class DflowMathSin extends DflowAbstractNumericUnaryOperator {
-  static kind = "Math.sin";
+export class DflowMathSin extends DflowAbstractOneInOneOut {
+  static kind = "mathSin";
 
   run() {
-    const num = this.getInputData();
-    console.log("num", num);
+    const num = this.getInputByPosition(0).getData();
 
     if (typeof num === "number") {
-      this.setOutputData(Math.sin(num));
+      this.getOutputByPosition(0).setData(Math.sin(num));
     }
   }
 }

@@ -5,7 +5,7 @@
   "homepage": "http://g14n.info/dflow",
   "type": "module",
   "main": "dflow.js",
-  "types": "dflow.ts",
+  "types": "engine.ts",
   "engines": {
     "node": ">=14",
     "deno": ">=1.10"
@@ -18,8 +18,9 @@
   "scripts": {
     "bundle": "run-p bundle:*",
     "bundle:dflow": "deno bundle dflow.ts | esbuild --minify > dflow.js",
-    "fmt": "deno fmt --ignore=./dflow.js",
-    "lint": "deno lint",
+    "bundle:engine": "deno bundle engine.ts | esbuild --minify > engine.js",
+    "fmt": "deno fmt --ignore=./dflow.js,./engine.js",
+    "lint": "deno lint --ignore=./dflow.js,./engine.js",
     "test": "deno test --unstable --importmap=import_map.json"
   },
   "repository": {
