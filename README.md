@@ -12,15 +12,14 @@ can run the following code, cloning this repo and launching
 import { DflowHost, nodesCatalog as coreNodes } from "dflow";
 
 async function runGraph() {
+  // Use builtin nodes.
   const dflow = new DflowHost(coreNodes);
 
   // Create two nodes.
   const numNode = dflow.newNode({
-    id: "num",
     kind: coreNodes.num.kind,
   });
   const sinNode = dflow.newNode({
-    id: "sin",
     kind: coreNodes.mathSin.kind,
   });
 
@@ -41,5 +40,9 @@ async function runGraph() {
 
 runGraph();
 ```
+
+## License
+
+[MIT](http://g14n.info/mit-license)
 
 [dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
