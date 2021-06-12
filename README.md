@@ -4,9 +4,14 @@
 
 ## Usage
 
-This is a trivial sample graph that will run `sin(π / 2) = 1` computation. You
-can run the following code, cloning this repo and launching
-`node examples/usage.js`.
+This is a trivial sample graph that will run `sin(π / 2) = 1` computation.
+
+You can run the following code with any of the following:
+
+- launching command `deno run https://raw.githubusercontent.com/fibo/dflow/main/examples/usage.js`
+- cloning this repo and launching `node examples/usage.js`.
+
+You should see a number `1` printed on output.
 
 ```js
 import { DflowHost, nodesCatalog as coreNodes } from "dflow";
