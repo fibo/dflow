@@ -22,7 +22,10 @@
     "fmt": "deno fmt --ignore=./dflow.js,./engine.js",
     "lint": "deno lint --ignore=./dflow.js,./engine.js",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
-    "test": "deno test --unstable --importmap=import_map.json"
+    "test": "run-s test:*",
+    "test:deno": "deno test --unstable --importmap=import_map.json",
+    "test:example:abstract": "deno run examples/abstract.js",
+    "test:example:usage": "deno run examples/usage.js"
   },
   "repository": {
     "type": "git",
