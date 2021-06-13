@@ -8,7 +8,7 @@ import {
 import {
   DflowHost,
   DflowNode,
-  DflowPin,
+  DflowOutput,
   DflowPinData,
   DflowPinType,
   DflowSerializedNode,
@@ -157,7 +157,7 @@ Deno.test("DflowGraph#run()", async () => {
 
   await dflow.graph.run();
 
-  const sum = sumNode.getOutputByPosition(0) as DflowPin;
+  const sum = sumNode.getOutputByPosition(0);
   assertEquals(sum.getData(), 4);
 });
 
@@ -226,188 +226,186 @@ Deno.test("DflowHost#newOutput()", () => {
 // DflowPin
 // ////////////////////////////////////////////////////////////////////////////
 
-function testPinSetData(data: DflowPinData, types?: DflowPinType[]) {
-  const pin = new DflowPin("output", { id: "test", types });
-  pin.setData(data);
-  assertStrictEquals(data, pin.getData());
+function testOutputSetData(data: DflowPinData, types?: DflowPinType[]) {
+  const output = new DflowOutput({ id: "test", types });
+  output.setData(data);
+  assertStrictEquals(data, output.getData());
 }
 
-function testPinSetDataThrows(data: DflowPinData, types: DflowPinType[]) {
-  const kind = "output";
-
+function testOutputSetDataThrows(data: DflowPinData, types: DflowPinType[]) {
   assertThrows(
     () => {
-      const pin = new DflowPin(kind, { id: "test", types });
-      pin.setData(data);
+      const output = new DflowOutput({ id: "test", types });
+      output.setData(data);
     },
     Error,
-    `could not set data pinKind=${kind} pinTypes=${JSON.stringify(types)}`,
+    `could not set data pinTypes=${JSON.stringify(types)}`,
   );
 }
 
-Deno.test("DflowPin#setData()", () => {
+Deno.test("DflowOutput#setData()", () => {
   const num = 1;
   const bool = true;
   const str = "string";
   const arr = [num, bool, str];
   const obj = { foo: num, bar: str };
 
-  const pin = new DflowPin("output", { id: "test" });
+  const pin = new DflowOutput({ id: "test" });
   assertEquals(pin.id, "test");
   assertEquals(pin.kind, "output");
   assertEquals(typeof pin.getData(), "undefined");
 
-  testPinSetData(str);
-  testPinSetData(num);
-  testPinSetData(bool);
-  testPinSetData(null);
-  testPinSetData(obj);
-  testPinSetData(arr);
+  testOutputSetData(str);
+  testOutputSetData(num);
+  testOutputSetData(bool);
+  testOutputSetData(null);
+  testOutputSetData(obj);
+  testOutputSetData(arr);
 
-  testPinSetData(str, ["string"]);
-  testPinSetDataThrows(num, ["string"]);
-  testPinSetDataThrows(bool, ["string"]);
-  testPinSetDataThrows(null, ["string"]);
-  testPinSetDataThrows(obj, ["string"]);
-  testPinSetDataThrows(arr, ["string"]);
+  testOutputSetData(str, ["string"]);
+  testOutputSetDataThrows(num, ["string"]);
+  testOutputSetDataThrows(bool, ["string"]);
+  testOutputSetDataThrows(null, ["string"]);
+  testOutputSetDataThrows(obj, ["string"]);
+  testOutputSetDataThrows(arr, ["string"]);
 
-  testPinSetDataThrows(str, ["number"]);
-  testPinSetData(num, ["number"]);
-  testPinSetDataThrows(bool, ["number"]);
-  testPinSetDataThrows(null, ["number"]);
-  testPinSetDataThrows(obj, ["number"]);
-  testPinSetDataThrows(arr, ["number"]);
+  testOutputSetDataThrows(str, ["number"]);
+  testOutputSetData(num, ["number"]);
+  testOutputSetDataThrows(bool, ["number"]);
+  testOutputSetDataThrows(null, ["number"]);
+  testOutputSetDataThrows(obj, ["number"]);
+  testOutputSetDataThrows(arr, ["number"]);
 
-  testPinSetDataThrows(str, ["boolean"]);
-  testPinSetDataThrows(num, ["boolean"]);
-  testPinSetData(bool, ["boolean"]);
-  testPinSetDataThrows(null, ["boolean"]);
-  testPinSetDataThrows(obj, ["boolean"]);
-  testPinSetDataThrows(arr, ["boolean"]);
+  testOutputSetDataThrows(str, ["boolean"]);
+  testOutputSetDataThrows(num, ["boolean"]);
+  testOutputSetData(bool, ["boolean"]);
+  testOutputSetDataThrows(null, ["boolean"]);
+  testOutputSetDataThrows(obj, ["boolean"]);
+  testOutputSetDataThrows(arr, ["boolean"]);
 
-  testPinSetDataThrows(str, ["null"]);
-  testPinSetDataThrows(num, ["null"]);
-  testPinSetDataThrows(bool, ["null"]);
-  testPinSetData(null, ["null"]);
-  testPinSetDataThrows(obj, ["null"]);
-  testPinSetDataThrows(arr, ["null"]);
+  testOutputSetDataThrows(str, ["null"]);
+  testOutputSetDataThrows(num, ["null"]);
+  testOutputSetDataThrows(bool, ["null"]);
+  testOutputSetData(null, ["null"]);
+  testOutputSetDataThrows(obj, ["null"]);
+  testOutputSetDataThrows(arr, ["null"]);
 
-  testPinSetDataThrows(str, ["object"]);
-  testPinSetDataThrows(num, ["object"]);
-  testPinSetDataThrows(bool, ["object"]);
-  testPinSetDataThrows(null, ["object"]);
-  testPinSetData(obj, ["object"]);
-  testPinSetDataThrows(arr, ["object"]);
+  testOutputSetDataThrows(str, ["object"]);
+  testOutputSetDataThrows(num, ["object"]);
+  testOutputSetDataThrows(bool, ["object"]);
+  testOutputSetDataThrows(null, ["object"]);
+  testOutputSetData(obj, ["object"]);
+  testOutputSetDataThrows(arr, ["object"]);
 
-  testPinSetDataThrows(str, ["array"]);
-  testPinSetDataThrows(num, ["array"]);
-  testPinSetDataThrows(bool, ["array"]);
-  testPinSetDataThrows(null, ["array"]);
-  testPinSetDataThrows(obj, ["array"]);
-  testPinSetData(arr, ["array"]);
+  testOutputSetDataThrows(str, ["array"]);
+  testOutputSetDataThrows(num, ["array"]);
+  testOutputSetDataThrows(bool, ["array"]);
+  testOutputSetDataThrows(null, ["array"]);
+  testOutputSetDataThrows(obj, ["array"]);
+  testOutputSetData(arr, ["array"]);
 
-  testPinSetData(str, ["string", "number"]);
-  testPinSetData(num, ["string", "number"]);
-  testPinSetDataThrows(bool, ["string", "number"]);
-  testPinSetDataThrows(null, ["string", "number"]);
-  testPinSetDataThrows(obj, ["string", "number"]);
-  testPinSetDataThrows(arr, ["string", "number"]);
+  testOutputSetData(str, ["string", "number"]);
+  testOutputSetData(num, ["string", "number"]);
+  testOutputSetDataThrows(bool, ["string", "number"]);
+  testOutputSetDataThrows(null, ["string", "number"]);
+  testOutputSetDataThrows(obj, ["string", "number"]);
+  testOutputSetDataThrows(arr, ["string", "number"]);
 
-  testPinSetData(str, ["string", "boolean"]);
-  testPinSetDataThrows(num, ["string", "boolean"]);
-  testPinSetData(bool, ["string", "boolean"]);
-  testPinSetDataThrows(null, ["string", "boolean"]);
-  testPinSetDataThrows(obj, ["string", "boolean"]);
-  testPinSetDataThrows(arr, ["string", "boolean"]);
+  testOutputSetData(str, ["string", "boolean"]);
+  testOutputSetDataThrows(num, ["string", "boolean"]);
+  testOutputSetData(bool, ["string", "boolean"]);
+  testOutputSetDataThrows(null, ["string", "boolean"]);
+  testOutputSetDataThrows(obj, ["string", "boolean"]);
+  testOutputSetDataThrows(arr, ["string", "boolean"]);
 
-  testPinSetData(str, ["string", "null"]);
-  testPinSetDataThrows(num, ["string", "null"]);
-  testPinSetDataThrows(bool, ["string", "null"]);
-  testPinSetData(null, ["string", "null"]);
-  testPinSetDataThrows(obj, ["string", "null"]);
-  testPinSetDataThrows(arr, ["string", "null"]);
+  testOutputSetData(str, ["string", "null"]);
+  testOutputSetDataThrows(num, ["string", "null"]);
+  testOutputSetDataThrows(bool, ["string", "null"]);
+  testOutputSetData(null, ["string", "null"]);
+  testOutputSetDataThrows(obj, ["string", "null"]);
+  testOutputSetDataThrows(arr, ["string", "null"]);
 
-  testPinSetData(str, ["string", "object"]);
-  testPinSetDataThrows(num, ["string", "object"]);
-  testPinSetDataThrows(bool, ["string", "object"]);
-  testPinSetDataThrows(null, ["string", "object"]);
-  testPinSetData(obj, ["string", "object"]);
-  testPinSetDataThrows(arr, ["string", "object"]);
+  testOutputSetData(str, ["string", "object"]);
+  testOutputSetDataThrows(num, ["string", "object"]);
+  testOutputSetDataThrows(bool, ["string", "object"]);
+  testOutputSetDataThrows(null, ["string", "object"]);
+  testOutputSetData(obj, ["string", "object"]);
+  testOutputSetDataThrows(arr, ["string", "object"]);
 
-  testPinSetData(str, ["string", "array"]);
-  testPinSetDataThrows(num, ["string", "array"]);
-  testPinSetDataThrows(bool, ["string", "array"]);
-  testPinSetDataThrows(null, ["string", "array"]);
-  testPinSetDataThrows(obj, ["string", "array"]);
-  testPinSetData(arr, ["string", "array"]);
+  testOutputSetData(str, ["string", "array"]);
+  testOutputSetDataThrows(num, ["string", "array"]);
+  testOutputSetDataThrows(bool, ["string", "array"]);
+  testOutputSetDataThrows(null, ["string", "array"]);
+  testOutputSetDataThrows(obj, ["string", "array"]);
+  testOutputSetData(arr, ["string", "array"]);
 
-  testPinSetDataThrows(str, ["number", "boolean"]);
-  testPinSetData(num, ["number", "boolean"]);
-  testPinSetData(bool, ["number", "boolean"]);
-  testPinSetDataThrows(null, ["number", "boolean"]);
-  testPinSetDataThrows(obj, ["number", "boolean"]);
-  testPinSetDataThrows(arr, ["number", "boolean"]);
+  testOutputSetDataThrows(str, ["number", "boolean"]);
+  testOutputSetData(num, ["number", "boolean"]);
+  testOutputSetData(bool, ["number", "boolean"]);
+  testOutputSetDataThrows(null, ["number", "boolean"]);
+  testOutputSetDataThrows(obj, ["number", "boolean"]);
+  testOutputSetDataThrows(arr, ["number", "boolean"]);
 
-  testPinSetDataThrows(str, ["number", "null"]);
-  testPinSetData(num, ["number", "null"]);
-  testPinSetDataThrows(bool, ["number", "null"]);
-  testPinSetData(null, ["number", "null"]);
-  testPinSetDataThrows(obj, ["number", "null"]);
-  testPinSetDataThrows(arr, ["number", "null"]);
+  testOutputSetDataThrows(str, ["number", "null"]);
+  testOutputSetData(num, ["number", "null"]);
+  testOutputSetDataThrows(bool, ["number", "null"]);
+  testOutputSetData(null, ["number", "null"]);
+  testOutputSetDataThrows(obj, ["number", "null"]);
+  testOutputSetDataThrows(arr, ["number", "null"]);
 
-  testPinSetDataThrows(str, ["number", "object"]);
-  testPinSetData(num, ["number", "object"]);
-  testPinSetDataThrows(bool, ["number", "object"]);
-  testPinSetDataThrows(null, ["number", "object"]);
-  testPinSetData(obj, ["number", "object"]);
-  testPinSetDataThrows(arr, ["number", "object"]);
+  testOutputSetDataThrows(str, ["number", "object"]);
+  testOutputSetData(num, ["number", "object"]);
+  testOutputSetDataThrows(bool, ["number", "object"]);
+  testOutputSetDataThrows(null, ["number", "object"]);
+  testOutputSetData(obj, ["number", "object"]);
+  testOutputSetDataThrows(arr, ["number", "object"]);
 
-  testPinSetDataThrows(str, ["number", "array"]);
-  testPinSetData(num, ["number", "array"]);
-  testPinSetDataThrows(bool, ["number", "array"]);
-  testPinSetDataThrows(null, ["number", "array"]);
-  testPinSetDataThrows(obj, ["number", "array"]);
-  testPinSetData(arr, ["number", "array"]);
+  testOutputSetDataThrows(str, ["number", "array"]);
+  testOutputSetData(num, ["number", "array"]);
+  testOutputSetDataThrows(bool, ["number", "array"]);
+  testOutputSetDataThrows(null, ["number", "array"]);
+  testOutputSetDataThrows(obj, ["number", "array"]);
+  testOutputSetData(arr, ["number", "array"]);
 
-  testPinSetDataThrows(str, ["boolean", "null"]);
-  testPinSetDataThrows(num, ["boolean", "null"]);
-  testPinSetData(bool, ["boolean", "null"]);
-  testPinSetData(null, ["boolean", "null"]);
-  testPinSetDataThrows(obj, ["boolean", "null"]);
-  testPinSetDataThrows(arr, ["boolean", "null"]);
+  testOutputSetDataThrows(str, ["boolean", "null"]);
+  testOutputSetDataThrows(num, ["boolean", "null"]);
+  testOutputSetData(bool, ["boolean", "null"]);
+  testOutputSetData(null, ["boolean", "null"]);
+  testOutputSetDataThrows(obj, ["boolean", "null"]);
+  testOutputSetDataThrows(arr, ["boolean", "null"]);
 
-  testPinSetDataThrows(str, ["boolean", "object"]);
-  testPinSetDataThrows(num, ["boolean", "object"]);
-  testPinSetData(bool, ["boolean", "object"]);
-  testPinSetDataThrows(null, ["boolean", "object"]);
-  testPinSetData(obj, ["boolean", "object"]);
-  testPinSetDataThrows(arr, ["boolean", "object"]);
+  testOutputSetDataThrows(str, ["boolean", "object"]);
+  testOutputSetDataThrows(num, ["boolean", "object"]);
+  testOutputSetData(bool, ["boolean", "object"]);
+  testOutputSetDataThrows(null, ["boolean", "object"]);
+  testOutputSetData(obj, ["boolean", "object"]);
+  testOutputSetDataThrows(arr, ["boolean", "object"]);
 
-  testPinSetDataThrows(str, ["boolean", "array"]);
-  testPinSetDataThrows(num, ["boolean", "array"]);
-  testPinSetData(bool, ["boolean", "array"]);
-  testPinSetDataThrows(null, ["boolean", "array"]);
-  testPinSetDataThrows(obj, ["boolean", "array"]);
-  testPinSetData(arr, ["boolean", "array"]);
+  testOutputSetDataThrows(str, ["boolean", "array"]);
+  testOutputSetDataThrows(num, ["boolean", "array"]);
+  testOutputSetData(bool, ["boolean", "array"]);
+  testOutputSetDataThrows(null, ["boolean", "array"]);
+  testOutputSetDataThrows(obj, ["boolean", "array"]);
+  testOutputSetData(arr, ["boolean", "array"]);
 
-  testPinSetDataThrows(str, ["null", "object"]);
-  testPinSetDataThrows(num, ["null", "object"]);
-  testPinSetDataThrows(bool, ["null", "object"]);
-  testPinSetData(null, ["null", "object"]);
-  testPinSetData(obj, ["null", "object"]);
-  testPinSetDataThrows(arr, ["null", "object"]);
+  testOutputSetDataThrows(str, ["null", "object"]);
+  testOutputSetDataThrows(num, ["null", "object"]);
+  testOutputSetDataThrows(bool, ["null", "object"]);
+  testOutputSetData(null, ["null", "object"]);
+  testOutputSetData(obj, ["null", "object"]);
+  testOutputSetDataThrows(arr, ["null", "object"]);
 
-  testPinSetDataThrows(str, ["null", "array"]);
-  testPinSetDataThrows(num, ["null", "array"]);
-  testPinSetDataThrows(bool, ["null", "array"]);
-  testPinSetData(null, ["null", "array"]);
-  testPinSetDataThrows(obj, ["null", "array"]);
-  testPinSetData(arr, ["null", "array"]);
+  testOutputSetDataThrows(str, ["null", "array"]);
+  testOutputSetDataThrows(num, ["null", "array"]);
+  testOutputSetDataThrows(bool, ["null", "array"]);
+  testOutputSetData(null, ["null", "array"]);
+  testOutputSetDataThrows(obj, ["null", "array"]);
+  testOutputSetData(arr, ["null", "array"]);
 
-  testPinSetDataThrows(str, ["object", "array"]);
-  testPinSetDataThrows(num, ["object", "array"]);
-  testPinSetDataThrows(bool, ["object", "array"]);
-  testPinSetDataThrows(null, ["object", "array"]);
-  testPinSetData(obj, ["object", "array"]);
-  testPinSetData(arr, ["object", "array"]);
+  testOutputSetDataThrows(str, ["object", "array"]);
+  testOutputSetDataThrows(num, ["object", "array"]);
+  testOutputSetDataThrows(bool, ["object", "array"]);
+  testOutputSetDataThrows(null, ["object", "array"]);
+  testOutputSetData(obj, ["object", "array"]);
+  testOutputSetData(arr, ["object", "array"]);
 });
