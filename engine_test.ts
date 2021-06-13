@@ -223,7 +223,7 @@ Deno.test("DflowHost#newOutput()", () => {
   assertEquals(outputId1, output1?.id);
 });
 
-// DflowPin
+// DflowOutput
 // ////////////////////////////////////////////////////////////////////////////
 
 function testOutputSetData(data: DflowPinData, types?: DflowPinType[]) {
@@ -242,6 +242,15 @@ function testOutputSetDataThrows(data: DflowPinData, types: DflowPinType[]) {
     `could not set data pinTypes=${JSON.stringify(types)}`,
   );
 }
+
+Deno.test("DflowOutput#clear()", () => {
+  const output = new DflowOutput({ id: "test" });
+  const data = 1;
+  output.data = data;
+  assertStrictEquals(data, output.data);
+  output.clear();
+  assertStrictEquals(undefined, output.data);
+});
 
 Deno.test("DflowOutput#set data", () => {
   const num = 1;
