@@ -39,7 +39,7 @@ class SleepNode extends DflowNode {
   static isAsync = true;
 
   constructor(serializedNode) {
-    super(serializedNode, SleepNode.isAsync);
+    super(serializedNode, { isAsync: SleepNode.isAsync });
   }
 
   async run() {

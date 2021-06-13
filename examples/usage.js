@@ -10,7 +10,7 @@ async function runGraph() {
     kind: coreNodes.num.kind,
   });
   const sinNode = dflow.newNode({
-    kind: coreNodes.mathSin.kind,
+    kind: coreNodes.sin.kind,
   });
 
   // Set numNode output to π / 2.

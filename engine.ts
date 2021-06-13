@@ -1,6 +1,10 @@
 export type DflowId = string;
 export type DflowNewItem<Item> = Omit<Item, "id"> & { id?: DflowId };
 export type DflowNodeKind = string;
+export type DflowNodeMetadata = {
+  isAsync?: boolean;
+  isConstant?: boolean;
+};
 export type DflowPinKind = "input" | "output";
 export type DflowPinType =
   | "string"
@@ -146,6 +150,7 @@ export class DflowNode {
   readonly id: DflowId;
   readonly kind: string;
   readonly isAsync: boolean;
+  readonly isConstant: boolean;
   readonly inputs: Map<DflowId, DflowPin> = new Map();
   readonly outputs: Map<DflowId, DflowPin> = new Map();
   readonly #inputPosition: DflowId[] = [];
@@ -153,11 +158,14 @@ export class DflowNode {
 
   constructor(
     { id, kind, inputs = [], outputs = [] }: DflowSerializedNode,
-    isAsync = false,
+    { isAsync = false, isConstant = false }: DflowNodeMetadata = {},
   ) {
     this.id = id;
     this.kind = kind;
+
+    // Metadata.
     this.isAsync = isAsync;
+    this.isConstant = isConstant;
 
     for (const serializedPin of inputs) {
       this.newInput(serializedPin);
@@ -418,10 +426,12 @@ export class DflowGraph {
       const node = this.nodes.get(nodeId) as DflowNode;
 
       try {
-        if (node.isAsync) {
-          await node.run();
-        } else {
-          node.run();
+        if (node.isConstant === false) {
+          if (node.isAsync) {
+            await node.run();
+          } else {
+            node.run();
+          }
         }
       } catch (error) {
         console.error(error);

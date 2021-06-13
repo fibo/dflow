@@ -1,42 +1,45 @@
 import { DflowNode, DflowSerializedNode } from "../engine.ts";
-import { DflowAbstractUnaryNumericOperator, outNum } from "./abstract.ts";
+import { DflowAbstractOneNumInOneNumOut, oneNumOut } from "./abstract.ts";
 
-export class DflowMathCos extends DflowAbstractUnaryNumericOperator {
-  static kind = "mathCos";
+class DflowMathCos extends DflowAbstractOneNumInOneNumOut {
+  static kind = "cos";
 
-  operation(num: number) {
+  task(num: number) {
     return Math.cos(num);
   }
 }
 
-export class DflowMathCosh extends DflowAbstractUnaryNumericOperator {
-  static kind = "mathCosh";
+class DflowMathCosh extends DflowAbstractOneNumInOneNumOut {
+  static kind = "cosh";
 
-  operation(num: number) {
+  task(num: number) {
     return Math.cosh(num);
   }
 }
 
-export class DflowMathPI extends DflowNode {
-  static kind = "mathPI";
+class DflowMathPI extends DflowNode {
+  static kind = "PI";
+  static isConstant = true;
 
   constructor(arg: DflowSerializedNode) {
-    super({ ...arg, outputs: [outNum(Math.PI)] });
+    super({ ...arg, outputs: [oneNumOut(Math.PI)] }, {
+      isConstant: DflowMathPI.isConstant,
+    });
   }
 }
 
-export class DflowMathSin extends DflowAbstractUnaryNumericOperator {
-  static kind = "mathSin";
+class DflowMathSin extends DflowAbstractOneNumInOneNumOut {
+  static kind = "sin";
 
-  operation(num: number) {
+  task(num: number) {
     return Math.sin(num);
   }
 }
 
-export class DflowMathSinh extends DflowAbstractUnaryNumericOperator {
-  static kind = "mathSinh";
+class DflowMathSinh extends DflowAbstractOneNumInOneNumOut {
+  static kind = "sinh";
 
-  operation(num: number) {
+  task(num: number) {
     return Math.sinh(num);
   }
 }

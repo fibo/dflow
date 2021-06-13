@@ -4,31 +4,67 @@ import {
   DflowSerializedPin,
 } from "../engine.ts";
 
-export const inNum = (): DflowSerializedPin => ({
+const _missingMethod = (
+  methodName: string,
+  nodeKind: string,
+) => (`unimplemented method ${methodName} nodeKind=${nodeKind}`);
+
+export const oneBoolIn = (): DflowSerializedPin => ({
+  id: "in",
+  types: ["boolean"],
+});
+
+export const oneBoolOut = (data?: boolean): DflowSerializedPin => ({
+  id: "out",
+  types: ["boolean"],
+  data,
+});
+
+export const oneNumIn = (): DflowSerializedPin => ({
   id: "in",
   types: ["number"],
 });
 
-export const outNum = (data?: number): DflowSerializedPin => ({
+export const oneNumOut = (data?: number): DflowSerializedPin => ({
   id: "out",
   types: ["number"],
   data,
 });
 
-export class DflowAbstractUnaryNumericOperator extends DflowNode {
+export class DflowAbstractOneNumInOneBoolOut extends DflowNode {
   constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: [inNum()], outputs: [outNum()] });
+    super({ ...arg, inputs: [oneNumIn()], outputs: [oneBoolOut()] });
   }
 
-  operation(_num: number): number {
-    throw new Error(`Unimplemented operation nodeKind=${this.kind}`);
+  task(_: number): boolean {
+    throw new Error(_missingMethod("task", this.kind));
   }
 
   run() {
     const num = this.getInputByPosition(0).getData();
 
     if (typeof num === "number") {
-      const result = this.operation(num);
+      const result = this.task(num);
+
+      this.getOutputByPosition(0).setData(result);
+    }
+  }
+}
+
+export class DflowAbstractOneNumInOneNumOut extends DflowNode {
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, inputs: [oneNumIn()], outputs: [oneNumOut()] });
+  }
+
+  task(_: number): number {
+    throw new Error(_missingMethod("task", this.kind));
+  }
+
+  run() {
+    const num = this.getInputByPosition(0).getData();
+
+    if (typeof num === "number") {
+      const result = this.task(num);
 
       this.getOutputByPosition(0).setData(result);
     }
