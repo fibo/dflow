@@ -2,6 +2,56 @@
 
 > is a minimal [Dataflow programming][dataflow-wikipedia] engine
 
+## Installation
+
+## Installation
+
+### Node
+
+With [npm](https://npmjs.org/) do
+
+```bash
+npm install dflow
+```
+
+### Deno
+
+Create an *import_map.json* file like this.
+
+```json
+{
+  "imports": {
+    "dflow/": "https://unpkg.com/dflow/"
+  }
+}
+```
+
+Then you can import for example the following.
+
+```typescript
+import { DflowHost } from "dflow/engine.ts";
+import { catalog as coreNodes } from "dflow/nodes/catalog.ts";
+
+const dflow = new DflowHost(coreNodes);
+```
+
+And With [deno](https://deno.land/) you can launch your script like this
+
+```bash
+deno run --importmap=import_map.json path/to/my/script.ts
+```
+
+It is recommended to point to a specific version, for instance to point to version `0.26` or whatever, then change your import map accordingly
+
+```diff
+{
+  "imports": {
+-    "dflow/": "https://unpkg.com/dflow/"
++    "dflow/": "https://unpkg.com/dflow@0.26/"
+  }
+}
+```
+
 ## Usage
 
 This is a trivial sample graph that will run `sin(π / 2) = 1` computation.
