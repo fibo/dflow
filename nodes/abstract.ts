@@ -1,5 +1,7 @@
 import {
+  DflowInput,
   DflowNode,
+  DflowOutput,
   DflowSerializedInput,
   DflowSerializedNode,
   DflowSerializedOutput,
@@ -32,7 +34,17 @@ export const oneNumOut = (data?: number): DflowSerializedOutput => ({
   data,
 });
 
-export class DflowAbstractOneNumInOneBoolOut extends DflowNode {
+export class DflowAbstractOneInOneOut extends DflowNode {
+  get input(): DflowInput {
+    return this.getInputByPosition(0);
+  }
+
+  get output(): DflowOutput {
+    return this.getOutputByPosition(0);
+  }
+}
+
+export class DflowAbstractOneNumInOneBoolOut extends DflowAbstractOneInOneOut {
   constructor(arg: DflowSerializedNode) {
     super({ ...arg, inputs: [oneNumIn()], outputs: [oneBoolOut()] });
   }
@@ -42,17 +54,19 @@ export class DflowAbstractOneNumInOneBoolOut extends DflowNode {
   }
 
   run() {
-    const num = this.getInputByPosition(0).data;
+    const num = this.input.data;
 
     if (typeof num === "number") {
       const result = this.task(num);
 
-      this.getOutputByPosition(0).data = result;
+      this.output.data = result;
+    } else {
+      this.output.clear();
     }
   }
 }
 
-export class DflowAbstractOneNumInOneNumOut extends DflowNode {
+export class DflowAbstractOneNumInOneNumOut extends DflowAbstractOneInOneOut {
   constructor(arg: DflowSerializedNode) {
     super({ ...arg, inputs: [oneNumIn()], outputs: [oneNumOut()] });
   }
@@ -62,12 +76,14 @@ export class DflowAbstractOneNumInOneNumOut extends DflowNode {
   }
 
   run() {
-    const num = this.getInputByPosition(0).data;
+    const num = this.input.data;
 
     if (typeof num === "number") {
       const result = this.task(num);
 
-      this.getOutputByPosition(0).data = result;
+      this.output.data = result;
+    } else {
+      this.output.clear();
     }
   }
 }

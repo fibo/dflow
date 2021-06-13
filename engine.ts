@@ -122,7 +122,11 @@ export class DflowOutput extends DflowPin {
   constructor({ id, data, types }: DflowSerializedOutput) {
     super("output", { id, types });
 
-    this.data = data;
+    this.#data = data;
+  }
+
+  clear() {
+    this.#data = undefined;
   }
 
   get data(): DflowPinData | undefined {
