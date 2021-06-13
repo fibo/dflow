@@ -1,4 +1,4 @@
-import { testOneNumInOneBoolOut, testOneNumInOneNumOut } from "./_test-utils.ts";
+import { testOneNumInOneBoolOut, testOneStrInOneNumOut } from "./_test-utils.ts";
 import { catalog } from "./number.ts";
 
 Deno.test(catalog.isFinite.kind, () => {
@@ -20,10 +20,10 @@ Deno.test(catalog.isNaN.kind, () => {
 
 Deno.test(catalog.parseFloat.kind, () => {
   const nodeKind = catalog.parseFloat.kind;
-  testOneNumInOneNumOut(nodeKind, 1.5, Number.parseFloat('1.5'));
+  testStrNumInOneNumOut(nodeKind, 1.5, Number.parseFloat('1.5'));
 });
 
 Deno.test(catalog.parseInt.kind, () => {
   const nodeKind = catalog.parseInt.kind;
-  testOneNumInOneNumOut(nodeKind, 1, Number.parseInt('1'));
+  testStrNumInOneNumOut(nodeKind, 1, Number.parseInt('1'));
 });

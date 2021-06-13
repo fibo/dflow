@@ -1,4 +1,4 @@
-import { DflowAbstractOneNumInOneBoolOut } from "./abstract.ts";
+import { DflowAbstractOneNumInOneBoolOut, DflowAbstractOneStrInOneNumOut } from "./abstract.ts";
 
 class DflowIsFinite extends DflowAbstractOneNumInOneBoolOut {
   static kind = "isFinite";
@@ -24,19 +24,19 @@ class DflowIsNaN extends DflowAbstractOneNumInOneBoolOut {
   }
 }
 
-class DflowParseFloat extends DflowAbstractOneNumInOneNumOut {
+class DflowParseFloat extends DflowAbstractOneStrInOneNumOut {
   static kind = "parseFloat";
 
-  task(num: number) {
+  task(num: string) {
     return Number.parseFloat(num);
   }
 }
 
-class DflowParseInt extends DflowAbstractOneNumInOneNumOut {
+class DflowParseInt extends DflowAbstractOneStrInOneNumOut {
   static kind = "parseInt";
 
-  task(num: number) {
-    return Number.parseInt(num);
+  task(str: string) {
+    return Number.parseInt(str);
   }
 }
 
