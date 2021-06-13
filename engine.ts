@@ -97,8 +97,8 @@ export class DflowInput extends DflowPin {
     this.#source = undefined;
   }
 
-  getData(): DflowPinData | undefined {
-    return this.#source?.getData();
+  get data(): DflowPinData | undefined {
+    return this.#source?.data;
   }
 
   toJSON() {
@@ -122,14 +122,14 @@ export class DflowOutput extends DflowPin {
   constructor({ id, data, types }: DflowSerializedOutput) {
     super("output", { id, types });
 
-    this.setData(data);
+    this.data = data;
   }
 
-  getData(): DflowPinData | undefined {
+  get data(): DflowPinData | undefined {
     return this.#data;
   }
 
-  setData(data?: DflowPinData) {
+  set data(data: DflowPinData | undefined) {
     const types = this.types ?? [];
 
     if (typeof data !== "undefined") {

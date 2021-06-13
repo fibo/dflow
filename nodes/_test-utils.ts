@@ -10,11 +10,11 @@ export function testOneNumInOneBoolOut(
 ) {
   const dflow = new DflowHost(catalog);
   const numNode = dflow.newNode({ kind: catalog.num.kind });
-  numNode.getOutputByPosition(0).setData(input);
+  numNode.getOutputByPosition(0).data = input;
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(numNode).to(testNode);
   dflow.graph.run();
-  assertEquals(testNode.getOutputByPosition(0).getData(), expected);
+  assertEquals(testNode.getOutputByPosition(0).data, expected);
 }
 
 export function testOneNumInOneNumOut(
@@ -24,11 +24,11 @@ export function testOneNumInOneNumOut(
 ) {
   const dflow = new DflowHost(catalog);
   const numNode = dflow.newNode({ kind: catalog.num.kind });
-  numNode.getOutputByPosition(0).setData(input);
+  numNode.getOutputByPosition(0).data = input;
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(numNode).to(testNode);
   dflow.graph.run();
-  assertEquals(testNode.getOutputByPosition(0).getData(), expected);
+  assertEquals(testNode.getOutputByPosition(0).data, expected);
 }
 
 export function testOneNumOut(
@@ -38,5 +38,5 @@ export function testOneNumOut(
   const dflow = new DflowHost(catalog);
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.graph.run();
-  assertEquals(testNode.getOutputByPosition(0).getData(), expected);
+  assertEquals(testNode.getOutputByPosition(0).data, expected);
 }

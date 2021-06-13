@@ -82,7 +82,7 @@ async function runGraph() {
 
   // Set numNode output to π / 2.
   const num = numNode.getOutputByPosition(0);
-  num.setData(Math.PI / 2);
+  num.data = Math.PI / 2;
 
   // Connect numNode to sinNode.
   dflow.connect(numNode).to(sinNode);
@@ -92,7 +92,7 @@ async function runGraph() {
 
   // Get sinNode output.
   const sin = sinNode.getOutputByPosition(0);
-  console.log(sin.getData()); // 1 = sin(π / 2)
+  console.log(sin.data); // 1 = sin(π / 2)
 }
 
 runGraph();

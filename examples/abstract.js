@@ -13,7 +13,7 @@ class SumNode extends DflowNode {
     let sum = 0;
 
     for (const input of this.inputs.values()) {
-      const inputData = input.getData();
+      const inputData = input.data;
       if (typeof inputData === "number") {
         sum += inputData;
       }
@@ -21,7 +21,7 @@ class SumNode extends DflowNode {
 
     const output = this.getOutputByPosition(0);
     if (output !== null) {
-      output.setData(sum);
+      output.data = sum;
     }
   }
 }
@@ -88,7 +88,7 @@ async function runGraph() {
   await dflow.graph.run();
 
   const sum = sumNode.getOutputByPosition(0);
-  console.log(sum.getData()); // 4
+  console.log(sum.data); // 4
 }
 
 runGraph();
