@@ -40,3 +40,17 @@ export function testOneNumOut(
   dflow.graph.run();
   assertEquals(testNode.getOutputByPosition(0).data, expected);
 }
+
+export function testOneStrInOneNumOut(
+  nodeKind: string,
+  input: string,
+  expected:number,
+) {
+  const dflow = new DflowHost(catalog);
+  const strNode = dflow.newNode({ kind: catalog.str.kind });
+  numNode.getOutputByPosition(0).data = input;
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(strNode).to(testNode);
+  dflow.graph.run();
+  assertEquals(testNode.getOutputByPosition(0).data, expected);
+}

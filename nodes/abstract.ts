@@ -13,24 +13,35 @@ const _missingMethod = (
 ) => (`unimplemented method ${methodName} nodeKind=${nodeKind}`);
 
 export const oneBoolIn = (): DflowSerializedInput => ({
-  id: "in",
-  types: ["boolean"],
+id:"in",
+types:["boolean"],
 });
 
 export const oneBoolOut = (data?: boolean): DflowSerializedOutput => ({
-  id: "out",
-  types: ["boolean"],
+id:"out",
+types:["boolean"],
   data,
 });
 
 export const oneNumIn = (): DflowSerializedInput => ({
-  id: "in",
-  types: ["number"],
+id:"in",
+types:["number"],
 });
 
 export const oneNumOut = (data?: number): DflowSerializedOutput => ({
-  id: "out",
-  types: ["number"],
+id:"out",
+types:["number"],
+  data,
+});
+
+export const oneStrIn = (): DflowSerializedInput => ({
+id:"in",
+types:["string"],
+});
+
+export const oneStrOut = (data?: string): DflowSerializedOutput => ({
+id:"out",
+types:["string"],
   data,
 });
 
@@ -80,6 +91,28 @@ export class DflowAbstractOneNumInOneNumOut extends DflowAbstractOneInOneOut {
 
     if (typeof num === "number") {
       const result = this.task(num);
+
+      this.output.data = result;
+    } else {
+      this.output.clear();
+    }
+  }
+}
+
+export class DflowAbstractOneStrInOneNumOut extends DflowAbstractOneInOneOut {
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, inputs: [oneStrIn()], outputs: [oneNumOut()] });
+  }
+
+  task(_: string): number {
+    throw new Error(_missingMethod("task", this.kind));
+  }
+
+  run() {
+    const str = this.input.data;
+
+    if (typeof str === "string") {
+      const result = this.task(str);
 
       this.output.data = result;
     } else {
