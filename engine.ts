@@ -180,8 +180,7 @@ export class DflowOutput extends DflowPin {
 export class DflowNode {
   readonly id: DflowId;
   readonly kind: string;
-  readonly isAsync: boolean;
-  readonly isConstant: boolean;
+  readonly meta: DflowNodeMetadata;
   readonly inputs: Map<DflowId, DflowInput> = new Map();
   readonly outputs: Map<DflowId, DflowOutput> = new Map();
   readonly #inputPosition: DflowId[] = [];
@@ -195,8 +194,7 @@ export class DflowNode {
     this.kind = kind;
 
     // Metadata.
-    this.isAsync = isAsync;
-    this.isConstant = isConstant;
+    this.meta = { isAsync, isConstant };
 
     for (const serializedPin of inputs) {
       this.newInput(serializedPin);
@@ -459,8 +457,8 @@ export class DflowGraph {
       const node = this.nodes.get(nodeId) as DflowNode;
 
       try {
-        if (node.isConstant === false) {
-          if (node.isAsync) {
+        if (node.meta.isConstant === false) {
+          if (node.meta.isAsync) {
             await node.run();
           } else {
             node.run();

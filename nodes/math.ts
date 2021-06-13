@@ -19,12 +19,10 @@ class DflowMathCosh extends DflowAbstractOneNumInOneNumOut {
 
 class DflowMathPI extends DflowNode {
   static kind = "PI";
-  static isConstant = true;
+  static metadata = { isConstant: true };
 
   constructor(arg: DflowSerializedNode) {
-    super({ ...arg, outputs: [oneNumOut(Math.PI)] }, {
-      isConstant: DflowMathPI.isConstant,
-    });
+    super({ ...arg, outputs: [oneNumOut(Math.PI)] }, DflowMathPI.metadata);
   }
 }
 

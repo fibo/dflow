@@ -16,7 +16,7 @@ npm install dflow
 
 ### Deno
 
-Create an *import_map.json* file like this.
+Create an _import_map.json_ file like this.
 
 ```json
 {
@@ -41,7 +41,8 @@ And With [deno](https://deno.land/) you can launch your script like this
 deno run --importmap=import_map.json path/to/my/script.ts
 ```
 
-It is recommended to point to a specific version, for instance to point to version `0.26` or whatever, then change your import map accordingly
+It is recommended to point to a specific version, for instance to point to
+version `0.26` or whatever, then change your import map accordingly
 
 ```diff
 {
