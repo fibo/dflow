@@ -35,11 +35,13 @@ function sleep(seconds = 1) {
 }
 
 class SleepNode extends DflowNode {
-  static kind = "Sleep";
-  static isAsync = true;
+  kind = "Sleep";
+  static meta = {
+    isAsync: true,
+  };
 
   constructor(serializedNode) {
-    super(serializedNode, { isAsync: SleepNode.isAsync });
+    super(serializedNode, SleepNode.meta);
   }
 
   async run() {
