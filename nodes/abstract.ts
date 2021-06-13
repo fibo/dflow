@@ -1,7 +1,8 @@
 import {
   DflowNode,
+  DflowSerializedInput,
   DflowSerializedNode,
-  DflowSerializedPin,
+  DflowSerializedOutput,
 } from "../engine.ts";
 
 const _missingMethod = (
@@ -9,23 +10,23 @@ const _missingMethod = (
   nodeKind: string,
 ) => (`unimplemented method ${methodName} nodeKind=${nodeKind}`);
 
-export const oneBoolIn = (): DflowSerializedPin => ({
+export const oneBoolIn = (): DflowSerializedInput => ({
   id: "in",
   types: ["boolean"],
 });
 
-export const oneBoolOut = (data?: boolean): DflowSerializedPin => ({
+export const oneBoolOut = (data?: boolean): DflowSerializedOutput => ({
   id: "out",
   types: ["boolean"],
   data,
 });
 
-export const oneNumIn = (): DflowSerializedPin => ({
+export const oneNumIn = (): DflowSerializedInput => ({
   id: "in",
   types: ["number"],
 });
 
-export const oneNumOut = (data?: number): DflowSerializedPin => ({
+export const oneNumOut = (data?: number): DflowSerializedOutput => ({
   id: "out",
   types: ["number"],
   data,
