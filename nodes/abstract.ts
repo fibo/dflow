@@ -42,12 +42,12 @@ export class DflowAbstractOneNumInOneBoolOut extends DflowNode {
   }
 
   run() {
-    const num = this.getInputByPosition(0).getData();
+    const num = this.getInputByPosition(0).data;
 
     if (typeof num === "number") {
       const result = this.task(num);
 
-      this.getOutputByPosition(0).setData(result);
+      this.getOutputByPosition(0).data = result;
     }
   }
 }
@@ -62,12 +62,12 @@ export class DflowAbstractOneNumInOneNumOut extends DflowNode {
   }
 
   run() {
-    const num = this.getInputByPosition(0).getData();
+    const num = this.getInputByPosition(0).data;
 
     if (typeof num === "number") {
       const result = this.task(num);
 
-      this.getOutputByPosition(0).setData(result);
+      this.getOutputByPosition(0).data = result;
     }
   }
 }

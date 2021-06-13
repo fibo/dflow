@@ -31,7 +31,7 @@ class SumNode extends DflowNode {
     let sum = 0;
 
     for (const input of this.inputs.values()) {
-      const inputData = input.getData();
+      const inputData = input.data;
       if (typeof inputData === "number") {
         sum += inputData;
       }
@@ -39,7 +39,7 @@ class SumNode extends DflowNode {
 
     const output = this.getOutputByPosition(0);
     if (output !== null) {
-      output.setData(sum);
+      output.data = sum;
     }
   }
 }
@@ -158,7 +158,7 @@ Deno.test("DflowGraph#run()", async () => {
   await dflow.graph.run();
 
   const sum = sumNode.getOutputByPosition(0);
-  assertEquals(sum.getData(), 4);
+  assertEquals(sum.data, 4);
 });
 
 // DflowHost
@@ -228,22 +228,22 @@ Deno.test("DflowHost#newOutput()", () => {
 
 function testOutputSetData(data: DflowPinData, types?: DflowPinType[]) {
   const output = new DflowOutput({ id: "test", types });
-  output.setData(data);
-  assertStrictEquals(data, output.getData());
+  output.data = data;
+  assertStrictEquals(data, output.data);
 }
 
 function testOutputSetDataThrows(data: DflowPinData, types: DflowPinType[]) {
   assertThrows(
     () => {
       const output = new DflowOutput({ id: "test", types });
-      output.setData(data);
+      output.data = data;
     },
     Error,
     `could not set data pinTypes=${JSON.stringify(types)}`,
   );
 }
 
-Deno.test("DflowOutput#setData()", () => {
+Deno.test("DflowOutput#set data", () => {
   const num = 1;
   const bool = true;
   const str = "string";
@@ -253,7 +253,7 @@ Deno.test("DflowOutput#setData()", () => {
   const pin = new DflowOutput({ id: "test" });
   assertEquals(pin.id, "test");
   assertEquals(pin.kind, "output");
-  assertEquals(typeof pin.getData(), "undefined");
+  assertEquals(typeof pin.data, "undefined");
 
   testOutputSetData(str);
   testOutputSetData(num);
