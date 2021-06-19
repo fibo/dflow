@@ -1,4 +1,8 @@
-import { testOneNumInOneBoolOut, testOneStrInOneNumOut } from "./_test-utils.ts";
+import {
+  testOneAnyInOneBoolOut,
+  testOneNumInOneBoolOut,
+  testOneStrInOneNumOut,
+} from "./_test-utils.ts";
 import { catalog } from "./number.ts";
 
 Deno.test(catalog.isFinite.kind, () => {
@@ -15,15 +19,17 @@ Deno.test(catalog.isInteger.kind, () => {
 
 Deno.test(catalog.isNaN.kind, () => {
   const nodeKind = catalog.isNaN.kind;
-  testOneNumInOneBoolOut(nodeKind, 1, Number.isNaN(1));
+  [1, 'x', null].forEach((input) => {
+  testOneAnyInOneBoolOut(nodeKind, input, Number.isNaN(input));
+  })
 });
 
 Deno.test(catalog.parseFloat.kind, () => {
   const nodeKind = catalog.parseFloat.kind;
-  testStrNumInOneNumOut(nodeKind, 1.5, Number.parseFloat('1.5'));
+  testOneStrInOneNumOut(nodeKind, "1.5", Number.parseFloat("1.5"));
 });
 
 Deno.test(catalog.parseInt.kind, () => {
   const nodeKind = catalog.parseInt.kind;
-  testStrNumInOneNumOut(nodeKind, 1, Number.parseInt('1'));
+  testOneStrInOneNumOut(nodeKind, "1", Number.parseInt("1"));
 });

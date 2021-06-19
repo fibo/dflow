@@ -1,5 +1,15 @@
 import { DflowNode, DflowSerializedNode } from "../engine.ts";
-import { oneNumOut, oneStrOut } from "./abstract.ts";
+import { oneAnyOut, oneNumOut, oneStrOut } from "./abstract.ts";
+
+class DflowData extends DflowNode {
+  static kind = "data";
+
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, outputs: [oneAnyOut()] });
+  }
+
+  run() {}
+}
 
 class DflowNum extends DflowNode {
   static kind = "num";
@@ -22,6 +32,7 @@ class DflowStr extends DflowNode {
 }
 
 export const catalog = {
+  [DflowData.kind]: DflowData,
   [DflowNum.kind]: DflowNum,
   [DflowStr.kind]: DflowStr,
 };

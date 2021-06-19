@@ -137,18 +137,26 @@ export class DflowOutput extends DflowPin {
     const types = this.types ?? [];
 
     if (typeof data !== "undefined") {
+      const hasTypeAny = types.length === 0;
+      const hasTypeString = types.includes("string") || hasTypeAny;
+      const hasTypeNumber = types.includes("number") || hasTypeAny;
+      const hasTypeBoolean = types.includes("boolean") || hasTypeAny;
+      const hasTypeNull = types.includes("null") || hasTypeAny;
+      const hasTypeObject = types.includes("object") || hasTypeAny;
+      const hasTypeArray = types.includes("array") || hasTypeAny;
+
       const isArray = Array.isArray(data);
       const isNull = data === null;
       const isObject = typeof data === "object" && !isNull && !isArray;
 
       switch (true) {
         case typeof this.types === "undefined":
-        case typeof data === "string" && types.includes("string"):
-        case typeof data === "number" && types.includes("number"):
-        case typeof data === "boolean" && types.includes("boolean"):
-        case isNull && types.includes("null"):
-        case isObject && types.includes("object"):
-        case isArray && types.includes("array"): {
+        case typeof data === "string" && hasTypeString:
+        case typeof data === "number" && hasTypeNumber:
+        case typeof data === "boolean" && hasTypeBoolean:
+        case isNull && hasTypeNull:
+        case isObject && hasTypeObject:
+        case isArray && hasTypeArray: {
           this.#data = data;
           break;
         }
