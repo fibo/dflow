@@ -183,6 +183,83 @@ Deno.test("DflowData.isUndefined()", () => {
   assertEquals(DflowData.isUndefined(undefined), true);
 });
 
+Deno.test("DflowData.validate()", () => {
+  assertEquals(DflowData.validate(arr, ["array"]), true);
+  assertEquals(DflowData.validate(bool, ["boolean"]), true);
+  assertEquals(DflowData.validate(num, ["number"]), true);
+  assertEquals(DflowData.validate(null, ["null"]), true);
+  assertEquals(DflowData.validate(obj, ["object"]), true);
+  assertEquals(DflowData.validate(str, ["string"]), true);
+
+  assertEquals(DflowData.validate(arr, []), true);
+  assertEquals(DflowData.validate(bool, []), true);
+  assertEquals(DflowData.validate(num, []), true);
+  assertEquals(DflowData.validate(null, []), true);
+  assertEquals(DflowData.validate(obj, []), true);
+  assertEquals(DflowData.validate(str, []), true);
+  assertEquals(DflowData.validate(undefined, []), true);
+
+  assertEquals(DflowData.validate(arr, ["boolean"]), false);
+  assertEquals(DflowData.validate(arr, ["number"]), false);
+  assertEquals(DflowData.validate(arr, ["null"]), false);
+  assertEquals(DflowData.validate(arr, ["object"]), false);
+  assertEquals(DflowData.validate(arr, ["string"]), false);
+
+  assertEquals(DflowData.validate(bool, ["array"]), false);
+  assertEquals(DflowData.validate(bool, ["number"]), false);
+  assertEquals(DflowData.validate(bool, ["null"]), false);
+  assertEquals(DflowData.validate(bool, ["object"]), false);
+  assertEquals(DflowData.validate(bool, ["string"]), false);
+
+  assertEquals(DflowData.validate(null, ["array"]), false);
+  assertEquals(DflowData.validate(null, ["boolean"]), false);
+  assertEquals(DflowData.validate(null, ["number"]), false);
+  assertEquals(DflowData.validate(null, ["object"]), false);
+  assertEquals(DflowData.validate(null, ["string"]), false);
+
+  assertEquals(DflowData.validate(num, ["array"]), false);
+  assertEquals(DflowData.validate(num, ["boolean"]), false);
+  assertEquals(DflowData.validate(num, ["null"]), false);
+  assertEquals(DflowData.validate(num, ["object"]), false);
+  assertEquals(DflowData.validate(num, ["string"]), false);
+
+  assertEquals(DflowData.validate(obj, ["array"]), false);
+  assertEquals(DflowData.validate(obj, ["boolean"]), false);
+  assertEquals(DflowData.validate(obj, ["number"]), false);
+  assertEquals(DflowData.validate(obj, ["null"]), false);
+  assertEquals(DflowData.validate(obj, ["string"]), false);
+
+  assertEquals(DflowData.validate(str, ["array"]), false);
+  assertEquals(DflowData.validate(str, ["boolean"]), false);
+  assertEquals(DflowData.validate(str, ["number"]), false);
+  assertEquals(DflowData.validate(str, ["null"]), false);
+  assertEquals(DflowData.validate(str, ["object"]), false);
+
+  assertEquals(DflowData.validate(undefined, ["array"]), false);
+  assertEquals(DflowData.validate(undefined, ["boolean"]), false);
+  assertEquals(DflowData.validate(undefined, ["number"]), false);
+  assertEquals(DflowData.validate(undefined, ["null"]), false);
+  assertEquals(DflowData.validate(undefined, ["object"]), false);
+  assertEquals(DflowData.validate(undefined, ["string"]), false);
+
+  // No particular order her.
+  assertEquals(DflowData.validate(arr, ["boolean", "array"]), true);
+  assertEquals(DflowData.validate(bool, ["null", "number", "boolean"]), true);
+  assertEquals(
+    DflowData.validate(num, ["null", "number", "object", "string"]),
+    true,
+  );
+  assertEquals(DflowData.validate(null, ["object", "null"]), true);
+  assertEquals(DflowData.validate(obj, ["array", "object"]), true);
+  assertEquals(DflowData.validate(str, ["null", "string"]), true);
+  assertEquals(DflowData.validate(arr, ["boolean", "string"]), false);
+  assertEquals(DflowData.validate(bool, ["null", "number", "array"]), false);
+  assertEquals(DflowData.validate(num, ["null", "object", "string"]), false);
+  assertEquals(DflowData.validate(null, ["object", "string"]), false);
+  assertEquals(DflowData.validate(obj, ["array", "null"]), false);
+  assertEquals(DflowData.validate(str, ["null", "array"]), false);
+});
+
 // DflowGraph
 // ////////////////////////////////////////////////////////////////////////////
 

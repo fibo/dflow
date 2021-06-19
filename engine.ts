@@ -79,12 +79,40 @@ const _missingPinById = (nodeId: DflowId, kind: DflowPinKind, pinId: DflowId) =>
 export class DflowPin {
   readonly id: DflowId;
   readonly kind: DflowPinKind;
-  readonly types?: DflowPinType[];
+  readonly types: DflowPinType[];
 
-  constructor(kind: DflowPinKind, { id, types }: DflowSerializedPin) {
+  constructor(kind: DflowPinKind, { id, types = [] }: DflowSerializedPin) {
     this.id = id;
     this.kind = kind;
     this.types = types;
+  }
+
+  get hasTypeAny() {
+    return this.types.length === 0;
+  }
+
+  get hasTypeString() {
+    return this.hasTypeAny || this.types.includes("string");
+  }
+
+  get hasTypeNumber() {
+    return this.hasTypeAny || this.types.includes("number");
+  }
+
+  get hasTypeBoolean() {
+    return this.hasTypeAny || this.types.includes("boolean");
+  }
+
+  get hasTypeNull() {
+    return this.hasTypeAny || this.types.includes("null");
+  }
+
+  get hasTypeObject() {
+    return this.hasTypeAny || this.types.includes("object");
+  }
+
+  get hasTypeArray() {
+    return this.hasTypeAny || this.types.includes("array");
   }
 }
 
@@ -117,6 +145,31 @@ export class DflowData {
   static isUndefined(data: DflowValue) {
     return typeof data === "undefined";
   }
+
+  static validate(data: DflowValue, types: DflowPinType[]) {
+    if (types.length === 0) {
+      return true;
+    }
+
+    return types.some((pinType) => {
+      switch (pinType) {
+        case "array":
+          return DflowData.isArray(data);
+        case "boolean":
+          return DflowData.isBoolean(data);
+        case "null":
+          return DflowData.isNull(data);
+        case "number":
+          return DflowData.isNumber(data);
+        case "object":
+          return DflowData.isObject(data);
+        case "string":
+          return DflowData.isString(data);
+        default:
+          return false;
+      }
+    }, true);
+  }
 }
 
 export class DflowInput extends DflowPin {
@@ -145,7 +198,7 @@ export class DflowInput extends DflowPin {
   toObject(): DflowSerializedInput {
     const obj = { id: this.id } as DflowSerializedInput;
 
-    if (typeof this.types !== "undefined") {
+    if (this.types.length > 0) {
       obj.types = this.types;
     }
 
@@ -171,37 +224,26 @@ export class DflowOutput extends DflowPin {
   }
 
   set data(data: DflowValue) {
-    const types = this.types ?? [];
-
-    if (DflowData.isUndefined(data)) {
-      this.clear();
-    } else {
-      const hasTypeAny = types.length === 0;
-      const hasTypeString = types.includes("string") || hasTypeAny;
-      const hasTypeNumber = types.includes("number") || hasTypeAny;
-      const hasTypeBoolean = types.includes("boolean") || hasTypeAny;
-      const hasTypeNull = types.includes("null") || hasTypeAny;
-      const hasTypeObject = types.includes("object") || hasTypeAny;
-      const hasTypeArray = types.includes("array") || hasTypeAny;
-
-      switch (true) {
-        case typeof this.types === "undefined":
-        case DflowData.isString(data) && hasTypeString:
-        case DflowData.isNumber(data) && hasTypeNumber:
-        case DflowData.isBoolean(data) && hasTypeBoolean:
-        case DflowData.isNull(data) && hasTypeNull:
-        case DflowData.isObject(data) && hasTypeObject:
-        case DflowData.isArray(data) && hasTypeArray: {
-          this.#data = data;
-          break;
-        }
-        default: {
-          throw new Error(
-            `could not set data pinTypes=${
-              JSON.stringify(this.types)
-            } typeof=${typeof data}`,
-          );
-        }
+    switch (true) {
+      case DflowData.isUndefined(data):
+        this.clear();
+        break;
+      case this.hasTypeAny:
+      case DflowData.isString(data) && this.hasTypeString:
+      case DflowData.isNumber(data) && this.hasTypeNumber:
+      case DflowData.isBoolean(data) && this.hasTypeBoolean:
+      case DflowData.isNull(data) && this.hasTypeNull:
+      case DflowData.isObject(data) && this.hasTypeObject:
+      case DflowData.isArray(data) && this.hasTypeArray: {
+        this.#data = data;
+        break;
+      }
+      default: {
+        throw new Error(
+          `could not set data pinTypes=${
+            JSON.stringify(this.types)
+          } typeof=${typeof data}`,
+        );
       }
     }
   }
@@ -216,7 +258,8 @@ export class DflowOutput extends DflowPin {
     if (!DflowData.isUndefined(this.#data)) {
       obj.data = this.#data;
     }
-    if (typeof this.types !== "undefined") {
+
+    if (this.types.length > 0) {
       obj.types = this.types;
     }
 
@@ -373,6 +416,7 @@ export class DflowEdge {
     // 1. Read source and target.
     const [sourceNodeId, sourcePinId] = source;
     const [targetNodeId, targetPinId] = target;
+
     // 2. Check their types.
     if (typeof sourceNodeId !== "string") {
       throw new TypeError(_missingString("sourceNodeId"));
@@ -386,6 +430,7 @@ export class DflowEdge {
     if (typeof targetPinId !== "string") {
       throw new TypeError(_missingString("targetPinId"));
     }
+
     // 3. Store in memory.
     this.source = source;
     this.target = target;
