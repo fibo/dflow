@@ -3,6 +3,8 @@ import {
   DflowNode,
   DflowOutput,
   DflowPinData,
+  DflowPinDataArray,
+  DflowPinDataObject,
   DflowSerializedInput,
   DflowSerializedNode,
   DflowSerializedOutput,
@@ -21,6 +23,17 @@ export const oneAnyOut = (): DflowSerializedInput => ({
   id: "out",
 });
 
+export const oneArrIn = (): DflowSerializedInput => ({
+  id: "in",
+  types: ["array"],
+});
+
+export const oneArrOut = (data?: DflowPinDataArray): DflowSerializedOutput => ({
+  id: "out",
+  types: ["array"],
+  data,
+});
+
 export const oneBoolIn = (): DflowSerializedInput => ({
   id: "in",
   types: ["boolean"],
@@ -29,6 +42,19 @@ export const oneBoolIn = (): DflowSerializedInput => ({
 export const oneBoolOut = (data?: boolean): DflowSerializedOutput => ({
   id: "out",
   types: ["boolean"],
+  data,
+});
+
+export const oneObjIn = (): DflowSerializedInput => ({
+  id: "in",
+  types: ["object"],
+});
+
+export const oneObjOut = (
+  data?: DflowPinDataObject,
+): DflowSerializedOutput => ({
+  id: "out",
+  types: ["object"],
   data,
 });
 
@@ -77,7 +103,27 @@ export class DflowAbstractOneAnyInOneBoolOut extends DflowAbstractOneInOneOut {
     const data = this.input.data;
 
     if (typeof data !== "undefined") {
-      this.output.data =  this.task(data);
+      this.output.data = this.task(data);
+    } else {
+      this.output.clear();
+    }
+  }
+}
+
+export class DflowAbstractOneObjInOneArrOut extends DflowAbstractOneInOneOut {
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, inputs: [oneObjIn()], outputs: [oneArrOut()] });
+  }
+
+  task(_: DflowPinDataObject): DflowPinDataArray {
+    throw new Error(_missingMethod("task", this.kind));
+  }
+
+  run() {
+    const data = this.input.data;
+
+    if (typeof data !== "undefined") {
+      this.output.data = this.task(data);
     } else {
       this.output.clear();
     }
@@ -97,7 +143,7 @@ export class DflowAbstractOneNumInOneBoolOut extends DflowAbstractOneInOneOut {
     const data = this.input.data;
 
     if (typeof data === "number") {
-      this.output.data =  this.task(data);
+      this.output.data = this.task(data);
     } else {
       this.output.clear();
     }
@@ -137,7 +183,7 @@ export class DflowAbstractOneStrInOneNumOut extends DflowAbstractOneInOneOut {
     const data = this.input.data;
 
     if (typeof data === "string") {
-      this.output.data =  this.task(data);
+      this.output.data = this.task(data);
     } else {
       this.output.clear();
     }

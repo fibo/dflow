@@ -19,10 +19,15 @@ export type DflowPinType =
 export type DflowRunStatus = "waiting" | "success" | "failure";
 
 // Stolen from https://github.com/sindresorhus/type-fest/blob/main/source/basic.d.ts
-type JsonObject = { [Key in string]?: JsonValue };
-type JsonArray = Array<JsonValue>;
-type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-export type DflowPinData = JsonValue;
+export type DflowPinDataObject = { [Key in string]?: DflowPinData };
+export type DflowPinDataArray = Array<DflowPinData>;
+export type DflowPinData =
+  | string
+  | number
+  | boolean
+  | null
+  | DflowPinDataObject
+  | DflowPinDataArray;
 
 export type DflowNodesCatalog = Record<DflowNodeKind, typeof DflowNode>;
 
