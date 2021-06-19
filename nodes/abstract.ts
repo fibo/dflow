@@ -1,13 +1,13 @@
 import {
+  DflowArray,
   DflowInput,
   DflowNode,
+  DflowObject,
   DflowOutput,
   DflowSerializedInput,
   DflowSerializedNode,
   DflowSerializedOutput,
-  JsonArray,
-  JsonObject,
-  JsonValue,
+  DflowValue,
 } from "../engine.ts";
 
 const _missingMethod = (
@@ -28,7 +28,7 @@ export const oneArrIn = (): DflowSerializedInput => ({
   types: ["array"],
 });
 
-export const oneArrOut = (data?: JsonArray): DflowSerializedOutput => ({
+export const oneArrOut = (data?: DflowArray): DflowSerializedOutput => ({
   id: "out",
   types: ["array"],
   data,
@@ -50,7 +50,7 @@ export const oneObjIn = (): DflowSerializedInput => ({
   types: ["object"],
 });
 
-export const oneObjOut = (data?: JsonObject): DflowSerializedOutput => ({
+export const oneObjOut = (data?: DflowObject): DflowSerializedOutput => ({
   id: "out",
   types: ["object"],
   data,
@@ -93,7 +93,7 @@ export class DflowAbstractOneAnyInOneBoolOut extends DflowAbstractOneInOneOut {
     super({ ...arg, inputs: [oneAnyIn()], outputs: [oneBoolOut()] });
   }
 
-  task(_: JsonValue): boolean {
+  task(_: DflowValue): boolean {
     throw new Error(_missingMethod("task", this.kind));
   }
 
@@ -113,7 +113,7 @@ export class DflowAbstractOneArrInOneNumOut extends DflowAbstractOneInOneOut {
     super({ ...arg, inputs: [oneArrIn()], outputs: [oneNumOut()] });
   }
 
-  task(_: JsonArray): number {
+  task(_: DflowArray): number {
     throw new Error(_missingMethod("task", this.kind));
   }
 
@@ -133,7 +133,7 @@ export class DflowAbstractOneObjInOneArrOut extends DflowAbstractOneInOneOut {
     super({ ...arg, inputs: [oneObjIn()], outputs: [oneArrOut()] });
   }
 
-  task(_: JsonObject): JsonArray {
+  task(_: DflowObject): DflowArray {
     throw new Error(_missingMethod("task", this.kind));
   }
 

@@ -1,11 +1,11 @@
 import { assertEquals } from "std/testing/asserts.ts";
 
-import { DflowHost, JsonArray, JsonObject, JsonValue } from "../engine.ts";
+import { DflowArray, DflowHost, DflowObject, DflowValue } from "../engine.ts";
 import { catalog } from "./catalog.ts";
 
 export function testOneAnyInOneBoolOut(
   nodeKind: string,
-  input: JsonValue,
+  input: DflowValue,
   expected: boolean,
 ) {
   const dflow = new DflowHost(catalog);
@@ -19,7 +19,7 @@ export function testOneAnyInOneBoolOut(
 
 export function testOneArrInOneNumOut(
   nodeKind: string,
-  input: JsonArray,
+  input: DflowArray,
   expected: number,
 ) {
   const dflow = new DflowHost(catalog);
@@ -33,8 +33,8 @@ export function testOneArrInOneNumOut(
 
 export function testOneObjInOneArrOut(
   nodeKind: string,
-  input: JsonObject,
-  expected: JsonArray,
+  input: DflowObject,
+  expected: DflowArray,
 ) {
   const dflow = new DflowHost(catalog);
   const dataNode = dflow.newNode({ kind: catalog.object.kind });
