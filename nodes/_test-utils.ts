@@ -1,11 +1,11 @@
 import { assertEquals } from "std/testing/asserts.ts";
 
-import { DflowHost, DflowPinData, DflowPinDataArray, DflowPinDataObject } from "../engine.ts";
+import { DflowHost, JsonArray, JsonObject, JsonValue } from "../engine.ts";
 import { catalog } from "./catalog.ts";
 
 export function testOneAnyInOneBoolOut(
   nodeKind: string,
-  input: DflowPinData,
+  input: JsonValue,
   expected: boolean,
 ) {
   const dflow = new DflowHost(catalog);
@@ -17,13 +17,27 @@ export function testOneAnyInOneBoolOut(
   assertEquals(testNode.getOutputByPosition(0).data, expected);
 }
 
-export function testOneObjInOneArrOut(
+export function testOneArrInOneNumOut(
   nodeKind: string,
-  input: DflowPinDataObject,
-  expected: DflowPinDataArray,
+  input: JsonArray,
+  expected: number,
 ) {
   const dflow = new DflowHost(catalog);
-  const dataNode = dflow.newNode({ kind: catalog.obj.kind });
+  const dataNode = dflow.newNode({ kind: catalog.array.kind });
+  dataNode.getOutputByPosition(0).data = input;
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode).to(testNode);
+  dflow.graph.run();
+  assertEquals(testNode.getOutputByPosition(0).data, expected);
+}
+
+export function testOneObjInOneArrOut(
+  nodeKind: string,
+  input: JsonObject,
+  expected: JsonArray,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode = dflow.newNode({ kind: catalog.object.kind });
   dataNode.getOutputByPosition(0).data = input;
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
@@ -37,7 +51,7 @@ export function testOneNumInOneBoolOut(
   expected: boolean,
 ) {
   const dflow = new DflowHost(catalog);
-  const dataNode = dflow.newNode({ kind: catalog.num.kind });
+  const dataNode = dflow.newNode({ kind: catalog.number.kind });
   dataNode.getOutputByPosition(0).data = input;
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
@@ -51,7 +65,7 @@ export function testOneNumInOneNumOut(
   expected: number,
 ) {
   const dflow = new DflowHost(catalog);
-  const dataNode = dflow.newNode({ kind: catalog.num.kind });
+  const dataNode = dflow.newNode({ kind: catalog.number.kind });
   dataNode.getOutputByPosition(0).data = input;
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
@@ -75,7 +89,7 @@ export function testOneStrInOneNumOut(
   expected: number,
 ) {
   const dflow = new DflowHost(catalog);
-  const dataNode = dflow.newNode({ kind: catalog.str.kind });
+  const dataNode = dflow.newNode({ kind: catalog.string.kind });
   dataNode.getOutputByPosition(0).data = input;
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);

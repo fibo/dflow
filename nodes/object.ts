@@ -1,10 +1,10 @@
-import { DflowPinDataObject } from "../engine.ts";
+import { JsonObject } from "../engine.ts";
 import { DflowAbstractOneObjInOneArrOut } from "./abstract.ts";
 
 class DflowObjectKeys extends DflowAbstractOneObjInOneArrOut {
   static kind = "objectKeys";
 
-  task(input: DflowPinDataObject) {
+  task(input: JsonObject) {
     return Object.keys(input);
   }
 }

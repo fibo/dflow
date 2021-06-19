@@ -2,7 +2,7 @@ import { DflowNode, DflowSerializedNode } from "../engine.ts";
 import { DflowAbstractOneNumInOneNumOut, oneNumOut } from "./abstract.ts";
 
 class DflowMathCos extends DflowAbstractOneNumInOneNumOut {
-  static kind = "cos";
+  static kind = "mathCos";
 
   task(num: number) {
     return Math.cos(num);
@@ -10,7 +10,7 @@ class DflowMathCos extends DflowAbstractOneNumInOneNumOut {
 }
 
 class DflowMathCosh extends DflowAbstractOneNumInOneNumOut {
-  static kind = "cosh";
+  static kind = "mathCosh";
 
   task(num: number) {
     return Math.cosh(num);
@@ -18,7 +18,7 @@ class DflowMathCosh extends DflowAbstractOneNumInOneNumOut {
 }
 
 class DflowMathPI extends DflowNode {
-  static kind = "PI";
+  static kind = "mathPI";
   static metadata = { isConstant: true };
 
   constructor(arg: DflowSerializedNode) {
@@ -27,7 +27,7 @@ class DflowMathPI extends DflowNode {
 }
 
 class DflowMathSin extends DflowAbstractOneNumInOneNumOut {
-  static kind = "sin";
+  static kind = "mathSin";
 
   task(num: number) {
     return Math.sin(num);
@@ -35,7 +35,7 @@ class DflowMathSin extends DflowAbstractOneNumInOneNumOut {
 }
 
 class DflowMathSinh extends DflowAbstractOneNumInOneNumOut {
-  static kind = "sinh";
+  static kind = "mathSinh";
 
   task(num: number) {
     return Math.sinh(num);

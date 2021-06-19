@@ -1,4 +1,4 @@
-import { DflowPinData } from "../engine.ts";
+import { JsonValue } from "../engine.ts";
 import {
   DflowAbstractOneAnyInOneBoolOut,
   DflowAbstractOneNumInOneBoolOut,
@@ -24,7 +24,7 @@ class DflowIsInteger extends DflowAbstractOneNumInOneBoolOut {
 class DflowIsNaN extends DflowAbstractOneAnyInOneBoolOut {
   static kind = "isNaN";
 
-  task(input: DflowPinData) {
+  task(input: JsonValue) {
     return Number.isNaN(input);
   }
 }

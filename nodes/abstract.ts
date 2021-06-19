@@ -2,12 +2,12 @@ import {
   DflowInput,
   DflowNode,
   DflowOutput,
-  DflowPinData,
-  DflowPinDataArray,
-  DflowPinDataObject,
   DflowSerializedInput,
   DflowSerializedNode,
   DflowSerializedOutput,
+  JsonArray,
+  JsonObject,
+  JsonValue,
 } from "../engine.ts";
 
 const _missingMethod = (
@@ -28,7 +28,7 @@ export const oneArrIn = (): DflowSerializedInput => ({
   types: ["array"],
 });
 
-export const oneArrOut = (data?: DflowPinDataArray): DflowSerializedOutput => ({
+export const oneArrOut = (data?: JsonArray): DflowSerializedOutput => ({
   id: "out",
   types: ["array"],
   data,
@@ -50,9 +50,7 @@ export const oneObjIn = (): DflowSerializedInput => ({
   types: ["object"],
 });
 
-export const oneObjOut = (
-  data?: DflowPinDataObject,
-): DflowSerializedOutput => ({
+export const oneObjOut = (data?: JsonObject): DflowSerializedOutput => ({
   id: "out",
   types: ["object"],
   data,
@@ -95,7 +93,7 @@ export class DflowAbstractOneAnyInOneBoolOut extends DflowAbstractOneInOneOut {
     super({ ...arg, inputs: [oneAnyIn()], outputs: [oneBoolOut()] });
   }
 
-  task(_: DflowPinData): boolean {
+  task(_: JsonValue): boolean {
     throw new Error(_missingMethod("task", this.kind));
   }
 
@@ -110,19 +108,42 @@ export class DflowAbstractOneAnyInOneBoolOut extends DflowAbstractOneInOneOut {
   }
 }
 
-export class DflowAbstractOneObjInOneArrOut extends DflowAbstractOneInOneOut {
+export class DflowAbstractOneArrInOneNumOut extends DflowAbstractOneInOneOut {
   constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: [oneObjIn()], outputs: [oneArrOut()] });
+    super({ ...arg, inputs: [oneArrIn()], outputs: [oneNumOut()] });
   }
 
-  task(_: DflowPinDataObject): DflowPinDataArray {
+  task(_: JsonArray): number {
     throw new Error(_missingMethod("task", this.kind));
   }
 
   run() {
     const data = this.input.data;
 
-    if (typeof data !== "undefined") {
+    if (Array.isArray(data)) {
+      this.output.data = this.task(data);
+    } else {
+      this.output.clear();
+    }
+  }
+}
+
+export class DflowAbstractOneObjInOneArrOut extends DflowAbstractOneInOneOut {
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, inputs: [oneObjIn()], outputs: [oneArrOut()] });
+  }
+
+  task(_: JsonObject): JsonArray {
+    throw new Error(_missingMethod("task", this.kind));
+  }
+
+  run() {
+    const data = this.input.data;
+
+    if (
+      typeof data !== "undefined" && !Array.isArray(data) && data !== null &&
+      typeof data === "object"
+    ) {
       this.output.data = this.task(data);
     } else {
       this.output.clear();
