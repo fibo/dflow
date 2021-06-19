@@ -1,5 +1,6 @@
 import {
   DflowArray,
+  DflowData,
   DflowInput,
   DflowNode,
   DflowObject,
@@ -86,6 +87,22 @@ export class DflowAbstractOneInOneOut extends DflowNode {
   get output(): DflowOutput {
     return this.getOutputByPosition(0);
   }
+
+  run() {
+    const data = this.input.data;
+
+    if (DflowData.isUndefined(data)) {
+      this.output.clear();
+    } else {
+      if (DflowData.validate(data, this.input.types)) {
+        this.output.data = this.task(data);
+      }
+    }
+  }
+
+  task(_: DflowValue): DflowValue {
+    throw new Error(_missingMethod("task", this.kind));
+  }
 }
 
 export class DflowAbstractOneAnyInOneBoolOut extends DflowAbstractOneInOneOut {
@@ -95,16 +112,6 @@ export class DflowAbstractOneAnyInOneBoolOut extends DflowAbstractOneInOneOut {
 
   task(_: DflowValue): boolean {
     throw new Error(_missingMethod("task", this.kind));
-  }
-
-  run() {
-    const data = this.input.data;
-
-    if (typeof data !== "undefined") {
-      this.output.data = this.task(data);
-    } else {
-      this.output.clear();
-    }
   }
 }
 
@@ -116,16 +123,6 @@ export class DflowAbstractOneArrInOneNumOut extends DflowAbstractOneInOneOut {
   task(_: DflowArray): number {
     throw new Error(_missingMethod("task", this.kind));
   }
-
-  run() {
-    const data = this.input.data;
-
-    if (Array.isArray(data)) {
-      this.output.data = this.task(data);
-    } else {
-      this.output.clear();
-    }
-  }
 }
 
 export class DflowAbstractOneObjInOneArrOut extends DflowAbstractOneInOneOut {
@@ -135,19 +132,6 @@ export class DflowAbstractOneObjInOneArrOut extends DflowAbstractOneInOneOut {
 
   task(_: DflowObject): DflowArray {
     throw new Error(_missingMethod("task", this.kind));
-  }
-
-  run() {
-    const data = this.input.data;
-
-    if (
-      typeof data !== "undefined" && !Array.isArray(data) && data !== null &&
-      typeof data === "object"
-    ) {
-      this.output.data = this.task(data);
-    } else {
-      this.output.clear();
-    }
   }
 }
 
@@ -159,16 +143,6 @@ export class DflowAbstractOneNumInOneBoolOut extends DflowAbstractOneInOneOut {
   task(_: number): boolean {
     throw new Error(_missingMethod("task", this.kind));
   }
-
-  run() {
-    const data = this.input.data;
-
-    if (typeof data === "number") {
-      this.output.data = this.task(data);
-    } else {
-      this.output.clear();
-    }
-  }
 }
 
 export class DflowAbstractOneNumInOneNumOut extends DflowAbstractOneInOneOut {
@@ -179,16 +153,6 @@ export class DflowAbstractOneNumInOneNumOut extends DflowAbstractOneInOneOut {
   task(_: number): number {
     throw new Error(_missingMethod("task", this.kind));
   }
-
-  run() {
-    const data = this.input.data;
-
-    if (typeof data === "number") {
-      this.output.data = this.task(data);
-    } else {
-      this.output.clear();
-    }
-  }
 }
 
 export class DflowAbstractOneStrInOneNumOut extends DflowAbstractOneInOneOut {
@@ -198,15 +162,5 @@ export class DflowAbstractOneStrInOneNumOut extends DflowAbstractOneInOneOut {
 
   task(_: string): number {
     throw new Error(_missingMethod("task", this.kind));
-  }
-
-  run() {
-    const data = this.input.data;
-
-    if (typeof data === "string") {
-      this.output.data = this.task(data);
-    } else {
-      this.output.clear();
-    }
   }
 }
