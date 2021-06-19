@@ -1,42 +1,47 @@
-import { DflowAbstractOneNumInOneBoolOut, DflowAbstractOneStrInOneNumOut } from "./abstract.ts";
+import { DflowPinData } from "../engine.ts";
+import {
+  DflowAbstractOneAnyInOneBoolOut,
+  DflowAbstractOneNumInOneBoolOut,
+  DflowAbstractOneStrInOneNumOut,
+} from "./abstract.ts";
 
 class DflowIsFinite extends DflowAbstractOneNumInOneBoolOut {
   static kind = "isFinite";
 
-  task(num: number) {
-    return Number.isFinite(num);
+  task(input: number) {
+    return Number.isFinite(input);
   }
 }
 
 class DflowIsInteger extends DflowAbstractOneNumInOneBoolOut {
   static kind = "isInteger";
 
-  task(num: number) {
-    return Number.isInteger(num);
+  task(input: number) {
+    return Number.isInteger(input);
   }
 }
 
-class DflowIsNaN extends DflowAbstractOneNumInOneBoolOut {
+class DflowIsNaN extends DflowAbstractOneAnyInOneBoolOut {
   static kind = "isNaN";
 
-  task(num: number) {
-    return Number.isNaN(num);
+  task(input: DflowPinData) {
+    return Number.isNaN(input);
   }
 }
 
 class DflowParseFloat extends DflowAbstractOneStrInOneNumOut {
   static kind = "parseFloat";
 
-  task(num: string) {
-    return Number.parseFloat(num);
+  task(input: string) {
+    return Number.parseFloat(input);
   }
 }
 
 class DflowParseInt extends DflowAbstractOneStrInOneNumOut {
   static kind = "parseInt";
 
-  task(str: string) {
-    return Number.parseInt(str);
+  task(input: string) {
+    return Number.parseInt(input);
   }
 }
 
