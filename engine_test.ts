@@ -6,6 +6,7 @@ import {
 } from "std/testing/asserts.ts";
 
 import {
+  DflowData,
   DflowHost,
   DflowNode,
   DflowOutput,
@@ -13,6 +14,12 @@ import {
   DflowSerializedNode,
   JsonValue,
 } from "./engine.ts";
+
+const num = 1;
+const bool = true;
+const str = "string";
+const arr = [num, bool, str];
+const obj = { foo: num, bar: str };
 
 class EmptyNode extends DflowNode {
   static kind = "Empty";
@@ -102,6 +109,79 @@ function sample01() {
 
   return { dflow, nodeId1, nodeId2, pinId1, pinId2, edgeId1 };
 }
+
+// DflowData
+// ////////////////////////////////////////////////////////////////////////////
+
+Deno.test("DflowData.isArray()", () => {
+  assertEquals(DflowData.isArray(arr), true);
+  assertEquals(DflowData.isArray(bool), false);
+  assertEquals(DflowData.isArray(num), false);
+  assertEquals(DflowData.isArray(null), false);
+  assertEquals(DflowData.isArray(obj), false);
+  assertEquals(DflowData.isArray(str), false);
+  assertEquals(DflowData.isArray(undefined), false);
+});
+
+Deno.test("DflowData.isBoolean()", () => {
+  assertEquals(DflowData.isBoolean(arr), false);
+  assertEquals(DflowData.isBoolean(bool), true);
+  assertEquals(DflowData.isBoolean(num), false);
+  assertEquals(DflowData.isBoolean(null), false);
+  assertEquals(DflowData.isBoolean(obj), false);
+  assertEquals(DflowData.isBoolean(str), false);
+  assertEquals(DflowData.isBoolean(undefined), false);
+});
+
+Deno.test("DflowData.isNull()", () => {
+  assertEquals(DflowData.isNull(arr), false);
+  assertEquals(DflowData.isNull(bool), false);
+  assertEquals(DflowData.isNull(num), false);
+  assertEquals(DflowData.isNull(null), true);
+  assertEquals(DflowData.isNull(obj), false);
+  assertEquals(DflowData.isNull(str), false);
+  assertEquals(DflowData.isNull(undefined), false);
+});
+
+Deno.test("DflowData.isNumber()", () => {
+  assertEquals(DflowData.isNumber(arr), false);
+  assertEquals(DflowData.isNumber(bool), false);
+  assertEquals(DflowData.isNumber(num), true);
+  assertEquals(DflowData.isNumber(null), false);
+  assertEquals(DflowData.isNumber(obj), false);
+  assertEquals(DflowData.isNumber(str), false);
+  assertEquals(DflowData.isNumber(undefined), false);
+});
+
+Deno.test("DflowData.isObject()", () => {
+  assertEquals(DflowData.isObject(arr), false);
+  assertEquals(DflowData.isObject(bool), false);
+  assertEquals(DflowData.isObject(num), false);
+  assertEquals(DflowData.isObject(null), false);
+  assertEquals(DflowData.isObject(obj), true);
+  assertEquals(DflowData.isObject(str), false);
+  assertEquals(DflowData.isObject(undefined), false);
+});
+
+Deno.test("DflowData.isString()", () => {
+  assertEquals(DflowData.isString(arr), false);
+  assertEquals(DflowData.isString(bool), false);
+  assertEquals(DflowData.isString(num), false);
+  assertEquals(DflowData.isString(null), false);
+  assertEquals(DflowData.isString(obj), false);
+  assertEquals(DflowData.isString(str), true);
+  assertEquals(DflowData.isString(undefined), false);
+});
+
+Deno.test("DflowData.isUndefined()", () => {
+  assertEquals(DflowData.isUndefined(arr), false);
+  assertEquals(DflowData.isUndefined(bool), false);
+  assertEquals(DflowData.isUndefined(num), false);
+  assertEquals(DflowData.isUndefined(null), false);
+  assertEquals(DflowData.isUndefined(obj), false);
+  assertEquals(DflowData.isUndefined(str), false);
+  assertEquals(DflowData.isUndefined(undefined), true);
+});
 
 // DflowGraph
 // ////////////////////////////////////////////////////////////////////////////
@@ -253,12 +333,6 @@ Deno.test("DflowOutput#clear()", () => {
 });
 
 Deno.test("DflowOutput#set data", () => {
-  const num = 1;
-  const bool = true;
-  const str = "string";
-  const arr = [num, bool, str];
-  const obj = { foo: num, bar: str };
-
   const pin = new DflowOutput({ id: "test" });
   assertEquals(pin.id, "test");
   assertEquals(pin.kind, "output");

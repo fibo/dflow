@@ -97,7 +97,7 @@ export class DflowData {
   }
 
   static isObject(data: JsonValue | undefined) {
-    return DflowData.isUndefined(data) && !DflowData.isNull(data) &&
+    return !DflowData.isUndefined(data) && !DflowData.isNull(data) &&
       !DflowData.isArray(data) && typeof data === "object";
   }
 
