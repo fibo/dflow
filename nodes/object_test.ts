@@ -7,3 +7,10 @@ Deno.test(catalog.objectKeys.kind, () => {
     testOneObjInOneArrOut(nodeKind, input, Object.keys(input));
   });
 });
+
+Deno.test(catalog.objectValues.kind, () => {
+  const nodeKind = catalog.objectValues.kind;
+  [{ foo: true }].forEach((input) => {
+    testOneObjInOneArrOut(nodeKind, input, Object.values(input));
+  });
+});

@@ -12,7 +12,7 @@ import {
   DflowOutput,
   DflowPinType,
   DflowSerializedNode,
-  JsonValue,
+  DflowValue,
 } from "./engine.ts";
 
 const num = 1;
@@ -306,13 +306,13 @@ Deno.test("DflowHost#newOutput()", () => {
 // DflowOutput
 // ////////////////////////////////////////////////////////////////////////////
 
-function testOutputSetData(data: JsonValue, types?: DflowPinType[]) {
+function testOutputSetData(data: DflowValue, types?: DflowPinType[]) {
   const output = new DflowOutput({ id: "test", types });
   output.data = data;
   assertStrictEquals(data, output.data);
 }
 
-function testOutputSetDataThrows(data: JsonValue, types: DflowPinType[]) {
+function testOutputSetDataThrows(data: DflowValue, types: DflowPinType[]) {
   assertThrows(
     () => {
       const output = new DflowOutput({ id: "test", types });

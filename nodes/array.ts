@@ -1,10 +1,10 @@
-import { JsonArray } from "../engine.ts";
+import { DflowArray } from "../engine.ts";
 import { DflowAbstractOneArrInOneNumOut } from "./abstract.ts";
 
 class DflowArrayLength extends DflowAbstractOneArrInOneNumOut {
   static kind = "arrayLength";
 
-  task(input: JsonArray) {
+  task(input: DflowArray) {
     return input.length;
   }
 }
