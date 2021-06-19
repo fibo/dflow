@@ -19,15 +19,15 @@ export type DflowPinType =
 export type DflowRunStatus = "waiting" | "success" | "failure";
 
 // Stolen from https://github.com/sindresorhus/type-fest/blob/main/source/basic.d.ts
-export type DflowPinDataObject = { [Key in string]?: DflowPinData };
-export type DflowPinDataArray = Array<DflowPinData>;
-export type DflowPinData =
+export type JsonObject = { [Key in string]?: JsonValue };
+export type JsonArray = Array<JsonValue>;
+export type JsonValue =
   | string
   | number
   | boolean
   | null
-  | DflowPinDataObject
-  | DflowPinDataArray;
+  | JsonObject
+  | JsonArray;
 
 export type DflowNodesCatalog = Record<DflowNodeKind, typeof DflowNode>;
 
@@ -48,7 +48,7 @@ export type DflowSerializedPin = DflowSerializedItem & {
 export type DflowSerializedInput = DflowSerializedPin;
 
 export type DflowSerializedOutput = DflowSerializedPin & {
-  data?: DflowPinData;
+  data?: JsonValue;
 };
 
 export type DflowSerializedPinPath = [nodeId: DflowId, pinId: DflowId];
@@ -87,6 +87,37 @@ export class DflowPin {
   }
 }
 
+export class DflowData {
+  static isArray(data: JsonValue | undefined) {
+    return Array.isArray(data);
+  }
+
+  static isBoolean(data: JsonValue | undefined) {
+    return typeof data === "boolean";
+  }
+
+  static isObject(data: JsonValue | undefined) {
+    return DflowData.isUndefined(data) && !DflowData.isNull(data) &&
+      !DflowData.isArray(data) && typeof data === "object";
+  }
+
+  static isNull(data: JsonValue | undefined) {
+    return data === null;
+  }
+
+  static isNumber(data: JsonValue | undefined) {
+    return typeof data === "number";
+  }
+
+  static isString(data: JsonValue | undefined) {
+    return typeof data === "string";
+  }
+
+  static isUndefined(data: JsonValue | undefined) {
+    return typeof data === "undefined";
+  }
+}
+
 export class DflowInput extends DflowPin {
   #source?: DflowOutput;
 
@@ -102,7 +133,7 @@ export class DflowInput extends DflowPin {
     this.#source = undefined;
   }
 
-  get data(): DflowPinData | undefined {
+  get data(): JsonValue | undefined {
     return this.#source?.data;
   }
 
@@ -122,7 +153,7 @@ export class DflowInput extends DflowPin {
 }
 
 export class DflowOutput extends DflowPin {
-  #data?: DflowPinData;
+  #data?: JsonValue;
 
   constructor({ id, data, types }: DflowSerializedOutput) {
     super("output", { id, types });
@@ -134,11 +165,11 @@ export class DflowOutput extends DflowPin {
     this.#data = undefined;
   }
 
-  get data(): DflowPinData | undefined {
+  get data(): JsonValue | undefined {
     return this.#data;
   }
 
-  set data(data: DflowPinData | undefined) {
+  set data(data: JsonValue | undefined) {
     const types = this.types ?? [];
 
     if (typeof data !== "undefined") {
@@ -150,18 +181,14 @@ export class DflowOutput extends DflowPin {
       const hasTypeObject = types.includes("object") || hasTypeAny;
       const hasTypeArray = types.includes("array") || hasTypeAny;
 
-      const isArray = Array.isArray(data);
-      const isNull = data === null;
-      const isObject = typeof data === "object" && !isNull && !isArray;
-
       switch (true) {
         case typeof this.types === "undefined":
-        case typeof data === "string" && hasTypeString:
-        case typeof data === "number" && hasTypeNumber:
-        case typeof data === "boolean" && hasTypeBoolean:
-        case isNull && hasTypeNull:
-        case isObject && hasTypeObject:
-        case isArray && hasTypeArray: {
+        case DflowData.isString(data) && hasTypeString:
+        case DflowData.isNumber(data) && hasTypeNumber:
+        case DflowData.isBoolean(data) && hasTypeBoolean:
+        case DflowData.isNull(data) && hasTypeNull:
+        case DflowData.isObject(data) && hasTypeObject:
+        case DflowData.isArray(data) && hasTypeArray: {
           this.#data = data;
           break;
         }

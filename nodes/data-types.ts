@@ -1,5 +1,12 @@
 import { DflowNode, DflowSerializedNode } from "../engine.ts";
-import { oneAnyOut, oneNumOut, oneStrOut } from "./abstract.ts";
+import {
+  oneAnyOut,
+  oneArrOut,
+  oneBoolOut,
+  oneNumOut,
+  oneObjOut,
+  oneStrOut,
+} from "./abstract.ts";
 
 class DflowData extends DflowNode {
   static kind = "data";
@@ -11,8 +18,28 @@ class DflowData extends DflowNode {
   run() {}
 }
 
-class DflowNum extends DflowNode {
-  static kind = "num";
+class DflowArray extends DflowNode {
+  static kind = "array";
+
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, outputs: [oneArrOut()] });
+  }
+
+  run() {}
+}
+
+class DflowBoolean extends DflowNode {
+  static kind = "boolean";
+
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, outputs: [oneBoolOut()] });
+  }
+
+  run() {}
+}
+
+class DflowNumber extends DflowNode {
+  static kind = "number";
 
   constructor(arg: DflowSerializedNode) {
     super({ ...arg, outputs: [oneNumOut()] });
@@ -21,8 +48,18 @@ class DflowNum extends DflowNode {
   run() {}
 }
 
-class DflowStr extends DflowNode {
-  static kind = "str";
+class DflowObject extends DflowNode {
+  static kind = "object";
+
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, outputs: [oneObjOut()] });
+  }
+
+  run() {}
+}
+
+class DflowString extends DflowNode {
+  static kind = "string";
 
   constructor(arg: DflowSerializedNode) {
     super({ ...arg, outputs: [oneStrOut()] });
@@ -33,6 +70,9 @@ class DflowStr extends DflowNode {
 
 export const catalog = {
   [DflowData.kind]: DflowData,
-  [DflowNum.kind]: DflowNum,
-  [DflowStr.kind]: DflowStr,
+  [DflowArray.kind]: DflowArray,
+  [DflowBoolean.kind]: DflowBoolean,
+  [DflowNumber.kind]: DflowNumber,
+  [DflowObject.kind]: DflowObject,
+  [DflowString.kind]: DflowString,
 };

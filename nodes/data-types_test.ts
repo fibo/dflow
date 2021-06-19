@@ -3,8 +3,8 @@ import { assertEquals } from "std/testing/asserts.ts";
 import { DflowHost } from "../dflow.ts";
 import { catalog } from "./data-types.ts";
 
-Deno.test("data type num", () => {
-  const nodeKind = catalog.num.kind;
+Deno.test(catalog.number.kind, () => {
+  const nodeKind = catalog.number.kind;
 
   const num = Math.random();
   const dflow = new DflowHost(catalog);
