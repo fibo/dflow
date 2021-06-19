@@ -7,6 +7,7 @@ import {
 
 import {
   DflowData,
+  DflowGraph,
   DflowHost,
   DflowNode,
   DflowOutput,
@@ -262,6 +263,12 @@ Deno.test("DflowData.validate()", () => {
 
 // DflowGraph
 // ////////////////////////////////////////////////////////////////////////////
+
+Deno.test("DflowGraph.isDflowGraph", () => {
+  [{nodes:[], edges:[]}].forEach(graph=> {
+  assertEquals(DflowGraph.isDflowGraph(graph), true);
+  })
+});
 
 Deno.test("DflowGraph#clear()", () => {
   const { dflow } = sample01();

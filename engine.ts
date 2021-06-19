@@ -14,7 +14,8 @@ export type DflowPinType =
   | "boolean"
   | "null"
   | "object"
-  | "array";
+  | "array"
+  | "Dflow";
 
 export type DflowRunStatus = "waiting" | "success" | "failure";
 
@@ -27,8 +28,9 @@ export type DflowValue =
   | boolean
   | null
   | undefined
+  | DflowArray
   | DflowObject
-  | DflowArray;
+  | DflowSerializedGraph;
 
 export type DflowNodesCatalog = Record<DflowNodeKind, typeof DflowNode>;
 
@@ -80,6 +82,25 @@ export class DflowPin {
   readonly id: DflowId;
   readonly kind: DflowPinKind;
   readonly types: DflowPinType[];
+
+  static types = [
+    "string",
+    "number",
+    "boolean",
+    "null",
+    "object",
+    "array",
+    "Dflow",
+  ];
+
+  static isDflowPin({ id, types = [] }: DflowSerializedPin) {
+    return typeof id === "string" &&
+      (types.every((pinType) => DflowPin.isDflowPinType(pinType)));
+  }
+
+  static isDflowPinType(pinType: DflowPinType) {
+    DflowPin.types.includes(pinType);
+  }
 
   constructor(kind: DflowPinKind, { id, types = [] }: DflowSerializedPin) {
     this.id = id;
@@ -146,6 +167,12 @@ export class DflowData {
     return typeof data === "undefined";
   }
 
+  static isDflow(data: DflowValue) {
+    return typeof data === "object" && data !== null && !Array.isArray(data) &&
+      Array.isArray(data.nodes) && Array.isArray(data.edges) &&
+      DflowGraph.isDflowGraph(data as DflowSerializedGraph);
+  }
+
   static validate(data: DflowValue, types: DflowPinType[]) {
     if (types.length === 0) {
       return true;
@@ -165,6 +192,8 @@ export class DflowData {
           return DflowData.isObject(data);
         case "string":
           return DflowData.isString(data);
+        case "Dflow":
+          return DflowData.isDflow(data);
         default:
           return false;
       }
@@ -174,6 +203,10 @@ export class DflowData {
 
 export class DflowInput extends DflowPin {
   #source?: DflowOutput;
+
+  static isDflowInput({ id, types }: DflowSerializedInput) {
+    return DflowPin.isDflowPin({ id, types });
+  }
 
   constructor({ id, types }: DflowSerializedInput) {
     super("input", { id, types });
@@ -208,6 +241,11 @@ export class DflowInput extends DflowPin {
 
 export class DflowOutput extends DflowPin {
   #data?: DflowValue;
+
+  static isDflowOutput({ id, data, types = [] }: DflowSerializedOutput) {
+    return DflowPin.isDflowPin({ id, types }) &&
+      DflowData.validate(data, types);
+  }
 
   constructor({ id, data, types }: DflowSerializedOutput) {
     super("output", { id, types });
@@ -275,6 +313,16 @@ export class DflowNode {
   readonly outputs: Map<DflowId, DflowOutput> = new Map();
   readonly #inputPosition: DflowId[] = [];
   readonly #outputPosition: DflowId[] = [];
+
+  static isDflowNode(
+    { id, kind, inputs = [], outputs = [] }: DflowSerializedNode,
+  ) {
+    return typeof id === "string" && typeof kind === "string" &&
+      // Check inputs.
+      (inputs.every((input) => DflowInput.isDflowInput(input))) &&
+      // Check outputs.
+      (outputs.every((output) => DflowOutput.isDflowOutput(output)));
+  }
 
   constructor(
     { id, kind, inputs = [], outputs = [] }: DflowSerializedNode,
@@ -410,6 +458,25 @@ export class DflowEdge {
   readonly source: DflowSerializedPinPath;
   readonly target: DflowSerializedPinPath;
 
+  static isDflowEdge(
+    { id, source, target }: DflowSerializedEdge,
+    graph: DflowSerializedGraph,
+  ) {
+    return typeof id === "string" &&
+      // Check source.
+      (Array.isArray(source) && source.length === 2 &&
+        graph.nodes.find((
+          { id, outputs = [] },
+        ) => (id === source[0] &&
+          outputs.find(({ id }) => id === source[1]))
+        )) &&
+      // Check source.
+      (Array.isArray(target) && target.length === 2 &&
+        graph.nodes.find((
+          { id, inputs = [] },
+        ) => (id === target[0] && inputs.find(({ id }) => id === target[1]))));
+  }
+
   constructor({ id, source, target }: DflowSerializedEdge) {
     this.id = id;
 
@@ -453,6 +520,11 @@ export class DflowGraph {
   #runStatus: DflowRunStatus = "success";
   readonly nodes: Map<DflowId, DflowNode> = new Map();
   readonly edges: Map<DflowId, DflowEdge> = new Map();
+
+  static isDflowGraph(graph: DflowSerializedGraph): boolean {
+    return graph.nodes.every((node) => DflowNode.isDflowNode(node)) &&
+      graph.edges.every((edge) => DflowEdge.isDflowEdge(edge, graph));
+  }
 
   static sort(
     nodeIds: DflowId[],
