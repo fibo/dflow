@@ -1,33 +1,27 @@
 import { DflowNode } from "../engine.ts";
 
-class DflowInput extends DflowNode {
-  static kind = "dflowInput";
+class DflowFunction extends DflowNode {
+  static kind = "dflowFunction";
 
   constructor(arg: DflowSerializedNode) {
     super({
       ...arg,
-      inputs: [{ id: "in", types: ["number"] }],
-      outputs: [{ id: "out" }],
+      inputs: [
+        /**
+          Defines the function signature.
+          For example if data = 1 there is a single argument.
+         */
+        { id: "in", types: ["number"], name: "arguments" },
+      ],
+      outputs: [{ id: "out", types: ["DflowGraph"] }, { id: "arg1" }],
     });
   }
 
-  run() {}
-}
-
-class DflowFunction extends DflowNode {
-  static kind = "dflowFunction";
-
-  run() {}
-}
-
-class DflowReturn extends DflowNode {
-  static kind = "dflowReturn";
-
-  run() {}
+  run() {
+    // 1. Get the trees starting from argument outputs.
+  }
 }
 
 export const catalog = {
-  [DflowInput.kind]: DflowInput,
   [DflowFunction.kind]: DflowFunction,
-  [DflowReturn.kind]: DflowReturn,
 };
