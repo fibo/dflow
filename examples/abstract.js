@@ -62,6 +62,7 @@ async function runGraph() {
 
   dflow.newNode({
     id: "num",
+    name: "Hello world",
     kind: NumNode.kind,
     outputs: [{ id: "out", data: 2 }],
   });

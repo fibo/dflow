@@ -94,6 +94,7 @@ function sample01() {
   const dflow = new DflowHost(nodesCatalog1);
   dflow.newNode({
     id: nodeId1,
+    name: "Hello world",
     kind: EmptyNode.kind,
     outputs: [{ id: pinId1 }],
   });
@@ -265,7 +266,7 @@ Deno.test("DflowData.validate()", () => {
 // ////////////////////////////////////////////////////////////////////////////
 
 Deno.test("DflowGraph.isDflowGraph", () => {
-  [{ nodes: [], edges: [] }].forEach((graph) => {
+  [{ id: "g1", nodes: [], edges: [] }].forEach((graph) => {
     assertEquals(DflowGraph.isDflowGraph(graph), true);
   });
 });
