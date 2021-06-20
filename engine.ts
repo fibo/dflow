@@ -15,7 +15,7 @@ export type DflowPinType =
   | "null"
   | "object"
   | "array"
-  | "Dflow";
+  | "DflowGraph";
 
 export type DflowRunStatus = "waiting" | "success" | "failure";
 
@@ -36,6 +36,7 @@ export type DflowNodesCatalog = Record<DflowNodeKind, typeof DflowNode>;
 
 export type DflowSerializedItem = {
   id: DflowId;
+  name?: string;
 };
 
 export type DflowSerializedNode = DflowSerializedItem & {
@@ -78,8 +79,20 @@ const _missingPinAtPosition = (
 const _missingPinById = (nodeId: DflowId, kind: DflowPinKind, pinId: DflowId) =>
   `${_missingPin(nodeId, kind)} pinId=${pinId}`;
 
-export class DflowPin {
+export class DflowItem {
   readonly id: DflowId;
+
+  static isDflowItem({ id, name }: DflowSerializedItem) {
+    return typeof id === "string" &&
+      (["undefined", "string"].includes(typeof name));
+  }
+
+  constructor({ id }: DflowSerializedPin) {
+    this.id = id;
+  }
+}
+
+export class DflowPin extends DflowItem {
   readonly kind: DflowPinKind;
   readonly types: DflowPinType[];
 
@@ -90,11 +103,11 @@ export class DflowPin {
     "null",
     "object",
     "array",
-    "Dflow",
+    "DflowGraph",
   ];
 
-  static isDflowPin({ id, types = [] }: DflowSerializedPin) {
-    return typeof id === "string" &&
+  static isDflowPin({ types = [], ...item }: DflowSerializedPin) {
+    return DflowItem.isDflowItem(item) &&
       (types.every((pinType) => DflowPin.isDflowPinType(pinType)));
   }
 
@@ -103,7 +116,8 @@ export class DflowPin {
   }
 
   constructor(kind: DflowPinKind, { id, types = [] }: DflowSerializedPin) {
-    this.id = id;
+    super({ id });
+
     this.kind = kind;
     this.types = types;
   }
@@ -146,6 +160,12 @@ export class DflowData {
     return typeof data === "boolean";
   }
 
+  static isDflowGraph(data: DflowValue) {
+    return typeof data === "object" && data !== null && !Array.isArray(data) &&
+      Array.isArray(data.nodes) && Array.isArray(data.edges) &&
+      DflowGraph.isDflowGraph(data as DflowSerializedGraph);
+  }
+
   static isObject(data: DflowValue) {
     return !DflowData.isUndefined(data) && !DflowData.isNull(data) &&
       !DflowData.isArray(data) && typeof data === "object";
@@ -167,12 +187,6 @@ export class DflowData {
     return typeof data === "undefined";
   }
 
-  static isDflow(data: DflowValue) {
-    return typeof data === "object" && data !== null && !Array.isArray(data) &&
-      Array.isArray(data.nodes) && Array.isArray(data.edges) &&
-      DflowGraph.isDflowGraph(data as DflowSerializedGraph);
-  }
-
   static validate(data: DflowValue, types: DflowPinType[]) {
     if (types.length === 0) {
       return true;
@@ -192,8 +206,8 @@ export class DflowData {
           return DflowData.isObject(data);
         case "string":
           return DflowData.isString(data);
-        case "Dflow":
-          return DflowData.isDflow(data);
+        case "DflowGraph":
+          return DflowData.isDflowGraph(data);
         default:
           return false;
       }
@@ -305,8 +319,7 @@ export class DflowOutput extends DflowPin {
   }
 }
 
-export class DflowNode {
-  readonly id: DflowId;
+export class DflowNode extends DflowItem {
   readonly kind: string;
   readonly meta: DflowNodeMetadata;
   readonly inputs: Map<DflowId, DflowInput> = new Map();
@@ -315,9 +328,9 @@ export class DflowNode {
   readonly #outputPosition: DflowId[] = [];
 
   static isDflowNode(
-    { id, kind, inputs = [], outputs = [] }: DflowSerializedNode,
+    { kind, inputs = [], outputs = [], ...item }: DflowSerializedNode,
   ) {
-    return typeof id === "string" && typeof kind === "string" &&
+    return DflowItem.isDflowItem(item) && typeof kind === "string" &&
       // Check inputs.
       (inputs.every((input) => DflowInput.isDflowInput(input))) &&
       // Check outputs.
@@ -328,16 +341,19 @@ export class DflowNode {
     { id, kind, inputs = [], outputs = [] }: DflowSerializedNode,
     { isAsync = false, isConstant = false }: DflowNodeMetadata = {},
   ) {
-    this.id = id;
+    super({ id });
+
     this.kind = kind;
 
     // Metadata.
     this.meta = { isAsync, isConstant };
 
+    // Inputs.
     for (const serializedPin of inputs) {
       this.newInput(serializedPin);
     }
 
+    // Outputs.
     for (const serializedPin of outputs) {
       this.newOutput(serializedPin);
     }
@@ -458,16 +474,15 @@ export class DflowUnknownNode extends DflowNode {
   run() {}
 }
 
-export class DflowEdge {
-  readonly id: string;
+export class DflowEdge extends DflowItem {
   readonly source: DflowSerializedPinPath;
   readonly target: DflowSerializedPinPath;
 
   static isDflowEdge(
-    { id, source, target }: DflowSerializedEdge,
+    { source, target, ...item }: DflowSerializedEdge,
     graph: DflowSerializedGraph,
   ) {
-    return typeof id === "string" &&
+    return DflowItem.isDflowItem(item) &&
       // Check source.
       (Array.isArray(source) && source.length === 2 &&
         graph.nodes.find((
@@ -475,15 +490,15 @@ export class DflowEdge {
         ) => (id === source[0] &&
           outputs.find(({ id }) => id === source[1]))
         )) &&
-      // Check source.
+      // Check target.
       (Array.isArray(target) && target.length === 2 &&
         graph.nodes.find((
           { id, inputs = [] },
         ) => (id === target[0] && inputs.find(({ id }) => id === target[1]))));
   }
 
-  constructor({ id, source, target }: DflowSerializedEdge) {
-    this.id = id;
+  constructor({ source, target, ...item }: DflowSerializedEdge) {
+    super(item);
 
     // 1. Read source and target.
     const [sourceNodeId, sourcePinId] = source;
