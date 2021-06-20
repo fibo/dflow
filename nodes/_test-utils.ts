@@ -129,6 +129,24 @@ export function testTwoBoolInOneBoolOut(
   assertEquals(testNode.getOutputByPosition(0).data, expected);
 }
 
+export function testTwoNumInOneBoolOut(
+  nodeKind: string,
+  input1: number,
+  input2: number,
+  expected: boolean,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode1 = dflow.newNode({ kind: catalog.number.kind });
+  dataNode1.getOutputByPosition(0).data = input1;
+  const dataNode2 = dflow.newNode({ kind: catalog.number.kind });
+  dataNode2.getOutputByPosition(0).data = input2;
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode1).to(testNode, 0);
+  dflow.connect(dataNode2).to(testNode, 1);
+  dflow.graph.run();
+  assertEquals(testNode.getOutputByPosition(0).data, expected);
+}
+
 export function testTwoNumInOneNumOut(
   nodeKind: string,
   input1: number,
