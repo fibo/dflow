@@ -80,6 +80,11 @@ export const twoBoolIn = (): DflowSerializedInput[] => ([
   { id: "i2", types: ["boolean"] },
 ]);
 
+export const twoNumIn = (): DflowSerializedInput[] => ([
+  { id: "1i", types: ["number"] },
+  { id: "i2", types: ["number"] },
+]);
+
 export class DflowAbstractOneInOneOut extends DflowNode {
   get input(): DflowInput {
     return this.getInputByPosition(0);
@@ -102,43 +107,6 @@ export class DflowAbstractOneInOneOut extends DflowNode {
   }
 
   task(_: DflowValue): DflowValue {
-    throw new Error(_missingMethod("task", this.kind));
-  }
-}
-
-export class DflowAbstractTwoInOneOut extends DflowNode {
-  get input1(): DflowInput {
-    return this.getInputByPosition(0);
-  }
-
-  get input2(): DflowInput {
-    return this.getInputByPosition(1);
-  }
-
-  get output(): DflowOutput {
-    return this.getOutputByPosition(0);
-  }
-
-  run() {
-    const {
-      input1: { data: data1, types: types1 },
-      input2: { data: data2, types: types2 },
-      output,
-      task,
-    } = this;
-
-    if (DflowData.isUndefined(data1) || DflowData.isUndefined(data2)) {
-      output.clear();
-    } else {
-      if (
-        DflowData.validate(data1, types1) && DflowData.validate(data2, types2)
-      ) {
-        output.data = task(data1, data2);
-      }
-    }
-  }
-
-  task(_input1: DflowValue, _input2: DflowValue): DflowValue {
     throw new Error(_missingMethod("task", this.kind));
   }
 }
@@ -199,6 +167,53 @@ export class DflowAbstractOneStrInOneNumOut extends DflowAbstractOneInOneOut {
   }
 
   task(_: string): number {
+    throw new Error(_missingMethod("task", this.kind));
+  }
+}
+
+export class DflowAbstractTwoInOneOut extends DflowNode {
+  get input1(): DflowInput {
+    return this.getInputByPosition(0);
+  }
+
+  get input2(): DflowInput {
+    return this.getInputByPosition(1);
+  }
+
+  get output(): DflowOutput {
+    return this.getOutputByPosition(0);
+  }
+
+  run() {
+    const {
+      input1: { data: data1, types: types1 },
+      input2: { data: data2, types: types2 },
+      output,
+      task,
+    } = this;
+
+    if (DflowData.isUndefined(data1) || DflowData.isUndefined(data2)) {
+      output.clear();
+    } else {
+      if (
+        DflowData.validate(data1, types1) && DflowData.validate(data2, types2)
+      ) {
+        output.data = task(data1, data2);
+      }
+    }
+  }
+
+  task(_input1: DflowValue, _input2: DflowValue): DflowValue {
+    throw new Error(_missingMethod("task", this.kind));
+  }
+}
+
+export class DflowAbstractTwoNumInOneNumOut extends DflowAbstractTwoInOneOut {
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, inputs: twoNumIn(), outputs: [oneNumOut()] });
+  }
+
+  task(_input: number, _input2: number): number {
     throw new Error(_missingMethod("task", this.kind));
   }
 }
