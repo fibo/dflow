@@ -265,9 +265,9 @@ Deno.test("DflowData.validate()", () => {
 // ////////////////////////////////////////////////////////////////////////////
 
 Deno.test("DflowGraph.isDflowGraph", () => {
-  [{nodes:[], edges:[]}].forEach(graph=> {
-  assertEquals(DflowGraph.isDflowGraph(graph), true);
-  })
+  [{ nodes: [], edges: [] }].forEach((graph) => {
+    assertEquals(DflowGraph.isDflowGraph(graph), true);
+  });
 });
 
 Deno.test("DflowGraph#clear()", () => {

@@ -1,6 +1,7 @@
 import { assertEquals } from "std/testing/asserts.ts";
 
 import { catalog as arrayCatalog } from "./array.ts";
+import { catalog as logicCatalog } from "./logic.ts";
 import { catalog as mathCatalog } from "./math.ts";
 import { catalog as objectCatalog } from "./object.ts";
 import { catalog as stringCatalog } from "./string.ts";
@@ -16,6 +17,7 @@ no need to prefix it.  Math catalog on the other end provide for example
 Deno.test("catalog naming conventions", () => {
   [
     { catalog: arrayCatalog, prefix: "array" },
+    { catalog: logicCatalog, prefix: "logic" },
     { catalog: mathCatalog, prefix: "math" },
     { catalog: objectCatalog, prefix: "object" },
     { catalog: stringCatalog, prefix: "string" },
