@@ -417,7 +417,7 @@ export class DflowNode {
     );
   }
 
-  toJSON(): string {
+  toJSON() {
     return JSON.stringify(this.toObject());
   }
 
@@ -427,14 +427,19 @@ export class DflowNode {
       kind: this.kind,
     } as DflowSerializedNode;
 
-    const inputs = Object.values(this.inputs).map((input) => input.toObject());
+    const inputs = [];
+    const outputs = [];
+
+    for (const input of this.inputs.values()) {
+      inputs.push(input.toObject());
+    }
     if (inputs.length > 0) {
       obj.inputs = inputs;
     }
 
-    const outputs = Object.values(this.outputs).map((output) =>
-      output.toObject()
-    );
+    for (const output of this.outputs.values()) {
+      outputs.push(output.toObject());
+    }
     if (outputs.length > 0) {
       obj.outputs = outputs;
     }
@@ -503,7 +508,7 @@ export class DflowEdge {
     this.target = target;
   }
 
-  toJSON(): string {
+  toJSON() {
     return JSON.stringify(this.toObject());
   }
 
@@ -652,13 +657,20 @@ export class DflowGraph {
     return this.#runStatus === "failure";
   }
 
-  toJSON(): string {
+  toJSON() {
     return JSON.stringify(this.toObject());
   }
 
   toObject(): DflowSerializedGraph {
-    const nodes = Object.values(this.nodes).map((node) => node.toObject());
-    const edges = Object.values(this.edges).map((edge) => edge.toObject());
+    const nodes = [];
+    const edges = [];
+
+    for (const node of this.nodes.values()) {
+      nodes.push(node.toObject());
+    }
+    for (const edge of this.edges.values()) {
+      edges.push(edge.toObject());
+    }
 
     return { nodes, edges };
   }
@@ -703,6 +715,7 @@ export class DflowHost {
       const targetNode = this.graph.getNodeById(targetNodeId);
       const targetPin = targetNode.getInputById(targetPinId);
       targetPin.disconnect();
+
       // 2. Delete edge.
       this.graph.edges.delete(edgeId);
     } else {
@@ -728,6 +741,7 @@ export class DflowHost {
           this.deleteEdge(edge.id);
         }
       }
+
       // 2. Delete node.
       this.graph.nodes.delete(nodeId);
     } else {

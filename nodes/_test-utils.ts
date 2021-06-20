@@ -31,6 +31,20 @@ export function testOneArrInOneNumOut(
   assertEquals(testNode.getOutputByPosition(0).data, expected);
 }
 
+export function testOneBoolInOneBoolOut(
+  nodeKind: string,
+  input: boolean,
+  expected: boolean,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode = dflow.newNode({ kind: catalog.boolean.kind });
+  dataNode.getOutputByPosition(0).data = input;
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode).to(testNode);
+  dflow.graph.run();
+  assertEquals(testNode.getOutputByPosition(0).data, expected);
+}
+
 export function testOneObjInOneArrOut(
   nodeKind: string,
   input: DflowObject,
@@ -93,6 +107,24 @@ export function testOneStrInOneNumOut(
   dataNode.getOutputByPosition(0).data = input;
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
+  dflow.graph.run();
+  assertEquals(testNode.getOutputByPosition(0).data, expected);
+}
+
+export function testTwoBoolInOneBoolOut(
+  nodeKind: string,
+  input1: boolean,
+  input2: boolean,
+  expected: boolean,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode1 = dflow.newNode({ kind: catalog.boolean.kind });
+  dataNode1.getOutputByPosition(0).data = input1;
+  const dataNode2 = dflow.newNode({ kind: catalog.boolean.kind });
+  dataNode2.getOutputByPosition(0).data = input2;
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode1).to(testNode, 0);
+  dflow.connect(dataNode2).to(testNode, 1);
   dflow.graph.run();
   assertEquals(testNode.getOutputByPosition(0).data, expected);
 }
