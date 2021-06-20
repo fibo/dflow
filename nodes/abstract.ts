@@ -208,6 +208,16 @@ export class DflowAbstractTwoInOneOut extends DflowNode {
   }
 }
 
+export class DflowAbstractTwoNumInOneBoolOut extends DflowAbstractTwoInOneOut {
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, inputs: twoNumIn(), outputs: [oneBoolOut()] });
+  }
+
+  task(_input: number, _input2: number): boolean {
+    throw new Error(_missingMethod("task", this.kind));
+  }
+}
+
 export class DflowAbstractTwoNumInOneNumOut extends DflowAbstractTwoInOneOut {
   constructor(arg: DflowSerializedNode) {
     super({ ...arg, inputs: twoNumIn(), outputs: [oneNumOut()] });

@@ -10,8 +10,8 @@ import { catalog as stringCatalog } from "./string.ts";
 Naming convention for nodes kind mimic JavaScript if it makes sense.
 
 For example number catalog provides for example `isFinite` which is global,
-no need to prefix it.  Math catalog on the other end provide for example
-`Math.cos()` so its node will be of kind 'mathCos'.
+no need to prefix it.  Math catalog provides for example `Math.cos()`
+so its node will be of kind 'mathCos'.
 */
 
 Deno.test("catalog naming conventions", () => {

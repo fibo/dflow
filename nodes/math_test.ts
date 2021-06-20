@@ -5,11 +5,6 @@ import {
 } from "./_test-utils.ts";
 import { catalog } from "./math.ts";
 
-Deno.test(catalog.mathPI.kind, () => {
-  const nodeKind = catalog.mathPI.kind;
-  testOneNumOut(nodeKind, Math.PI);
-});
-
 Deno.test(catalog.mathCos.kind, () => {
   const nodeKind = catalog.mathCos.kind;
   [1].forEach((input) => {
@@ -22,6 +17,11 @@ Deno.test(catalog.mathCosh.kind, () => {
   [1].forEach((input) => {
     testOneNumInOneNumOut(nodeKind, input, Math.cosh(input));
   });
+});
+
+Deno.test(catalog.mathPI.kind, () => {
+  const nodeKind = catalog.mathPI.kind;
+  testOneNumOut(nodeKind, Math.PI);
 });
 
 Deno.test(catalog.mathSin.kind, () => {
