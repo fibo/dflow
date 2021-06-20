@@ -16,72 +16,68 @@ const _missingMethod = (
   nodeKind: string,
 ) => (`unimplemented method ${methodName} nodeKind=${nodeKind}`);
 
-export const oneAnyIn = (): DflowSerializedInput => ({
-  id: "in",
-});
+export const oneAnyIn = (): DflowSerializedInput => ({ id: "i1" });
 
-export const oneAnyOut = (): DflowSerializedInput => ({
-  id: "out",
-});
+export const oneAnyOut = (): DflowSerializedInput => ({ id: "o1" });
 
 export const oneArrIn = (): DflowSerializedInput => ({
-  id: "in",
+  id: "i1",
   types: ["array"],
 });
 
 export const oneArrOut = (data?: DflowArray): DflowSerializedOutput => ({
-  id: "out",
+  id: "o1",
   types: ["array"],
   data,
 });
 
 export const oneBoolIn = (): DflowSerializedInput => ({
-  id: "in",
+  id: "i1",
   types: ["boolean"],
 });
 
 export const oneBoolOut = (data?: boolean): DflowSerializedOutput => ({
-  id: "out",
+  id: "o1",
   types: ["boolean"],
   data,
 });
 
 export const oneObjIn = (): DflowSerializedInput => ({
-  id: "in",
+  id: "i1",
   types: ["object"],
 });
 
 export const oneObjOut = (data?: DflowObject): DflowSerializedOutput => ({
-  id: "out",
+  id: "o1",
   types: ["object"],
   data,
 });
 
 export const oneNumIn = (): DflowSerializedInput => ({
-  id: "in",
+  id: "i1",
   types: ["number"],
 });
 
 export const oneNumOut = (data?: number): DflowSerializedOutput => ({
-  id: "out",
+  id: "o1",
   types: ["number"],
   data,
 });
 
 export const oneStrIn = (): DflowSerializedInput => ({
-  id: "in",
+  id: "i1",
   types: ["string"],
 });
 
 export const oneStrOut = (data?: string): DflowSerializedOutput => ({
-  id: "out",
+  id: "o1",
   types: ["string"],
   data,
 });
 
 export const twoBoolIn = (): DflowSerializedInput[] => ([
-  { id: "in1", types: ["boolean"] },
-  { id: "in2", types: ["boolean"] },
+  { id: "1i", types: ["boolean"] },
+  { id: "i2", types: ["boolean"] },
 ]);
 
 export class DflowAbstractOneInOneOut extends DflowNode {
