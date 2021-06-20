@@ -284,7 +284,7 @@ Deno.test("DflowGraph#runStatusIsSuccess", () => {
   assertEquals(dflow.graph.runStatusIsSuccess, true);
 
   dflow.newNode({ id: "n1", kind: "EmptyNode" });
-  dflow.graph.run();
+  dflow.run();
 
   assertEquals(dflow.graph.runStatusIsSuccess, true);
 });
@@ -320,7 +320,7 @@ Deno.test("DflowGraph#run()", async () => {
   // Add also an async node.
   dflow.newNode({ id: "sleep", kind: SleepNode.kind });
 
-  await dflow.graph.run();
+  await dflow.run();
 
   const sum = sumNode.getOutputByPosition(0);
   assertEquals(sum.data, 4);

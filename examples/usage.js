@@ -21,7 +21,7 @@ async function runGraph() {
   dflow.connect(numNode).to(sinNode);
 
   // Run graph.
-  await dflow.graph.run();
+  await dflow.run();
 
   // Get sinNode output.
   const sin = sinNode.getOutputByPosition(0);

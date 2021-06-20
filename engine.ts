@@ -463,7 +463,7 @@ export class DflowNode extends DflowItem {
     return pin;
   }
 
-  run(): void {
+  run(_: DflowHost): void {
     throw new Error(
       `${this.constructor.name} does not implement a run() method`,
     );
@@ -661,7 +661,7 @@ export class DflowGraph extends DflowItem {
     return this.nodes.has(id) ? this.generateNodeId(i + 1) : id;
   }
 
-  async run() {
+  async run(host: DflowHost) {
     // Set runStatus to waiting if there was some unhandled error in a previous run.
     if (this.runStatusIsSuccess) {
       this.#runStatus = "waiting";
@@ -682,9 +682,9 @@ export class DflowGraph extends DflowItem {
       try {
         if (node.meta.isConstant === false) {
           if (node.meta.isAsync) {
-            await node.run();
+            await node.run(host);
           } else {
-            node.run();
+            node.run(host);
           }
         }
       } catch (error) {
@@ -736,6 +736,10 @@ export class DflowHost {
   constructor(nodesCatalog: DflowNodesCatalog = {}) {
     this.#nodesCatalog = nodesCatalog;
     this.graph = new DflowGraph({ id: "g1" });
+  }
+
+  get nodeKinds() {
+    return Object.keys(this.#nodesCatalog);
   }
 
   connect(sourceNode: DflowNode, sourcePosition = 0) {
@@ -855,5 +859,9 @@ export class DflowHost {
   newOutput(nodeId: DflowId, obj: DflowNewOutput): DflowOutput {
     const node = this.graph.getNodeById(nodeId);
     return node.newOutput(obj);
+  }
+
+  async run() {
+    await this.graph.run(this);
   }
 }
