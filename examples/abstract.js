@@ -86,7 +86,7 @@ async function runGraph() {
   // Add also an async node.
   dflow.newNode({ id: "sleep", kind: SleepNode.kind });
 
-  await dflow.graph.run();
+  await dflow.run();
 
   const sum = sumNode.getOutputByPosition(0);
   console.log(sum.data); // 4
