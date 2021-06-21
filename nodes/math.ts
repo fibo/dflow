@@ -1,9 +1,5 @@
 import { DflowNode, DflowSerializedNode } from "../engine.ts";
-import {
-  DflowAbstractOneNumInOneNumOut,
-  DflowAbstractTwoNumInOneNumOut,
-  oneNumOut,
-} from "./abstract.ts";
+import { DflowAbstractOneNumInOneNumOut, oneNumOut } from "./abstract.ts";
 
 class DflowMathCos extends DflowAbstractOneNumInOneNumOut {
   static kind = "mathCos";
@@ -46,19 +42,10 @@ class DflowMathSinh extends DflowAbstractOneNumInOneNumOut {
   }
 }
 
-class DflowMathSum extends DflowAbstractTwoNumInOneNumOut {
-  static kind = "mathSum";
-
-  task(num1: number, num2: number) {
-    return num1 + num2;
-  }
-}
-
 export const catalog = {
   [DflowMathCos.kind]: DflowMathCos,
   [DflowMathCosh.kind]: DflowMathCosh,
   [DflowMathPI.kind]: DflowMathPI,
   [DflowMathSin.kind]: DflowMathSin,
   [DflowMathSinh.kind]: DflowMathSinh,
-  [DflowMathSum.kind]: DflowMathSum,
 };

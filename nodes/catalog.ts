@@ -5,6 +5,7 @@ import { catalog as logicCatalog } from "./logic.ts";
 import { catalog as mathCatalog } from "./math.ts";
 import { catalog as numberCatalog } from "./number.ts";
 import { catalog as objectCatalog } from "./object.ts";
+import { catalog as operatorCatalog } from "./operator.ts";
 import { catalog as stringatalog } from "./string.ts";
 
 export const catalog = {
@@ -15,5 +16,6 @@ export const catalog = {
   ...mathCatalog,
   ...numberCatalog,
   ...objectCatalog,
+  ...operatorCatalog,
   ...stringatalog,
 };
