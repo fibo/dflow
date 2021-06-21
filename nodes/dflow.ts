@@ -16,24 +16,22 @@ class Dflow extends DflowNode {
   }
 }
 
-class DflowFunction extends DflowNode {
-  static kind = "function";
+class DflowArguments extends DflowNode {
+  static kind = "arguments";
 
   constructor(arg: DflowSerializedNode) {
     super({
       ...arg,
       inputs: [
-        /**
-          Defines the function signature.
-          For example if data = 1 there is a single argument.
-         */
         { id: "in", types: ["number"], name: "signature" },
       ],
-      outputs: [{ id: "out", types: ["DflowGraph"] }],
+      outputs: [{ id: "out", types: ["DflowArguments"] }],
     });
   }
 
-  run() {}
+  run() {
+    this.updateOutputs();
+  }
 
   updateOutputs() {
     const signature = this.getInputByPosition(0);
@@ -68,13 +66,17 @@ class DflowFunction extends DflowNode {
   }
 }
 
-class DflowReturn extends DflowNode {
-  static kind = "return";
+class DflowFunction extends DflowNode {
+  static kind = "function";
 
   constructor(arg: DflowSerializedNode) {
     super({
       ...arg,
-      inputs: [{ id: "i1" }],
+      inputs: [
+        { id: "in1", name: "arguments", types: ["DflowArguments"] },
+        { id: "in2", name: "return" },
+      ],
+      outputs: [{ id: "out", types: ["DflowGraph"] }],
     });
   }
 
@@ -83,6 +85,6 @@ class DflowReturn extends DflowNode {
 
 export const catalog = {
   [Dflow.kind]: Dflow,
+  [DflowArguments.kind]: DflowArguments,
   [DflowFunction.kind]: DflowFunction,
-  [DflowReturn.kind]: DflowReturn,
 };

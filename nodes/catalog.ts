@@ -1,6 +1,7 @@
 import { catalog as arrayCatalog } from "./array.ts";
 import { catalog as conditionalCatalog } from "./conditional.ts";
 import { catalog as dataTypesCatalog } from "./data-types.ts";
+import { catalog as dflowCatalog } from "./dflow.ts";
 import { catalog as logicCatalog } from "./logic.ts";
 import { catalog as mathCatalog } from "./math.ts";
 import { catalog as numberCatalog } from "./number.ts";
@@ -12,6 +13,7 @@ export const catalog = {
   ...arrayCatalog,
   ...conditionalCatalog,
   ...dataTypesCatalog,
+  ...dflowCatalog,
   ...logicCatalog,
   ...mathCatalog,
   ...numberCatalog,

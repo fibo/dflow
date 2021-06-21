@@ -15,6 +15,7 @@ export type DflowPinType =
   | "null"
   | "object"
   | "array"
+  | "DflowArguments"
   | "DflowGraph";
 
 export type DflowRunStatus = "waiting" | "success" | "failure";
