@@ -1,7 +1,7 @@
 import { DflowHost, DflowNode, DflowSerializedNode } from "../engine.ts";
 
-class DflowNodeHost extends DflowNode {
-  static kind = "dflowHost";
+class Dflow extends DflowNode {
+  static kind = "dflow";
 
   constructor(arg: DflowSerializedNode) {
     super({
@@ -17,7 +17,7 @@ class DflowNodeHost extends DflowNode {
 }
 
 class DflowFunction extends DflowNode {
-  static kind = "dflowFunction";
+  static kind = "function";
 
   constructor(arg: DflowSerializedNode) {
     super({
@@ -27,18 +27,62 @@ class DflowFunction extends DflowNode {
           Defines the function signature.
           For example if data = 1 there is a single argument.
          */
-        { id: "in", types: ["number"], name: "arguments" },
+        { id: "in", types: ["number"], name: "signature" },
       ],
-      outputs: [{ id: "out", types: ["DflowGraph"] }, { id: "arg1" }],
+      outputs: [{ id: "out", types: ["DflowGraph"] }],
     });
   }
 
-  run() {
-    // 1. Get the trees starting from argument outputs.
+  run() {}
+
+  updateOutputs() {
+    const signature = this.getInputByPosition(0);
+    const numOutputs = this.outputs.size;
+
+    switch (true) {
+      // No argument, delete all argument outputs.
+      case signature.data === 0: {
+        for (let i = 1; i < numOutputs; i++) {
+          const output = this.getInputByPosition(i);
+          this.deleteOutput(output.id);
+        }
+        break;
+      }
+
+      case Number.isInteger(signature.data): {
+        const numArguments = signature.data as number;
+
+        // Create missing argument outputs.
+        for (let i = numOutputs - 1; i < numArguments; i++) {
+          this.newInput({});
+        }
+
+        // Delete exceeding argument outputs.
+        for (let i = numOutputs; i > 1; i--) {
+          const output = this.getInputByPosition(i);
+          this.deleteOutput(output.id);
+        }
+        break;
+      }
+    }
   }
 }
 
+class DflowReturn extends DflowNode {
+  static kind = "return";
+
+  constructor(arg: DflowSerializedNode) {
+    super({
+      ...arg,
+      inputs: [{ id: "i1" }],
+    });
+  }
+
+  run() {}
+}
+
 export const catalog = {
+  [Dflow.kind]: Dflow,
   [DflowFunction.kind]: DflowFunction,
-  [DflowNodeHost.kind]: DflowNodeHost,
+  [DflowReturn.kind]: DflowReturn,
 };
