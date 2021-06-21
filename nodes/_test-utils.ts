@@ -154,9 +154,9 @@ export function testTwoNumOrStrInOneBoolOut(
   expected: boolean,
 ) {
   const dflow = new DflowHost(catalog);
-  const dataNode1 = dflow.newNode({ kind: catalog.number.kind });
+  const dataNode1 = dflow.newNode({ kind: catalog.data.kind });
   dataNode1.getOutputByPosition(0).data = input1;
-  const dataNode2 = dflow.newNode({ kind: catalog.number.kind });
+  const dataNode2 = dflow.newNode({ kind: catalog.data.kind });
   dataNode2.getOutputByPosition(0).data = input2;
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode1).to(testNode, 0);

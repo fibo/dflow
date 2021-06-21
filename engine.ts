@@ -443,13 +443,24 @@ export class DflowNode extends DflowItem {
     return this.getOutputById(pinId);
   }
 
+  deleteInput(pinId: DflowId) {
+    this.inputs.delete(pinId);
+    this.#inputPosition.splice(this.#inputPosition.indexOf(pinId), 1);
+  }
+
+  deleteOutput(pinId: DflowId) {
+    this.outputs.delete(pinId);
+    this.#outputPosition.splice(this.#outputPosition.indexOf(pinId), 1);
+  }
+
   newInput(obj: DflowNewInput): DflowInput {
     const id = DflowData.isStringNotEmpty(obj.id)
       ? obj.id as DflowId
       : this.generateInputId();
 
     const pin = new DflowInput({ ...obj, id });
-    this.storeInput(pin);
+    this.inputs.set(pin.id, pin);
+    this.#inputPosition.push(pin.id);
     return pin;
   }
 
@@ -459,7 +470,8 @@ export class DflowNode extends DflowItem {
       : this.generateOutputId();
 
     const pin = new DflowOutput({ ...obj, id });
-    this.storeOutput(pin);
+    this.outputs.set(pin.id, pin);
+    this.#outputPosition.push(pin.id);
     return pin;
   }
 
@@ -467,16 +479,6 @@ export class DflowNode extends DflowItem {
     throw new Error(
       `${this.constructor.name} does not implement a run() method`,
     );
-  }
-
-  storeInput(pin: DflowInput): void {
-    this.inputs.set(pin.id, pin);
-    this.#inputPosition.push(pin.id);
-  }
-
-  storeOutput(pin: DflowOutput): void {
-    this.outputs.set(pin.id, pin);
-    this.#outputPosition.push(pin.id);
   }
 
   toObject(): DflowSerializedNode {

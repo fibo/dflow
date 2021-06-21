@@ -4,8 +4,6 @@
 
 ## Installation
 
-## Installation
-
 ### Node
 
 With [npm](https://npmjs.org/) do
@@ -35,7 +33,7 @@ import { catalog as coreNodes } from "dflow/nodes/catalog.ts";
 const dflow = new DflowHost(coreNodes);
 ```
 
-And With [deno](https://deno.land/) you can launch your script like this
+With [deno](https://deno.land/) you can then launch your script like this
 
 ```bash
 deno run --importmap=import_map.json path/to/my/script.ts
