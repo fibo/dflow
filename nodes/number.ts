@@ -3,7 +3,6 @@ import {
   DflowAbstractOneAnyInOneBoolOut,
   DflowAbstractOneNumInOneBoolOut,
   DflowAbstractOneStrInOneNumOut,
-  DflowAbstractTwoNumInOneBoolOut,
 } from "./abstract.ts";
 
 class DflowIsFinite extends DflowAbstractOneNumInOneBoolOut {
@@ -11,14 +10,6 @@ class DflowIsFinite extends DflowAbstractOneNumInOneBoolOut {
 
   task(input: number) {
     return Number.isFinite(input);
-  }
-}
-
-class DflowIsGreaterThen extends DflowAbstractTwoNumInOneBoolOut {
-  static kind = "isGreaterThen";
-
-  task(input1: number, input2: number) {
-    return input1 > input2;
   }
 }
 
@@ -57,7 +48,6 @@ class DflowParseInt extends DflowAbstractOneStrInOneNumOut {
 export const catalog = {
   [DflowIsFinite.kind]: DflowIsFinite,
   [DflowIsInteger.kind]: DflowIsInteger,
-  [DflowIsGreaterThen.kind]: DflowIsGreaterThen,
   [DflowIsNaN.kind]: DflowIsNaN,
   [DflowParseFloat.kind]: DflowParseFloat,
   [DflowParseInt.kind]: DflowParseInt,

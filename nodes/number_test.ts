@@ -2,7 +2,6 @@ import {
   testOneAnyInOneBoolOut,
   testOneNumInOneBoolOut,
   testOneStrInOneNumOut,
-  testTwoNumInOneBoolOut,
 } from "./_test-utils.ts";
 import { catalog } from "./number.ts";
 
@@ -11,15 +10,6 @@ Deno.test(catalog.isFinite.kind, () => {
   [1, Infinity].forEach((input) => {
     testOneNumInOneBoolOut(nodeKind, input, Number.isFinite(input));
   });
-});
-
-Deno.test(catalog.isGreaterThen.kind, () => {
-  const nodeKind = catalog.isGreaterThen.kind;
-  [[1, 2]].forEach(
-    ([input1, input2]) => {
-      testTwoNumInOneBoolOut(nodeKind, input1, input2, input1 > input2);
-    },
-  );
 });
 
 Deno.test(catalog.isInteger.kind, () => {
