@@ -254,6 +254,14 @@ export class DflowInput extends DflowPin {
     super("input", pin);
   }
 
+  get data(): DflowValue {
+    return this.#source?.data;
+  }
+
+  get isConnected() {
+    return typeof this.#source === "undefined";
+  }
+
   connectTo(pin: DflowOutput) {
     const { hasTypeAny: targetHasTypeAny, types: targetTypes } = this;
     const { types: sourceTypes } = pin;
@@ -273,10 +281,6 @@ export class DflowInput extends DflowPin {
 
   disconnect() {
     this.#source = undefined;
-  }
-
-  get data(): DflowValue {
-    return this.#source?.data;
   }
 
   toObject(): DflowSerializedInput {
@@ -609,8 +613,8 @@ export class DflowEdge extends DflowItem {
 
 export class DflowGraph extends DflowItem {
   #runStatus: DflowRunStatus = "success";
-  readonly nodes: Map<DflowId, DflowNode> = new Map();
-  readonly edges: Map<DflowId, DflowEdge> = new Map();
+  readonly #nodes: Map<DflowId, DflowNode> = new Map();
+  readonly #edges: Map<DflowId, DflowEdge> = new Map();
 
   static isDflowGraph(graph: DflowSerializedGraph): boolean {
     return graph.nodes.every((node) => DflowNode.isDflowNode(node)) &&
@@ -651,9 +655,61 @@ export class DflowGraph extends DflowItem {
     return nodeIds.slice().sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
   }
 
+  get edges() {
+    return this.#edges.values();
+  }
+
+  get nodes() {
+    return this.#nodes.values();
+  }
+
+  get numEdges() {
+    return this.#edges.size;
+  }
+
+  get numNodes() {
+    return this.#nodes.size;
+  }
+
+  get runStatusIsSuccess() {
+    return this.#runStatus === "success";
+  }
+
+  get runStatusIsWaiting() {
+    return this.#runStatus === "waiting";
+  }
+
+  get runStatusIsFailure() {
+    return this.#runStatus === "failure";
+  }
+
+  addEdge(edge: DflowEdge) {
+    if (this.#edges.has(edge.id)) {
+      throw new Error(`cannot overwrite edge, id=${edge.id}`);
+    } else {
+      this.#edges.set(edge.id, edge);
+    }
+  }
+
+  addNode(node: DflowNode) {
+    if (this.#nodes.has(node.id)) {
+      throw new Error(`cannot overwrite node, id=${node.id}`);
+    } else {
+      this.#nodes.set(node.id, node);
+    }
+  }
+
   clear() {
-    this.nodes.clear();
-    this.edges.clear();
+    this.#nodes.clear();
+    this.#edges.clear();
+  }
+
+  deleteEdge(edgeId: DflowId) {
+    this.#edges.delete(edgeId);
+  }
+
+  deleteNode(nodeId: DflowId) {
+    this.#nodes.delete(nodeId);
   }
 
   getNodeById(nodeId: DflowId): DflowNode {
@@ -661,7 +717,7 @@ export class DflowGraph extends DflowItem {
       throw new TypeError(_missingString("nodeId"));
     }
 
-    const node = this.nodes.get(nodeId);
+    const node = this.#nodes.get(nodeId);
 
     if (node instanceof DflowNode) {
       return node;
@@ -675,7 +731,7 @@ export class DflowGraph extends DflowItem {
       throw new TypeError(_missingString("edgeId"));
     }
 
-    const edge = this.edges.get(edgeId);
+    const edge = this.#edges.get(edgeId);
 
     if (edge instanceof DflowEdge) {
       return edge;
@@ -684,14 +740,14 @@ export class DflowGraph extends DflowItem {
     }
   }
 
-  generateEdgeId(i = this.edges.size): DflowId {
+  generateEdgeId(i = this.numEdges): DflowId {
     const id = `e${i}`;
-    return this.edges.has(id) ? this.generateEdgeId(i + 1) : id;
+    return this.#edges.has(id) ? this.generateEdgeId(i + 1) : id;
   }
 
-  generateNodeId(i = this.nodes.size): DflowId {
+  generateNodeId(i = this.numNodes): DflowId {
     const id = `n${i}`;
-    return this.nodes.has(id) ? this.generateNodeId(i + 1) : id;
+    return this.#nodes.has(id) ? this.generateNodeId(i + 1) : id;
   }
 
   async run(host: DflowHost) {
@@ -702,15 +758,15 @@ export class DflowGraph extends DflowItem {
 
     // Get nodeIds sorted by graph hierarchy.
     const nodeIds = DflowGraph.sort(
-      [...this.nodes.keys()],
-      [...this.edges.values()].map((edge) => ({
+      [...this.#nodes.keys()],
+      [...this.#edges.values()].map((edge) => ({
         sourceId: edge.source[0],
         targetId: edge.target[0],
       })),
     );
 
     for (const nodeId of nodeIds) {
-      const node = this.nodes.get(nodeId) as DflowNode;
+      const node = this.#nodes.get(nodeId) as DflowNode;
 
       try {
         if (node.meta.isConstant === false) {
@@ -732,18 +788,6 @@ export class DflowGraph extends DflowItem {
     }
   }
 
-  get runStatusIsSuccess() {
-    return this.#runStatus === "success";
-  }
-
-  get runStatusIsWaiting() {
-    return this.#runStatus === "waiting";
-  }
-
-  get runStatusIsFailure() {
-    return this.#runStatus === "failure";
-  }
-
   toObject(): DflowSerializedGraph {
     const obj = {
       ...super.toObject(),
@@ -751,10 +795,10 @@ export class DflowGraph extends DflowItem {
       edges: [],
     } as DflowSerializedGraph;
 
-    for (const node of this.nodes.values()) {
+    for (const node of this.nodes) {
       obj.nodes.push(node.toObject());
     }
-    for (const edge of this.edges.values()) {
+    for (const edge of this.edges) {
       obj.edges.push(edge.toObject());
     }
 
@@ -763,22 +807,46 @@ export class DflowGraph extends DflowItem {
 }
 
 export class DflowHost {
-  readonly graph;
+  readonly #graph;
   readonly #nodesCatalog: DflowNodesCatalog;
 
   constructor(nodesCatalog: DflowNodesCatalog = {}) {
     this.#nodesCatalog = nodesCatalog;
-    this.graph = new DflowGraph({ id: "g1" });
+    this.#graph = new DflowGraph({ id: "g1" });
+  }
+
+  get numEdges() {
+    return this.#graph.numEdges;
+  }
+
+  get numNodes() {
+    return this.#graph.numNodes;
   }
 
   get nodeKinds() {
     return Object.keys(this.#nodesCatalog);
   }
 
+  get runStatusIsSuccess() {
+    return this.#graph.runStatusIsSuccess;
+  }
+
+  get runStatusIsWaiting() {
+    return this.#graph.runStatusIsWaiting;
+  }
+
+  get runStatusIsFailure() {
+    return this.#graph.runStatusIsFailure;
+  }
+
+  clearGraph() {
+    this.#graph.clear();
+  }
+
   connect(sourceNode: DflowNode, sourcePosition = 0) {
     return {
       to: (targetNode: DflowNode, targetPosition = 0) => {
-        const edgeId = this.graph.generateEdgeId();
+        const edgeId = this.#graph.generateEdgeId();
 
         const sourcePin = sourceNode.getOutputByPosition(sourcePosition);
 
@@ -798,17 +866,17 @@ export class DflowHost {
       throw new TypeError(_missingString("edgeId"));
     }
 
-    const edge = this.graph.getEdgeById(edgeId);
+    const edge = this.#graph.getEdgeById(edgeId);
 
     if (edge instanceof DflowEdge) {
       // 1. Cleanup target pin.
       const [targetNodeId, targetPinId] = edge.target;
-      const targetNode = this.graph.getNodeById(targetNodeId);
+      const targetNode = this.getNodeById(targetNodeId);
       const targetPin = targetNode.getInputById(targetPinId);
       targetPin.disconnect();
 
       // 2. Delete edge.
-      this.graph.edges.delete(edgeId);
+      this.#graph.deleteEdge(edgeId);
     } else {
       throw new Error(`DflowEdge not found, id=${edgeId}`);
     }
@@ -819,11 +887,11 @@ export class DflowHost {
       throw new TypeError(_missingString("nodeId"));
     }
 
-    const node = this.graph.getNodeById(nodeId);
+    const node = this.getNodeById(nodeId);
 
     if (node instanceof DflowNode) {
       // 1. Delete all edges connected to node.
-      for (const edge of this.graph.edges.values()) {
+      for (const edge of this.#graph.edges) {
         const {
           source: [sourceNodeId],
           target: [targetNodeId],
@@ -834,10 +902,18 @@ export class DflowHost {
       }
 
       // 2. Delete node.
-      this.graph.nodes.delete(nodeId);
+      this.#graph.deleteNode(nodeId);
     } else {
       throw new Error(`DflowNode not found, id=${nodeId}`);
     }
+  }
+
+  getEdgeById(edgeId: DflowId) {
+    return this.#graph.getEdgeById(edgeId);
+  }
+
+  getNodeById(nodeId: DflowId) {
+    return this.#graph.getNodeById(nodeId);
   }
 
   newNode(obj: DflowNewNode): DflowNode {
@@ -846,15 +922,11 @@ export class DflowHost {
 
     const id = DflowData.isStringNotEmpty(obj.id)
       ? obj.id as DflowId
-      : this.graph.generateNodeId();
+      : this.#graph.generateNodeId();
 
     const node = new NodeClass({ ...obj, id });
 
-    if (this.graph.nodes.has(node.id)) {
-      throw new Error(`Cannot overwrite DflowNode, id=${node.id}`);
-    } else {
-      this.graph.nodes.set(node.id, node);
-    }
+    this.#graph.addNode(node);
 
     return node;
   }
@@ -862,21 +934,17 @@ export class DflowHost {
   newEdge(obj: DflowNewEdge): DflowEdge {
     const id = DflowData.isStringNotEmpty(obj.id)
       ? obj.id as DflowId
-      : this.graph.generateEdgeId();
+      : this.#graph.generateEdgeId();
 
     const edge = new DflowEdge({ ...obj, id });
 
-    if (this.graph.edges.has(edge.id)) {
-      throw new Error(`Cannot overwrite DflowEdge, id=${edge.id}`);
-    } else {
-      this.graph.edges.set(edge.id, edge);
-    }
+    this.#graph.addEdge(edge);
 
     const [sourceNodeId, sourcePinId] = edge.source;
     const [targetNodeId, targetPinId] = edge.target;
 
-    const sourceNode = this.graph.getNodeById(sourceNodeId);
-    const targetNode = this.graph.getNodeById(targetNodeId);
+    const sourceNode = this.#graph.getNodeById(sourceNodeId);
+    const targetNode = this.#graph.getNodeById(targetNodeId);
     const sourcePin = sourceNode.getOutputById(sourcePinId);
     const targetPin = targetNode.getInputById(targetPinId);
     targetPin.connectTo(sourcePin);
@@ -885,16 +953,24 @@ export class DflowHost {
   }
 
   newInput(nodeId: DflowId, obj: DflowNewInput): DflowInput {
-    const node = this.graph.getNodeById(nodeId);
+    const node = this.#graph.getNodeById(nodeId);
     return node.newInput(obj);
   }
 
   newOutput(nodeId: DflowId, obj: DflowNewOutput): DflowOutput {
-    const node = this.graph.getNodeById(nodeId);
+    const node = this.#graph.getNodeById(nodeId);
     return node.newOutput(obj);
   }
 
+  toJSON() {
+    return this.#graph.toJSON();
+  }
+
+  toObject() {
+    return this.#graph.toObject();
+  }
+
   async run() {
-    await this.graph.run(this);
+    await this.#graph.run(this);
   }
 }
