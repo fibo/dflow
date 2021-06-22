@@ -269,25 +269,33 @@ Deno.test("DflowGraph.isDflowGraph", () => {
   });
 });
 
-Deno.test("DflowGraph#clear()", () => {
-  const { dflow } = sample01();
-  dflow.graph.clear();
+// DflowHost
+// ////////////////////////////////////////////////////////////////////////////
 
-  assertEquals(dflow.graph.nodes.size, 0);
-  assertEquals(dflow.graph.edges.size, 0);
+Deno.test("new DflowHost has an empty graph", () => {
+  const dflow = new DflowHost();
+  assertObjectMatch(JSON.parse(dflow.toJSON()), { nodes: [], edges: [] });
 });
 
-Deno.test("DflowGraph#runStatusIsSuccess", () => {
+Deno.test("DflowHost#clearGraph()", () => {
+  const { dflow } = sample01();
+  dflow.clearGraph();
+
+  assertEquals(dflow.numNodes, 0);
+  assertEquals(dflow.numEdges, 0);
+});
+
+Deno.test("DflowHost#runStatusIsSuccess", () => {
   const dflow = new DflowHost();
-  assertEquals(dflow.graph.runStatusIsSuccess, true);
+  assertEquals(dflow.runStatusIsSuccess, true);
 
   dflow.newNode({ id: "n1", kind: "EmptyNode" });
   dflow.run();
 
-  assertEquals(dflow.graph.runStatusIsSuccess, true);
+  assertEquals(dflow.runStatusIsSuccess, true);
 });
 
-Deno.test("DflowGraph#run()", async () => {
+Deno.test("DflowHost#run()", async () => {
   const dflow = new DflowHost(nodesCatalog2);
 
   // Num#out=2 -> Sum#in1 |
@@ -324,42 +332,40 @@ Deno.test("DflowGraph#run()", async () => {
   assertEquals(sum.data, 4);
 });
 
-// DflowHost
-// ////////////////////////////////////////////////////////////////////////////
-
-Deno.test("new DflowHost has an empty graph", () => {
-  const dflow = new DflowHost();
-  assertObjectMatch(JSON.parse(dflow.graph.toJSON()), { nodes: [], edges: [] });
-});
-
 Deno.test("DflowHost#newNode()", () => {
   const nodeId1 = "n1";
   const dflow = new DflowHost(nodesCatalog1);
   dflow.newNode({ id: nodeId1, kind: EmptyNode.kind });
 
-  const node1 = dflow.graph.nodes.get(nodeId1);
-  assertEquals(nodeId1, node1?.id);
-  assertEquals(EmptyNode.kind, node1?.kind);
+  const node1 = dflow.getNodeById(nodeId1);
+  assertEquals(nodeId1, node1.id);
+  assertEquals(EmptyNode.kind, node1.kind);
 });
 
 Deno.test("DflowHost#newEdge()", () => {
   const { dflow, edgeId1 } = sample01();
 
-  const edge1 = dflow.graph.edges.get(edgeId1);
-  assertEquals(edgeId1, edge1?.id);
+  const edge1 = dflow.getEdgeById(edgeId1);
+  assertEquals(edgeId1, edge1.id);
 });
 
 Deno.test("DflowHost#deleteNode()", () => {
   const { dflow, nodeId1, edgeId1 } = sample01();
   dflow.deleteNode(nodeId1);
-  assertEquals(dflow.graph.nodes.has(nodeId1), false);
-  assertEquals(dflow.graph.edges.has(edgeId1), false);
+  assertThrows(() => {
+    dflow.getNodeById(nodeId1);
+  });
+  assertThrows(() => {
+    dflow.getEdgeById(edgeId1);
+  });
 });
 
 Deno.test("DflowHost#deleteEdge()", () => {
   const { dflow, edgeId1 } = sample01();
   dflow.deleteEdge(edgeId1);
-  assertEquals(dflow.graph.edges.has(edgeId1), false);
+  assertThrows(() => {
+    dflow.getEdgeById(edgeId1);
+  });
 });
 
 Deno.test("DflowHost#newInput()", () => {
