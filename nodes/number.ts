@@ -13,7 +13,7 @@ class DflowIsFinite extends DflowAbstractOneNumInOneBoolOut {
   }
 }
 
-class DflowIsInteger extends DflowAbstractOneNumInOneBoolOut {
+class DflowIsInteger extends DflowAbstractOneAnyInOneBoolOut {
   static kind = "isInteger";
 
   task(input: number) {

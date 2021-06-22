@@ -64,6 +64,17 @@ export const oneNumOut = (data?: number): DflowSerializedOutput => ({
   data,
 });
 
+export const oneNumStrIn = (): DflowSerializedInput => ({
+  id: "i1",
+  types: ["number"],
+});
+
+export const oneNumStrOut = (data?: number): DflowSerializedOutput => ({
+  id: "o1",
+  types: ["number", "string"],
+  data,
+});
+
 export const oneStrIn = (): DflowSerializedInput => ({
   id: "i1",
   types: ["string"],

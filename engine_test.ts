@@ -38,7 +38,7 @@ class SumNode extends DflowNode {
   run() {
     let sum = 0;
 
-    for (const input of this.inputs.values()) {
+    for (const input of this.inputs) {
       const inputData = input.data;
       if (typeof inputData === "number") {
         sum += inputData;
@@ -46,9 +46,7 @@ class SumNode extends DflowNode {
     }
 
     const output = this.getOutputByPosition(0);
-    if (output !== null) {
-      output.data = sum;
-    }
+    output.data = sum;
   }
 }
 
@@ -369,11 +367,8 @@ Deno.test("DflowHost#newInput()", () => {
   const inputId1 = "i1";
   const dflow = new DflowHost();
   dflow.newNode({ id: nodeId1, kind: "EmptyNode" });
-  dflow.newInput(nodeId1, { id: inputId1 });
-
-  const node1 = dflow.graph.nodes.get(nodeId1);
-  const input1 = node1?.inputs.get(inputId1);
-  assertEquals(inputId1, input1?.id);
+  const input1 = dflow.newInput(nodeId1, { id: inputId1 });
+  assertEquals(inputId1, input1.id);
 });
 
 Deno.test("DflowHost#newOutput()", () => {
@@ -381,11 +376,8 @@ Deno.test("DflowHost#newOutput()", () => {
   const outputId1 = "i1";
   const dflow = new DflowHost();
   dflow.newNode({ id: nodeId1, kind: "EmptyNode" });
-  dflow.newOutput(nodeId1, { id: outputId1 });
-
-  const node1 = dflow.graph.nodes.get(nodeId1);
-  const output1 = node1?.outputs.get(outputId1);
-  assertEquals(outputId1, output1?.id);
+  const output1 = dflow.newOutput(nodeId1, { id: outputId1 });
+  assertEquals(outputId1, output1.id);
 });
 
 // DflowOutput

@@ -194,6 +194,7 @@ export class DflowPin extends DflowItem {
     "null",
     "object",
     "array",
+    "DflowArguments",
     "DflowGraph",
   ];
 
@@ -206,8 +207,8 @@ export class DflowPin extends DflowItem {
     DflowPin.types.includes(pinType);
   }
 
-  constructor(kind: DflowPinKind, { id, types = [] }: DflowSerializedPin) {
-    super({ id });
+  constructor(kind: DflowPinKind, { types = [], ...pin }: DflowSerializedPin) {
+    super(pin);
 
     this.kind = kind;
     this.types = types;
@@ -254,7 +255,20 @@ export class DflowInput extends DflowPin {
   }
 
   connectTo(pin: DflowOutput) {
-    this.#source = pin;
+    const { hasTypeAny: targetHasTypeAny, types: targetTypes } = this;
+    const { types: sourceTypes } = pin;
+
+    if (
+      targetHasTypeAny || (
+        targetTypes.some((pinType) => sourceTypes.includes(pinType))
+      )
+    ) {
+      this.#source = pin;
+    } else {
+      throw new Error(
+        `mismatching pinTypes, source has types [${sourceTypes.join()}] and target has types [${targetTypes.join()}]`,
+      );
+    }
   }
 
   disconnect() {
@@ -341,15 +355,15 @@ export class DflowOutput extends DflowPin {
 export class DflowNode extends DflowItem {
   readonly kind: string;
   readonly meta: DflowNodeMetadata;
-  readonly inputs: Map<DflowId, DflowInput> = new Map();
-  readonly outputs: Map<DflowId, DflowOutput> = new Map();
+  readonly #inputs: Map<DflowId, DflowInput> = new Map();
+  readonly #outputs: Map<DflowId, DflowOutput> = new Map();
   readonly #inputPosition: DflowId[] = [];
   readonly #outputPosition: DflowId[] = [];
 
   static isDflowNode(
     { kind, inputs = [], outputs = [], ...item }: DflowSerializedNode,
   ) {
-    return DflowItem.isDflowItem(item) && typeof kind === "string" &&
+    return DflowItem.isDflowItem(item) && DflowData.isStringNotEmpty(kind) &&
       // Check inputs.
       (inputs.every((input) => DflowInput.isDflowInput(input))) &&
       // Check outputs.
@@ -378,14 +392,30 @@ export class DflowNode extends DflowItem {
     }
   }
 
-  generateInputId(i = this.inputs.size): DflowId {
-    const id = `i${i}`;
-    return this.inputs.has(id) ? this.generateInputId(i + 1) : id;
+  get inputs() {
+    return this.#inputs.values();
   }
 
-  generateOutputId(i = this.outputs.size): DflowId {
+  get outputs() {
+    return this.#outputs.values();
+  }
+
+  get numInputs() {
+    return this.#inputs.size;
+  }
+
+  get numOutputs() {
+    return this.#outputs.size;
+  }
+
+  generateInputId(i = this.numInputs): DflowId {
+    const id = `i${i}`;
+    return this.#inputs.has(id) ? this.generateInputId(i + 1) : id;
+  }
+
+  generateOutputId(i = this.numOutputs): DflowId {
     const id = `o${i}`;
-    return this.outputs.has(id) ? this.generateOutputId(i + 1) : id;
+    return this.#outputs.has(id) ? this.generateOutputId(i + 1) : id;
   }
 
   getInputById(pinId: DflowId): DflowInput {
@@ -393,7 +423,7 @@ export class DflowNode extends DflowItem {
       throw new TypeError(_missingString("inputId"));
     }
 
-    const pin = this.inputs.get(pinId);
+    const pin = this.#inputs.get(pinId);
 
     if (pin instanceof DflowInput) {
       return pin;
@@ -409,7 +439,7 @@ export class DflowNode extends DflowItem {
 
     const pinId = this.#inputPosition[position];
 
-    if (typeof pinId === "undefined") {
+    if (DflowData.isUndefined(pinId)) {
       throw new Error(_missingPinAtPosition(this.id, "input", position));
     }
 
@@ -421,7 +451,7 @@ export class DflowNode extends DflowItem {
       throw new TypeError(_missingString("outputId"));
     }
 
-    const pin = this.outputs.get(pinId);
+    const pin = this.#outputs.get(pinId);
 
     if (pin instanceof DflowOutput) {
       return pin;
@@ -437,7 +467,7 @@ export class DflowNode extends DflowItem {
 
     const pinId = this.#outputPosition[position];
 
-    if (typeof pinId === "undefined") {
+    if (DflowData.isUndefined(pinId)) {
       throw new Error(_missingPinAtPosition(this.id, "output", position));
     }
 
@@ -445,12 +475,12 @@ export class DflowNode extends DflowItem {
   }
 
   deleteInput(pinId: DflowId) {
-    this.inputs.delete(pinId);
+    this.#inputs.delete(pinId);
     this.#inputPosition.splice(this.#inputPosition.indexOf(pinId), 1);
   }
 
   deleteOutput(pinId: DflowId) {
-    this.outputs.delete(pinId);
+    this.#outputs.delete(pinId);
     this.#outputPosition.splice(this.#outputPosition.indexOf(pinId), 1);
   }
 
@@ -460,8 +490,8 @@ export class DflowNode extends DflowItem {
       : this.generateInputId();
 
     const pin = new DflowInput({ ...obj, id });
-    this.inputs.set(pin.id, pin);
-    this.#inputPosition.push(pin.id);
+    this.#inputs.set(id, pin);
+    this.#inputPosition.push(id);
     return pin;
   }
 
@@ -471,8 +501,8 @@ export class DflowNode extends DflowItem {
       : this.generateOutputId();
 
     const pin = new DflowOutput({ ...obj, id });
-    this.outputs.set(pin.id, pin);
-    this.#outputPosition.push(pin.id);
+    this.#outputs.set(id, pin);
+    this.#outputPosition.push(id);
     return pin;
   }
 
@@ -491,14 +521,14 @@ export class DflowNode extends DflowItem {
     const inputs = [];
     const outputs = [];
 
-    for (const input of this.inputs.values()) {
+    for (const input of this.inputs) {
       inputs.push(input.toObject());
     }
     if (inputs.length > 0) {
       obj.inputs = inputs;
     }
 
-    for (const output of this.outputs.values()) {
+    for (const output of this.outputs) {
       outputs.push(output.toObject());
     }
     if (outputs.length > 0) {

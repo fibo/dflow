@@ -4,6 +4,7 @@ import {
   oneArrOut,
   oneBoolOut,
   oneNumOut,
+  oneNumStrOut,
   oneObjOut,
   oneStrOut,
 } from "./abstract.ts";
@@ -48,6 +49,16 @@ class DflowNumber extends DflowNode {
   run() {}
 }
 
+class DflowNumberOrString extends DflowNode {
+  static kind = "numberOrString";
+
+  constructor(arg: DflowSerializedNode) {
+    super({ ...arg, outputs: [oneNumStrOut()] });
+  }
+
+  run() {}
+}
+
 class DflowObject extends DflowNode {
   static kind = "object";
 
@@ -73,6 +84,7 @@ export const catalog = {
   [DflowArray.kind]: DflowArray,
   [DflowBoolean.kind]: DflowBoolean,
   [DflowNumber.kind]: DflowNumber,
+  [DflowNumberOrString.kind]: DflowNumberOrString,
   [DflowObject.kind]: DflowObject,
   [DflowString.kind]: DflowString,
 };

@@ -29,39 +29,44 @@ class DflowArguments extends DflowNode {
     });
   }
 
-  run() {
-    this.updateOutputs();
+  get numArguments() {
+    return this.signature.data ?? 0;
   }
 
-  updateOutputs() {
-    const signature = this.getInputByPosition(0);
-    const numOutputs = this.outputs.size;
+  get signature() {
+    return this.getInputByPosition(0);
+  }
+
+  run() {
+    const { numArguments, numOutputs } = this;
 
     switch (true) {
       // No argument, delete all argument outputs.
-      case signature.data === 0: {
+      case numArguments === 0: {
         for (let i = 1; i < numOutputs; i++) {
-          const output = this.getInputByPosition(i);
+          const output = this.getOutputByPosition(i);
           this.deleteOutput(output.id);
         }
         break;
       }
 
-      case Number.isInteger(signature.data): {
-        const numArguments = signature.data as number;
+      case Number.isInteger(numArguments): {
+        // Delete exceeding argument outputs.
+        for (let i = numOutputs; i > 1; i--) {
+          const output = this.getOutputByPosition(i);
+          this.deleteOutput(output.id);
+        }
 
         // Create missing argument outputs.
         for (let i = numOutputs - 1; i < numArguments; i++) {
-          this.newInput({});
+          this.newOutput({ id: `a${i}`, name: `argument${i}` });
         }
 
-        // Delete exceeding argument outputs.
-        for (let i = numOutputs; i > 1; i--) {
-          const output = this.getInputByPosition(i);
-          this.deleteOutput(output.id);
-        }
         break;
       }
+
+      default:
+        this.getOutputByPosition(0).clear();
     }
   }
 }
@@ -76,11 +81,12 @@ class DflowFunction extends DflowNode {
         { id: "in1", name: "arguments", types: ["DflowArguments"] },
         { id: "in2", name: "return" },
       ],
-      outputs: [{ id: "out", types: ["DflowGraph"] }],
+      outputs: [{ id: "o1", types: ["DflowGraph"] }],
     });
   }
 
-  run() {}
+  run() {
+  }
 }
 
 export const catalog = {
