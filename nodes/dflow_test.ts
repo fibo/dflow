@@ -10,21 +10,21 @@ Deno.test(catalog.arguments.kind, () => {
 
   const testNode0 = dflow.newNode({ kind: nodeKind });
 
-  // const numNode1 = dflow.newNode({ kind: catalog.number.kind });
-  // numNode1.getOutputByPosition(0).data = 1;
-  // const testNode1 = dflow.newNode({ kind: nodeKind });
-  // dflow.connect(numNode1).to(testNode1);
+  const numNode1 = dflow.newNode({ kind: catalog.number.kind });
+  numNode1.getOutputByPosition(0).data = 1;
+  const testNode1 = dflow.newNode({ kind: nodeKind });
+  dflow.connect(numNode1).to(testNode1);
 
-  // const numNode2 = dflow.newNode({ kind: catalog.number.kind });
-  // numNode2.getOutputByPosition(0).data = 2;
-  // const testNode2 = dflow.newNode({ kind: nodeKind });
-  // dflow.connect(numNode2).to(testNode2);
+  const numNode2 = dflow.newNode({ kind: catalog.number.kind });
+  numNode2.getOutputByPosition(0).data = 2;
+  const testNode2 = dflow.newNode({ kind: nodeKind });
+  dflow.connect(numNode2).to(testNode2);
 
   dflow.run();
 
-  assertEquals(testNode0.outputs.size, 1);
-  // assertEquals(testNode1.outputs.size, 2);
-  // assertEquals(testNode2.outputs.size, 3);
+  assertEquals(testNode0.numOutputs, 1);
+  assertEquals(testNode1.numOutputs, 2);
+  assertEquals(testNode2.numOutputs, 3);
 });
 
 Deno.test(catalog.dflow.kind, () => {

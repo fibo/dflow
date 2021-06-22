@@ -12,7 +12,7 @@ class SumNode extends DflowNode {
   run() {
     let sum = 0;
 
-    for (const input of this.inputs.values()) {
+    for (const input of this.inputs) {
       const inputData = input.data;
       if (typeof inputData === "number") {
         sum += inputData;
