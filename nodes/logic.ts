@@ -1,4 +1,4 @@
-import { DflowSerializedNode } from "../engine.ts";
+import { DflowHost, DflowSerializedNode } from "../engine.ts";
 import {
   DflowAbstractOneInOneOut,
   DflowAbstractTwoInOneOut,
@@ -10,8 +10,8 @@ import {
 class DflowLogicAnd extends DflowAbstractTwoInOneOut {
   static kind = "logicAnd";
 
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: twoBoolIn(), outputs: [oneBoolOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: twoBoolIn(), outputs: [oneBoolOut()] }, host);
   }
 
   task(input1: boolean, input2: boolean) {
@@ -22,8 +22,8 @@ class DflowLogicAnd extends DflowAbstractTwoInOneOut {
 class DflowLogicNot extends DflowAbstractOneInOneOut {
   static kind = "logicNot";
 
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: [oneBoolIn()], outputs: [oneBoolOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: [oneBoolIn()], outputs: [oneBoolOut()] }, host);
   }
 
   task(input: boolean) {
@@ -34,8 +34,8 @@ class DflowLogicNot extends DflowAbstractOneInOneOut {
 class DflowLogicOr extends DflowAbstractTwoInOneOut {
   static kind = "logicOr";
 
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: twoBoolIn(), outputs: [oneBoolOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: twoBoolIn(), outputs: [oneBoolOut()] }, host);
   }
 
   task(input1: boolean, input2: boolean) {

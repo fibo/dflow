@@ -357,12 +357,53 @@ export class DflowOutput extends DflowPin {
 }
 
 export class DflowNode extends DflowItem {
-  readonly kind: string;
-  readonly meta: DflowNodeMetadata;
+  static kind: string;
+  static isAsync?: DflowNodeMetadata["isAsync"];
+  static isConstant?: DflowNodeMetadata["isConstant"];
+  static inputs?: DflowNewInput[];
+  static outputs?: DflowNewOutput[];
+
+  static generateInputIds(pins: DflowNewInput[] = []) {
+    return pins.map((pin, i) => ({ ...pin, id: `i${i}` }));
+  }
+
+  static generateOutputIds(pins: DflowNewOutput[] = []) {
+    return pins.map((pin, i) => ({ ...pin, id: `o${i}` }));
+  }
+
+  static in(
+    types: DflowPinType[],
+    rest?: Omit<DflowNewInput, "types">,
+  ): DflowNewInput[] {
+    return [{ types, ...rest }];
+  }
+
+  static ins(num: number, types: DflowPinType[]): DflowNewOutput[] {
+    return Array(num).fill(DflowNode.in(types)).flat();
+  }
+
+  static out(
+    types: DflowPinType[],
+    rest?: Omit<DflowNewOutput, "types">,
+  ): DflowNewOutput[] {
+    return [{ types, ...rest }];
+  }
+
+  static outs(num: number, types: DflowPinType[]): DflowNewOutput[] {
+    return Array(num).fill(DflowNode.out(types)).flat();
+  }
+
+  static outputNumber(obj: Omit<DflowNewOutput, "types">): DflowNewOutput {
+    return { ...obj, types: ["number"] };
+  }
+
   readonly #inputs: Map<DflowId, DflowInput> = new Map();
   readonly #outputs: Map<DflowId, DflowOutput> = new Map();
   readonly #inputPosition: DflowId[] = [];
   readonly #outputPosition: DflowId[] = [];
+  readonly kind: string;
+  readonly meta: DflowNodeMetadata;
+  readonly host: DflowHost;
 
   static isDflowNode(
     { kind, inputs = [], outputs = [], ...item }: DflowSerializedNode,
@@ -376,10 +417,12 @@ export class DflowNode extends DflowItem {
 
   constructor(
     { kind, inputs = [], outputs = [], ...item }: DflowSerializedNode,
+    host: DflowHost,
     { isAsync = false, isConstant = false }: DflowNodeMetadata = {},
   ) {
     super(item);
 
+    this.host = host;
     this.kind = kind;
 
     // Metadata.
@@ -479,11 +522,13 @@ export class DflowNode extends DflowItem {
   }
 
   deleteInput(pinId: DflowId) {
+    this.host.deleteEdgesConnectedToPin([this.id, pinId]);
     this.#inputs.delete(pinId);
     this.#inputPosition.splice(this.#inputPosition.indexOf(pinId), 1);
   }
 
   deleteOutput(pinId: DflowId) {
+    this.host.deleteEdgesConnectedToPin([this.id, pinId]);
     this.#outputs.delete(pinId);
     this.#outputPosition.splice(this.#outputPosition.indexOf(pinId), 1);
   }
@@ -510,7 +555,7 @@ export class DflowNode extends DflowItem {
     return pin;
   }
 
-  run(_: DflowHost): void {
+  run(): void {
     throw new Error(
       `${this.constructor.name} does not implement a run() method`,
     );
@@ -546,8 +591,8 @@ export class DflowNode extends DflowItem {
 export class DflowUnknownNode extends DflowNode {
   static kind = "Unknown";
 
-  constructor(obj: DflowSerializedNode) {
-    super({ ...obj, kind: DflowUnknownNode.kind });
+  constructor(obj: DflowSerializedNode, host: DflowHost) {
+    super({ ...obj, kind: DflowUnknownNode.kind }, host);
   }
 
   run() {}
@@ -750,7 +795,7 @@ export class DflowGraph extends DflowItem {
     return this.#nodes.has(id) ? this.generateNodeId(i + 1) : id;
   }
 
-  async run(host: DflowHost) {
+  async run() {
     // Set runStatus to waiting if there was some unhandled error in a previous run.
     if (this.runStatusIsSuccess) {
       this.#runStatus = "waiting";
@@ -771,9 +816,9 @@ export class DflowGraph extends DflowItem {
       try {
         if (node.meta.isConstant === false) {
           if (node.meta.isAsync) {
-            await node.run(host);
+            await node.run();
           } else {
-            node.run(host);
+            node.run();
           }
         }
       } catch (error) {
@@ -813,6 +858,14 @@ export class DflowHost {
   constructor(nodesCatalog: DflowNodesCatalog = {}) {
     this.#nodesCatalog = nodesCatalog;
     this.#graph = new DflowGraph({ id: "g1" });
+  }
+
+  get edges() {
+    return this.#graph.edges;
+  }
+
+  get nodes() {
+    return this.#graph.nodes;
   }
 
   get numEdges() {
@@ -908,6 +961,20 @@ export class DflowHost {
     }
   }
 
+  deleteEdgesConnectedToPin([nodeId, pinId]: DflowSerializedPinPath) {
+    for (const edge of this.edges) {
+      const [sourceNodeId, sourcePinId] = edge.source;
+      const [targetNodeId, targetPinId] = edge.target;
+
+      if (
+        (sourceNodeId === nodeId && sourcePinId === pinId) ||
+        (targetNodeId === nodeId && targetPinId === pinId)
+      ) {
+        this.deleteEdge(edge.id);
+      }
+    }
+  }
+
   getEdgeById(edgeId: DflowId) {
     return this.#graph.getEdgeById(edgeId);
   }
@@ -924,7 +991,19 @@ export class DflowHost {
       ? obj.id as DflowId
       : this.#graph.generateNodeId();
 
-    const node = new NodeClass({ ...obj, id });
+    const meta = {
+      isAsync: NodeClass.isAsync,
+      isConstant: NodeClass.isConstant,
+    };
+
+    const inputs = Array.isArray(obj.inputs)
+      ? obj.inputs
+      : DflowNode.generateInputIds(NodeClass.inputs);
+    const outputs = Array.isArray(obj.outputs)
+      ? obj.outputs
+      : DflowNode.generateOutputIds(NodeClass.outputs);
+
+    const node = new NodeClass({ ...obj, id, inputs, outputs }, this, meta);
 
     this.#graph.addNode(node);
 
@@ -971,6 +1050,6 @@ export class DflowHost {
   }
 
   async run() {
-    await this.#graph.run(this);
+    await this.#graph.run();
   }
 }
