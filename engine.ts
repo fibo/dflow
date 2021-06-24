@@ -75,6 +75,10 @@ export type DflowNewOutput = DflowNewItem<DflowSerializedOutput>;
 export type DflowNewNode = DflowNewItem<DflowSerializedNode>;
 
 const _missingString = (stringName: string) => `${stringName} must be a string`;
+const _missingMethod = (
+  methodName: string,
+  nodeKind: string,
+) => (`unimplemented method ${methodName} nodeKind=${nodeKind}`);
 const _missingNumber = (numberName: string) => `${numberName} must be a number`;
 const _missingPin = (nodeId: DflowId, kind: DflowPinKind) =>
   `${kind} pin not found nodeId=${nodeId}`;
@@ -357,6 +361,32 @@ export class DflowOutput extends DflowPin {
 }
 
 export class DflowNode extends DflowItem {
+  static Unary = class DflowNodeUnary extends DflowNode {
+    get input() {
+      return this.getOutputByPosition(0);
+    }
+
+    get output(): DflowOutput {
+      return this.getOutputByPosition(0);
+    }
+
+    task(): DflowValue {
+      throw new Error(_missingMethod("task", this.kind));
+    }
+
+    run() {
+      const { input: { data, types }, output, task } = this;
+
+      if (DflowData.isUndefined(data)) {
+        output.clear();
+      } else {
+        if (DflowData.validate(data, types)) {
+          output.data = task();
+        }
+      }
+    }
+  };
+
   static kind: string;
   static isAsync?: DflowNodeMetadata["isAsync"];
   static isConstant?: DflowNodeMetadata["isConstant"];
