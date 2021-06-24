@@ -1,4 +1,4 @@
-import { DflowNode, DflowSerializedNode } from "../engine.ts";
+import { DflowHost, DflowNode, DflowSerializedNode } from "../engine.ts";
 import {
   oneAnyOut,
   oneArrOut,
@@ -12,8 +12,8 @@ import {
 class DflowData extends DflowNode {
   static kind = "data";
 
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, outputs: [oneAnyOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, outputs: [oneAnyOut()] }, host);
   }
 
   run() {}
@@ -22,8 +22,8 @@ class DflowData extends DflowNode {
 class DflowArray extends DflowNode {
   static kind = "array";
 
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, outputs: [oneArrOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, outputs: [oneArrOut()] }, host);
   }
 
   run() {}
@@ -32,8 +32,8 @@ class DflowArray extends DflowNode {
 class DflowBoolean extends DflowNode {
   static kind = "boolean";
 
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, outputs: [oneBoolOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, outputs: [oneBoolOut()] }, host);
   }
 
   run() {}
@@ -42,8 +42,8 @@ class DflowBoolean extends DflowNode {
 class DflowNumber extends DflowNode {
   static kind = "number";
 
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, outputs: [oneNumOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, outputs: [oneNumOut()] }, host);
   }
 
   run() {}
@@ -52,8 +52,8 @@ class DflowNumber extends DflowNode {
 class DflowNumberOrString extends DflowNode {
   static kind = "numberOrString";
 
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, outputs: [oneNumStrOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, outputs: [oneNumStrOut()] }, host);
   }
 
   run() {}
@@ -62,8 +62,8 @@ class DflowNumberOrString extends DflowNode {
 class DflowObject extends DflowNode {
   static kind = "object";
 
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, outputs: [oneObjOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, outputs: [oneObjOut()] }, host);
   }
 
   run() {}
@@ -72,8 +72,8 @@ class DflowObject extends DflowNode {
 class DflowString extends DflowNode {
   static kind = "string";
 
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, outputs: [oneStrOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, outputs: [oneStrOut()] }, host);
   }
 
   run() {}

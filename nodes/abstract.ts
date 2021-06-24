@@ -1,6 +1,7 @@
 import {
   DflowArray,
   DflowData,
+  DflowHost,
   DflowInput,
   DflowNode,
   DflowObject,
@@ -123,8 +124,8 @@ export class DflowAbstractOneInOneOut extends DflowNode {
 }
 
 export class DflowAbstractOneAnyInOneBoolOut extends DflowAbstractOneInOneOut {
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: [oneAnyIn()], outputs: [oneBoolOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: [oneAnyIn()], outputs: [oneBoolOut()] }, host);
   }
 
   task(_: DflowValue): boolean {
@@ -133,8 +134,8 @@ export class DflowAbstractOneAnyInOneBoolOut extends DflowAbstractOneInOneOut {
 }
 
 export class DflowAbstractOneArrInOneNumOut extends DflowAbstractOneInOneOut {
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: [oneArrIn()], outputs: [oneNumOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: [oneArrIn()], outputs: [oneNumOut()] }, host);
   }
 
   task(_: DflowArray): number {
@@ -143,8 +144,8 @@ export class DflowAbstractOneArrInOneNumOut extends DflowAbstractOneInOneOut {
 }
 
 export class DflowAbstractOneObjInOneArrOut extends DflowAbstractOneInOneOut {
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: [oneObjIn()], outputs: [oneArrOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: [oneObjIn()], outputs: [oneArrOut()] }, host);
   }
 
   task(_: DflowObject): DflowArray {
@@ -153,8 +154,8 @@ export class DflowAbstractOneObjInOneArrOut extends DflowAbstractOneInOneOut {
 }
 
 export class DflowAbstractOneNumInOneBoolOut extends DflowAbstractOneInOneOut {
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: [oneNumIn()], outputs: [oneBoolOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: [oneNumIn()], outputs: [oneBoolOut()] }, host);
   }
 
   task(_: number): boolean {
@@ -163,8 +164,8 @@ export class DflowAbstractOneNumInOneBoolOut extends DflowAbstractOneInOneOut {
 }
 
 export class DflowAbstractOneNumInOneNumOut extends DflowAbstractOneInOneOut {
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: [oneNumIn()], outputs: [oneNumOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: [oneNumIn()], outputs: [oneNumOut()] }, host);
   }
 
   task(_: number): number {
@@ -173,8 +174,8 @@ export class DflowAbstractOneNumInOneNumOut extends DflowAbstractOneInOneOut {
 }
 
 export class DflowAbstractOneStrInOneNumOut extends DflowAbstractOneInOneOut {
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: [oneStrIn()], outputs: [oneNumOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: [oneStrIn()], outputs: [oneNumOut()] }, host);
   }
 
   task(_: string): number {
@@ -220,8 +221,8 @@ export class DflowAbstractTwoInOneOut extends DflowNode {
 }
 
 export class DflowAbstractTwoNumInOneBoolOut extends DflowAbstractTwoInOneOut {
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: twoNumIn(), outputs: [oneBoolOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: twoNumIn(), outputs: [oneBoolOut()] }, host);
   }
 
   task(_input: number, _input2: number): boolean {
@@ -230,8 +231,8 @@ export class DflowAbstractTwoNumInOneBoolOut extends DflowAbstractTwoInOneOut {
 }
 
 export class DflowAbstractTwoNumInOneNumOut extends DflowAbstractTwoInOneOut {
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, inputs: twoNumIn(), outputs: [oneNumOut()] });
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
+    super({ ...arg, inputs: twoNumIn(), outputs: [oneNumOut()] }, host);
   }
 
   task(_input: number, _input2: number): number {

@@ -1,9 +1,9 @@
-import { DflowNode, DflowSerializedNode } from "../engine.ts";
+import { DflowHost, DflowNode, DflowSerializedNode } from "../engine.ts";
 
 class DflowIf extends DflowNode {
   static kind = "if";
 
-  constructor(arg: DflowSerializedNode) {
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
     super({
       ...arg,
       inputs: [{ id: "i1", name: "condition", types: ["boolean"] }, {
@@ -11,7 +11,7 @@ class DflowIf extends DflowNode {
         name: "then",
       }, { id: "i3", name: "else" }],
       outputs: [{ id: "o1" }],
-    });
+    }, host);
   }
 
   run() {

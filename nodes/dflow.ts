@@ -3,30 +3,30 @@ import { DflowHost, DflowNode, DflowSerializedNode } from "../engine.ts";
 class Dflow extends DflowNode {
   static kind = "dflow";
 
-  constructor(arg: DflowSerializedNode) {
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
     super({
       ...arg,
       outputs: [{ id: "o1", name: "nodeKinds", types: ["array"] }],
-    });
+    }, host);
   }
 
-  run(host: DflowHost) {
+  run() {
     const nodeKinds = this.getOutputByPosition(0);
-    nodeKinds.data = host.nodeKinds;
+    nodeKinds.data = this.host.nodeKinds;
   }
 }
 
 class DflowArguments extends DflowNode {
   static kind = "arguments";
 
-  constructor(arg: DflowSerializedNode) {
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
     super({
       ...arg,
       inputs: [
         { id: "in", types: ["number"], name: "signature" },
       ],
       outputs: [{ id: "out", types: ["DflowArguments"] }],
-    });
+    }, host);
   }
 
   get numArguments() {
@@ -65,8 +65,9 @@ class DflowArguments extends DflowNode {
         break;
       }
 
-      default:
+      default: {
         this.getOutputByPosition(0).clear();
+      }
     }
   }
 }
@@ -74,7 +75,7 @@ class DflowArguments extends DflowNode {
 class DflowFunction extends DflowNode {
   static kind = "function";
 
-  constructor(arg: DflowSerializedNode) {
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
     super({
       ...arg,
       inputs: [
@@ -82,7 +83,7 @@ class DflowFunction extends DflowNode {
         { id: "in2", name: "return" },
       ],
       outputs: [{ id: "o1", types: ["DflowGraph"] }],
-    });
+    }, host);
   }
 
   run() {

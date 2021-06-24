@@ -1,7 +1,7 @@
 /**
 [Operators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators)
 */
-import { DflowData, DflowSerializedNode } from "../engine.ts";
+import { DflowData, DflowHost, DflowSerializedNode } from "../engine.ts";
 import {
   DflowAbstractTwoInOneOut,
   DflowAbstractTwoNumInOneBoolOut,
@@ -19,7 +19,7 @@ class DflowAddition extends DflowAbstractTwoNumInOneNumOut {
 class DflowEquality extends DflowAbstractTwoInOneOut {
   static kind = "equality";
 
-  constructor(arg: DflowSerializedNode) {
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
     super({
       ...arg,
       inputs: [{ id: "i1", types: ["number", "string"] }, {
@@ -27,7 +27,7 @@ class DflowEquality extends DflowAbstractTwoInOneOut {
         types: ["number", "string"],
       }],
       outputs: [{ id: "o1", types: ["boolean"] }],
-    });
+    }, host);
   }
 
   run() {
@@ -81,7 +81,7 @@ class DflowGreaterThanOrEqual extends DflowAbstractTwoNumInOneBoolOut {
 class DflowInequality extends DflowAbstractTwoInOneOut {
   static kind = "inequality";
 
-  constructor(arg: DflowSerializedNode) {
+  constructor(arg: DflowSerializedNode, host: DflowHost) {
     super({
       ...arg,
       inputs: [{ id: "i1", types: ["number", "string"] }, {
@@ -89,7 +89,7 @@ class DflowInequality extends DflowAbstractTwoInOneOut {
         types: ["number", "string"],
       }],
       outputs: [{ id: "o1", types: ["boolean"] }],
-    });
+    }, host);
   }
 
   run() {

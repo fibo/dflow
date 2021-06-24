@@ -1,5 +1,5 @@
-import { DflowNode, DflowSerializedNode } from "../engine.ts";
-import { DflowAbstractOneNumInOneNumOut, oneNumOut } from "./abstract.ts";
+import { DflowNode } from "../engine.ts";
+import { DflowAbstractOneNumInOneNumOut } from "./abstract.ts";
 
 class DflowMathCos extends DflowAbstractOneNumInOneNumOut {
   static kind = "mathCos";
@@ -19,11 +19,8 @@ class DflowMathCosh extends DflowAbstractOneNumInOneNumOut {
 
 class DflowMathPI extends DflowNode {
   static kind = "mathPI";
-  static metadata = { isConstant: true };
-
-  constructor(arg: DflowSerializedNode) {
-    super({ ...arg, outputs: [oneNumOut(Math.PI)] }, DflowMathPI.metadata);
-  }
+  static isConstant = true;
+  static outputs = DflowNode.out(["number"], { data: Math.PI });
 }
 
 class DflowMathSin extends DflowAbstractOneNumInOneNumOut {
