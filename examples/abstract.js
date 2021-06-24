@@ -19,7 +19,7 @@ class SumNode extends DflowNode {
       }
     }
 
-    const output = this.getOutputByPosition(0);
+    const output = this.output(0);
     if (output !== null) {
       output.data = sum;
     }
@@ -88,7 +88,7 @@ async function runGraph() {
 
   await dflow.run();
 
-  const sum = sumNode.getOutputByPosition(0);
+  const sum = sumNode.output(0);
   console.log(sum.data); // 4
 }
 

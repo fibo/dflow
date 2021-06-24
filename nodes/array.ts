@@ -1,11 +1,11 @@
-import { DflowArray } from "../engine.ts";
-import { DflowAbstractOneArrInOneNumOut } from "./abstract.ts";
+import { DflowArray, DflowNode } from "../engine.ts";
 
-class DflowArrayLength extends DflowAbstractOneArrInOneNumOut {
+class DflowArrayLength extends DflowNode.Task {
   static kind = "arrayLength";
-
-  task(input: DflowArray) {
-    return input.length;
+  static inputs = DflowNode.in(["array"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return (this.input(0).data as DflowArray).length;
   }
 }
 

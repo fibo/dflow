@@ -361,29 +361,20 @@ export class DflowOutput extends DflowPin {
 }
 
 export class DflowNode extends DflowItem {
-  static Unary = class DflowNodeUnary extends DflowNode {
-    get input() {
-      return this.getOutputByPosition(0);
-    }
-
-    get output(): DflowOutput {
-      return this.getOutputByPosition(0);
-    }
-
+  static Task = class DflowNodeUnary extends DflowNode {
     task(): DflowValue {
       throw new Error(_missingMethod("task", this.kind));
     }
 
     run() {
-      const { input: { data, types }, output, task } = this;
-
-      if (DflowData.isUndefined(data)) {
-        output.clear();
-      } else {
-        if (DflowData.validate(data, types)) {
-          output.data = task();
+      for (const { data, types } of this.inputs) {
+        if (DflowData.isUndefined(data) || !DflowData.validate(data, types)) {
+          this.output(0).clear();
+          return;
         }
       }
+
+      this.output(0).data = this.task();
     }
   };
 
@@ -402,24 +393,24 @@ export class DflowNode extends DflowItem {
   }
 
   static in(
-    types: DflowPinType[],
+    types: DflowPinType[] = [],
     rest?: Omit<DflowNewInput, "types">,
   ): DflowNewInput[] {
     return [{ types, ...rest }];
   }
 
-  static ins(num: number, types: DflowPinType[]): DflowNewOutput[] {
+  static ins(num: number, types: DflowPinType[] = []): DflowNewOutput[] {
     return Array(num).fill(DflowNode.in(types)).flat();
   }
 
   static out(
-    types: DflowPinType[],
+    types: DflowPinType[] = [],
     rest?: Omit<DflowNewOutput, "types">,
   ): DflowNewOutput[] {
     return [{ types, ...rest }];
   }
 
-  static outs(num: number, types: DflowPinType[]): DflowNewOutput[] {
+  static outs(num: number, types: DflowPinType[] = []): DflowNewOutput[] {
     return Array(num).fill(DflowNode.out(types)).flat();
   }
 
@@ -509,7 +500,7 @@ export class DflowNode extends DflowItem {
     }
   }
 
-  getInputByPosition(position: number): DflowInput {
+  input(position: number): DflowInput {
     if (typeof position !== "number") {
       throw new TypeError(_missingNumber("position"));
     }
@@ -537,7 +528,7 @@ export class DflowNode extends DflowItem {
     }
   }
 
-  getOutputByPosition(position: number): DflowOutput {
+  output(position: number): DflowOutput {
     if (typeof position !== "number") {
       throw new TypeError(_missingNumber("position"));
     }
@@ -931,9 +922,9 @@ export class DflowHost {
       to: (targetNode: DflowNode, targetPosition = 0) => {
         const edgeId = this.#graph.generateEdgeId();
 
-        const sourcePin = sourceNode.getOutputByPosition(sourcePosition);
+        const sourcePin = sourceNode.output(sourcePosition);
 
-        const targetPin = targetNode.getInputByPosition(targetPosition);
+        const targetPin = targetNode.input(targetPosition);
 
         this.newEdge({
           id: edgeId,

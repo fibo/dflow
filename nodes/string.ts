@@ -1,10 +1,11 @@
-import { DflowAbstractOneStrInOneNumOut } from "./abstract.ts";
+import { DflowNode } from "../engine.ts";
 
-class DflowStringLength extends DflowAbstractOneStrInOneNumOut {
+class DflowStringLength extends DflowNode.Task {
   static kind = "stringLength";
-
-  task(input: string) {
-    return input.length;
+  static inputs = DflowNode.in(["string"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return (this.input(0).data as string).length;
   }
 }
 
