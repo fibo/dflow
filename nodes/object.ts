@@ -1,19 +1,20 @@
-import { DflowObject } from "../engine.ts";
-import { DflowAbstractOneObjInOneArrOut } from "./abstract.ts";
+import { DflowNode, DflowObject } from "../engine.ts";
 
-class DflowObjectKeys extends DflowAbstractOneObjInOneArrOut {
+class DflowObjectKeys extends DflowNode.Task {
   static kind = "objectKeys";
-
-  task(input: DflowObject) {
-    return Object.keys(input);
+  static inputs = DflowNode.in(["object"]);
+  static outputs = DflowNode.out(["array"]);
+  task() {
+    return Object.keys(this.input(0).data as DflowObject);
   }
 }
 
-class DflowObjectValues extends DflowAbstractOneObjInOneArrOut {
+class DflowObjectValues extends DflowNode.Task {
   static kind = "objectValues";
-
-  task(input: DflowObject) {
-    return Object.values(input);
+  static inputs = DflowNode.in(["object"]);
+  static outputs = DflowNode.out(["array"]);
+  task() {
+    return Object.values(this.input(0).data as DflowObject);
   }
 }
 

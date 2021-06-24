@@ -45,7 +45,7 @@ class SumNode extends DflowNode {
       }
     }
 
-    const output = this.getOutputByPosition(0);
+    const output = this.output(0);
     output.data = sum;
   }
 }
@@ -328,7 +328,7 @@ Deno.test("DflowHost#run()", async () => {
 
   await dflow.run();
 
-  const sum = sumNode.getOutputByPosition(0);
+  const sum = sumNode.output(0);
   assertEquals(sum.data, 4);
 });
 

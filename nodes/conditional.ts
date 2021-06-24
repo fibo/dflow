@@ -15,10 +15,10 @@ class DflowIf extends DflowNode {
   }
 
   run() {
-    const conditionData = this.getInputByPosition(0).data;
-    const thenData = this.getInputByPosition(1).data;
-    const elseData = this.getInputByPosition(2).data;
-    const output = this.getOutputByPosition(0);
+    const conditionData = this.input(0).data;
+    const thenData = this.input(1).data;
+    const elseData = this.input(2).data;
+    const output = this.output(0);
 
     if (conditionData) {
       output.data = thenData;

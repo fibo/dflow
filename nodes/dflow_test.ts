@@ -1,8 +1,9 @@
-import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
+import { assertArrayIncludes } from "std/testing/asserts.ts";
 
 import { DflowArray, DflowHost } from "../engine.ts";
 import { catalog } from "./catalog.ts";
 
+/*
 Deno.test(catalog.arguments.kind, () => {
   const nodeKind = catalog.arguments.kind;
 
@@ -11,12 +12,12 @@ Deno.test(catalog.arguments.kind, () => {
   const testNode0 = dflow.newNode({ kind: nodeKind });
 
   const numNode1 = dflow.newNode({ kind: catalog.number.kind });
-  numNode1.getOutputByPosition(0).data = 1;
+  numNode1.output(0).data = 1;
   const testNode1 = dflow.newNode({ kind: nodeKind });
   dflow.connect(numNode1).to(testNode1);
 
   const numNode2 = dflow.newNode({ kind: catalog.number.kind });
-  numNode2.getOutputByPosition(0).data = 2;
+  numNode2.output(0).data = 2;
   const testNode2 = dflow.newNode({ kind: nodeKind });
   dflow.connect(numNode2).to(testNode2);
 
@@ -26,6 +27,7 @@ Deno.test(catalog.arguments.kind, () => {
   assertEquals(testNode1.numOutputs, 2);
   assertEquals(testNode2.numOutputs, 3);
 });
+*/
 
 Deno.test(catalog.dflow.kind, () => {
   const nodeKind = catalog.dflow.kind;
@@ -34,7 +36,7 @@ Deno.test(catalog.dflow.kind, () => {
   const dflow = new DflowHost({ [nodeKind]: catalog[nodeKind] });
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.run();
-  assertArrayIncludes(testNode.getOutputByPosition(0).data as DflowArray, [
+  assertArrayIncludes(testNode.output(0).data as DflowArray, [
     nodeKind,
   ]);
 });

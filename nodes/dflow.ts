@@ -11,7 +11,7 @@ class Dflow extends DflowNode {
   }
 
   run() {
-    const nodeKinds = this.getOutputByPosition(0);
+    const nodeKinds = this.output(0);
     nodeKinds.data = this.host.nodeKinds;
   }
 }
@@ -34,7 +34,7 @@ class DflowArguments extends DflowNode {
   }
 
   get signature() {
-    return this.getInputByPosition(0);
+    return this.output(0);
   }
 
   run() {
@@ -44,7 +44,7 @@ class DflowArguments extends DflowNode {
       // No argument, delete all argument outputs.
       case numArguments === 0: {
         for (let i = 1; i < numOutputs; i++) {
-          const output = this.getOutputByPosition(i);
+          const output = this.output(i);
           this.deleteOutput(output.id);
         }
         break;
@@ -53,7 +53,7 @@ class DflowArguments extends DflowNode {
       case Number.isInteger(numArguments): {
         // Delete exceeding argument outputs.
         for (let i = numOutputs; i > 1; i--) {
-          const output = this.getOutputByPosition(i);
+          const output = this.output(i);
           this.deleteOutput(output.id);
         }
 
@@ -66,7 +66,7 @@ class DflowArguments extends DflowNode {
       }
 
       default: {
-        this.getOutputByPosition(0).clear();
+        this.output(0).clear();
       }
     }
   }

@@ -1,19 +1,20 @@
 import { DflowNode } from "../engine.ts";
-import { DflowAbstractOneNumInOneNumOut } from "./abstract.ts";
 
-class DflowMathCos extends DflowAbstractOneNumInOneNumOut {
+class DflowMathCos extends DflowNode.Task {
   static kind = "mathCos";
-
-  task(num: number) {
-    return Math.cos(num);
+  static inputs = DflowNode.in(["number"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return Math.cos(this.input(0).data as number);
   }
 }
 
-class DflowMathCosh extends DflowAbstractOneNumInOneNumOut {
+class DflowMathCosh extends DflowNode.Task {
   static kind = "mathCosh";
-
-  task(num: number) {
-    return Math.cosh(num);
+  static inputs = DflowNode.in(["number"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return Math.cosh(this.input(0).data as number);
   }
 }
 
@@ -23,19 +24,21 @@ class DflowMathPI extends DflowNode {
   static outputs = DflowNode.out(["number"], { data: Math.PI });
 }
 
-class DflowMathSin extends DflowAbstractOneNumInOneNumOut {
+class DflowMathSin extends DflowNode.Task {
   static kind = "mathSin";
-
-  task(num: number) {
-    return Math.sin(num);
+  static inputs = DflowNode.in(["number"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return Math.sin(this.input(0).data as number);
   }
 }
 
-class DflowMathSinh extends DflowAbstractOneNumInOneNumOut {
+class DflowMathSinh extends DflowNode.Task {
   static kind = "mathSinh";
-
-  task(num: number) {
-    return Math.sinh(num);
+  static inputs = DflowNode.in(["number"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return Math.sinh(this.input(0).data as number);
   }
 }
 

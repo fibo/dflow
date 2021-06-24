@@ -1,118 +1,77 @@
 /**
 [Operators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators)
 */
-import { DflowData, DflowHost, DflowSerializedNode } from "../engine.ts";
-import {
-  DflowAbstractTwoInOneOut,
-  DflowAbstractTwoNumInOneBoolOut,
-  DflowAbstractTwoNumInOneNumOut,
-} from "./abstract.ts";
+import { DflowNode } from "../engine.ts";
 
-class DflowAddition extends DflowAbstractTwoNumInOneNumOut {
+class DflowAddition extends DflowNode.Task {
   static kind = "addition";
-
-  task(input1: number, input2: number) {
-    return input1 + input2;
+  static inputs = DflowNode.ins(2, ["number"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return (this.input(0).data as number) + (this.input(1).data as number);
   }
 }
 
-class DflowEquality extends DflowAbstractTwoInOneOut {
+class DflowEquality extends DflowNode.Task {
   static kind = "equality";
-
-  constructor(arg: DflowSerializedNode, host: DflowHost) {
-    super({
-      ...arg,
-      inputs: [{ id: "i1", types: ["number", "string"] }, {
-        id: "i2",
-        types: ["number", "string"],
-      }],
-      outputs: [{ id: "o1", types: ["boolean"] }],
-    }, host);
-  }
-
-  run() {
-    const { input1: { data: data1, types }, input2: { data: data2 }, output } =
-      this;
-
-    if (DflowData.isUndefined(data1) || (DflowData.isUndefined(data2))) {
-      output.clear();
-    } else {
-      if (
-        DflowData.validate(data1, types) && DflowData.validate(data2, types)
-      ) {
-        output.data = data1 == data2;
-      }
-    }
+  static inputs = DflowNode.in(["boolean", "number", "string"]);
+  static outputs = DflowNode.out(["boolean"]);
+  task() {
+    return this.input(0).data == this.input(1).data;
   }
 }
 
-class DflowLessThan extends DflowAbstractTwoNumInOneBoolOut {
+class DflowLessThan extends DflowNode.Task {
   static kind = "lessThan";
-
-  task(input1: number, input2: number) {
-    return input1 < input2;
+  static inputs = DflowNode.ins(2, ["number"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return (this.input(0).data as number) < (this.input(1).data as number);
   }
 }
 
-class DflowLessThanOrEqual extends DflowAbstractTwoNumInOneBoolOut {
+class DflowLessThanOrEqual extends DflowNode.Task {
   static kind = "lessThanOrEqual";
-
-  task(input1: number, input2: number) {
-    return input1 <= input2;
+  static inputs = DflowNode.ins(2, ["number"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return (this.input(0).data as number) <= (this.input(1).data as number);
   }
 }
 
-class DflowGreaterThan extends DflowAbstractTwoNumInOneBoolOut {
+class DflowGreaterThan extends DflowNode.Task {
   static kind = "greaterThan";
-
-  task(input1: number, input2: number) {
-    return input1 > input2;
+  static inputs = DflowNode.ins(2, ["number"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return (this.input(0).data as number) > (this.input(1).data as number);
   }
 }
 
-class DflowGreaterThanOrEqual extends DflowAbstractTwoNumInOneBoolOut {
+class DflowGreaterThanOrEqual extends DflowNode.Task {
   static kind = "greaterThanOrEqual";
-
-  task(input1: number, input2: number) {
-    return input1 >= input2;
+  static inputs = DflowNode.ins(2, ["number"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return (this.input(0).data as number) >= (this.input(1).data as number);
   }
 }
 
-class DflowInequality extends DflowAbstractTwoInOneOut {
+class DflowInequality extends DflowNode.Task {
   static kind = "inequality";
-
-  constructor(arg: DflowSerializedNode, host: DflowHost) {
-    super({
-      ...arg,
-      inputs: [{ id: "i1", types: ["number", "string"] }, {
-        id: "i2",
-        types: ["number", "string"],
-      }],
-      outputs: [{ id: "o1", types: ["boolean"] }],
-    }, host);
-  }
-
-  run() {
-    const { input1: { data: data1, types }, input2: { data: data2 }, output } =
-      this;
-
-    if (DflowData.isUndefined(data1) || (DflowData.isUndefined(data2))) {
-      output.clear();
-    } else {
-      if (
-        DflowData.validate(data1, types) && DflowData.validate(data2, types)
-      ) {
-        output.data = data1 != data2;
-      }
-    }
+  static inputs = DflowNode.ins(2, ["boolean", "null", "number", "string"]);
+  static outputs = DflowNode.out(["boolean"]);
+  task() {
+    return this.input(0).data != this.input(1).data;
   }
 }
 
-class DflowSubtraction extends DflowAbstractTwoNumInOneNumOut {
+class DflowSubtraction extends DflowNode.Task {
   static kind = "subtraction";
-
-  task(input1: number, input2: number) {
-    return input1 - input2;
+  static inputs = DflowNode.ins(2, ["number"]);
+  static outputs = DflowNode.out(["number"]);
+  task() {
+    return (this.input(0).data as number) - (this.input(1).data as number);
   }
 }
 
