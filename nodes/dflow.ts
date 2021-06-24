@@ -2,13 +2,7 @@ import { DflowHost, DflowNode, DflowSerializedNode } from "../engine.ts";
 
 class Dflow extends DflowNode {
   static kind = "dflow";
-
-  constructor(arg: DflowSerializedNode, host: DflowHost) {
-    super({
-      ...arg,
-      outputs: [{ id: "o1", name: "nodeKinds", types: ["array"] }],
-    }, host);
-  }
+  static outputs = DflowNode.out(["array"], { name: "nodeKinds" });
 
   run() {
     const nodeKinds = this.output(0);
@@ -16,59 +10,11 @@ class Dflow extends DflowNode {
   }
 }
 
-class DflowArguments extends DflowNode {
-  static kind = "arguments";
-
-  constructor(arg: DflowSerializedNode, host: DflowHost) {
-    super({
-      ...arg,
-      inputs: [
-        { id: "in", types: ["number"], name: "signature" },
-      ],
-      outputs: [{ id: "out", types: ["DflowArguments"] }],
-    }, host);
-  }
-
-  get numArguments() {
-    return this.signature.data ?? 0;
-  }
-
-  get signature() {
-    return this.output(0);
-  }
+class DflowArgument extends DflowNode {
+  static kind = "argument";
+  static outputs = DflowNode.out();
 
   run() {
-    const { numArguments, numOutputs } = this;
-
-    switch (true) {
-      // No argument, delete all argument outputs.
-      case numArguments === 0: {
-        for (let i = 1; i < numOutputs; i++) {
-          const output = this.output(i);
-          this.deleteOutput(output.id);
-        }
-        break;
-      }
-
-      case Number.isInteger(numArguments): {
-        // Delete exceeding argument outputs.
-        for (let i = numOutputs; i > 1; i--) {
-          const output = this.output(i);
-          this.deleteOutput(output.id);
-        }
-
-        // Create missing argument outputs.
-        for (let i = numOutputs - 1; i < numArguments; i++) {
-          this.newOutput({ id: `a${i}`, name: `argument${i}` });
-        }
-
-        break;
-      }
-
-      default: {
-        this.output(0).clear();
-      }
-    }
   }
 }
 
@@ -92,6 +38,6 @@ class DflowFunction extends DflowNode {
 
 export const catalog = {
   [Dflow.kind]: Dflow,
-  [DflowArguments.kind]: DflowArguments,
+  [DflowArgument.kind]: DflowArgument,
   [DflowFunction.kind]: DflowFunction,
 };
