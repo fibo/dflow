@@ -1,4 +1,4 @@
-import { DflowValue } from "../engine.ts";
+import { DflowNode } from "../engine.ts";
 import {
   DflowAbstractOneAnyInOneBoolOut,
   DflowAbstractOneNumInOneBoolOut,
@@ -21,11 +21,13 @@ class DflowIsInteger extends DflowAbstractOneAnyInOneBoolOut {
   }
 }
 
-class DflowIsNaN extends DflowAbstractOneAnyInOneBoolOut {
+class DflowIsNaN extends DflowNode.Unary {
   static kind = "isNaN";
+  static inputs = DflowNode.in(["number", "string", "null"]);
+  static outputs = DflowNode.out(["boolean"]);
 
-  task(input: DflowValue) {
-    return Number.isNaN(input);
+  task() {
+    return Number.isNaN(this.input);
   }
 }
 
