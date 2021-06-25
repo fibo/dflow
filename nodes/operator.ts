@@ -24,7 +24,7 @@ class DflowEquality extends DflowNode.Task {
 class DflowLessThan extends DflowNode.Task {
   static kind = "lessThan";
   static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static outputs = DflowNode.out(["boolean"]);
   task() {
     return (this.input(0).data as number) < (this.input(1).data as number);
   }
@@ -33,7 +33,7 @@ class DflowLessThan extends DflowNode.Task {
 class DflowLessThanOrEqual extends DflowNode.Task {
   static kind = "lessThanOrEqual";
   static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static outputs = DflowNode.out(["boolean"]);
   task() {
     return (this.input(0).data as number) <= (this.input(1).data as number);
   }
@@ -42,7 +42,7 @@ class DflowLessThanOrEqual extends DflowNode.Task {
 class DflowGreaterThan extends DflowNode.Task {
   static kind = "greaterThan";
   static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static outputs = DflowNode.out(["boolean"]);
   task() {
     return (this.input(0).data as number) > (this.input(1).data as number);
   }
@@ -51,7 +51,7 @@ class DflowGreaterThan extends DflowNode.Task {
 class DflowGreaterThanOrEqual extends DflowNode.Task {
   static kind = "greaterThanOrEqual";
   static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static outputs = DflowNode.out(["boolean"]);
   task() {
     return (this.input(0).data as number) >= (this.input(1).data as number);
   }

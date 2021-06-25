@@ -19,11 +19,15 @@ Deno.test(catalog.function.kind, () => {
   const nodeKind = catalog.function.kind;
 
   const dflow = new DflowHost(catalog);
-  const dataNode = dflow.newNode({ kind: catalog.data.kind });
+  const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
+  const additionNode = dflow.newNode({ kind: catalog.addition.kind });
   const returnNode = dflow.newNode({ kind: catalog.return.kind });
   const testNode = dflow.newNode({ kind: nodeKind });
-  dflow.connect(testNode, 1).to(returnNode, 0);
-  dflow.connect(dataNode).to(returnNode, 1);
+  dflow.connect(testNode).to(returnNode);
+  dflow.connect(additionNode).to(returnNode, 1);
+  dflow.connect(numNode).to(additionNode, 1);
+
   dflow.run();
-  assertEquals(testNode.output(1).data as DflowId, testNode.id);
+
+  assertEquals(testNode.output(0).data as DflowId, testNode.id);
 });

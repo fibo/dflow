@@ -3,6 +3,7 @@ export type DflowNewItem<Item> = Omit<Item, "id"> & { id?: DflowId };
 
 export type DflowNodeKind = string;
 export type DflowNodeMetadata = {
+  label?: string;
   isAsync?: boolean;
   isConstant?: boolean;
 };
@@ -74,6 +75,8 @@ export type DflowNewInput = DflowNewItem<DflowSerializedInput>;
 export type DflowNewOutput = DflowNewItem<DflowSerializedOutput>;
 export type DflowNewNode = DflowNewItem<DflowSerializedNode>;
 
+export type DflowNodeConnections = { sourceId: DflowId; targetId: DflowId }[];
+
 const _missingString = (stringName: string) => `${stringName} must be a string`;
 const _missingMethod = (
   methodName: string,
@@ -103,6 +106,10 @@ export class DflowData {
     return typeof data === "object" && data !== null && !Array.isArray(data) &&
       Array.isArray(data.nodes) && Array.isArray(data.edges) &&
       DflowGraph.isDflowGraph(data as DflowSerializedGraph);
+  }
+
+  static isDflowId(data: DflowValue) {
+    return DflowData.isStringNotEmpty(data);
   }
 
   static isObject(data: DflowValue) {
@@ -151,6 +158,8 @@ export class DflowData {
           return DflowData.isString(data);
         case "DflowGraph":
           return DflowData.isDflowGraph(data);
+        case "DflowId":
+          return DflowData.isDflowId(data);
         default:
           return false;
       }
@@ -163,8 +172,8 @@ export class DflowItem {
   name?: string;
 
   static isDflowItem({ id, name }: DflowSerializedItem) {
-    return typeof id === "string" &&
-      (["undefined", "string"].includes(typeof name));
+    return DflowData.isDflowId(id) &&
+      (DflowData.isUndefined(name) || DflowData.isStringNotEmpty(name));
   }
 
   constructor({ id, name }: DflowSerializedPin) {
@@ -220,6 +229,14 @@ export class DflowPin extends DflowItem {
 
   get hasTypeAny() {
     return this.types.length === 0;
+  }
+
+  get hasTypeDflowId() {
+    return this.hasTypeAny || this.types.includes("DflowId");
+  }
+
+  get hasTypeDflowGraph() {
+    return this.hasTypeAny || this.types.includes("DflowGraph");
   }
 
   get hasTypeString() {
@@ -326,6 +343,8 @@ export class DflowOutput extends DflowPin {
         this.clear();
         break;
       case this.hasTypeAny:
+      case DflowData.isDflowGraph(data) && this.hasTypeDflowGraph:
+      case DflowData.isDflowId(data) && this.hasTypeDflowId:
       case DflowData.isString(data) && this.hasTypeString:
       case DflowData.isNumber(data) && this.hasTypeNumber:
       case DflowData.isBoolean(data) && this.hasTypeBoolean:
@@ -361,6 +380,15 @@ export class DflowOutput extends DflowPin {
 }
 
 export class DflowNode extends DflowItem {
+  readonly #inputs: Map<DflowId, DflowInput> = new Map();
+  readonly #outputs: Map<DflowId, DflowOutput> = new Map();
+  readonly #inputPosition: DflowId[] = [];
+  readonly #outputPosition: DflowId[] = [];
+  readonly #label?: string;
+  readonly kind: string;
+  readonly meta: DflowNodeMetadata;
+  readonly host: DflowHost;
+
   static Task = class DflowNodeUnary extends DflowNode {
     task(): DflowValue {
       throw new Error(_missingMethod("task", this.kind));
@@ -381,6 +409,7 @@ export class DflowNode extends DflowItem {
   static kind: string;
   static isAsync?: DflowNodeMetadata["isAsync"];
   static isConstant?: DflowNodeMetadata["isConstant"];
+  static label?: DflowNodeMetadata["label"];
   static inputs?: DflowNewInput[];
   static outputs?: DflowNewOutput[];
 
@@ -418,14 +447,6 @@ export class DflowNode extends DflowItem {
     return { ...obj, types: ["number"] };
   }
 
-  readonly #inputs: Map<DflowId, DflowInput> = new Map();
-  readonly #outputs: Map<DflowId, DflowOutput> = new Map();
-  readonly #inputPosition: DflowId[] = [];
-  readonly #outputPosition: DflowId[] = [];
-  readonly kind: string;
-  readonly meta: DflowNodeMetadata;
-  readonly host: DflowHost;
-
   static isDflowNode(
     { kind, inputs = [], outputs = [], ...item }: DflowSerializedNode,
   ) {
@@ -439,10 +460,11 @@ export class DflowNode extends DflowItem {
   constructor(
     { kind, inputs = [], outputs = [], ...item }: DflowSerializedNode,
     host: DflowHost,
-    { isAsync = false, isConstant = false }: DflowNodeMetadata = {},
+    { isAsync = false, isConstant = false, label }: DflowNodeMetadata = {},
   ) {
     super(item);
 
+    this.#label = label;
     this.host = host;
     this.kind = kind;
 
@@ -461,6 +483,10 @@ export class DflowNode extends DflowItem {
 
     // Finally, call the onCreate() hook.
     this.onCreate();
+  }
+
+  get label() {
+    return this.#label || this.kind;
   }
 
   get inputs() {
@@ -563,7 +589,7 @@ export class DflowNode extends DflowItem {
   onCreate() {}
 
   newInput(obj: DflowNewInput): DflowInput {
-    const id = DflowData.isStringNotEmpty(obj.id)
+    const id = DflowData.isDflowId(obj.id)
       ? obj.id as DflowId
       : this.generateInputId();
 
@@ -574,7 +600,7 @@ export class DflowNode extends DflowItem {
   }
 
   newOutput(obj: DflowNewOutput): DflowOutput {
-    const id = DflowData.isStringNotEmpty(obj.id)
+    const id = DflowData.isDflowId(obj.id)
       ? obj.id as DflowId
       : this.generateOutputId();
 
@@ -695,35 +721,75 @@ export class DflowGraph extends DflowItem {
       graph.edges.every((edge) => DflowEdge.isDflowEdge(edge, graph));
   }
 
+  static parentsOfNodeId(
+    nodeId: DflowId,
+    nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
+  ) {
+    return nodeConnections
+      .filter(({ targetId }) => nodeId === targetId)
+      .map(({ sourceId }) => sourceId);
+  }
+
+  static levelOfNodeId(nodeId: DflowId, nodeConnections: DflowNodeConnections) {
+    const parentsNodeIds = DflowGraph.parentsOfNodeId(
+      nodeId,
+      nodeConnections,
+    );
+    // 1. A node with no parent as level zero.
+    if (parentsNodeIds.length === 0) {
+      return 0;
+    }
+
+    // 2. Otherwise its level is the max level of its parents plus one.
+    let maxLevel = 0;
+    for (const parentNodeId of parentsNodeIds) {
+      const level = DflowGraph.levelOfNodeId(parentNodeId, nodeConnections);
+      maxLevel = Math.max(level, maxLevel);
+    }
+    return maxLevel + 1;
+  }
+
+  static ancestorsOfNodeId(
+    nodeId: DflowId,
+    nodeConnections: DflowNodeConnections,
+  ): DflowId[] {
+    const parentsNodeIds = DflowGraph.parentsOfNodeId(
+      nodeId,
+      nodeConnections,
+    );
+
+    if (parentsNodeIds.length === 0) {
+      return [];
+    } else {
+      return parentsNodeIds.reduce<DflowId[]>(
+        (otherAncestors, parentNodeId, index, parents) => {
+          const isLast = index === parents.length - 1;
+
+          const ancestors = DflowGraph.ancestorsOfNodeId(
+            parentNodeId,
+            nodeConnections,
+          );
+
+          if (isLast) {
+            // On last iteration, remove duplicates
+            return Array.from(new Set(otherAncestors.concat(ancestors)));
+          } else {
+            return otherAncestors.concat(ancestors);
+          }
+        },
+        [],
+      );
+    }
+  }
+
   static sort(
     nodeIds: DflowId[],
-    nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
+    nodeConnections: DflowNodeConnections,
   ): DflowId[] {
     const levelOf: Record<DflowId, number> = {};
 
-    const parentsOfNodeId = (nodeId: DflowId) =>
-      nodeConnections
-        .filter(({ targetId }) => nodeId === targetId)
-        .map(({ sourceId }) => sourceId);
-
-    const levelOfNodeId = (nodeId: DflowId) => {
-      const parentsNodeIds = parentsOfNodeId(nodeId);
-      // 1. A node with no parent as level zero.
-      if (parentsNodeIds.length === 0) {
-        return 0;
-      }
-
-      // 2. Otherwise its level is the max level of its parents plus one.
-      let maxLevel = 0;
-      for (const parentNodeId of parentsNodeIds) {
-        const level = levelOfNodeId(parentNodeId);
-        maxLevel = Math.max(level, maxLevel);
-      }
-      return maxLevel + 1;
-    };
-
     for (const nodeId of nodeIds) {
-      levelOf[nodeId] = levelOfNodeId(nodeId);
+      levelOf[nodeId] = DflowGraph.levelOfNodeId(nodeId, nodeConnections);
     }
 
     return nodeIds.slice().sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
@@ -735,6 +801,21 @@ export class DflowGraph extends DflowItem {
 
   get nodes() {
     return this.#nodes.values();
+  }
+
+  get nodeConnections(): DflowNodeConnections {
+    return [...this.#edges.values()].map((edge) => ({
+      sourceId: edge.source[0],
+      targetId: edge.target[0],
+    }));
+  }
+
+  get edgeIds() {
+    return [...this.#edges.keys()];
+  }
+
+  get nodeIds() {
+    return [...this.#nodes.keys()];
   }
 
   get numEdges() {
@@ -824,19 +905,34 @@ export class DflowGraph extends DflowItem {
     return this.#nodes.has(id) ? this.generateNodeId(i + 1) : id;
   }
 
+  nodesInsideFunctions() {
+    const ancestorsOfReturnNodes = [];
+
+    // Find all "return" nodes and get their ancestors.
+    for (const node of this.nodes) {
+      if (node.kind === "return") {
+        ancestorsOfReturnNodes.push(
+          DflowGraph.ancestorsOfNodeId(node.id, this.nodeConnections),
+        );
+      }
+    }
+
+    // Flatten and deduplicate results.
+    return Array.from(new Set(ancestorsOfReturnNodes.flat()));
+  }
+
   async run() {
     // Set runStatus to waiting if there was some unhandled error in a previous run.
     if (this.runStatusIsSuccess) {
       this.#runStatus = "waiting";
     }
 
-    // Get nodeIds sorted by graph hierarchy.
+    // Get nodeIds
+    // 1. filtered by nodes inside functions
+    // 2. sorted by graph hierarchy
     const nodeIds = DflowGraph.sort(
-      [...this.#nodes.keys()],
-      [...this.#edges.values()].map((edge) => ({
-        sourceId: edge.source[0],
-        targetId: edge.target[0],
-      })),
+      this.nodeIds,
+      this.nodeConnections,
     );
 
     for (const nodeId of nodeIds) {
@@ -1016,13 +1112,14 @@ export class DflowHost {
     const NodeClass = this.#nodesCatalog[obj.kind] ??
       DflowUnknownNode;
 
-    const id = DflowData.isStringNotEmpty(obj.id)
+    const id = DflowData.isDflowId(obj.id)
       ? obj.id as DflowId
       : this.#graph.generateNodeId();
 
     const meta = {
       isAsync: NodeClass.isAsync,
       isConstant: NodeClass.isConstant,
+      label: NodeClass.label,
     };
 
     const inputs = Array.isArray(obj.inputs)
@@ -1040,7 +1137,7 @@ export class DflowHost {
   }
 
   newEdge(obj: DflowNewEdge): DflowEdge {
-    const id = DflowData.isStringNotEmpty(obj.id)
+    const id = DflowData.isDflowId(obj.id)
       ? obj.id as DflowId
       : this.#graph.generateEdgeId();
 
