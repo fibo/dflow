@@ -16,15 +16,12 @@ class DflowArgument extends DflowNode {
   static outputs = DflowNode.out();
 }
 
-class DflowFunction extends DflowNode {
+export class DflowFunction extends DflowNode {
   static kind = "function";
   static isConstant = true;
-  static outputs = [
-    ...Dflow.out(["DflowGraph"], { name: "graph" }),
-    ...Dflow.out(["DflowId"], { name: "id" }),
-  ];
+  static outputs = Dflow.out(["DflowId"], { name: "id" });
   onCreate() {
-    this.output(1).data = this.id;
+    this.output(0).data = this.id;
   }
 }
 
