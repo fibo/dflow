@@ -1,4 +1,4 @@
-import { DflowHost, DflowNode, DflowSerializedNode } from "../engine.ts";
+import { DflowNode } from "../engine.ts";
 
 class Dflow extends DflowNode {
   static kind = "dflow";
@@ -12,32 +12,34 @@ class Dflow extends DflowNode {
 
 class DflowArgument extends DflowNode {
   static kind = "argument";
+  static isConstant = true;
   static outputs = DflowNode.out();
-
-  run() {
-  }
 }
 
 class DflowFunction extends DflowNode {
   static kind = "function";
-
-  constructor(arg: DflowSerializedNode, host: DflowHost) {
-    super({
-      ...arg,
-      inputs: [
-        { id: "in1", name: "arguments", types: ["DflowArguments"] },
-        { id: "in2", name: "return" },
-      ],
-      outputs: [{ id: "o1", types: ["DflowGraph"] }],
-    }, host);
+  static isConstant = true;
+  static outputs = [
+    ...Dflow.out(["DflowGraph"], { name: "graph" }),
+    ...Dflow.out(["DflowId"], { name: "id" }),
+  ];
+  onCreate() {
+    this.output(1).data = this.id;
   }
+}
 
-  run() {
-  }
+class DflowReturn extends DflowNode {
+  static kind = "return";
+  static isConstant = true;
+  static inputs = [
+    ...Dflow.in(["DflowId"], { name: "functionId" }),
+    ...Dflow.in([], { name: "value" }),
+  ];
 }
 
 export const catalog = {
   [Dflow.kind]: Dflow,
   [DflowArgument.kind]: DflowArgument,
   [DflowFunction.kind]: DflowFunction,
+  [DflowReturn.kind]: DflowReturn,
 };

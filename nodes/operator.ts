@@ -14,7 +14,7 @@ class DflowAddition extends DflowNode.Task {
 
 class DflowEquality extends DflowNode.Task {
   static kind = "equality";
-  static inputs = DflowNode.in(["boolean", "number", "string"]);
+  static inputs = DflowNode.ins(2);
   static outputs = DflowNode.out(["boolean"]);
   task() {
     return this.input(0).data == this.input(1).data;
@@ -59,7 +59,7 @@ class DflowGreaterThanOrEqual extends DflowNode.Task {
 
 class DflowInequality extends DflowNode.Task {
   static kind = "inequality";
-  static inputs = DflowNode.ins(2, ["boolean", "null", "number", "string"]);
+  static inputs = DflowNode.ins(2);
   static outputs = DflowNode.out(["boolean"]);
   task() {
     return this.input(0).data != this.input(1).data;
