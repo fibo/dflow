@@ -15,7 +15,7 @@ export type DflowPinType =
   | "null"
   | "object"
   | "array"
-  | "DflowArguments"
+  | "DflowId"
   | "DflowGraph";
 
 export type DflowRunStatus = "waiting" | "success" | "failure";
@@ -198,7 +198,7 @@ export class DflowPin extends DflowItem {
     "null",
     "object",
     "array",
-    "DflowArguments",
+    "DflowId",
     "DflowGraph",
   ];
 
@@ -458,6 +458,9 @@ export class DflowNode extends DflowItem {
     for (const pin of outputs) {
       this.newOutput(pin);
     }
+
+    // Finally, call the onCreate() hook.
+    this.onCreate();
   }
 
   get inputs() {
@@ -553,6 +556,11 @@ export class DflowNode extends DflowItem {
     this.#outputs.delete(pinId);
     this.#outputPosition.splice(this.#outputPosition.indexOf(pinId), 1);
   }
+
+  /**
+   The `onCreate()` method is a hook run after node instance is created.
+   */
+  onCreate() {}
 
   newInput(obj: DflowNewInput): DflowInput {
     const id = DflowData.isStringNotEmpty(obj.id)

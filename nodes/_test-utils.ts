@@ -111,6 +111,24 @@ export function testOneStrInOneNumOut(
   assertEquals(testNode.output(0).data, expected);
 }
 
+export function testTwoAnyInOneBoolOut(
+  nodeKind: string,
+  input1: DflowValue,
+  input2: DflowValue,
+  expected: boolean,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode1 = dflow.newNode({ kind: catalog.data.kind });
+  dataNode1.output(0).data = input1;
+  const dataNode2 = dflow.newNode({ kind: catalog.data.kind });
+  dataNode2.output(0).data = input2;
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode1).to(testNode, 0);
+  dflow.connect(dataNode2).to(testNode, 1);
+  dflow.run();
+  assertEquals(testNode.output(0).data, expected);
+}
+
 export function testTwoBoolInOneBoolOut(
   nodeKind: string,
   input1: boolean,
