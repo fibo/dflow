@@ -2,7 +2,7 @@ import {
   testOneBoolInOneBoolOut,
   testTwoBoolInOneBoolOut,
 } from "./_test-utils.ts";
-import { catalog } from "./logic.ts";
+import { catalog } from "./catalog.ts";
 
 Deno.test(catalog.and.kind, () => {
   const nodeKind = catalog.and.kind;

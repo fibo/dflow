@@ -1,5 +1,5 @@
 import { testOneObjInOneArrOut } from "./_test-utils.ts";
-import { catalog } from "./object.ts";
+import { catalog } from "./catalog.ts";
 
 Deno.test(catalog.objectKeys.kind, () => {
   const nodeKind = catalog.objectKeys.kind;

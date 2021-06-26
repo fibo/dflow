@@ -17,7 +17,8 @@ export type DflowPinType =
   | "object"
   | "array"
   | "DflowId"
-  | "DflowGraph";
+  | "DflowGraph"
+  | "DflowType";
 
 export type DflowRunStatus = "waiting" | "success" | "failure";
 
@@ -112,6 +113,10 @@ export class DflowData {
     return DflowData.isStringNotEmpty(data);
   }
 
+  static isDflowType(data: DflowValue) {
+    return typeof data === "string" && DflowPin.types.includes(data);
+  }
+
   static isObject(data: DflowValue) {
     return !DflowData.isUndefined(data) && !DflowData.isNull(data) &&
       !DflowData.isArray(data) && typeof data === "object";
@@ -160,6 +165,8 @@ export class DflowData {
           return DflowData.isDflowGraph(data);
         case "DflowId":
           return DflowData.isDflowId(data);
+        case "DflowType":
+          return DflowData.isDflowType(data);
         default:
           return false;
       }
@@ -209,6 +216,7 @@ export class DflowPin extends DflowItem {
     "array",
     "DflowId",
     "DflowGraph",
+    "DflowType",
   ];
 
   static isDflowPin({ types = [], ...item }: DflowSerializedPin) {
@@ -239,6 +247,10 @@ export class DflowPin extends DflowItem {
     return this.hasTypeAny || this.types.includes("DflowGraph");
   }
 
+  get hasTypeDflowType() {
+    return this.hasTypeAny || this.types.includes("DflowType");
+  }
+
   get hasTypeString() {
     return this.hasTypeAny || this.types.includes("string");
   }
@@ -261,6 +273,14 @@ export class DflowPin extends DflowItem {
 
   get hasTypeArray() {
     return this.hasTypeAny || this.types.includes("array");
+  }
+
+  addType(pinType: DflowPinType) {
+    this.types.push(pinType);
+  }
+
+  removeType(pinType: DflowPinType) {
+    this.types.splice(this.types.indexOf(pinType), 1);
   }
 }
 
@@ -584,6 +604,12 @@ export class DflowNode extends DflowItem {
   }
 
   /**
+   The `onBeforeConnectInput()` method is a hook run just before edge creation
+   when a node output is connected to another node input.
+   */
+  onBeforeConnectInput(_sourceNode: DflowNode, _sourcePosition: number) {}
+
+  /**
    The `onCreate()` method is a hook run after node instance is created.
    */
   onCreate() {}
@@ -721,6 +747,15 @@ export class DflowGraph extends DflowItem {
       graph.edges.every((edge) => DflowEdge.isDflowEdge(edge, graph));
   }
 
+  static childrenOfNodeId(
+    nodeId: DflowId,
+    nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
+  ) {
+    return nodeConnections
+      .filter(({ sourceId }) => nodeId === sourceId)
+      .map(({ targetId }) => targetId);
+  }
+
   static parentsOfNodeId(
     nodeId: DflowId,
     nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
@@ -762,20 +797,18 @@ export class DflowGraph extends DflowItem {
       return [];
     } else {
       return parentsNodeIds.reduce<DflowId[]>(
-        (otherAncestors, parentNodeId, index, parents) => {
-          const isLast = index === parents.length - 1;
-
+        (accumulator, parentNodeId, index, array) => {
           const ancestors = DflowGraph.ancestorsOfNodeId(
             parentNodeId,
             nodeConnections,
           );
 
-          if (isLast) {
-            // On last iteration, remove duplicates
-            return Array.from(new Set(otherAncestors.concat(ancestors)));
-          } else {
-            return otherAncestors.concat(ancestors);
-          }
+          const result = accumulator.concat(ancestors);
+
+          // On last iteration, remove duplicates
+          return index === array.length - 1
+            ? Array.from(new Set(result))
+            : result;
         },
         [],
       );
@@ -905,7 +938,7 @@ export class DflowGraph extends DflowItem {
     return this.#nodes.has(id) ? this.generateNodeId(i + 1) : id;
   }
 
-  nodesInsideFunctions() {
+  nodeIdsInsideFunctions() {
     const ancestorsOfReturnNodes = [];
 
     // Find all "return" nodes and get their ancestors.
@@ -930,8 +963,9 @@ export class DflowGraph extends DflowItem {
     // Get nodeIds
     // 1. filtered by nodes inside functions
     // 2. sorted by graph hierarchy
+    const nodeIdsExcluded = this.nodeIdsInsideFunctions();
     const nodeIds = DflowGraph.sort(
-      this.nodeIds,
+      this.nodeIds.filter((nodeId) => !nodeIdsExcluded.includes(nodeId)),
       this.nodeConnections,
     );
 
@@ -1030,6 +1064,9 @@ export class DflowHost {
 
         const targetPin = targetNode.input(targetPosition);
 
+        // Hook.
+        targetNode.onBeforeConnectInput(sourceNode, sourcePosition);
+
         this.newEdge({
           id: edgeId,
           source: [sourceNode.id, sourcePin.id],
@@ -1098,6 +1135,41 @@ export class DflowHost {
         this.deleteEdge(edge.id);
       }
     }
+  }
+
+  executeFunction(functionId: DflowId, args: DflowArray) {
+    // Get all return nodes connected to function node.
+    const nodeConnections = this.#graph.nodeConnections;
+    const childrenNodeIds = DflowGraph.childrenOfNodeId(
+      functionId,
+      nodeConnections,
+    );
+    const returnNodeIds = [];
+    for (const childrenNodeId of childrenNodeIds) {
+      const node = this.getNodeById(childrenNodeId);
+      if (node.kind === "return") {
+        returnNodeIds.push(node.id);
+      }
+    }
+
+    // Get all nodes inside function.
+    const nodeIdsInsideFunction = returnNodeIds.reduce<DflowId[]>(
+      (accumulator, returnNodeId, index, array) => {
+        const ancestors = DflowGraph.ancestorsOfNodeId(
+          returnNodeId,
+          nodeConnections,
+        );
+
+        const result = accumulator.concat(ancestors);
+
+        // On last iteration, remove duplicates
+        return index === array.length ? Array.from(new Set(result)) : result;
+      },
+      [],
+    );
+
+    console.log(returnNodeIds, nodeIdsInsideFunction);
+    return args;
   }
 
   getEdgeById(edgeId: DflowId) {

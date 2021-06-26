@@ -23,8 +23,10 @@ Deno.test(catalog.function.kind, () => {
   const additionNode = dflow.newNode({ kind: catalog.addition.kind });
   const returnNode = dflow.newNode({ kind: catalog.return.kind });
   const testNode = dflow.newNode({ kind: nodeKind });
+
   dflow.connect(testNode).to(returnNode);
   dflow.connect(additionNode).to(returnNode, 1);
+  dflow.connect(numNode).to(additionNode, 0);
   dflow.connect(numNode).to(additionNode, 1);
 
   dflow.run();
