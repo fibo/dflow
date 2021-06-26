@@ -9,6 +9,13 @@ class Dflow extends DflowNode {
     nodeKinds.data = this.host.nodeKinds;
   }
 }
+
+class DflowComment extends DflowNode {
+  static kind = "comment";
+  static isConstant = true;
+  static outputs = DflowNode.out(["string"]);
+}
+
 class DflowTypeNumber extends DflowNode {
   static kind = "typeNumber";
   static isConstant = true;
@@ -38,6 +45,15 @@ export class DflowFunction extends DflowNode {
   }
 }
 
+export class DflowFunctionCall extends DflowNode {
+  static kind = "functionCall";
+  static isConstant = true;
+  static inputs = [
+    ...DflowNode.in(["DflowId"], { name: "functionId" }),
+    DflowNode.in([], { name: "argument0" }),
+  ];
+}
+
 class DflowReturn extends DflowNode {
   static kind = "return";
   static isConstant = true;
@@ -50,7 +66,9 @@ class DflowReturn extends DflowNode {
 export const catalog = {
   [Dflow.kind]: Dflow,
   [DflowArgument.kind]: DflowArgument,
+  [DflowComment.kind]: DflowComment,
   [DflowFunction.kind]: DflowFunction,
+  [DflowFunctionCall.kind]: DflowFunctionCall,
   [DflowReturn.kind]: DflowReturn,
   [DflowTypeNumber.kind]: DflowTypeNumber,
 };
