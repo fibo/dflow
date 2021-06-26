@@ -4,12 +4,13 @@
 
 ## Features
 
-* Implemented in TypeScript, available both on Node and on Deno.
-* Expressive API.
-* Graphic interface implemented with WebComponents (cooming on late 2021)
-* Core nodes catalog with basic JavaScript features (to be completed)
-* Supports custom nodes, just extending `DflowNode` class or even simpler with `DflowNode.Task`.
-* Can create reusable functions just connecting nodes.
+- Implemented in TypeScript, available both on Node and on Deno.
+- Expressive API.
+- Graphic interface implemented with WebComponents (cooming on late 2021)
+- Core nodes catalog with basic JavaScript features (to be completed)
+- Supports custom nodes, just extending `DflowNode` class or even simpler with
+  `DflowNode.Task`.
+- Can create reusable functions just connecting nodes.
 
 ## Installation
 
@@ -64,6 +65,22 @@ version `0.26` or whatever, then change your import map accordingly
 
 This is a trivial sample graph that will run `sin(π / 2) = 1` computation.
 
+```
+--------------
+        number = π / 2
+        --------------
+        |
+        |
+        -------
+        mathSin
+        -------
+        |
+        |
+       ---
+      | 1 |
+       ---
+```
+
 You can run the following code with any of the following:
 
 - launching command
@@ -75,15 +92,17 @@ You should see a number `1` printed on output.
 ```js
 import { DflowHost, nodesCatalog as coreNodes } from "dflow";
 
-async function runGraph() {
+function runGraph() {
   // Use builtin nodes.
   const dflow = new DflowHost(coreNodes);
 
   // Create two nodes.
   const numNode = dflow.newNode({
-    kind: coreNodes.number.kind,
+    kind: "number",
   });
   const sinNode = dflow.newNode({
+    // To raise errors at compile time when using TypeScript,
+    // you can get the node kind from the catalog like this.
     kind: coreNodes.mathSin.kind,
   });
 
@@ -95,7 +114,7 @@ async function runGraph() {
   dflow.connect(numNode).to(sinNode);
 
   // Run graph.
-  await dflow.run();
+  dflow.run();
 
   // Get sinNode output.
   const sin = sinNode.output(0);
