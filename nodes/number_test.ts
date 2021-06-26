@@ -3,7 +3,7 @@ import {
   testOneNumInOneBoolOut,
   testOneStrInOneNumOut,
 } from "./_test-utils.ts";
-import { catalog } from "./number.ts";
+import { catalog } from "./catalog.ts";
 
 Deno.test(catalog.isFinite.kind, () => {
   const nodeKind = catalog.isFinite.kind;

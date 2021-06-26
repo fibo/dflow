@@ -1,5 +1,5 @@
 import { testOneNumInOneNumOut, testOneNumOut } from "./_test-utils.ts";
-import { catalog } from "./math.ts";
+import { catalog } from "./catalog.ts";
 
 Deno.test(catalog.mathCos.kind, () => {
   const nodeKind = catalog.mathCos.kind;

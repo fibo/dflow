@@ -1,4 +1,4 @@
-import { DflowNode } from "../engine.ts";
+import { DflowNode, DflowPinType } from "../engine.ts";
 
 class Dflow extends DflowNode {
   static kind = "dflow";
@@ -9,11 +9,24 @@ class Dflow extends DflowNode {
     nodeKinds.data = this.host.nodeKinds;
   }
 }
+class DflowTypeNumber extends DflowNode {
+  static kind = "typeNumber";
+  static isConstant = true;
+  static outputs = DflowNode.out(["DflowType"], {
+    name: "number",
+    data: "number",
+  });
+}
 
 class DflowArgument extends DflowNode {
   static kind = "argument";
   static isConstant = true;
+  static inputs = [...DflowNode.in(["DflowType"], { name: "type" })];
   static outputs = DflowNode.out();
+  onBeforeConnectInput(sourceNode: DflowNode, sourcePosition: number) {
+    const pinType = sourceNode.output(sourcePosition).data as DflowPinType;
+    this.output(0).addType(pinType);
+  }
 }
 
 export class DflowFunction extends DflowNode {
@@ -39,4 +52,5 @@ export const catalog = {
   [DflowArgument.kind]: DflowArgument,
   [DflowFunction.kind]: DflowFunction,
   [DflowReturn.kind]: DflowReturn,
+  [DflowTypeNumber.kind]: DflowTypeNumber,
 };

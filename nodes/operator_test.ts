@@ -3,7 +3,7 @@ import {
   testTwoNumInOneBoolOut,
   testTwoNumInOneNumOut,
 } from "./_test-utils.ts";
-import { catalog } from "./operator.ts";
+import { catalog } from "./catalog.ts";
 
 Deno.test(catalog.addition.kind, () => {
   const nodeKind = catalog.addition.kind;
