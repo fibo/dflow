@@ -30,7 +30,7 @@ Deno.test(catalog.arrayFilter.kind, () => {
 
   dflow.run();
 
-  assertArrayIncludes(testNode.output(0).data as DflowArray, [-1]);
+  assertArrayIncludes(testNode.output(0).data as DflowArray, [5, 6, 7]);
 });
 
 Deno.test(catalog.arrayLength.kind, () => {

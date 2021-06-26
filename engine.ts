@@ -792,7 +792,6 @@ export class DflowGraph extends DflowItem {
       nodeId,
       nodeConnections,
     );
-
     if (parentsNodeIds.length === 0) {
       return [];
     } else {
@@ -807,7 +806,7 @@ export class DflowGraph extends DflowItem {
 
           // On last iteration, remove duplicates
           return index === array.length - 1
-            ? Array.from(new Set(result))
+            ? Array.from(new Set(array.concat(result)))
             : result;
         },
         [],
@@ -1137,7 +1136,7 @@ export class DflowHost {
     }
   }
 
-  executeFunction(functionId: DflowId, args: DflowArray) {
+  async executeFunction(functionId: DflowId, args: DflowArray) {
     // Get all return nodes connected to function node.
     const nodeConnections = this.#graph.nodeConnections;
     const childrenNodeIds = DflowGraph.childrenOfNodeId(
@@ -1168,8 +1167,41 @@ export class DflowHost {
       [],
     );
 
-    console.log(returnNodeIds, nodeIdsInsideFunction);
-    return args;
+    // 1. get nodeIds sorted by graph hierarchy
+    // 2. if it is an argument node, inject input data
+    // 3. if if is a return node, output data
+    // 4. otherwise run node
+    const nodeIds = DflowGraph.sort(
+      nodeIdsInsideFunction,
+      nodeConnections,
+    );
+    for (const nodeId of nodeIds) {
+      const node = this.getNodeById(nodeId);
+
+      try {
+        switch (node.kind) {
+          case "argument": {
+            const argumentPosition = 0;
+            node.output(0).data = args[argumentPosition];
+            break;
+          }
+          case "return": {
+            return node.input(1).data;
+          }
+          default: {
+            if (node.meta.isConstant === false) {
+              if (node.meta.isAsync) {
+                await node.run();
+              } else {
+                node.run();
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 
   getEdgeById(edgeId: DflowId) {

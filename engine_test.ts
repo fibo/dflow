@@ -1,4 +1,5 @@
 import {
+  assertArrayIncludes,
   assertEquals,
   assertObjectMatch,
   assertStrictEquals,
@@ -267,6 +268,23 @@ Deno.test("DflowGraph.isDflowGraph", () => {
   [{ id: "g1", nodes: [], edges: [] }].forEach((graph) => {
     assertEquals(DflowGraph.isDflowGraph(graph), true);
   });
+});
+
+Deno.test("DflowGraph.ancestorsOfNodeId", () => {
+  assertArrayIncludes(
+    DflowGraph.ancestorsOfNodeId("n", [
+      { sourceId: "n1", targetId: "n" },
+    ]),
+    ["n1"],
+  );
+
+  assertArrayIncludes(
+    DflowGraph.ancestorsOfNodeId("n", [
+      { sourceId: "n1", targetId: "n2" },
+      { sourceId: "n2", targetId: "n" },
+    ]),
+    ["n1", "n2"],
+  );
 });
 
 // DflowHost
