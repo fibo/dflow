@@ -2,6 +2,15 @@
 
 > is a minimal [Dataflow programming][dataflow-wikipedia] engine
 
+## Features
+
+* Implemented in TypeScript, available both on Node and on Deno.
+* Expressive API.
+* Graphic interface implemented with WebComponents (cooming on late 2021)
+* Core nodes catalog with basic JavaScript features (to be completed)
+* Supports custom nodes, just extending `DflowNode` class or even simpler with `DflowNode.Task`.
+* Can create reusable functions just connecting nodes.
+
 ## Installation
 
 ### Node
