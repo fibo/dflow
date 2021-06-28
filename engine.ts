@@ -1,7 +1,6 @@
 export type DflowId = string;
 export type DflowNewItem<Item> = Omit<Item, "id"> & { id?: DflowId };
 
-export type DflowNodeKind = string;
 export type DflowNodeMetadata = {
   label?: string;
   isAsync?: boolean;
@@ -35,18 +34,20 @@ export type DflowValue =
   | DflowObject
   | DflowSerializedGraph;
 
-export type DflowNodesCatalog = Record<DflowNodeKind, typeof DflowNode>;
+export type DflowNodesCatalog = Record<DflowNode["kind"], typeof DflowNode>;
 
 export type DflowSerializedItem = {
   id: DflowId;
   name?: string;
 };
 
-export type DflowSerializedNode = DflowSerializedItem & {
-  kind: DflowNodeKind;
-  inputs?: DflowSerializedInput[];
-  outputs?: DflowSerializedOutput[];
-};
+export type DflowSerializedNode =
+  & DflowSerializedItem
+  & Pick<DflowNode, "kind">
+  & {
+    inputs?: DflowSerializedInput[];
+    outputs?: DflowSerializedOutput[];
+  };
 
 export type DflowSerializedPin = DflowSerializedItem & {
   types?: DflowPinType[];
@@ -1136,7 +1137,7 @@ export class DflowHost {
     }
   }
 
-  async executeFunction(functionId: DflowId, args: DflowArray) {
+  executeFunction(functionId: DflowId, args: DflowArray) {
     // Get all return nodes connected to function node.
     const nodeConnections = this.#graph.nodeConnections;
     const childrenNodeIds = DflowGraph.childrenOfNodeId(
@@ -1190,11 +1191,7 @@ export class DflowHost {
           }
           default: {
             if (node.meta.isConstant === false) {
-              if (node.meta.isAsync) {
-                await node.run();
-              } else {
-                node.run();
-              }
+              node.run();
             }
           }
         }

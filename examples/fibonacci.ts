@@ -23,13 +23,14 @@ const functionCallNode = dflow.newNode({
 //                       ----------
 //                       typeNumber
 //                       ----------
-//          --------      |
-//          function      |
-//          --------      |
-//          |\            |       ----------
-//          | \           |       number = 1
-//          |  \          |       ----------
-//          |   \         --------          |--------------------
+//                        |
+//          --------      |       ----------
+//          function      |       number = 1
+//          --------      |       ----------
+//          |\            |                 |--------------------
+//          | \           |                 |              |     |
+//          |  \          |                 |              |     |
+//          |   \         --------          |              |     |
 //          |    \        argument          |              |     |
 //          |     \       --------          |              |     |
 //          |      \             |--------- | ---          |     |
@@ -63,15 +64,26 @@ const functionCallNode = dflow.newNode({
 //          ------
 //
 
+// implement fibonacci function
+dflow.connect(functionNode).to(returnNode, 0);
+dflow.connect(functionNode).to(functionCallNode, 1);
 dflow.connect(typeNumberNode).to(argumentNode);
 dflow.connect(argumentNode).to(greaterThanNode);
-dflow.connect(numberNode).to(greaterThanNode);
-dflow.connect(greaterThanNode).to(ifNode);
-dflow.connect(functionNode).to(returnNode, 0);
-dflow.connect(ifNode, 0).to(returnNode, 1);
-dflow.connect(ifNode, 1).to(functionCallNode);
 dflow.connect(argumentNode).to(subtractionNode, 0);
+dflow.connect(numberNode).to(greaterThanNode);
 dflow.connect(numberNode).to(subtractionNode, 1);
-dflow.connect(subtractionNode).to(functionCallNode);
+dflow.connect(numberNode).to(ifNode, 2);
+dflow.connect(greaterThanNode).to(ifNode, 0);
+dflow.connect(subtractionNode).to(functionCallNode, 1);
+dflow.connect(functionCallNode).to(ifNode, 1);
+dflow.connect(ifNode, 0).to(returnNode, 1);
+
+// setup nodes to test it
+const numberNode2 = dflow.newNode({ kind: "number" });
+const functionCallNode2 = dflow.newNode({ kind: "functionCall" });
+const consoleLogNode = dflow.newNode({ kind: "consoleLog" });
+dflow.connect(functionNode).to(functionCallNode2, 0);
+dflow.connect(numberNode2).to(functionCallNode2, 1);
+dflow.connect(functionCallNode2).to(consoleLogNode);
 
 dflow.run();
