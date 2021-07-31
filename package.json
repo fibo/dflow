@@ -4,8 +4,9 @@
   "version": "0.28.0",
   "homepage": "http://g14n.info/dflow",
   "type": "module",
-  "main": "dflow.js",
+  "exports": "./dflow.js",
   "types": "engine.ts",
+  "funding": "https://github.com/sponsors/fibo",
   "engines": {
     "node": ">=14",
     "deno": ">=1.10"
