@@ -1,15 +1,17 @@
 // Keep in sync with README
 import { catalog as coreNodes, DflowHost } from "../dflow.js";
 
-async function runGraph() {
+function runGraph() {
   // Use builtin nodes.
   const dflow = new DflowHost(coreNodes);
 
   // Create two nodes.
   const numNode = dflow.newNode({
-    kind: coreNodes.number.kind,
+    kind: "number",
   });
   const sinNode = dflow.newNode({
+    // To raise errors at compile time when using TypeScript,
+    // you can get the node kind from the catalog like this.
     kind: coreNodes.mathSin.kind,
   });
 
@@ -21,7 +23,7 @@ async function runGraph() {
   dflow.connect(numNode).to(sinNode);
 
   // Run graph.
-  await dflow.run();
+  dflow.run();
 
   // Get sinNode output.
   const sin = sinNode.output(0);

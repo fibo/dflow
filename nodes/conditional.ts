@@ -1,30 +1,17 @@
-import { DflowHost, DflowNode, DflowSerializedNode } from "../engine.ts";
+import { DflowNode } from "../engine.ts";
 
-class DflowIf extends DflowNode {
+class DflowIf extends DflowNode.Task {
   static kind = "if";
+  static inputs = [
+    ...DflowNode.in(["boolean"], { name: "condition" }),
+    ...DflowNode.in([], { name: "then" }),
+    ...DflowNode.in([], { name: "else" }),
+  ];
+  static outputs = DflowNode.out();
+  task() {
+    const condition = this.input(0).data;
 
-  constructor(arg: DflowSerializedNode, host: DflowHost) {
-    super({
-      ...arg,
-      inputs: [{ id: "i1", name: "condition", types: ["boolean"] }, {
-        id: "i2",
-        name: "then",
-      }, { id: "i3", name: "else" }],
-      outputs: [{ id: "o1" }],
-    }, host);
-  }
-
-  run() {
-    const conditionData = this.input(0).data;
-    const thenData = this.input(1).data;
-    const elseData = this.input(2).data;
-    const output = this.output(0);
-
-    if (conditionData) {
-      output.data = thenData;
-    } else {
-      output.data = elseData;
-    }
+    return condition ? this.input(1).data : this.input(2).data;
   }
 }
 
