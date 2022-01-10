@@ -7,7 +7,7 @@ Install [Deno](https://deno.land/).
 With [https://www.npmjs.com/] install the following packages globally:
 
 ```bash
-npm install esbuild npm-run-all -g
+npm install esbuild serve -g
 ```
 
 ## scripts
@@ -15,4 +15,7 @@ npm install esbuild npm-run-all -g
 - Run tests: `npm run test` ...ehm or, you know, just `npm t`
 - Format code: `npm run fmt`
 - Lint code: `npm run lint`
-- Generate code bundles: `npm run bundle`
+- Generate code bundles:
+  1. `npm run bundle:dflow`
+  2. `npm run bundle:engine`
+

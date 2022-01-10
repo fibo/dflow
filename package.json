@@ -17,16 +17,14 @@
   },
   "license": "MIT",
   "scripts": {
-    "bundle": "run-p bundle:*",
     "bundle:dflow": "deno bundle dflow.ts | esbuild --minify --target=safari11 > dflow.js",
     "bundle:engine": "deno bundle engine.ts | esbuild --minify --target=safari11 > engine.js",
+    "example:abstract": "deno run examples/abstract.js",
+    "example:usage": "deno run examples/usage.js",
     "fmt": "deno fmt --ignore=./dflow.js,./engine.js",
     "lint": "deno lint --ignore=./dflow.js,./engine.js",
-    "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
-    "test": "run-s test:*",
-    "test:deno": "deno test --unstable --importmap=import_map.json",
-    "test:example:abstract": "deno run examples/abstract.js",
-    "test:example:usage": "deno run examples/usage.js"
+    "start": "serve",
+    "test": "deno test --unstable --importmap=import_map.json"
   },
   "repository": {
     "type": "git",
