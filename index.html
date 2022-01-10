@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:;base64,=">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, minimum-scale=1.0, maximum-scale=2.0" />
+
+  <title>flow-view</title>
+  <meta name="description" content="is a minimal Dataflow programming engine">
+
+  <style>
+    .container {
+      max-width: 800px;
+      height: 500px;
+    }
+  </style>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>dflow</h1>
+
+    <blockquote>is a minimal <em>Dataflow programming</em> engine</blockquote>
+
+    <div class="container">
+      <flow-view id="element"></flow-view>
+    </div>
+  </main>
+
+  <script type="module">
+    import { FlowView } from 'https://unpkg.com/flow-view@5.2.0';
+
+    const flowView = new FlowView({
+      element: document.getElementById('element'),
+      nodes: [
+        {
+          label: 'addition',
+          inputs: [
+            { name: 'in1', types: ['number'] },
+            { name: 'in2', types: ['number'] }
+          ],
+          outputs: [
+            { name: 'out', types: ['number'] }
+          ]
+        },
+        {
+          label: 'number',
+          inputs: [],
+          outputs: [
+            { name: 'out', types: ['number'] }
+          ]
+        }
+      ]
+    });
+
+    flowView.loadGraph({
+      nodes: [
+        {
+          id: 'a',
+          label: 'number',
+          x: 60, y: 70,
+          outputs: [ { id: 'ao1' } ]
+        },
+        {
+          id: 'b',
+          label: 'addition',
+          x: 60, y: 240,
+          inputs: [ { id: 'bi1' }, { id: 'bi2' } ],
+          outputs: [ { id: 'bo1' } ]
+        }
+      ],
+      edges: [
+        { from: ['a', 'ao1'], to: ['b', 'bi1'] },
+        { from: ['a', 'ao1'], to: ['b', 'bi2'] },
+      ]
+    });
+  </script>
+
+  <footer>
+    GitHub: <a href="https://github.com/fibo/dflow">fibo/dflow</a>
+  </footer>
+</body>
+</html>
