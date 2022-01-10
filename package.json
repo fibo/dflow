@@ -18,8 +18,8 @@
   "license": "MIT",
   "scripts": {
     "bundle": "run-p bundle:*",
-    "bundle:dflow": "deno bundle dflow.ts | esbuild --minify > dflow.js",
-    "bundle:engine": "deno bundle engine.ts | esbuild --minify > engine.js",
+    "bundle:dflow": "deno bundle dflow.ts | esbuild --minify --target=safari11 > dflow.js",
+    "bundle:engine": "deno bundle engine.ts | esbuild --minify --target=safari11 > engine.js",
     "fmt": "deno fmt --ignore=./dflow.js,./engine.js",
     "lint": "deno lint --ignore=./dflow.js,./engine.js",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
