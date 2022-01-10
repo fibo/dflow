@@ -51,39 +51,6 @@ export class DflowFunction extends DflowNode {
   }
 }
 
-export class DflowFunctionCall extends DflowNode {
-  static kind = "functionCall";
-  static inputs = [
-    ...DflowNode.in(["DflowId"], { name: "functionId" }),
-    ...DflowNode.in([], { name: "argument0" }),
-  ];
-  static outputs = DflowNode.out();
-  run() {
-    const functionId = this.input(0).data;
-
-    const args = [];
-    for (let i = 1; i < this.numInputs; i++) {
-      const arg = this.input(i).data;
-      if (DflowData.isUndefined(arg)) {
-        break;
-      } else {
-        args.push(arg);
-      }
-    }
-
-    if (DflowData.isDflowId(functionId)) {
-      try {
-        this.output(0).data = this.host.executeFunction(
-          functionId as DflowId,
-          args as DflowArray,
-        );
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
-}
-
 class DflowReturn extends DflowNode {
   static kind = "return";
   static isConstant = true;
@@ -98,7 +65,6 @@ export const catalog = {
   [DflowArgument.kind]: DflowArgument,
   [DflowComment.kind]: DflowComment,
   [DflowFunction.kind]: DflowFunction,
-  [DflowFunctionCall.kind]: DflowFunctionCall,
   [DflowReturn.kind]: DflowReturn,
   [DflowTypeNumber.kind]: DflowTypeNumber,
 };
