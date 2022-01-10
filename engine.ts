@@ -1,7 +1,6 @@
 export type DflowId = string;
 export type DflowNewItem<Item> = Omit<Item, "id"> & { id?: DflowId };
 
-export type DflowNodeKind = string;
 export type DflowNodeMetadata = {
   label?: string;
   isAsync?: boolean;
@@ -35,18 +34,20 @@ export type DflowValue =
   | DflowObject
   | DflowSerializedGraph;
 
-export type DflowNodesCatalog = Record<DflowNodeKind, typeof DflowNode>;
+export type DflowNodesCatalog = Record<DflowNode["kind"], typeof DflowNode>;
 
 export type DflowSerializedItem = {
   id: DflowId;
   name?: string;
 };
 
-export type DflowSerializedNode = DflowSerializedItem & {
-  kind: DflowNodeKind;
-  inputs?: DflowSerializedInput[];
-  outputs?: DflowSerializedOutput[];
-};
+export type DflowSerializedNode =
+  & DflowSerializedItem
+  & Pick<DflowNode, "kind">
+  & {
+    inputs?: DflowSerializedInput[];
+    outputs?: DflowSerializedOutput[];
+  };
 
 export type DflowSerializedPin = DflowSerializedItem & {
   types?: DflowPinType[];
@@ -1136,7 +1137,7 @@ export class DflowHost {
     }
   }
 
-  async executeFunction(functionId: DflowId, args: DflowArray) {
+  executeFunction(functionId: DflowId, args: DflowArray) {
     // Get all return nodes connected to function node.
     const nodeConnections = this.#graph.nodeConnections;
     const childrenNodeIds = DflowGraph.childrenOfNodeId(
@@ -1172,12 +1173,11 @@ export class DflowHost {
     // 3. if if is a return node, output data
     // 4. otherwise run node
     const nodeIds = DflowGraph.sort(
-      nodeIdsInsideFunction,
+      [...returnNodeIds, ...nodeIdsInsideFunction],
       nodeConnections,
     );
     for (const nodeId of nodeIds) {
       const node = this.getNodeById(nodeId);
-
       try {
         switch (node.kind) {
           case "argument": {
@@ -1189,12 +1189,8 @@ export class DflowHost {
             return node.input(1).data;
           }
           default: {
-            if (node.meta.isConstant === false) {
-              if (node.meta.isAsync) {
-                await node.run();
-              } else {
-                node.run();
-              }
+            if (!node.meta.isConstant) {
+              node.run();
             }
           }
         }
