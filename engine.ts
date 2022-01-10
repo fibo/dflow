@@ -1173,12 +1173,11 @@ export class DflowHost {
     // 3. if if is a return node, output data
     // 4. otherwise run node
     const nodeIds = DflowGraph.sort(
-      nodeIdsInsideFunction,
+      [...returnNodeIds, ...nodeIdsInsideFunction],
       nodeConnections,
     );
     for (const nodeId of nodeIds) {
       const node = this.getNodeById(nodeId);
-
       try {
         switch (node.kind) {
           case "argument": {
@@ -1190,7 +1189,7 @@ export class DflowHost {
             return node.input(1).data;
           }
           default: {
-            if (node.meta.isConstant === false) {
+            if (!node.meta.isConstant) {
               node.run();
             }
           }

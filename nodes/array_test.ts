@@ -13,24 +13,23 @@ Deno.test(catalog.arrayFilter.kind, () => {
   const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
   const typeNumNode = dflow.newNode({ kind: catalog.typeNumber.kind });
   const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
-  const greaterThenNode = dflow.newNode({ kind: catalog.greaterThan.kind });
+  const greaterThanNode = dflow.newNode({ kind: catalog.greaterThan.kind });
   const returnNode = dflow.newNode({ kind: catalog.return.kind });
   const functionNode = dflow.newNode({ kind: catalog.function.kind });
 
   dataNode.output(0).data = [1, 2, 3, 4, 5, 6, 7];
-  numNode.output(0).data = 4;
 
   dflow.connect(functionNode).to(returnNode);
-  dflow.connect(greaterThenNode).to(returnNode, 1);
+  dflow.connect(greaterThanNode).to(returnNode, 1);
   dflow.connect(typeNumNode).to(argumentNode);
-  dflow.connect(argumentNode).to(greaterThenNode, 0);
-  dflow.connect(numNode).to(greaterThenNode, 1);
+  dflow.connect(argumentNode).to(greaterThanNode, 0);
+  dflow.connect(numNode).to(greaterThanNode, 1);
   dflow.connect(dataNode).to(testNode);
   dflow.connect(functionNode).to(testNode, 1);
 
   dflow.run();
 
-  assertArrayIncludes(testNode.output(0).data as DflowArray, [5, 6, 7]);
+  assertArrayIncludes(testNode.output(0).data as DflowArray, [4, 5, 6, 7]);
 });
 
 Deno.test(catalog.arrayLength.kind, () => {
