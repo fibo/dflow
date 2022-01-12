@@ -92,6 +92,28 @@
                 view.outputs[i].text = outputs[i].name;
               }
             }
+          } else {
+            try {
+              const maybeJson = JSON.parse(label)
+              if (typeof maybeJson === 'number') {
+                view.newOutput({});
+              }
+
+              if (typeof maybeJson === 'string') {
+                view.newOutput({});
+              }
+
+              if (typeof maybeJson === 'object') {
+                view.newOutput({});
+                view.label = JSON.stringify(maybeJson);
+
+                if (Array.isArray(maybeJson)) {
+                  view.outputs[0].text = 'array';
+                } else {
+                  view.outputs[0].text = 'object';
+                }
+              }
+            } catch (ignore) {}
           }
         }
 
