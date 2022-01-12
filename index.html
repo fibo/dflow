@@ -5,15 +5,8 @@
   <link rel="icon" href="data:;base64,=">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, minimum-scale=1.0, maximum-scale=2.0" />
 
-  <title>flow-view</title>
+  <title>dflow</title>
   <meta name="description" content="is a minimal Dataflow programming engine">
-
-  <style>
-    .container {
-      max-width: 800px;
-      height: 500px;
-    }
-  </style>
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -24,37 +17,22 @@
     <blockquote>is a minimal <em>Dataflow programming</em> engine</blockquote>
 
     <div class="container">
-      <flow-view id="element"></flow-view>
     </div>
   </main>
 
   <script type="module">
-    import { FlowView } from 'https://unpkg.com/flow-view@5.2.0';
+    import { FlowView } from 'https://unpkg.com/flow-view@5.3.0';
+    import { catalog } from './dflow.js';
 
     const flowView = new FlowView({
-      element: document.getElementById('element'),
-      nodes: [
-        {
-          label: 'addition',
-          inputs: [
-            { name: 'in1', types: ['number'] },
-            { name: 'in2', types: ['number'] }
-          ],
-          outputs: [
-            { name: 'out', types: ['number'] }
-          ]
-        },
-        {
-          label: 'number',
-          inputs: [],
-          outputs: [
-            { name: 'out', types: ['number'] }
-          ]
-        }
-      ]
+      container: document.querySelector('.container')
     });
 
-    flowView.loadGraph({
+    const nodeLabels = Object.keys(catalog);
+
+    flowView.addNodeLabels(nodeLabels);
+
+    const initialGraph = {
       nodes: [
         {
           id: 'a',
@@ -74,7 +52,56 @@
         { from: ['a', 'ao1'], to: ['b', 'bi1'] },
         { from: ['a', 'ao1'], to: ['b', 'bi2'] },
       ]
-    });
+    };
+
+    flowView.onChange(({ action, data }) => {
+      switch(action) {
+        case FlowView.action.CREATE_NODE: {
+          const view = flowView.node(data.id);
+
+          // Make it case insensitive.
+          const label = nodeLabels.find((nodeLabel) => {
+            return (nodeLabel.toLowerCase() === data.label.toLowerCase());
+          }) || data.label;
+          view.label = label;
+
+          // Complete node inputs and outputs.
+          if (nodeLabels.includes(label)) {
+            const NodeClass = catalog[label];
+
+            const { inputs = [], outputs = [] } = NodeClass
+
+            for (let i = 0; i < inputs.length; i++) {
+              if (!view.inputs[i]) {
+                view.newInput({});
+              }
+
+              if (typeof inputs[i].name === 'string') {
+                view.inputs[i].name = inputs[i].name;
+                view.inputs[i].text = inputs[i].name;
+              }
+            }
+
+            for (let i = 0; i < outputs.length; i++) {
+              if (!view.outputs[i]) {
+                view.newOutput({});
+              }
+
+              if (typeof outputs[i].name === 'string') {
+                view.outputs[i].name = outputs[i].name;
+                view.outputs[i].text = outputs[i].name;
+              }
+            }
+          }
+        }
+
+        default: {
+          console.log(action, data);
+        }
+      }
+    })
+
+    flowView.loadGraph(initialGraph);
   </script>
 
   <footer>
