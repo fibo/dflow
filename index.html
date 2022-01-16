@@ -56,7 +56,7 @@
 
     flowView.onChange(({ action, data }) => {
       switch(action) {
-        case FlowView.action.CREATE_NODE: {
+        case "CREATE_NODE": {
           const view = flowView.node(data.id);
 
           // Make it case insensitive.
