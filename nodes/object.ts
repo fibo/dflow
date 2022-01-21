@@ -1,6 +1,6 @@
-import { DflowNode, DflowObject } from "../engine.ts";
+import { DflowNode, DflowNodeUnary, DflowObject } from "../engine.ts";
 
-class DflowObjectKeys extends DflowNode.Task {
+class DflowObjectKeys extends DflowNodeUnary {
   static kind = "objectKeys";
   static inputs = DflowNode.in(["object"]);
   static outputs = DflowNode.out(["array"]);
@@ -9,7 +9,7 @@ class DflowObjectKeys extends DflowNode.Task {
   }
 }
 
-class DflowObjectValues extends DflowNode.Task {
+class DflowObjectValues extends DflowNodeUnary {
   static kind = "objectValues";
   static inputs = DflowNode.in(["object"]);
   static outputs = DflowNode.out(["array"]);

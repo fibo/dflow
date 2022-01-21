@@ -1,6 +1,6 @@
-import { DflowNode } from "../engine.ts";
+import { DflowNode, DflowNodeUnary } from "../engine.ts";
 
-class DflowMathCos extends DflowNode.Task {
+class DflowMathCos extends DflowNodeUnary {
   static kind = "mathCos";
   static inputs = DflowNode.in(["number"]);
   static outputs = DflowNode.out(["number"]);
@@ -9,7 +9,7 @@ class DflowMathCos extends DflowNode.Task {
   }
 }
 
-class DflowMathCosh extends DflowNode.Task {
+class DflowMathCosh extends DflowNodeUnary {
   static kind = "mathCosh";
   static inputs = DflowNode.in(["number"]);
   static outputs = DflowNode.out(["number"]);
@@ -24,7 +24,7 @@ class DflowMathPI extends DflowNode {
   static outputs = DflowNode.out(["number"], { data: Math.PI });
 }
 
-class DflowMathSin extends DflowNode.Task {
+class DflowMathSin extends DflowNodeUnary {
   static kind = "mathSin";
   static inputs = DflowNode.in(["number"]);
   static outputs = DflowNode.out(["number"]);
@@ -33,7 +33,7 @@ class DflowMathSin extends DflowNode.Task {
   }
 }
 
-class DflowMathSinh extends DflowNode.Task {
+class DflowMathSinh extends DflowNodeUnary {
   static kind = "mathSinh";
   static inputs = DflowNode.in(["number"]);
   static outputs = DflowNode.out(["number"]);

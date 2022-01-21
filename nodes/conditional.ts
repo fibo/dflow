@@ -1,6 +1,6 @@
-import { DflowNode } from "../engine.ts";
+import { DflowNode, DflowNodeUnary } from "../engine.ts";
 
-class DflowIf extends DflowNode.Task {
+class DflowIf extends DflowNodeUnary {
   static kind = "if";
   static inputs = [
     ...DflowNode.in(["boolean"], { name: "condition" }),

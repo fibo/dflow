@@ -1,6 +1,6 @@
-import { DflowNode } from "../engine.ts";
+import { DflowNode, DflowNodeUnary } from "../engine.ts";
 
-class DflowLogicAnd extends DflowNode.Task {
+class DflowLogicAnd extends DflowNodeUnary {
   static kind = "and";
   static inputs = DflowNode.ins(2, ["boolean"]);
   static outputs = DflowNode.out(["boolean"]);
@@ -9,7 +9,7 @@ class DflowLogicAnd extends DflowNode.Task {
   }
 }
 
-class DflowLogicNot extends DflowNode.Task {
+class DflowLogicNot extends DflowNodeUnary {
   static kind = "not";
   static inputs = DflowNode.in(["boolean"]);
   static outputs = DflowNode.out(["boolean"]);
@@ -18,7 +18,7 @@ class DflowLogicNot extends DflowNode.Task {
   }
 }
 
-class DflowLogicOr extends DflowNode.Task {
+class DflowLogicOr extends DflowNodeUnary {
   static kind = "or";
   static inputs = DflowNode.ins(2, ["boolean"]);
   static outputs = DflowNode.out(["boolean"]);

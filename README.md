@@ -9,7 +9,7 @@
 - Graphic interface implemented with WebComponents (cooming on late 2021)
 - Core nodes catalog with basic JavaScript features (to be completed)
 - Supports custom nodes, just extending `DflowNode` class or even simpler with
-  `DflowNode.Task`.
+  `DflowNodeUnary`.
 - Can create reusable functions just connecting nodes.
 
 ## Installation

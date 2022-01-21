@@ -1,6 +1,6 @@
-import { DflowNode } from "../engine.ts";
+import { DflowNode, DflowNodeUnary } from "../engine.ts";
 
-class DflowStringLength extends DflowNode.Task {
+class DflowStringLength extends DflowNodeUnary {
   static kind = "stringLength";
   static inputs = DflowNode.in(["string"]);
   static outputs = DflowNode.out(["number"]);
