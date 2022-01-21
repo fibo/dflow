@@ -410,23 +410,6 @@ export class DflowNode extends DflowItem {
   readonly meta: DflowNodeMetadata;
   readonly host: DflowHost;
 
-  static Task = class DflowNodeUnary extends DflowNode {
-    task(): DflowValue {
-      throw new Error(_missingMethod("task", this.kind));
-    }
-
-    run() {
-      for (const { data, types } of this.inputs) {
-        if (DflowData.isUndefined(data) || !DflowData.validate(data, types)) {
-          this.output(0).clear();
-          return;
-        }
-      }
-
-      this.output(0).data = this.task();
-    }
-  };
-
   static kind: string;
   static isAsync?: DflowNodeMetadata["isAsync"];
   static isConstant?: DflowNodeMetadata["isConstant"];
@@ -667,6 +650,23 @@ export class DflowNode extends DflowItem {
     }
 
     return obj;
+  }
+}
+
+export class DflowNodeUnary extends DflowNode {
+  task(): DflowValue {
+    throw new Error(_missingMethod("task", this.kind));
+  }
+
+  run() {
+    for (const { data, types } of this.inputs) {
+      if (DflowData.isUndefined(data) || !DflowData.validate(data, types)) {
+        this.output(0).clear();
+        return;
+      }
+    }
+
+    this.output(0).data = this.task();
   }
 }
 

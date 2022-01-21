@@ -1,9 +1,9 @@
 /**
 [Operators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators)
 */
-import { DflowNode } from "../engine.ts";
+import { DflowNode, DflowNodeUnary } from "../engine.ts";
 
-class DflowAddition extends DflowNode.Task {
+class DflowAddition extends DflowNodeUnary {
   static kind = "addition";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["number"]);
@@ -12,7 +12,7 @@ class DflowAddition extends DflowNode.Task {
   }
 }
 
-class DflowEquality extends DflowNode.Task {
+class DflowEquality extends DflowNodeUnary {
   static kind = "equality";
   static inputs = DflowNode.ins(2);
   static outputs = DflowNode.out(["boolean"]);
@@ -21,7 +21,7 @@ class DflowEquality extends DflowNode.Task {
   }
 }
 
-class DflowLessThan extends DflowNode.Task {
+class DflowLessThan extends DflowNodeUnary {
   static kind = "lessThan";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["boolean"]);
@@ -30,7 +30,7 @@ class DflowLessThan extends DflowNode.Task {
   }
 }
 
-class DflowLessThanOrEqual extends DflowNode.Task {
+class DflowLessThanOrEqual extends DflowNodeUnary {
   static kind = "lessThanOrEqual";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["boolean"]);
@@ -39,7 +39,7 @@ class DflowLessThanOrEqual extends DflowNode.Task {
   }
 }
 
-class DflowGreaterThan extends DflowNode.Task {
+class DflowGreaterThan extends DflowNodeUnary {
   static kind = "greaterThan";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["boolean"]);
@@ -48,7 +48,7 @@ class DflowGreaterThan extends DflowNode.Task {
   }
 }
 
-class DflowGreaterThanOrEqual extends DflowNode.Task {
+class DflowGreaterThanOrEqual extends DflowNodeUnary {
   static kind = "greaterThanOrEqual";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["boolean"]);
@@ -57,7 +57,7 @@ class DflowGreaterThanOrEqual extends DflowNode.Task {
   }
 }
 
-class DflowInequality extends DflowNode.Task {
+class DflowInequality extends DflowNodeUnary {
   static kind = "inequality";
   static inputs = DflowNode.ins(2);
   static outputs = DflowNode.out(["boolean"]);
@@ -66,7 +66,7 @@ class DflowInequality extends DflowNode.Task {
   }
 }
 
-class DflowSubtraction extends DflowNode.Task {
+class DflowSubtraction extends DflowNodeUnary {
   static kind = "subtraction";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["number"]);

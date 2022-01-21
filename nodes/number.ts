@@ -1,6 +1,6 @@
-import { DflowNode } from "../engine.ts";
+import { DflowNode, DflowNodeUnary } from "../engine.ts";
 
-class DflowIsFinite extends DflowNode.Task {
+class DflowIsFinite extends DflowNodeUnary {
   static kind = "isFinite";
   static inputs = DflowNode.in(["number"]);
   static outputs = DflowNode.out(["boolean"]);
@@ -9,7 +9,7 @@ class DflowIsFinite extends DflowNode.Task {
   }
 }
 
-class DflowIsInteger extends DflowNode.Task {
+class DflowIsInteger extends DflowNodeUnary {
   static kind = "isInteger";
   static inputs = DflowNode.in([]);
   static outputs = DflowNode.out(["boolean"]);
@@ -18,7 +18,7 @@ class DflowIsInteger extends DflowNode.Task {
   }
 }
 
-class DflowIsNaN extends DflowNode.Task {
+class DflowIsNaN extends DflowNodeUnary {
   static kind = "isNaN";
   static inputs = DflowNode.in([]);
   static outputs = DflowNode.out(["boolean"]);
@@ -28,7 +28,7 @@ class DflowIsNaN extends DflowNode.Task {
   }
 }
 
-class DflowParseFloat extends DflowNode.Task {
+class DflowParseFloat extends DflowNodeUnary {
   static kind = "parseFloat";
   static inputs = DflowNode.in(["string"]);
   static outputs = DflowNode.out(["number"]);
@@ -37,7 +37,7 @@ class DflowParseFloat extends DflowNode.Task {
   }
 }
 
-class DflowParseInt extends DflowNode.Task {
+class DflowParseInt extends DflowNodeUnary {
   static kind = "parseInt";
   static inputs = DflowNode.in(["number", "string"]);
   static outputs = DflowNode.out(["number"]);

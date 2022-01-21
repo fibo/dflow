@@ -1,10 +1,4 @@
-import {
-  DflowArray,
-  DflowData,
-  DflowId,
-  DflowNode,
-  DflowPinType,
-} from "../engine.ts";
+import { DflowNode, DflowPinType } from "../engine.ts";
 
 class Dflow extends DflowNode {
   static kind = "dflow";
