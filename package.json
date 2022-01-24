@@ -5,7 +5,6 @@
   "homepage": "http://g14n.info/dflow",
   "type": "module",
   "exports": "./dflow.js",
-  "types": "engine.ts",
   "funding": "https://github.com/sponsors/fibo",
   "engines": {
     "node": ">=14",
@@ -17,12 +16,12 @@
   },
   "license": "MIT",
   "scripts": {
-    "bundle:dflow": "deno bundle dflow.ts | esbuild --minify --target=safari11 > dflow.js",
-    "bundle:engine": "deno bundle engine.ts | esbuild --minify --target=safari11 > engine.js",
+    "bundle": "deno bundle dflow.ts | esbuild --minify --target=safari11 > dflow.js",
     "example:abstract": "deno run examples/abstract.js",
     "example:usage": "deno run examples/usage.js",
-    "fmt": "deno fmt --ignore=./dflow.js,./engine.js",
-    "lint": "deno lint --ignore=./dflow.js,./engine.js",
+    "fmt": "deno fmt --ignore=./dflow.js",
+    "generate_types": "tsc --project ./tsconfig.declarations.json; mv engine.d.ts index.d.ts; echo 'export const catalog: DflowNodesCatalog;' >> index.d.ts",
+    "lint": "deno lint --ignore=./dflow.js",
     "start": "serve",
     "test": "deno test --unstable --importmap=import_map.json"
   },

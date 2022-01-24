@@ -72,24 +72,28 @@
             const { inputs = [], outputs = [] } = NodeClass
 
             for (let i = 0; i < inputs.length; i++) {
+              const name = inputs[i].name;
+
               if (!view.inputs[i]) {
                 view.newInput({});
               }
 
-              if (typeof inputs[i].name === 'string') {
-                view.inputs[i].name = inputs[i].name;
-                view.inputs[i].text = inputs[i].name;
+              if (typeof name === 'string') {
+                view.inputs[i].name = name;
+                view.inputs[i].text = name;
               }
             }
 
             for (let i = 0; i < outputs.length; i++) {
+              const name = outputs[i].name;
+
               if (!view.outputs[i]) {
                 view.newOutput({});
               }
 
-              if (typeof outputs[i].name === 'string') {
-                view.outputs[i].name = outputs[i].name;
-                view.outputs[i].text = outputs[i].name;
+              if (typeof name === 'string') {
+                view.outputs[i].name = name;
+                view.outputs[i].text = name;
               }
             }
           } else {
