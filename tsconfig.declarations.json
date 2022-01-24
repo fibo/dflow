@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "es2019"],
+    "target": "es6",
+    "module": "es6",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "strict": true
+  },
+  "files": [
+    "engine.ts"
+  ]
+}

@@ -16,5 +16,5 @@ npm install esbuild serve -g
 - Format code: `npm run fmt`
 - Lint code: `npm run lint`
 - Generate code bundles:
-  1. `npm run bundle:dflow`
-  2. `npm run bundle:engine`
+  1. `npm run bundle`
+  2. `npm run generate_types`
