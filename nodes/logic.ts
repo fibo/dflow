@@ -1,29 +1,29 @@
-import { DflowNode, DflowNodeUnary } from "../engine.ts";
+import { DflowNode } from "../engine.ts";
 
-class DflowLogicAnd extends DflowNodeUnary {
+class DflowLogicAnd extends DflowNode {
   static kind = "and";
   static inputs = DflowNode.ins(2, ["boolean"]);
   static outputs = DflowNode.out(["boolean"]);
-  task() {
-    return this.input(0).data && this.input(1).data;
+  run() {
+    this.output(0).data = this.input(0).data && this.input(1).data;
   }
 }
 
-class DflowLogicNot extends DflowNodeUnary {
+class DflowLogicNot extends DflowNode {
   static kind = "not";
   static inputs = DflowNode.in(["boolean"]);
   static outputs = DflowNode.out(["boolean"]);
-  task() {
-    return !this.input(0).data;
+  run() {
+    this.output(0).data = !this.input(0).data;
   }
 }
 
-class DflowLogicOr extends DflowNodeUnary {
+class DflowLogicOr extends DflowNode {
   static kind = "or";
   static inputs = DflowNode.ins(2, ["boolean"]);
   static outputs = DflowNode.out(["boolean"]);
-  task() {
-    return this.input(0).data || this.input(1).data;
+  run() {
+    this.output(0).data = this.input(0).data || this.input(1).data;
   }
 }
 

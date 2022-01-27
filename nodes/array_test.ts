@@ -1,4 +1,4 @@
-import { assertArrayIncludes } from "std/testing/asserts.ts";
+import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
 
 import { DflowArray, DflowHost } from "../engine.ts";
 import { testOneArrInOneNumOut } from "./_test-utils.ts";
@@ -29,7 +29,11 @@ Deno.test(catalog.arrayFilter.kind, () => {
 
   dflow.run();
 
-  assertArrayIncludes(testNode.output(0).data as DflowArray, [4, 5, 6, 7]);
+  const expected = [4, 5, 6, 7];
+  const result = testNode.output(0).data as DflowArray;
+
+  assertArrayIncludes(result, expected);
+  assertEquals(result.length, expected.length);
 });
 
 Deno.test(catalog.arrayLength.kind, () => {

@@ -1,77 +1,83 @@
 /**
 [Operators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators)
 */
-import { DflowNode, DflowNodeUnary } from "../engine.ts";
+import { DflowNode } from "../engine.ts";
 
-class DflowAddition extends DflowNodeUnary {
+class DflowAddition extends DflowNode {
   static kind = "addition";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["number"]);
-  task() {
-    return (this.input(0).data as number) + (this.input(1).data as number);
+  run() {
+    this.output(0).data = (this.input(0).data as number) +
+      (this.input(1).data as number);
   }
 }
 
-class DflowEquality extends DflowNodeUnary {
+class DflowEquality extends DflowNode {
   static kind = "equality";
   static inputs = DflowNode.ins(2);
   static outputs = DflowNode.out(["boolean"]);
-  task() {
-    return this.input(0).data == this.input(1).data;
+  run() {
+    this.output(0).data = this.input(0).data == this.input(1).data;
   }
 }
 
-class DflowLessThan extends DflowNodeUnary {
+class DflowLessThan extends DflowNode {
   static kind = "lessThan";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["boolean"]);
-  task() {
-    return (this.input(0).data as number) < (this.input(1).data as number);
+  run() {
+    this.output(0).data =
+      (this.input(0).data as number) < (this.input(1).data as number);
   }
 }
 
-class DflowLessThanOrEqual extends DflowNodeUnary {
+class DflowLessThanOrEqual extends DflowNode {
   static kind = "lessThanOrEqual";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["boolean"]);
-  task() {
-    return (this.input(0).data as number) <= (this.input(1).data as number);
+  run() {
+    this.output(0).data =
+      (this.input(0).data as number) <= (this.input(1).data as number);
   }
 }
 
-class DflowGreaterThan extends DflowNodeUnary {
+class DflowGreaterThan extends DflowNode {
   static kind = "greaterThan";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["boolean"]);
-  task() {
-    return (this.input(0).data as number) > (this.input(1).data as number);
+  run() {
+    this.output(0).data =
+      (this.input(0).data as number) > (this.input(1).data as number);
   }
 }
 
-class DflowGreaterThanOrEqual extends DflowNodeUnary {
+class DflowGreaterThanOrEqual extends DflowNode {
   static kind = "greaterThanOrEqual";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["boolean"]);
-  task() {
-    return (this.input(0).data as number) >= (this.input(1).data as number);
+  run() {
+    this.output(0).data =
+      (this.input(0).data as number) >= (this.input(1).data as number);
   }
 }
 
-class DflowInequality extends DflowNodeUnary {
+class DflowInequality extends DflowNode {
   static kind = "inequality";
   static inputs = DflowNode.ins(2);
   static outputs = DflowNode.out(["boolean"]);
-  task() {
-    return this.input(0).data != this.input(1).data;
+  run() {
+    this.output(0).data = this.input(0).data != this.input(1).data;
   }
 }
 
-class DflowSubtraction extends DflowNodeUnary {
+class DflowSubtraction extends DflowNode {
   static kind = "subtraction";
   static inputs = DflowNode.ins(2, ["number"]);
   static outputs = DflowNode.out(["number"]);
-  task() {
-    return (this.input(0).data as number) - (this.input(1).data as number);
+  run() {
+    this.output(0).data = (this.input(0).data as number) -
+      (this.input(1).data as number);
   }
 }
 

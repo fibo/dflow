@@ -1,20 +1,20 @@
-import { DflowNode, DflowNodeUnary, DflowObject } from "../engine.ts";
+import { DflowNode, DflowObject } from "../engine.ts";
 
-class DflowObjectKeys extends DflowNodeUnary {
+class DflowObjectKeys extends DflowNode {
   static kind = "objectKeys";
   static inputs = DflowNode.in(["object"]);
   static outputs = DflowNode.out(["array"]);
-  task() {
-    return Object.keys(this.input(0).data as DflowObject);
+  run() {
+    this.output(0).data = Object.keys(this.input(0).data as DflowObject);
   }
 }
 
-class DflowObjectValues extends DflowNodeUnary {
+class DflowObjectValues extends DflowNode {
   static kind = "objectValues";
   static inputs = DflowNode.in(["object"]);
   static outputs = DflowNode.out(["array"]);
-  task() {
-    return Object.values(this.input(0).data as DflowObject);
+  run() {
+    this.output(0).data = Object.values(this.input(0).data as DflowObject);
   }
 }
 

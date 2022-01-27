@@ -99,16 +99,20 @@
           } else {
             try {
               const maybeJson = JSON.parse(label)
-              if (typeof maybeJson === 'number') {
+
+              if (view.outputs.length === 0) {
                 view.newOutput({});
+              }
+
+              if (typeof maybeJson === 'number') {
+                view.outputs[0].text = 'number';
               }
 
               if (typeof maybeJson === 'string') {
-                view.newOutput({});
+                view.outputs[0].text = 'string';
               }
 
               if (typeof maybeJson === 'object') {
-                view.newOutput({});
                 view.label = JSON.stringify(maybeJson);
 
                 if (Array.isArray(maybeJson)) {
