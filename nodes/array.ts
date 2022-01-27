@@ -1,26 +1,26 @@
-import { DflowArray, DflowId, DflowNode, DflowNodeUnary } from "../engine.ts";
+import { DflowArray, DflowId, DflowNode } from "../engine.ts";
 
-class DflowArrayFilter extends DflowNodeUnary {
+class DflowArrayFilter extends DflowNode {
   static kind = "arrayFilter";
   static inputs = [
     ...DflowNode.in(["array"]),
     ...DflowNode.in(["DflowId"], { name: "functionId" }),
   ];
   static outputs = DflowNode.out(["array"]);
-  task() {
-    return (this.input(0).data as DflowArray).filter(
+  run() {
+    this.output(0).data = (this.input(0).data as DflowArray).filter(
       (...args) =>
         this.host.executeFunction(this.input(1).data as DflowId, args),
     );
   }
 }
 
-class DflowArrayLength extends DflowNodeUnary {
+class DflowArrayLength extends DflowNode {
   static kind = "arrayLength";
   static inputs = DflowNode.in(["array"]);
   static outputs = DflowNode.out(["number"]);
-  task() {
-    return (this.input(0).data as DflowArray).length;
+  run() {
+    this.output(0).data = (this.input(0).data as DflowArray).length;
   }
 }
 

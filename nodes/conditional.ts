@@ -1,6 +1,6 @@
-import { DflowNode, DflowNodeUnary } from "../engine.ts";
+import { DflowNode } from "../engine.ts";
 
-class DflowIf extends DflowNodeUnary {
+class DflowIf extends DflowNode {
   static kind = "if";
   static inputs = [
     ...DflowNode.in(["boolean"], { name: "condition" }),
@@ -8,10 +8,10 @@ class DflowIf extends DflowNodeUnary {
     ...DflowNode.in([], { name: "else" }),
   ];
   static outputs = DflowNode.out();
-  task() {
-    const condition = this.input(0).data;
-
-    return condition ? this.input(1).data : this.input(2).data;
+  run() {
+    this.output(0).data = this.input(0).data
+      ? this.input(1).data
+      : this.input(2).data;
   }
 }
 

@@ -653,23 +653,6 @@ export class DflowNode extends DflowItem {
   }
 }
 
-export class DflowNodeUnary extends DflowNode {
-  task(): DflowValue {
-    throw new Error(_missingMethod("task", this.kind));
-  }
-
-  run() {
-    for (const { data, types } of this.inputs) {
-      if (DflowData.isUndefined(data) || !DflowData.validate(data, types)) {
-        this.output(0).clear();
-        return;
-      }
-    }
-
-    this.output(0).data = this.task();
-  }
-}
-
 export class DflowUnknownNode extends DflowNode {
   static kind = "Unknown";
 
@@ -974,6 +957,22 @@ export class DflowGraph extends DflowItem {
 
       try {
         if (node.meta.isConstant === false) {
+          let someInputIsNotValid = false;
+
+          for (const { data, types } of node.inputs) {
+            if (!DflowData.validate(data, types)) {
+              someInputIsNotValid = true;
+              break;
+            }
+          }
+
+          if (someInputIsNotValid) {
+            for (const output of node.outputs) {
+              output.clear();
+            }
+            break;
+          }
+
           if (node.meta.isAsync) {
             await node.run();
           } else {
