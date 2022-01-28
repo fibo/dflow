@@ -217,6 +217,7 @@ export declare class DflowGraph extends DflowItem {
 }
 export declare class DflowHost {
     #private;
+    readonly context: Record<string, unknown>;
     constructor(nodesCatalog?: DflowNodesCatalog);
     get edges(): IterableIterator<DflowEdge>;
     get nodes(): IterableIterator<DflowNode>;
