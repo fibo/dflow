@@ -18,6 +18,7 @@
   "scripts": {
     "bundle": "deno bundle dflow.ts | esbuild --minify --target=safari11 > dflow.js",
     "example:abstract": "deno run examples/abstract.js",
+    "example:context": "deno run examples/context.ts",
     "example:usage": "deno run examples/usage.js",
     "fmt": "deno fmt --ignore=./dflow.js",
     "generate_types": "tsc --project ./tsconfig.declarations.json; mv engine.d.ts index.d.ts; echo 'export const catalog: DflowNodesCatalog;' >> index.d.ts",

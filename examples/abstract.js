@@ -36,13 +36,7 @@ function sleep(seconds = 1) {
 
 class SleepNode extends DflowNode {
   kind = "Sleep";
-  static meta = {
-    isAsync: true,
-  };
-
-  constructor(serializedNode) {
-    super(serializedNode, SleepNode.meta);
-  }
+  static isAsync = true
 
   async run() {
     console.log("sleep node start");
