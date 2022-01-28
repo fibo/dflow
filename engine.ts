@@ -1012,10 +1012,14 @@ export class DflowGraph extends DflowItem {
 export class DflowHost {
   readonly #graph;
   readonly #nodesCatalog: DflowNodesCatalog;
+  readonly context: Record<string, unknown>;
 
-  constructor(nodesCatalog: DflowNodesCatalog = {}) {
+  constructor(
+    nodesCatalog: DflowNodesCatalog = {},
+  ) {
     this.#nodesCatalog = nodesCatalog;
     this.#graph = new DflowGraph({ id: "g1" });
+    this.context = {};
   }
 
   get edges() {
