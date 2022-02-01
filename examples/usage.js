@@ -1,30 +1,32 @@
 // keep in sync with readme
-import { catalog as corenodes, dflowhost } from "../dflow.js";
+import { catalog as coreNodes, DflowHost } from "../dflow.js";
 
 function rungraph() {
   // use builtin nodes
-  const dflow = new dflowhost(corenodes);
+  const dflow = new DflowHost(coreNodes);
 
   // create nodes
-  const numnode = dflow.newnode({
+  const numNode = dflow.newNode({
     kind: "number",
   });
-  const sinnode = dflow.newnode({
-    kind: corenodes.mathsin.kind,
+  const sinNode = dflow.newNode({
+    kind: coreNodes.mathSin.kind,
   });
-  const consolelognode = dflow.newnode({
-    kind: corenodes.consolelog.kind,
+  const consoleLogNode = dflow.newNode({
+    kind: coreNodes.consoleLog.kind,
   });
 
-  // set numnode output to π / 2
-  numnode.output(0).data = math.pi / 2;
+  // set numNode output to π / 2
+  numNode.output(0).data = Math.PI / 2;
 
-  // connect numnode to sinnode and sinnode to consolelog
-  dflow.connect(numnode).to(sinnode);
-  dflow.connect(sinnode).to(consolelognode);
+  // connect numNode to sinNode and sinNode to consoleLog
+  dflow.connect(numNode).to(sinNode);
+  dflow.connect(sinNode).to(consoleLogNode);
 
   // run graph
   dflow.run();
+
+  console.log(dflow.executionReport)
 }
 
 rungraph();

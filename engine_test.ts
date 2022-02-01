@@ -13,7 +13,7 @@ import {
   DflowNode,
   DflowOutput,
   DflowPinType,
-  DflowSerializedNode,
+  DflowSerializableNode,
   DflowValue,
 } from "./engine.ts";
 
@@ -63,7 +63,7 @@ class SleepNode extends DflowNode {
   static kind = "Sleep";
   static isAsync = true;
 
-  constructor(arg: DflowSerializedNode, host: DflowHost) {
+  constructor(arg: DflowSerializableNode, host: DflowHost) {
     super(arg, host, { isAsync: SleepNode.isAsync });
   }
 
@@ -292,7 +292,7 @@ Deno.test("DflowGraph.ancestorsOfNodeId", () => {
 
 Deno.test("new DflowHost has an empty graph", () => {
   const dflow = new DflowHost();
-  assertObjectMatch(JSON.parse(dflow.toJSON()), { nodes: [], edges: [] });
+  assertObjectMatch(dflow.toObject(), { nodes: [], edges: [] });
 });
 
 Deno.test("DflowHost#clearGraph()", () => {
