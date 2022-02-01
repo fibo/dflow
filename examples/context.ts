@@ -22,9 +22,8 @@ class ApiClient {
 class CustomNode extends DflowNode {
   static kind = "Custom";
   static isAsync = true;
-  static outputs = [
-    ...DflowNode.out(["string"]),
-  ];
+  static inputs = [...DflowNode.in(["string"])];
+  static outputs = [...DflowNode.out(["number"])];
 
   async run() {
     const apiClient = this.host.context.apiClient;
