@@ -28,7 +28,10 @@ class DflowTypeNumber extends DflowNode {
 class DflowArgument extends DflowNode {
   static kind = "argument";
   static isConstant = true;
-  static inputs = [...DflowNode.in(["DflowType"], { name: "type" })];
+  static inputs = [
+    ...DflowNode.in(["DflowType"], { name: "type" }),
+    ...DflowNode.in(["number"], { name: "argumentPosition" }),
+  ];
   static outputs = DflowNode.out();
   onBeforeConnectInput(sourceNode: DflowNode, sourcePosition: number) {
     const pinType = sourceNode.output(sourcePosition).data as DflowPinType;

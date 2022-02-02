@@ -42,3 +42,36 @@ Deno.test(catalog.arrayLength.kind, () => {
     testOneArrInOneNumOut(nodeKind, input, input.length);
   });
 });
+
+Deno.test(catalog.arrayMap.kind, () => {
+  const nodeKind = catalog.arrayMap.kind;
+
+  const dflow = new DflowHost(catalog);
+  const testNode = dflow.newNode({ kind: nodeKind });
+  const dataNode = dflow.newNode({ kind: catalog.array.kind });
+  const numNode = dflow.newNode({ kind: catalog.number.kind });
+  const typeNumNode = dflow.newNode({ kind: catalog.typeNumber.kind });
+  const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
+  const additionNode = dflow.newNode({ kind: catalog.addition.kind });
+  const returnNode = dflow.newNode({ kind: catalog.return.kind });
+  const functionNode = dflow.newNode({ kind: catalog.function.kind });
+
+  numNode.output(0).data = 1;
+  dataNode.output(0).data = [1, 2, 3, 4];
+
+  dflow.connect(functionNode).to(returnNode);
+  dflow.connect(additionNode).to(returnNode, 1);
+  dflow.connect(typeNumNode).to(argumentNode);
+  dflow.connect(argumentNode).to(additionNode, 0);
+  dflow.connect(numNode).to(additionNode, 1);
+  dflow.connect(dataNode).to(testNode);
+  dflow.connect(functionNode).to(testNode, 1);
+
+  dflow.run();
+
+  const expected = [2, 3, 4, 5];
+  const result = testNode.output(0).data as DflowArray;
+
+  assertArrayIncludes(result, expected);
+  assertEquals(result.length, expected.length);
+});

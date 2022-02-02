@@ -24,7 +24,23 @@ class DflowArrayLength extends DflowNode {
   }
 }
 
+class DflowArrayMap extends DflowNode {
+  static kind = "arrayMap";
+  static inputs = [
+    ...DflowNode.in(["array"]),
+    ...DflowNode.in(["DflowId"], { name: "functionId" }),
+  ];
+  static outputs = DflowNode.out(["array"]);
+  run() {
+    this.output(0).data = (this.input(0).data as DflowArray).map(
+      (...args) =>
+        this.host.executeFunction(this.input(1).data as DflowId, args),
+    );
+  }
+}
+
 export const catalog = {
   [DflowArrayFilter.kind]: DflowArrayFilter,
   [DflowArrayLength.kind]: DflowArrayLength,
+  [DflowArrayMap.kind]: DflowArrayMap,
 };

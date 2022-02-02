@@ -21,11 +21,16 @@ export type DflowPinType =
 
 export type DflowRunStatus = "waiting" | "success" | "failure";
 
+type DflowExecutionNodeInfo = Pick<
+  DflowSerializableNode,
+  "id" | "kind" | "outputs"
+>;
+
 export type DflowExecutionReport = {
   status: DflowRunStatus;
   start: Date;
   end?: Date;
-  steps?: DflowSerializableNode[];
+  steps?: DflowExecutionNodeInfo[];
 };
 
 // Inspiration from https://github.com/sindresorhus/type-fest/blob/main/source/basic.d.ts
@@ -86,11 +91,9 @@ export type DflowNewNode = DflowNewItem<DflowSerializableNode>;
 
 export type DflowNodeConnections = { sourceId: DflowId; targetId: DflowId }[];
 
-export type DflowRunOptions = { verbose?: boolean };
+type DflowRunOptions = { verbose: boolean };
 
 const _missingString = (stringName: string) => `${stringName} must be a string`;
-const _missingMethod = (methodName: string, nodeKind: string) =>
-  `unimplemented method ${methodName} nodeKind=${nodeKind}`;
 const _missingNumber = (numberName: string) => `${numberName} must be a number`;
 const _missingPin = (nodeId: DflowId, kind: DflowPinKind) =>
   `${kind} pin not found nodeId=${nodeId}`;
@@ -101,6 +104,12 @@ const _missingPinAtPosition = (
 ) => `${_missingPin(nodeId, kind)} position=${position}`;
 const _missingPinById = (nodeId: DflowId, kind: DflowPinKind, pinId: DflowId) =>
   `${_missingPin(nodeId, kind)} pinId=${pinId}`;
+
+const _executionNodeInfo = ({ id, kind, outputs }: DflowSerializableNode) => ({
+  id,
+  kind,
+  outputs: outputs?.map(({ id, data }) => ({ id, data })),
+});
 
 export class DflowData {
   static isArray(data: DflowValue) {
@@ -753,10 +762,11 @@ export class DflowEdge extends DflowItem {
 }
 
 export class DflowGraph extends DflowItem {
-  runStatus: DflowRunStatus = "success";
-  executionReport: DflowExecutionReport | null = null;
   readonly #nodes: Map<DflowId, DflowNode> = new Map();
   readonly #edges: Map<DflowId, DflowEdge> = new Map();
+  runOptions: DflowRunOptions = { verbose: false };
+  runStatus: DflowRunStatus | null = null;
+  executionReport: DflowExecutionReport | null = null;
 
   static isDflowGraph(graph: DflowSerializableGraph): boolean {
     return (
@@ -953,11 +963,11 @@ export class DflowGraph extends DflowItem {
     return Array.from(new Set(ancestorsOfReturnNodes.flat()));
   }
 
-  async run({ verbose = false }: DflowRunOptions) {
+  async run() {
+    const { verbose } = this.runOptions;
+
     // Set runStatus to waiting if there was some unhandled error in a previous run.
-    if (this.runStatus === "success") {
-      this.runStatus = "waiting";
-    }
+    this.runStatus = "waiting";
 
     this.executionReport = {
       status: this.runStatus,
@@ -1006,7 +1016,7 @@ export class DflowGraph extends DflowItem {
         }
 
         if (verbose) {
-          this.executionReport.steps?.push({ id: nodeId, kind: node.kind });
+          this.executionReport.steps?.push(_executionNodeInfo(node.toObject()));
         }
       } catch (error) {
         console.error(error);
@@ -1086,6 +1096,10 @@ export class DflowHost {
 
   get runStatusIsFailure() {
     return this.#graph.runStatus === "failure";
+  }
+
+  set verbose(option: DflowRunOptions["verbose"]) {
+    this.#graph.runOptions.verbose = option;
   }
 
   clearGraph() {
@@ -1175,6 +1189,8 @@ export class DflowHost {
   }
 
   executeFunction(functionId: DflowId, args: DflowArray) {
+    const { verbose } = this.#graph.runOptions;
+
     // Get all return nodes connected to function node.
     const nodeConnections = this.#graph.nodeConnections;
     const childrenNodeIds = DflowGraph.childrenOfNodeId(
@@ -1218,7 +1234,11 @@ export class DflowHost {
       try {
         switch (node.kind) {
           case "argument": {
-            const argumentPosition = 0;
+            // argumentPosition default to 0, must be >= 0.
+            const argumentPosition = Math.max(
+              node.input(1).data as number ?? 0,
+              0,
+            );
             node.output(0).data = args[argumentPosition];
             break;
           }
@@ -1228,6 +1248,12 @@ export class DflowHost {
           default: {
             if (!node.meta.isConstant) {
               node.run();
+            }
+
+            if (verbose) {
+              this.executionReport?.steps?.push(
+                _executionNodeInfo(node.toObject()),
+              );
             }
           }
         }
@@ -1307,7 +1333,7 @@ export class DflowHost {
     return this.#graph.toObject();
   }
 
-  async run(options: DflowRunOptions = {}) {
-    await this.#graph.run(options);
+  async run() {
+    await this.#graph.run();
   }
 }
