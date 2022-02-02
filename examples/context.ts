@@ -22,8 +22,7 @@ class ApiClient {
 class CustomNode extends DflowNode {
   static kind = "Custom";
   static isAsync = true;
-  static inputs = [...DflowNode.in(["string"])];
-  static outputs = [...DflowNode.out(["number"])];
+  static outputs = [...DflowNode.out(["string"])];
 
   async run() {
     const apiClient = this.host.context.apiClient;
@@ -40,18 +39,17 @@ const nodesCatalog = {
 
 async function contextExample() {
   const dflow = new DflowHost(nodesCatalog);
+  dflow.verbose = true;
 
   const apiKey = "s3cret";
   const apiClient = new ApiClient(apiKey);
   dflow.context.apiClient = apiClient;
 
-  const node = dflow.newNode({ kind: CustomNode.kind });
-
-  console.log("before", node.output(0).data);
+  dflow.newNode({ kind: CustomNode.kind });
 
   await dflow.run();
 
-  console.log("after", node.output(0).data);
+  console.log(JSON.stringify(dflow.executionReport, null, 2));
 }
 
 contextExample();

@@ -305,7 +305,6 @@ Deno.test("DflowHost#clearGraph()", () => {
 
 Deno.test("DflowHost#runStatusIsSuccess", () => {
   const dflow = new DflowHost();
-  assertEquals(dflow.runStatusIsSuccess, true);
 
   dflow.newNode({ id: "n1", kind: "EmptyNode" });
   dflow.run();

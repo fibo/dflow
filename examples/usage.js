@@ -25,8 +25,6 @@ function rungraph() {
 
   // run graph
   dflow.run();
-
-  console.log(dflow.executionReport)
 }
 
 rungraph();
