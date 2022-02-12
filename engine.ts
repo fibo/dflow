@@ -108,7 +108,7 @@ const _missingPinById = (nodeId: DflowId, kind: DflowPinKind, pinId: DflowId) =>
 const _executionNodeInfo = ({ id, kind, outputs }: DflowSerializableNode) => ({
   id,
   kind,
-  outputs: outputs?.map(({ id, data }) => ({ id, data })),
+  outputs: outputs?.map(({ id, data, name }) => ({ id, data, name })),
 });
 
 export class DflowData {
