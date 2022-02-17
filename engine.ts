@@ -1067,7 +1067,7 @@ export class DflowGraph extends DflowItem {
 }
 
 export class DflowHost {
-  readonly #graph;
+  readonly #graph: DflowGraph;
   readonly #nodesCatalog: DflowNodesCatalog;
   readonly context: Record<string, unknown>;
 

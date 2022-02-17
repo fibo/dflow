@@ -21,7 +21,7 @@ class DflowMathCosh extends DflowNode {
 class DflowMathPI extends DflowNode {
   static kind = "mathPI";
   static isConstant = true;
-  static outputs = DflowNode.out(["number"], { data: Math.PI });
+  static outputs = DflowNode.out(["number"], { name: "π", data: Math.PI });
 }
 
 class DflowMathSin extends DflowNode {

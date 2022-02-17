@@ -18,15 +18,27 @@
 
     <div class="container">
     </div>
+
+    <div class="controls">
+      <button id="run">Run</button>
+      <button id="clear">Clear</button>
+    </div>
+
+    <div>
+      <pre><code id="execution-report"></code></pre>
+    </div>
   </main>
 
   <script type="module">
     import { FlowView } from 'https://unpkg.com/flow-view@5.4.0';
-    import { catalog } from './dflow.js';
+    import { catalog, DflowHost } from './dflow.js';
 
     const flowView = new FlowView({
       container: document.querySelector('.container')
     });
+
+    const dflow = new DflowHost(catalog)
+    dflow.verbose = true;
 
     const nodeLabels = Object.keys(catalog);
 
@@ -36,9 +48,9 @@
       nodes: [
         {
           id: 'a',
-          label: 'number',
+          label: '2',
           x: 60, y: 70,
-          outputs: [ { id: 'ao1' } ]
+          outputs: [ { id: 'ao1', types: ['number'], data: 2 } ]
         },
         {
           id: 'b',
@@ -46,7 +58,20 @@
           x: 60, y: 240,
           inputs: [ { id: 'bi1' }, { id: 'bi2' } ],
           outputs: [ { id: 'bo1' } ]
-        }
+        },
+        {
+          id: 'PI',
+          label: 'mathPi',
+          x: 170, y: 70,
+          outputs: [ { id: 'pi' } ]
+        },
+        {
+          id: 'x',
+          label: '',
+          x: 170, y: 170,
+          inputs: [ { id: 'in' } ],
+          outputs: [ { id: 'out' } ]
+        },
       ],
       edges: [
         { from: ['a', 'ao1'], to: ['b', 'bi1'] },
@@ -65,8 +90,11 @@
           }) || data.label;
           view.label = label;
 
-          // Complete node inputs and outputs.
           if (nodeLabels.includes(label)) {
+            // Create node on dflow
+            dflow.newNode({ kind: label })
+
+            // Complete node view with inputs and outputs.
             const NodeClass = catalog[label];
 
             const { inputs = [], outputs = [] } = NodeClass
@@ -98,17 +126,24 @@
             }
           } else {
             try {
-              const maybeJson = JSON.parse(label)
+              const maybeJson = JSON.parse(label);
+              console.log(maybeJson, typeof maybeJson)
 
               if (view.outputs.length === 0) {
                 view.newOutput({});
               }
 
               if (typeof maybeJson === 'number') {
+                const node = dflow.newNode({ kind: 'number' });
+                node.output(0).data = maybeJson;
+
                 view.outputs[0].text = 'number';
               }
 
               if (typeof maybeJson === 'string') {
+                const node = dflow.newNode({ kind: 'string' });
+                node.output(0).data = maybeJson;
+
                 view.outputs[0].text = 'string';
               }
 
@@ -116,8 +151,14 @@
                 view.label = JSON.stringify(maybeJson);
 
                 if (Array.isArray(maybeJson)) {
+                  const node = dflow.newNode({ kind: 'array' });
+                  node.output(0).data = maybeJson;
+
                   view.outputs[0].text = 'array';
                 } else {
+                  const node = dflow.newNode({ kind: 'object' });
+                  node.output(0).data = maybeJson;
+
                   view.outputs[0].text = 'object';
                 }
               }
@@ -132,6 +173,26 @@
     })
 
     flowView.loadGraph(initialGraph);
+
+    // Controls
+
+    const executionReport = document.querySelector('code#execution-report');
+
+    const runButton = document.querySelector('button#run');
+    runButton.addEventListener('click', () => {
+      executionReport.innerHTML = ''
+
+      dflow.run()
+
+      executionReport.innerHTML = JSON.stringify(dflow.executionReport, null, 2)
+    })
+
+    const clearButton = document.querySelector('button#clear');
+    clearButton.addEventListener('click', () => {
+      flowView.clearGraph();
+      dflow.clearGraph()
+      executionReport.innerHTML = ''
+    })
   </script>
 
   <footer>
