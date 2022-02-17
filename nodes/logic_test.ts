@@ -6,9 +6,18 @@ import { catalog } from "./catalog.ts";
 
 Deno.test(catalog.and.kind, () => {
   const nodeKind = catalog.and.kind;
-  [[true, true], [true, false], [false, false], [false, true]].forEach(
-    ([input1, input2]) => {
-      testTwoBoolInOneBoolOut(nodeKind, input1, input2, input1 && input2);
+  [
+    { inputs: [true, true], expected: true && true },
+    { inputs: [true, false], expected: true && false },
+    { inputs: [false, false], expected: false && false },
+    { inputs: [false, true], expected: false && true },
+    { inputs: [undefined, true], expected: undefined },
+    { inputs: [undefined, false], expected: undefined },
+    { inputs: [true, undefined], expected: undefined },
+    { inputs: [false, undefined], expected: undefined },
+  ].forEach(
+    ({ inputs: [input1, input2], expected }) => {
+      testTwoBoolInOneBoolOut(nodeKind, input1, input2, expected);
     },
   );
 });
@@ -22,9 +31,18 @@ Deno.test(catalog.not.kind, () => {
 
 Deno.test(catalog.or.kind, () => {
   const nodeKind = catalog.or.kind;
-  [[true, true], [true, false], [false, false], [false, true]].forEach(
-    ([input1, input2]) => {
-      testTwoBoolInOneBoolOut(nodeKind, input1, input2, input1 || input2);
+  [
+    { inputs: [true, true], expected: true || true },
+    { inputs: [true, false], expected: true || false },
+    { inputs: [false, false], expected: false || false },
+    { inputs: [false, true], expected: false || true },
+    { inputs: [undefined, true], expected: undefined },
+    { inputs: [undefined, false], expected: undefined },
+    { inputs: [true, undefined], expected: undefined },
+    { inputs: [false, undefined], expected: undefined },
+  ].forEach(
+    ({ inputs: [input1, input2], expected }) => {
+      testTwoBoolInOneBoolOut(nodeKind, input1, input2, expected);
     },
   );
 });
