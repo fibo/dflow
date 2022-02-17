@@ -13,6 +13,20 @@ class DflowAddition extends DflowNode {
   }
 }
 
+class DflowDivision extends DflowNode {
+  static kind = "division";
+  static inputs = DflowNode.ins(2, ["number"]);
+  static outputs = DflowNode.out(["number"]);
+  run() {
+    if (this.input(1).data) {
+      this.output(0).data = (this.input(0).data as number) /
+        (this.input(1).data as number);
+    } else {
+      this.output(0).clear();
+    }
+  }
+}
+
 class DflowEquality extends DflowNode {
   static kind = "equality";
   static inputs = DflowNode.ins(2);
@@ -71,6 +85,16 @@ class DflowInequality extends DflowNode {
   }
 }
 
+class DflowMultiplication extends DflowNode {
+  static kind = "multiplication";
+  static inputs = DflowNode.ins(2, ["number"]);
+  static outputs = DflowNode.out(["number"]);
+  run() {
+    this.output(0).data = (this.input(0).data as number) *
+      (this.input(1).data as number);
+  }
+}
+
 class DflowSubtraction extends DflowNode {
   static kind = "subtraction";
   static inputs = DflowNode.ins(2, ["number"]);
@@ -83,11 +107,13 @@ class DflowSubtraction extends DflowNode {
 
 export const catalog = {
   [DflowAddition.kind]: DflowAddition,
+  [DflowDivision.kind]: DflowDivision,
   [DflowEquality.kind]: DflowEquality,
   [DflowGreaterThan.kind]: DflowGreaterThan,
   [DflowGreaterThanOrEqual.kind]: DflowGreaterThanOrEqual,
   [DflowLessThan.kind]: DflowLessThan,
   [DflowLessThanOrEqual.kind]: DflowLessThanOrEqual,
   [DflowInequality.kind]: DflowInequality,
+  [DflowMultiplication.kind]: DflowMultiplication,
   [DflowSubtraction.kind]: DflowSubtraction,
 };
