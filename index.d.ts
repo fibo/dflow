@@ -60,7 +60,9 @@ export declare type DflowSerializableNode =
 export declare type DflowSerializablePin = DflowSerializableItem & {
   types?: DflowPinType[];
 };
-export declare type DflowSerializableInput = DflowSerializablePin;
+export declare type DflowSerializableInput = DflowSerializablePin & {
+  optional?: boolean;
+};
 export declare type DflowSerializableOutput = DflowSerializablePin & {
   data?: DflowValue;
 };
@@ -132,9 +134,10 @@ export declare class DflowPin extends DflowItem {
 export declare class DflowInput extends DflowPin {
   #private;
   static isDflowInput({ id, types }: DflowSerializableInput): boolean;
-  constructor(pin: DflowSerializableInput);
+  constructor({ optional, ...pin }: DflowSerializableInput);
   get data(): DflowValue;
   get isConnected(): boolean;
+  get isOptional(): boolean | undefined;
   connectTo(pin: DflowOutput): void;
   disconnect(): void;
   toObject(): DflowSerializableInput;
@@ -161,6 +164,7 @@ export declare class DflowNode extends DflowItem {
   static outputs?: DflowNewOutput[];
   static generateInputIds(pins?: DflowNewInput[]): {
     id: string;
+    optional?: boolean | undefined;
     name?: string | undefined;
     types?: DflowPinType[] | undefined;
   }[];

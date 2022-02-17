@@ -15,6 +15,6 @@ npm install esbuild serve -g
 - Run tests: `npm run test` ...ehm or, you know, just `npm t`
 - Format code: `npm run fmt`
 - Lint code: `npm run lint`
-- Generate code bundles:
-  1. `npm run bundle`
-  2. `npm run generate_types`
+- Build package: `npm run build`. It will
+  1. Create bundle: `npm run bundle`
+  2. Generate types: `npm run generate_types`
