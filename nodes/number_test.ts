@@ -14,14 +14,14 @@ Deno.test(catalog.isFinite.kind, () => {
 
 Deno.test(catalog.isInteger.kind, () => {
   const nodeKind = catalog.isInteger.kind;
-  [1, 1.5].forEach((input) => {
+  [undefined, 1, 1.5, true, "one", NaN].forEach((input) => {
     testOneAnyInOneBoolOut(nodeKind, input, Number.isInteger(input));
   });
 });
 
 Deno.test(catalog.isNaN.kind, () => {
   const nodeKind = catalog.isNaN.kind;
-  [1, "x", null].forEach((input) => {
+  [undefined, 1, "x", null, NaN].forEach((input) => {
     testOneAnyInOneBoolOut(nodeKind, input, Number.isNaN(input));
   });
 });

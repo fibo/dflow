@@ -1,7 +1,11 @@
 import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
 
 import { DflowArray, DflowHost } from "../engine.ts";
-import { testOneArrInOneNumOut } from "./_test-utils.ts";
+import {
+  testOneArrAndOneStrInOneBoolOut,
+  testOneArrAndOneStrInOneStrOut,
+  testOneArrInOneNumOut,
+} from "./_test-utils.ts";
 import { catalog } from "./catalog.ts";
 
 Deno.test(catalog.arrayFilter.kind, () => {
@@ -36,10 +40,40 @@ Deno.test(catalog.arrayFilter.kind, () => {
   assertEquals(result.length, expected.length);
 });
 
+Deno.test(catalog.arrayIncludes.kind, () => {
+  const nodeKind = catalog.arrayIncludes.kind;
+  [
+    { inputs: { array: undefined, element: undefined }, expected: undefined },
+    { inputs: { array: ["a", "b"], element: "c" }, expected: false },
+    { inputs: { array: ["a", "b"], element: "a" }, expected: true },
+  ].forEach(
+    ({ inputs: { array, element }, expected }) => {
+      testOneArrAndOneStrInOneBoolOut(nodeKind, array, element, expected);
+    },
+  );
+});
+
+Deno.test(catalog.arrayJoin.kind, () => {
+  const nodeKind = catalog.arrayJoin.kind;
+  [
+    { inputs: { array: undefined, separator: undefined }, expected: undefined },
+    { inputs: { array: ["a", "b"], separator: "/" }, expected: "a/b" },
+    { inputs: { array: ["a", "b"], separator: "-" }, expected: "a-b" },
+    { inputs: { array: ["a", "b"], separator: undefined }, expected: "a,b" },
+  ].forEach(
+    ({ inputs: { array, separator }, expected }) => {
+      testOneArrAndOneStrInOneStrOut(nodeKind, array, separator, expected);
+    },
+  );
+});
+
 Deno.test(catalog.arrayLength.kind, () => {
   const nodeKind = catalog.arrayLength.kind;
-  [["a"]].forEach((input) => {
-    testOneArrInOneNumOut(nodeKind, input, input.length);
+  [
+    { input: undefined, expected: undefined },
+    { input: ["a"], expected: 1 },
+  ].forEach(({ input, expected }) => {
+    testOneArrInOneNumOut(nodeKind, input, expected);
   });
 });
 

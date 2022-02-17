@@ -5,8 +5,8 @@ import { catalog } from "./catalog.ts";
 
 export function testOneAnyInOneBoolOut(
   nodeKind: string,
-  input: DflowValue,
-  expected: boolean,
+  input?: DflowValue,
+  expected?: boolean,
 ) {
   const dflow = new DflowHost(catalog);
   const dataNode = dflow.newNode({ kind: catalog.data.kind });
@@ -19,8 +19,8 @@ export function testOneAnyInOneBoolOut(
 
 export function testOneArrInOneNumOut(
   nodeKind: string,
-  input: DflowArray,
-  expected: number,
+  input?: DflowArray,
+  expected?: number,
 ) {
   const dflow = new DflowHost(catalog);
   const dataNode = dflow.newNode({ kind: catalog.array.kind });
@@ -31,10 +31,50 @@ export function testOneArrInOneNumOut(
   assertEquals(testNode.output(0).data, expected);
 }
 
+export function testOneArrAndOneStrInOneBoolOut(
+  nodeKind: string,
+  input1?: DflowArray,
+  input2?: string,
+  expected?: boolean,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode1 = dflow.newNode({ kind: catalog.array.kind });
+  dataNode1.output(0).data = input1;
+  const dataNode2 = dflow.newNode({
+    kind: catalog.string.kind,
+  });
+  dataNode2.output(0).data = input2;
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode1).to(testNode, 0);
+  dflow.connect(dataNode2).to(testNode, 1);
+  dflow.run();
+  assertEquals(testNode.output(0).data, expected);
+}
+
+export function testOneArrAndOneStrInOneStrOut(
+  nodeKind: string,
+  input1?: DflowArray,
+  input2?: string,
+  expected?: string,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode1 = dflow.newNode({ kind: catalog.array.kind });
+  dataNode1.output(0).data = input1;
+  const dataNode2 = dflow.newNode({
+    kind: catalog.string.kind,
+  });
+  dataNode2.output(0).data = input2;
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode1).to(testNode, 0);
+  dflow.connect(dataNode2).to(testNode, 1);
+  dflow.run();
+  assertEquals(testNode.output(0).data, expected);
+}
+
 export function testOneBoolInOneBoolOut(
   nodeKind: string,
-  input: boolean,
-  expected: boolean,
+  input?: boolean,
+  expected?: boolean,
 ) {
   const dflow = new DflowHost(catalog);
   const dataNode = dflow.newNode({ kind: catalog.boolean.kind });
@@ -131,9 +171,9 @@ export function testTwoAnyInOneBoolOut(
 
 export function testTwoBoolInOneBoolOut(
   nodeKind: string,
-  input1: boolean,
-  input2: boolean,
-  expected: boolean,
+  input1?: boolean,
+  input2?: boolean,
+  expected?: boolean,
 ) {
   const dflow = new DflowHost(catalog);
   const dataNode1 = dflow.newNode({ kind: catalog.boolean.kind });
@@ -149,9 +189,9 @@ export function testTwoBoolInOneBoolOut(
 
 export function testTwoNumInOneBoolOut(
   nodeKind: string,
-  input1: number,
-  input2: number,
-  expected: boolean,
+  input1?: number,
+  input2?: number,
+  expected?: boolean,
 ) {
   const dflow = new DflowHost(catalog);
   const dataNode1 = dflow.newNode({ kind: catalog.number.kind });
@@ -165,29 +205,11 @@ export function testTwoNumInOneBoolOut(
   assertEquals(testNode.output(0).data, expected);
 }
 
-export function testTwoNumOrStrInOneBoolOut(
-  nodeKind: string,
-  input1: number | string,
-  input2: number | string,
-  expected: boolean,
-) {
-  const dflow = new DflowHost(catalog);
-  const dataNode1 = dflow.newNode({ kind: catalog.numberOrString.kind });
-  dataNode1.output(0).data = input1;
-  const dataNode2 = dflow.newNode({ kind: catalog.numberOrString.kind });
-  dataNode2.output(0).data = input2;
-  const testNode = dflow.newNode({ kind: nodeKind });
-  dflow.connect(dataNode1).to(testNode, 0);
-  dflow.connect(dataNode2).to(testNode, 1);
-  dflow.run();
-  assertEquals(testNode.output(0).data, expected);
-}
-
 export function testTwoNumInOneNumOut(
   nodeKind: string,
-  input1: number,
-  input2: number,
-  expected: number,
+  input1?: number,
+  input2?: number,
+  expected?: number,
 ) {
   const dflow = new DflowHost(catalog);
   const dataNode1 = dflow.newNode({ kind: catalog.number.kind });

@@ -65,7 +65,9 @@ export type DflowSerializablePin = DflowSerializableItem & {
   types?: DflowPinType[];
 };
 
-export type DflowSerializableInput = DflowSerializablePin;
+export type DflowSerializableInput = DflowSerializablePin & {
+  optional?: boolean;
+};
 
 export type DflowSerializableOutput = DflowSerializablePin & {
   data?: DflowValue;
@@ -315,13 +317,16 @@ export class DflowPin extends DflowItem {
 
 export class DflowInput extends DflowPin {
   #source?: DflowOutput;
+  #optional?: boolean;
 
   static isDflowInput({ id, types }: DflowSerializableInput) {
     return DflowPin.isDflowPin({ id, types });
   }
 
-  constructor(pin: DflowSerializableInput) {
+  constructor({ optional, ...pin }: DflowSerializableInput) {
     super("input", pin);
+
+    this.#optional = optional;
   }
 
   get data(): DflowValue {
@@ -330,6 +335,10 @@ export class DflowInput extends DflowPin {
 
   get isConnected() {
     return typeof this.#source === "undefined";
+  }
+
+  get isOptional() {
+    return this.#optional;
   }
 
   connectTo(pin: DflowOutput) {
@@ -991,10 +1000,16 @@ export class DflowGraph extends DflowItem {
       const node = this.#nodes.get(nodeId) as DflowNode;
 
       try {
-        if (node.meta.isConstant === false) {
+        if (!node.meta.isConstant) {
           let someInputIsNotValid = false;
 
-          for (const { data, types } of node.inputs) {
+          for (const { data, types, isOptional } of node.inputs) {
+            // Ignore optional inputs.
+            if (isOptional && typeof data === "undefined") {
+              continue;
+            }
+
+            // Validate input data.
             if (!DflowData.validate(data, types)) {
               someInputIsNotValid = true;
               break;
