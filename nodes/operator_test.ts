@@ -7,9 +7,24 @@ import { catalog } from "./catalog.ts";
 
 Deno.test(catalog.addition.kind, () => {
   const nodeKind = catalog.addition.kind;
-  [[2, 2]].forEach(([input1, input2]) => {
-    testTwoNumInOneNumOut(nodeKind, input1, input2, input1 + input2);
-  });
+  [{ inputs: [2, 2], expected: 4 }].forEach(
+    ({ inputs: [input1, input2], expected }) => {
+      testTwoNumInOneNumOut(nodeKind, input1, input2, expected);
+    },
+  );
+});
+
+Deno.test(catalog.division.kind, () => {
+  const nodeKind = catalog.division.kind;
+  [
+    { inputs: [2, 2], expected: 1 },
+    { inputs: [0, 1], expected: 0 },
+    { inputs: [1, 0], expected: undefined },
+  ].forEach(
+    ({ inputs: [input1, input2], expected }) => {
+      testTwoNumInOneNumOut(nodeKind, input1, input2, expected);
+    },
+  );
 });
 
 Deno.test(catalog.equality.kind, () => {
@@ -104,6 +119,15 @@ Deno.test(catalog.inequality.kind, () => {
   ].forEach(
     ({ inputs: [input1, input2], expected }) => {
       testTwoAnyInOneBoolOut(nodeKind, input1, input2, expected);
+    },
+  );
+});
+
+Deno.test(catalog.multiplication.kind, () => {
+  const nodeKind = catalog.multiplication.kind;
+  [{ inputs: [2, 2], expected: 4 }].forEach(
+    ({ inputs: [input1, input2], expected }) => {
+      testTwoNumInOneNumOut(nodeKind, input1, input2, expected);
     },
   );
 });
