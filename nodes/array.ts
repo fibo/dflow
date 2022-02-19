@@ -78,10 +78,26 @@ class DflowArrayMap extends DflowNode {
   }
 }
 
+class DflowArrayPop extends DflowNode {
+  static kind = "arrayPop";
+  static inputs = DflowNode.in(["array"], { name: "array" });
+  static outputs = [
+    ...DflowNode.out([], { name: "element" }),
+    ...DflowNode.out(["array"], { name: "rest" }),
+  ];
+  run() {
+    const array = (this.input(0).data as DflowArray).slice();
+    const element = array.pop();
+    this.output(0).data = element;
+    this.output(1).data = array;
+  }
+}
+
 export const catalog = {
   [DflowArrayFilter.kind]: DflowArrayFilter,
   [DflowArrayIncludes.kind]: DflowArrayIncludes,
   [DflowArrayJoin.kind]: DflowArrayJoin,
   [DflowArrayLength.kind]: DflowArrayLength,
   [DflowArrayMap.kind]: DflowArrayMap,
+  [DflowArrayPop.kind]: DflowArrayPop,
 };
