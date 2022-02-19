@@ -4,7 +4,9 @@ import { DflowArray, DflowHost } from "../engine.ts";
 import {
   testOneArrAndOneStrInOneBoolOut,
   testOneArrAndOneStrInOneStrOut,
-  testOneArrInOneAnyAndOneArrayOut,
+  testOneArrAndTwoNumInOneArrOut,
+  testOneArrInOneAnyAndOneArrOut,
+  testOneArrInOneArrOut,
   testOneArrInOneNumOut,
 } from "./_test-utils.ts";
 import { catalog } from "./catalog.ts";
@@ -117,6 +119,64 @@ Deno.test(catalog.arrayPop.kind, () => {
     { input: undefined, output1: undefined, output2: undefined },
     { input: [1, 2, 3], output1: 3, output2: [1, 2] },
   ].forEach(({ input, output1, output2 }) => {
-    testOneArrInOneAnyAndOneArrayOut(nodeKind, input, output1, output2);
+    testOneArrInOneAnyAndOneArrOut(nodeKind, input, output1, output2);
+  });
+});
+
+Deno.test(catalog.arrayReverse.kind, () => {
+  const nodeKind = catalog.arrayReverse.kind;
+  [
+    { input: undefined, output: undefined },
+    { input: [1, 2, 3], output: [3, 2, 1] },
+  ].forEach(({ input, output }) => {
+    testOneArrInOneArrOut(nodeKind, input, output);
+  });
+});
+
+Deno.test(catalog.arrayShift.kind, () => {
+  const nodeKind = catalog.arrayShift.kind;
+  [
+    { input: undefined, output1: undefined, output2: undefined },
+    { input: [1, 2, 3], output1: 1, output2: [2, 3] },
+  ].forEach(({ input, output1, output2 }) => {
+    testOneArrInOneAnyAndOneArrOut(nodeKind, input, output1, output2);
+  });
+});
+
+Deno.test(catalog.arraySlice.kind, () => {
+  const nodeKind = catalog.arraySlice.kind;
+  [
+    {
+      input1: undefined,
+      input2: undefined,
+      input3: undefined,
+      output: undefined,
+    },
+    {
+      input1: ["ant", "bison", "camel", "duck", "elephant"],
+      input2: 2,
+      input3: undefined,
+      output: ["camel", "duck", "elephant"],
+    },
+    {
+      input1: ["ant", "bison", "camel", "duck", "elephant"],
+      input2: 2,
+      input3: 4,
+      output: ["camel", "duck"],
+    },
+    {
+      input1: ["ant", "bison", "camel", "duck", "elephant"],
+      input2: 1,
+      input3: 5,
+      output: ["bison", "camel", "duck", "elephant"],
+    },
+    {
+      input1: ["ant", "bison", "camel", "duck", "elephant"],
+      input2: 2,
+      input3: -1,
+      output: ["camel", "duck"],
+    },
+  ].forEach(({ input1, input2, input3, output }) => {
+    testOneArrAndTwoNumInOneArrOut(nodeKind, input1, input2, input3, output);
   });
 });

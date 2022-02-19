@@ -71,7 +71,7 @@ export function testOneArrAndOneStrInOneStrOut(
   assertEquals(testNode.output(0).data, output);
 }
 
-export function testOneArrInOneAnyAndOneArrayOut(
+export function testOneArrInOneAnyAndOneArrOut(
   nodeKind: string,
   input1?: DflowArray,
   output1?: DflowValue,
@@ -85,6 +85,42 @@ export function testOneArrInOneAnyAndOneArrayOut(
   dflow.run();
   assertEquals(testNode.output(0).data, output1);
   assertEquals(testNode.output(1).data, output2);
+}
+
+export function testOneArrAndTwoNumInOneArrOut(
+  nodeKind: string,
+  input1?: DflowArray,
+  input2?: number,
+  input3?: number,
+  output1?: DflowArray,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode1 = dflow.newNode({ kind: catalog.array.kind });
+  dataNode1.output(0).data = input1;
+  const dataNode2 = dflow.newNode({ kind: catalog.number.kind });
+  dataNode2.output(0).data = input2;
+  const dataNode3 = dflow.newNode({ kind: catalog.number.kind });
+  dataNode3.output(0).data = input3;
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode1).to(testNode, 0);
+  dflow.connect(dataNode2).to(testNode, 1);
+  dflow.connect(dataNode3).to(testNode, 2);
+  dflow.run();
+  assertEquals(testNode.output(0).data, output1);
+}
+
+export function testOneArrInOneArrOut(
+  nodeKind: string,
+  input1?: DflowArray,
+  output1?: DflowArray,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode1 = dflow.newNode({ kind: catalog.array.kind });
+  dataNode1.output(0).data = input1;
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode1).to(testNode, 0);
+  dflow.run();
+  assertEquals(testNode.output(0).data, output1);
 }
 
 export function testOneBoolInOneBoolOut(
