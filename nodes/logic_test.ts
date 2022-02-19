@@ -7,17 +7,17 @@ import { catalog } from "./catalog.ts";
 Deno.test(catalog.and.kind, () => {
   const nodeKind = catalog.and.kind;
   [
-    { inputs: [true, true], expected: true && true },
-    { inputs: [true, false], expected: true && false },
-    { inputs: [false, false], expected: false && false },
-    { inputs: [false, true], expected: false && true },
-    { inputs: [undefined, true], expected: undefined },
-    { inputs: [undefined, false], expected: undefined },
-    { inputs: [true, undefined], expected: undefined },
-    { inputs: [false, undefined], expected: undefined },
+    { inputs: [true, true], output: true && true },
+    { inputs: [true, false], output: true && false },
+    { inputs: [false, false], output: false && false },
+    { inputs: [false, true], output: false && true },
+    { inputs: [undefined, true], output: undefined },
+    { inputs: [undefined, false], output: undefined },
+    { inputs: [true, undefined], output: undefined },
+    { inputs: [false, undefined], output: undefined },
   ].forEach(
-    ({ inputs: [input1, input2], expected }) => {
-      testTwoBoolInOneBoolOut(nodeKind, input1, input2, expected);
+    ({ inputs: [input1, input2], output }) => {
+      testTwoBoolInOneBoolOut(nodeKind, input1, input2, output);
     },
   );
 });
@@ -32,17 +32,17 @@ Deno.test(catalog.not.kind, () => {
 Deno.test(catalog.or.kind, () => {
   const nodeKind = catalog.or.kind;
   [
-    { inputs: [true, true], expected: true || true },
-    { inputs: [true, false], expected: true || false },
-    { inputs: [false, false], expected: false || false },
-    { inputs: [false, true], expected: false || true },
-    { inputs: [undefined, true], expected: undefined },
-    { inputs: [undefined, false], expected: undefined },
-    { inputs: [true, undefined], expected: undefined },
-    { inputs: [false, undefined], expected: undefined },
+    { inputs: [true, true], output: true || true },
+    { inputs: [true, false], output: true || false },
+    { inputs: [false, false], output: false || false },
+    { inputs: [false, true], output: false || true },
+    { inputs: [undefined, true], output: undefined },
+    { inputs: [undefined, false], output: undefined },
+    { inputs: [true, undefined], output: undefined },
+    { inputs: [false, undefined], output: undefined },
   ].forEach(
-    ({ inputs: [input1, input2], expected }) => {
-      testTwoBoolInOneBoolOut(nodeKind, input1, input2, expected);
+    ({ inputs: [input1, input2], output }) => {
+      testTwoBoolInOneBoolOut(nodeKind, input1, input2, output);
     },
   );
 });
