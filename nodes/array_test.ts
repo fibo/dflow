@@ -4,6 +4,7 @@ import { DflowArray, DflowHost } from "../engine.ts";
 import {
   testOneArrAndOneStrInOneBoolOut,
   testOneArrAndOneStrInOneStrOut,
+  testOneArrInOneAnyAndOneArrayOut,
   testOneArrInOneNumOut,
 } from "./_test-utils.ts";
 import { catalog } from "./catalog.ts";
@@ -108,4 +109,14 @@ Deno.test(catalog.arrayMap.kind, () => {
 
   assertArrayIncludes(result, expected);
   assertEquals(result.length, expected.length);
+});
+
+Deno.test(catalog.arrayPop.kind, () => {
+  const nodeKind = catalog.arrayPop.kind;
+  [
+    { input: undefined, output1: undefined, output2: undefined },
+    { input: [1, 2, 3], output1: 3, output2: [1, 2] },
+  ].forEach(({ input, output1, output2 }) => {
+    testOneArrInOneAnyAndOneArrayOut(nodeKind, input, output1, output2);
+  });
 });

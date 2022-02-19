@@ -7,7 +7,7 @@ export function testConditionalIf(
   input1: boolean,
   input2: DflowValue,
   input3: DflowValue,
-  expected: DflowValue,
+  output: DflowValue,
 ) {
   const dflow = new DflowHost(catalog);
 
@@ -23,13 +23,13 @@ export function testConditionalIf(
   dflow.connect(dataNode2).to(testNode, 1);
   dflow.connect(dataNode3).to(testNode, 2);
   dflow.run();
-  assertEquals(testNode.output(0).data, expected);
+  assertEquals(testNode.output(0).data, output);
 }
 
 Deno.test(catalog.if.kind, () => {
   [{ condition: true, data: [1, 2, 1] }].forEach(
-    ({ condition, data: [thenData, elseData, expected] }) => {
-      testConditionalIf(condition, thenData, elseData, expected);
+    ({ condition, data: [thenData, elseData, output] }) => {
+      testConditionalIf(condition, thenData, elseData, output);
     },
   );
 });
