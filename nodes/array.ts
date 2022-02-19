@@ -80,7 +80,7 @@ class DflowArrayMap extends DflowNode {
 
 class DflowArrayPop extends DflowNode {
   static kind = "arrayPop";
-  static inputs = DflowNode.in(["array"], { name: "array" });
+  static inputs = DflowNode.in(["array"]);
   static outputs = [
     ...DflowNode.out([], { name: "element" }),
     ...DflowNode.out(["array"], { name: "rest" }),
@@ -93,6 +93,52 @@ class DflowArrayPop extends DflowNode {
   }
 }
 
+class DflowArrayReverse extends DflowNode {
+  static kind = "arrayReverse";
+  static inputs = DflowNode.in(["array"]);
+  static outputs = DflowNode.in(["array"]);
+  run() {
+    const array = (this.input(0).data as DflowArray).slice();
+    this.output(0).data = array.reverse();
+  }
+}
+
+class DflowArrayShift extends DflowNode {
+  static kind = "arrayShift";
+  static inputs = DflowNode.in(["array"]);
+  static outputs = [
+    ...DflowNode.out([], { name: "element" }),
+    ...DflowNode.out(["array"], { name: "rest" }),
+  ];
+  run() {
+    const array = (this.input(0).data as DflowArray).slice();
+    const element = array.shift();
+    this.output(0).data = element;
+    this.output(1).data = array;
+  }
+}
+
+class DflowArraySlice extends DflowNode {
+  static kind = "arraySlice";
+  static inputs = [
+    ...DflowNode.in(["array"]),
+    ...DflowNode.in(["number"], { name: "start" }),
+    ...DflowNode.in(["number"], { name: "end", optional: true }),
+  ];
+  static outputs = DflowNode.out(["array"]);
+  run() {
+    const array = this.input(0).data as DflowArray;
+    const start = this.input(1).data as number;
+    const end = this.input(2).data;
+
+    if (typeof end === "number") {
+      this.output(0).data = array.slice(start, end);
+    } else {
+      this.output(0).data = array.slice(start);
+    }
+  }
+}
+
 export const catalog = {
   [DflowArrayFilter.kind]: DflowArrayFilter,
   [DflowArrayIncludes.kind]: DflowArrayIncludes,
@@ -100,4 +146,7 @@ export const catalog = {
   [DflowArrayLength.kind]: DflowArrayLength,
   [DflowArrayMap.kind]: DflowArrayMap,
   [DflowArrayPop.kind]: DflowArrayPop,
+  [DflowArrayReverse.kind]: DflowArrayReverse,
+  [DflowArrayShift.kind]: DflowArrayShift,
+  [DflowArraySlice.kind]: DflowArraySlice,
 };
