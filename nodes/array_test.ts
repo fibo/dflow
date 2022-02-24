@@ -2,6 +2,7 @@ import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
 
 import { DflowArray, DflowHost } from "../engine.ts";
 import {
+  testOneArrAndOneAnyInOneArrOut,
   testOneArrAndOneStrInOneBoolOut,
   testOneArrAndOneStrInOneStrOut,
   testOneArrAndTwoNumInOneArrOut,
@@ -120,6 +121,20 @@ Deno.test(catalog.arrayPop.kind, () => {
     { input: [1, 2, 3], output1: 3, output2: [1, 2] },
   ].forEach(({ input, output1, output2 }) => {
     testOneArrInOneAnyAndOneArrOut(nodeKind, input, output1, output2);
+  });
+});
+
+Deno.test(catalog.arrayPush.kind, () => {
+  const nodeKind = catalog.arrayPush.kind;
+  [
+    { input1: undefined, input2: undefined, output: undefined },
+    { input1: undefined, input2: "foo", output: undefined },
+    { input1: [], input2: undefined, output: [] },
+    { input1: [], input2: "x", output: ["x"] },
+    { input1: [1, 2], input2: 3, output: [1, 2, 3] },
+    { input1: [1, "a"], input2: true, output: [1, "a", true] },
+  ].forEach(({ input1, input2, output }) => {
+    testOneArrAndOneAnyInOneArrOut(nodeKind, input1, input2, output);
   });
 });
 

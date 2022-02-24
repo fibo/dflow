@@ -93,6 +93,23 @@ class DflowArrayPop extends DflowNode {
   }
 }
 
+class DflowArrayPush extends DflowNode {
+  static kind = "arrayPush";
+  static inputs = [
+    ...DflowNode.in(["array"]),
+    ...DflowNode.in([], { name: "element" }),
+  ];
+  static outputs = DflowNode.out(["array"]);
+  run() {
+    const array = (this.input(0).data as DflowArray).slice();
+    const element = this.input(1).data;
+    if (element) {
+      array.push(element);
+    }
+    this.output(0).data = array;
+  }
+}
+
 class DflowArrayReverse extends DflowNode {
   static kind = "arrayReverse";
   static inputs = DflowNode.in(["array"]);
@@ -146,6 +163,7 @@ export const catalog = {
   [DflowArrayLength.kind]: DflowArrayLength,
   [DflowArrayMap.kind]: DflowArrayMap,
   [DflowArrayPop.kind]: DflowArrayPop,
+  [DflowArrayPush.kind]: DflowArrayPush,
   [DflowArrayReverse.kind]: DflowArrayReverse,
   [DflowArrayShift.kind]: DflowArrayShift,
   [DflowArraySlice.kind]: DflowArraySlice,
