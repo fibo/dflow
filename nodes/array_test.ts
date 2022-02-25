@@ -17,15 +17,16 @@ Deno.test(catalog.arrayFilter.kind, () => {
 
   const dflow = new DflowHost(catalog);
   const testNode = dflow.newNode({ kind: nodeKind });
-  const dataNode = dflow.newNode({ kind: catalog.array.kind });
+  const dataNode = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4, 5, 6, 7] }],
+  });
   const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
   const typeNumNode = dflow.newNode({ kind: catalog.typeNumber.kind });
   const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
   const greaterThanNode = dflow.newNode({ kind: catalog.greaterThan.kind });
   const returnNode = dflow.newNode({ kind: catalog.return.kind });
   const functionNode = dflow.newNode({ kind: catalog.function.kind });
-
-  dataNode.output(0).data = [1, 2, 3, 4, 5, 6, 7];
 
   dflow.connect(functionNode).to(returnNode);
   dflow.connect(greaterThanNode).to(returnNode, 1);
@@ -86,8 +87,14 @@ Deno.test(catalog.arrayMap.kind, () => {
 
   const dflow = new DflowHost(catalog);
   const testNode = dflow.newNode({ kind: nodeKind });
-  const dataNode = dflow.newNode({ kind: catalog.array.kind });
-  const numNode = dflow.newNode({ kind: catalog.number.kind });
+  const dataNode = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4] }],
+  });
+  const numNode = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out", types: ["number"], data: 1 }],
+  });
   const typeNumNode = dflow.newNode({ kind: catalog.typeNumber.kind });
   const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
   const additionNode = dflow.newNode({ kind: catalog.addition.kind });
