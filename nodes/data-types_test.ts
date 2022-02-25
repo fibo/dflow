@@ -1,8 +1,8 @@
 import { assertEquals } from "std/testing/asserts.ts";
 
 import { DflowHost } from "../dflow.ts";
-import { catalog } from "./data-types.ts";
 import { testOneAnyInOneBoolOut } from "./_test-utils.ts";
+import { catalog } from "./data-types.ts";
 
 Deno.test(catalog.boolean.kind, () => {
   const nodeKind = catalog.boolean.kind;
@@ -37,9 +37,9 @@ Deno.test(catalog.string.kind, () => {
 Deno.test(catalog.isArray.kind, () => {
   const nodeKind = catalog.isArray.kind;
   [
+    { input: undefined, output: false },
     { input: [], output: true },
     { input: [1, 2, 3], output: true },
-    { input: undefined, output: false },
     { input: true, output: false },
     { input: { foo: "bar" }, output: false },
   ].forEach((input) => {

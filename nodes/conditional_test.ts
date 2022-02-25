@@ -3,20 +3,26 @@ import { assertEquals } from "std/testing/asserts.ts";
 import { DflowHost, DflowValue } from "../engine.ts";
 import { catalog } from "./catalog.ts";
 
-export function testConditionalIf(
-  input1: boolean,
-  input2: DflowValue,
-  input3: DflowValue,
-  output: DflowValue,
+function testConditionalIf(
+  input1?: boolean,
+  input2?: DflowValue,
+  input3?: DflowValue,
+  output?: DflowValue,
 ) {
   const dflow = new DflowHost(catalog);
 
-  const dataNode1 = dflow.newNode({ kind: catalog.boolean.kind });
-  dataNode1.output(0).data = input1;
-  const dataNode2 = dflow.newNode({ kind: catalog.data.kind });
-  dataNode2.output(0).data = input2;
-  const dataNode3 = dflow.newNode({ kind: catalog.data.kind });
-  dataNode3.output(0).data = input3;
+  const dataNode1 = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out1", types: ["boolean"], data: input1 }],
+  });
+  const dataNode2 = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out2", types: [], data: input2 }],
+  });
+  const dataNode3 = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out3", types: [], data: input3 }],
+  });
   const testNode = dflow.newNode({ kind: catalog.if.kind });
 
   dflow.connect(dataNode1).to(testNode, 0);
@@ -27,9 +33,17 @@ export function testConditionalIf(
 }
 
 Deno.test(catalog.if.kind, () => {
-  [{ condition: true, data: [1, 2, 1] }].forEach(
-    ({ condition, data: [thenData, elseData, output] }) => {
-      testConditionalIf(condition, thenData, elseData, output);
+  [
+    {
+      input1: undefined,
+      input2: undefined,
+      input3: undefined,
+      output: undefined,
+    },
+    { input1: true, input2: 1, input3: 2, output: 1 },
+  ].forEach(
+    ({ input1, input2, input3, output }) => {
+      testConditionalIf(input1, input2, input3, output);
     },
   );
 });
