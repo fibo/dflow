@@ -1,4 +1,4 @@
-import { DflowNode } from "../engine.ts";
+import { DflowArray, DflowNode } from "../engine.ts";
 
 class DflowMathCos extends DflowNode {
   static kind = "mathCos";
@@ -15,6 +15,40 @@ class DflowMathCosh extends DflowNode {
   static outputs = DflowNode.out(["number"]);
   run() {
     this.output(0).data = Math.cosh(this.input(0).data as number);
+  }
+}
+
+class DflowMathMax extends DflowNode {
+  static kind = "mathMax";
+  static inputs = DflowNode.in(["array"]);
+  static outputs = DflowNode.out(["number"]);
+  run() {
+    // Suppose input is a list of numbers, just to make TS happy.
+    // Then check that result is not `NaN`, in case some input is not ok.
+    const list = this.input(0).data as number[];
+    const data = Math.max(...list);
+    if (isNaN(data)) {
+      this.output(0).clear();
+    } else {
+      this.output(0).data = data;
+    }
+  }
+}
+
+class DflowMathMin extends DflowNode {
+  static kind = "mathMin";
+  static inputs = DflowNode.in(["array"]);
+  static outputs = DflowNode.out(["number"]);
+  run() {
+    // Suppose input is a list of numbers, just to make TS happy.
+    // Then check that result is not `NaN`, in case some input is not ok.
+    const list = this.input(0).data as number[];
+    const data = Math.min(...list);
+    if (isNaN(data)) {
+      this.output(0).clear();
+    } else {
+      this.output(0).data = data;
+    }
   }
 }
 
@@ -45,6 +79,8 @@ class DflowMathSinh extends DflowNode {
 export const catalog = {
   [DflowMathCos.kind]: DflowMathCos,
   [DflowMathCosh.kind]: DflowMathCosh,
+  [DflowMathMax.kind]: DflowMathMax,
+  [DflowMathMin.kind]: DflowMathMin,
   [DflowMathPI.kind]: DflowMathPI,
   [DflowMathSin.kind]: DflowMathSin,
   [DflowMathSinh.kind]: DflowMathSinh,
