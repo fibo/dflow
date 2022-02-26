@@ -665,11 +665,7 @@ export class DflowNode extends DflowItem {
     return pin;
   }
 
-  run(): void {
-    throw new Error(
-      `${this.constructor.name} does not implement a run() method`,
-    );
-  }
+  run(): void {}
 
   toObject(): DflowSerializableNode {
     const obj = {
@@ -996,6 +992,9 @@ export class DflowGraph extends DflowItem {
       this.nodeConnections,
     );
 
+    // Two nested loops: for every nodes (NODES_LOOP label) loop over all their
+    // inputs (INPUTS_LOOP label) and validate data.
+    NODES_LOOP:
     for (const nodeId of nodeIds) {
       const node = this.#nodes.get(nodeId) as DflowNode;
 
@@ -1003,16 +1002,17 @@ export class DflowGraph extends DflowItem {
         if (!node.meta.isConstant) {
           let someInputIsNotValid = false;
 
+          INPUTS_LOOP:
           for (const { data, types, isOptional } of node.inputs) {
             // Ignore optional inputs.
             if (isOptional && typeof data === "undefined") {
-              continue;
+              continue INPUTS_LOOP;
             }
 
             // Validate input data.
             if (!DflowData.validate(data, types)) {
               someInputIsNotValid = true;
-              break;
+              break INPUTS_LOOP;
             }
           }
 
@@ -1020,14 +1020,15 @@ export class DflowGraph extends DflowItem {
             for (const output of node.outputs) {
               output.clear();
             }
-            break;
+            if (verbose) {
+              this.executionReport.steps?.push(
+                _executionNodeInfo(node.toObject()),
+              );
+            }
+            continue NODES_LOOP;
           }
 
-          if (node.meta.isAsync) {
-            await node.run();
-          } else {
-            node.run();
-          }
+          await node.run();
         }
 
         if (verbose) {
@@ -1262,7 +1263,7 @@ export class DflowHost {
           }
           default: {
             if (!node.meta.isConstant) {
-              node.run();
+              await node.run();
             }
 
             if (verbose) {
