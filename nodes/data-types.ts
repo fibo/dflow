@@ -87,8 +87,32 @@ class DflowIsArray extends DflowNode {
   }
 }
 
+class DflowIsDefined extends DflowNode {
+  static kind = "isDefined";
+  static inputs = DflowNode.in();
+  static outputs = DflowNode.out(["boolean"]);
+  run() {
+    const data = this.input(0).data;
+    console.log(data);
+    this.output(0).data = typeof data !== "undefined";
+  }
+}
+
+class DflowIsUndefined extends DflowNode {
+  static kind = "isUndefined";
+  static inputs = DflowNode.in();
+  static outputs = DflowNode.out(["boolean"]);
+  run() {
+    const data = this.input(0).data;
+    console.log(data);
+    this.output(0).data = typeof data === "undefined";
+  }
+}
+
 export const catalog = {
   [DflowData.kind]: DflowData,
+  [DflowIsDefined.kind]: DflowIsDefined,
+  [DflowIsUndefined.kind]: DflowIsUndefined,
   [DflowArray.kind]: DflowArray,
   [DflowBoolean.kind]: DflowBoolean,
   [DflowNumber.kind]: DflowNumber,
