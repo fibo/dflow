@@ -213,8 +213,8 @@ export function testOneNumInOneBoolOut(
 
 export function testOneNumInOneNumOut(
   nodeKind: string,
-  input: number,
-  output: number,
+  input?: number,
+  output?: number,
 ) {
   const dflow = new DflowHost(catalog);
   const dataNode = dflow.newNode({
