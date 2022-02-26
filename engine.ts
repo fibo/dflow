@@ -992,8 +992,14 @@ export class DflowGraph extends DflowItem {
       this.nodeConnections,
     );
 
-    // Two nested loops: for every nodes (NODES_LOOP label) loop over all their
-    // inputs (INPUTS_LOOP label) and validate data.
+    // Two nested loops:
+    //   1. NODES_LOOP
+    //   2. INPUTS_LOOP
+    //
+    // For every node loop over their inputs and validate data.
+
+    // 1. NODES_LOOP
+    // /////////////
     NODES_LOOP:
     for (const nodeId of nodeIds) {
       const node = this.#nodes.get(nodeId) as DflowNode;
@@ -1002,6 +1008,8 @@ export class DflowGraph extends DflowItem {
         if (!node.meta.isConstant) {
           let someInputIsNotValid = false;
 
+          // 2. INPUTS_LOOP
+          // //////////////
           INPUTS_LOOP:
           for (const { data, types, isOptional } of node.inputs) {
             // Ignore optional inputs.
@@ -1028,7 +1036,11 @@ export class DflowGraph extends DflowItem {
             continue NODES_LOOP;
           }
 
-          await node.run();
+          if (node.meta.isAsync) {
+            await node.run();
+          } else {
+            node.run();
+          }
         }
 
         if (verbose) {
@@ -1262,8 +1274,9 @@ export class DflowHost {
             return node.input(1).data;
           }
           default: {
-            if (!node.meta.isConstant) {
-              await node.run();
+            // Notice that executeFunction cannot execute async functions.
+            if (!node.meta.isConstant && !node.meta.isAsync) {
+              node.run();
             }
 
             if (verbose) {
