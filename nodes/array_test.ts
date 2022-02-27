@@ -3,6 +3,7 @@ import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
 import { DflowArray, DflowHost } from "../engine.ts";
 import {
   testOneArrAndOneAnyInOneArrOut,
+  testOneArrAndOneNumInOneAnyOut,
   testOneArrAndOneStrInOneBoolOut,
   testOneArrAndOneStrInOneStrOut,
   testOneArrAndTwoNumInOneArrOut,
@@ -11,6 +12,19 @@ import {
   testOneArrInOneNumOut,
 } from "./_test-utils.ts";
 import { catalog } from "./catalog.ts";
+
+Deno.test(catalog.arrayAt.kind, () => {
+  const nodeKind = catalog.arrayAt.kind;
+  [
+    { input1: undefined, input2: undefined, output: undefined },
+    { input1: ["a"], input2: 0, output: "a" },
+    { input1: ["a"], input2: 1, output: undefined },
+    { input1: ["a", true], input2: 1, output: true },
+    { input1: ["a", true, 42], input2: -1, output: 42 },
+  ].forEach(({ input1, input2, output }) => {
+    testOneArrAndOneNumInOneAnyOut(nodeKind, input1, input2, output);
+  });
+});
 
 Deno.test(catalog.arrayFindIndex.kind, () => {
   const nodeKind = catalog.arrayFindIndex.kind;
@@ -38,10 +52,10 @@ Deno.test(catalog.arrayFindIndex.kind, () => {
 
   dflow.run();
 
-  const expected = 3;
+  const output = 3;
   const result = testNode.output(0).data as number;
 
-  assertEquals(result, expected);
+  assertEquals(result, output);
 });
 
 Deno.test(catalog.arrayFindLastIndex.kind, () => {
@@ -70,10 +84,10 @@ Deno.test(catalog.arrayFindLastIndex.kind, () => {
 
   dflow.run();
 
-  const expected = 5;
+  const output = 5;
   const result = testNode.output(0).data as number;
 
-  assertEquals(result, expected);
+  assertEquals(result, output);
 });
 
 Deno.test(catalog.arrayFilter.kind, () => {
@@ -102,22 +116,22 @@ Deno.test(catalog.arrayFilter.kind, () => {
 
   dflow.run();
 
-  const expected = [4, 5, 6, 7];
+  const output = [4, 5, 6, 7];
   const result = testNode.output(0).data as DflowArray;
 
-  assertArrayIncludes(result, expected);
-  assertEquals(result.length, expected.length);
+  assertArrayIncludes(result, output);
+  assertEquals(result.length, output.length);
 });
 
 Deno.test(catalog.arrayIncludes.kind, () => {
   const nodeKind = catalog.arrayIncludes.kind;
   [
-    { inputs: { array: undefined, element: undefined }, expected: undefined },
-    { inputs: { array: ["a", "b"], element: "c" }, expected: false },
-    { inputs: { array: ["a", "b"], element: "a" }, expected: true },
+    { inputs: { array: undefined, element: undefined }, output: undefined },
+    { inputs: { array: ["a", "b"], element: "c" }, output: false },
+    { inputs: { array: ["a", "b"], element: "a" }, output: true },
   ].forEach(
-    ({ inputs: { array, element }, expected }) => {
-      testOneArrAndOneStrInOneBoolOut(nodeKind, array, element, expected);
+    ({ inputs: { array, element }, output }) => {
+      testOneArrAndOneStrInOneBoolOut(nodeKind, array, element, output);
     },
   );
 });
@@ -125,13 +139,13 @@ Deno.test(catalog.arrayIncludes.kind, () => {
 Deno.test(catalog.arrayJoin.kind, () => {
   const nodeKind = catalog.arrayJoin.kind;
   [
-    { inputs: { array: undefined, separator: undefined }, expected: undefined },
-    { inputs: { array: ["a", "b"], separator: "/" }, expected: "a/b" },
-    { inputs: { array: ["a", "b"], separator: "-" }, expected: "a-b" },
-    { inputs: { array: ["a", "b"], separator: undefined }, expected: "a,b" },
+    { inputs: { array: undefined, separator: undefined }, output: undefined },
+    { inputs: { array: ["a", "b"], separator: "/" }, output: "a/b" },
+    { inputs: { array: ["a", "b"], separator: "-" }, output: "a-b" },
+    { inputs: { array: ["a", "b"], separator: undefined }, output: "a,b" },
   ].forEach(
-    ({ inputs: { array, separator }, expected }) => {
-      testOneArrAndOneStrInOneStrOut(nodeKind, array, separator, expected);
+    ({ inputs: { array, separator }, output }) => {
+      testOneArrAndOneStrInOneStrOut(nodeKind, array, separator, output);
     },
   );
 });
@@ -139,10 +153,10 @@ Deno.test(catalog.arrayJoin.kind, () => {
 Deno.test(catalog.arrayLength.kind, () => {
   const nodeKind = catalog.arrayLength.kind;
   [
-    { input: undefined, expected: undefined },
-    { input: ["a"], expected: 1 },
-  ].forEach(({ input, expected }) => {
-    testOneArrInOneNumOut(nodeKind, input, expected);
+    { input: undefined, output: undefined },
+    { input: ["a"], output: 1 },
+  ].forEach(({ input, output }) => {
+    testOneArrInOneNumOut(nodeKind, input, output);
   });
 });
 
@@ -178,11 +192,11 @@ Deno.test(catalog.arrayMap.kind, () => {
 
   dflow.run();
 
-  const expected = [2, 3, 4, 5];
+  const output = [2, 3, 4, 5];
   const result = testNode.output(0).data as DflowArray;
 
-  assertArrayIncludes(result, expected);
-  assertEquals(result.length, expected.length);
+  assertArrayIncludes(result, output);
+  assertEquals(result.length, output.length);
 });
 
 Deno.test(catalog.arrayPop.kind, () => {
