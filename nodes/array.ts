@@ -1,5 +1,19 @@
 import { DflowArray, DflowId, DflowNode } from "../engine.ts";
 
+class DflowArrayAt extends DflowNode {
+  static kind = "arrayAt";
+  static inputs = [
+    ...DflowNode.in(["array"]),
+    ...DflowNode.in(["number"], { name: "index" }),
+  ];
+  static outputs = DflowNode.out();
+  run() {
+    const array = this.input(0).data as DflowArray;
+    const index = this.input(1).data as number;
+    this.output(0).data = array.at(index);
+  }
+}
+
 class DflowArrayFilter extends DflowNode {
   static kind = "arrayFilter";
   static inputs = [
@@ -187,6 +201,7 @@ class DflowArraySlice extends DflowNode {
 }
 
 export const catalog = {
+  [DflowArrayAt.kind]: DflowArrayAt,
   [DflowArrayFilter.kind]: DflowArrayFilter,
   [DflowArrayFindLastIndex.kind]: DflowArrayFindLastIndex,
   [DflowArrayFindIndex.kind]: DflowArrayFindIndex,

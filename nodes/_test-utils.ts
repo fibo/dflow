@@ -57,6 +57,28 @@ export function testOneArrAndOneAnyInOneArrOut(
   assertEquals(testNode.output(0).data, output);
 }
 
+export function testOneArrAndOneNumInOneAnyOut(
+  nodeKind: string,
+  input1?: DflowArray,
+  input2?: number,
+  output?: DflowValue,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode1 = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out1", types: ["array"], data: input1 }],
+  });
+  const dataNode2 = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out2", types: ["number"], data: input2 }],
+  });
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode1).to(testNode, 0);
+  dflow.connect(dataNode2).to(testNode, 1);
+  dflow.run();
+  assertEquals(testNode.output(0).data, output);
+}
+
 export function testOneArrAndOneStrInOneBoolOut(
   nodeKind: string,
   input1?: DflowArray,
