@@ -12,6 +12,70 @@ import {
 } from "./_test-utils.ts";
 import { catalog } from "./catalog.ts";
 
+Deno.test(catalog.arrayFindIndex.kind, () => {
+  const nodeKind = catalog.arrayFindIndex.kind;
+
+  const dflow = new DflowHost(catalog);
+  const testNode = dflow.newNode({ kind: nodeKind });
+  const dataNode = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4, 5, 6, 7] }],
+  });
+  const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
+  const typeNumNode = dflow.newNode({ kind: catalog.typeNumber.kind });
+  const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
+  const greaterThanNode = dflow.newNode({ kind: catalog.greaterThan.kind });
+  const returnNode = dflow.newNode({ kind: catalog.return.kind });
+  const functionNode = dflow.newNode({ kind: catalog.function.kind });
+
+  dflow.connect(functionNode).to(returnNode);
+  dflow.connect(greaterThanNode).to(returnNode, 1);
+  dflow.connect(typeNumNode).to(argumentNode);
+  dflow.connect(argumentNode).to(greaterThanNode, 0);
+  dflow.connect(numNode).to(greaterThanNode, 1);
+  dflow.connect(dataNode).to(testNode);
+  dflow.connect(functionNode).to(testNode, 1);
+
+  dflow.run();
+
+  const expected = 3;
+  const result = testNode.output(0).data as number;
+
+  assertEquals(result, expected);
+});
+
+Deno.test(catalog.arrayFindLastIndex.kind, () => {
+  const nodeKind = catalog.arrayFindLastIndex.kind;
+
+  const dflow = new DflowHost(catalog);
+  const testNode = dflow.newNode({ kind: nodeKind });
+  const dataNode = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4, 5, 6, 0] }],
+  });
+  const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
+  const typeNumNode = dflow.newNode({ kind: catalog.typeNumber.kind });
+  const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
+  const greaterThanNode = dflow.newNode({ kind: catalog.greaterThan.kind });
+  const returnNode = dflow.newNode({ kind: catalog.return.kind });
+  const functionNode = dflow.newNode({ kind: catalog.function.kind });
+
+  dflow.connect(functionNode).to(returnNode);
+  dflow.connect(greaterThanNode).to(returnNode, 1);
+  dflow.connect(typeNumNode).to(argumentNode);
+  dflow.connect(argumentNode).to(greaterThanNode, 0);
+  dflow.connect(numNode).to(greaterThanNode, 1);
+  dflow.connect(dataNode).to(testNode);
+  dflow.connect(functionNode).to(testNode, 1);
+
+  dflow.run();
+
+  const expected = 5;
+  const result = testNode.output(0).data as number;
+
+  assertEquals(result, expected);
+});
+
 Deno.test(catalog.arrayFilter.kind, () => {
   const nodeKind = catalog.arrayFilter.kind;
 

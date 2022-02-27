@@ -15,6 +15,36 @@ class DflowArrayFilter extends DflowNode {
   }
 }
 
+class DflowArrayFindLastIndex extends DflowNode {
+  static kind = "arrayFindLastIndex";
+  static inputs = [
+    ...DflowNode.in(["array"]),
+    ...DflowNode.in(["DflowId"], { name: "functionId" }),
+  ];
+  static outputs = DflowNode.out(["number"]);
+  run() {
+    this.output(0).data = (this.input(0).data as DflowArray).findLastIndex(
+      (...args) =>
+        this.host.executeFunction(this.input(1).data as DflowId, args),
+    );
+  }
+}
+
+class DflowArrayFindIndex extends DflowNode {
+  static kind = "arrayFindIndex";
+  static inputs = [
+    ...DflowNode.in(["array"]),
+    ...DflowNode.in(["DflowId"], { name: "functionId" }),
+  ];
+  static outputs = DflowNode.out(["number"]);
+  run() {
+    this.output(0).data = (this.input(0).data as DflowArray).findIndex(
+      (...args) =>
+        this.host.executeFunction(this.input(1).data as DflowId, args),
+    );
+  }
+}
+
 class DflowArrayIncludes extends DflowNode {
   static kind = "arrayIncludes";
   static inputs = [
@@ -158,6 +188,8 @@ class DflowArraySlice extends DflowNode {
 
 export const catalog = {
   [DflowArrayFilter.kind]: DflowArrayFilter,
+  [DflowArrayFindLastIndex.kind]: DflowArrayFindLastIndex,
+  [DflowArrayFindIndex.kind]: DflowArrayFindIndex,
   [DflowArrayIncludes.kind]: DflowArrayIncludes,
   [DflowArrayJoin.kind]: DflowArrayJoin,
   [DflowArrayLength.kind]: DflowArrayLength,
