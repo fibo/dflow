@@ -5,7 +5,10 @@
   "homepage": "http://g14n.info/dflow",
   "type": "module",
   "main": "./dflow.cjs",
-  "module": "./dflow.js",
+  "exports": {
+    "import": "./dflow.js",
+    "require": "./dflow.cjs"
+  },
   "funding": "https://github.com/sponsors/fibo",
   "engines": {
     "node": ">=14",
