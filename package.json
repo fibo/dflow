@@ -4,7 +4,8 @@
   "version": "0.33.0",
   "homepage": "http://g14n.info/dflow",
   "type": "module",
-  "exports": "./dflow.js",
+  "main": "./dflow.cjs",
+  "module": "./dflow.js",
   "funding": "https://github.com/sponsors/fibo",
   "engines": {
     "node": ">=14",
@@ -16,8 +17,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "npm run bundle && npm run generate_types",
-    "bundle": "deno bundle dflow.ts | esbuild --minify --target=safari11 > dflow.js",
+    "build": "npm run bundle:commonjs && npm run bundle:esmodule && npm run generate_types",
+    "bundle:esmodule": "deno bundle dflow.ts | esbuild --minify --target=safari11 > dflow.js",
+    "bundle:commonjs": "deno bundle dflow.ts | esbuild --minify --format=cjs > dflow.cjs",
     "example:abstract": "deno run examples/abstract.js",
     "example:context": "deno run examples/context.ts",
     "example:execution-report": "deno run examples/execution-report.ts",
