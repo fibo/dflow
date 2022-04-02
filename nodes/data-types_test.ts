@@ -51,9 +51,9 @@ Deno.test(catalog.isDefined.kind, () => {
   const nodeKind = catalog.isDefined.kind;
   [
     { input: undefined, output: false },
+    { input: true, output: true },
     { input: [], output: true },
     { input: [1, 2, 3], output: true },
-    { input: true, output: true },
     { input: { foo: "bar" }, output: true },
   ].forEach(({ input, output }) => {
     testOneAnyInOneBoolOut(nodeKind, input, output);
@@ -61,12 +61,12 @@ Deno.test(catalog.isDefined.kind, () => {
 });
 
 Deno.test(catalog.isUndefined.kind, () => {
-  const nodeKind = catalog.isDefined.kind;
+  const nodeKind = catalog.isUndefined.kind;
   [
     { input: undefined, output: true },
+    { input: false, output: false },
     { input: [], output: false },
     { input: [1, 2, 3], output: false },
-    { input: false, output: false },
     { input: { foo: "bar" }, output: false },
   ].forEach(({ input, output }) => {
     testOneAnyInOneBoolOut(nodeKind, input, output);
