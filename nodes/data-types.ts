@@ -93,7 +93,6 @@ class DflowIsDefined extends DflowNode {
   static outputs = DflowNode.out(["boolean"]);
   run() {
     const data = this.input(0).data;
-    console.log(data);
     this.output(0).data = typeof data !== "undefined";
   }
 }
@@ -104,7 +103,6 @@ class DflowIsUndefined extends DflowNode {
   static outputs = DflowNode.out(["boolean"]);
   run() {
     const data = this.input(0).data;
-    console.log(data);
     this.output(0).data = typeof data === "undefined";
   }
 }
