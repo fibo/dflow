@@ -1,4 +1,13 @@
-import { DflowArray, DflowNode } from "../engine.ts";
+import { DflowNode } from "../engine.ts";
+
+class DflowMathAbs extends DflowNode {
+  static kind = "mathAbs";
+  static inputs = DflowNode.in(["number"]);
+  static outputs = DflowNode.out(["number"]);
+  run() {
+    this.output(0).data = Math.abs(this.input(0).data as number);
+  }
+}
 
 class DflowMathCos extends DflowNode {
   static kind = "mathCos";
@@ -77,6 +86,7 @@ class DflowMathSinh extends DflowNode {
 }
 
 export const catalog = {
+  [DflowMathAbs.kind]: DflowMathAbs,
   [DflowMathCos.kind]: DflowMathCos,
   [DflowMathCosh.kind]: DflowMathCosh,
   [DflowMathMax.kind]: DflowMathMax,

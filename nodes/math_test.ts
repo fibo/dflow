@@ -5,6 +5,16 @@ import {
 } from "./_test-utils.ts";
 import { catalog } from "./catalog.ts";
 
+Deno.test(catalog.mathAbs.kind, () => {
+  const nodeKind = catalog.mathAbs.kind;
+  [
+    { input: undefined, output: undefined },
+    { input: -1, output: 1 },
+  ].forEach(({ input, output }) => {
+    testOneNumInOneNumOut(nodeKind, input, output);
+  });
+});
+
 Deno.test(catalog.mathCos.kind, () => {
   const nodeKind = catalog.mathCos.kind;
   [
