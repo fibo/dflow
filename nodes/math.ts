@@ -27,6 +27,15 @@ class DflowMathCosh extends DflowNode {
   }
 }
 
+class DflowMathFloor extends DflowNode {
+  static kind = "mathFloor";
+  static inputs = DflowNode.in(["number"]);
+  static outputs = DflowNode.out(["number"]);
+  run() {
+    this.output(0).data = Math.floor(this.input(0).data as number);
+  }
+}
+
 class DflowMathMax extends DflowNode {
   static kind = "mathMax";
   static inputs = DflowNode.in(["array"]);
@@ -67,6 +76,15 @@ class DflowMathPI extends DflowNode {
   static outputs = DflowNode.out(["number"], { name: "π", data: Math.PI });
 }
 
+class DflowMathRound extends DflowNode {
+  static kind = "mathRound";
+  static inputs = DflowNode.in(["number"]);
+  static outputs = DflowNode.out(["number"]);
+  run() {
+    this.output(0).data = Math.round(this.input(0).data as number);
+  }
+}
+
 class DflowMathSin extends DflowNode {
   static kind = "mathSin";
   static inputs = DflowNode.in(["number"]);
@@ -89,9 +107,11 @@ export const catalog = {
   [DflowMathAbs.kind]: DflowMathAbs,
   [DflowMathCos.kind]: DflowMathCos,
   [DflowMathCosh.kind]: DflowMathCosh,
+  [DflowMathFloor.kind]: DflowMathFloor,
   [DflowMathMax.kind]: DflowMathMax,
   [DflowMathMin.kind]: DflowMathMin,
   [DflowMathPI.kind]: DflowMathPI,
+  [DflowMathRound.kind]: DflowMathRound,
   [DflowMathSin.kind]: DflowMathSin,
   [DflowMathSinh.kind]: DflowMathSinh,
 };

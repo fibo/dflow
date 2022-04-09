@@ -35,6 +35,16 @@ Deno.test(catalog.mathCosh.kind, () => {
   });
 });
 
+Deno.test(catalog.mathFloor.kind, () => {
+  const nodeKind = catalog.mathFloor.kind;
+  [
+    { input: undefined, output: undefined },
+    { input: 1.2, output: Math.floor(1.2) },
+  ].forEach(({ input, output }) => {
+    testOneNumInOneNumOut(nodeKind, input, output);
+  });
+});
+
 Deno.test(catalog.mathMax.kind, () => {
   const nodeKind = catalog.mathMax.kind;
   [
@@ -64,6 +74,16 @@ Deno.test(catalog.mathMin.kind, () => {
 Deno.test(catalog.mathPI.kind, () => {
   const nodeKind = catalog.mathPI.kind;
   testOneNumOut(nodeKind, Math.PI);
+});
+
+Deno.test(catalog.mathRound.kind, () => {
+  const nodeKind = catalog.mathRound.kind;
+  [
+    { input: undefined, output: undefined },
+    { input: 1.2, output: Math.floor(1.2) },
+  ].forEach(({ input, output }) => {
+    testOneNumInOneNumOut(nodeKind, input, output);
+  });
 });
 
 Deno.test(catalog.mathSin.kind, () => {
