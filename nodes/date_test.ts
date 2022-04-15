@@ -3,6 +3,21 @@ import { assertEquals } from "std/testing/asserts.ts";
 import { DflowHost } from "../engine.ts";
 import { catalog } from "./catalog.ts";
 
+Deno.test(catalog.newDate.kind, () => {
+  const nodeKind = catalog.newDate.kind;
+
+  const dflow = new DflowHost(catalog);
+  const testNode = dflow.newNode({ kind: nodeKind });
+
+  dflow.run();
+
+  const output0 = testNode.output(0).data as string;
+  const output1 = testNode.output(1).data as number;
+
+  assertEquals(typeof output0, "string");
+  assertEquals(typeof output1, "number");
+});
+
 Deno.test(catalog.now.kind, () => {
   const nodeKind = catalog.now.kind;
 
@@ -11,7 +26,9 @@ Deno.test(catalog.now.kind, () => {
 
   dflow.run();
 
-  const result = testNode.output(0).data as number;
+  const output0 = testNode.output(0).data as string;
+  const output1 = testNode.output(1).data as number;
 
-  assertEquals(typeof result, "number");
+  assertEquals(typeof output0, "string");
+  assertEquals(typeof output1, "number");
 });
