@@ -554,14 +554,20 @@ export class DflowNode extends DflowItem {
     return this.#outputs.size;
   }
 
-  generateInputId(i = this.numInputs): DflowId {
-    const id = `i${i}`;
-    return this.#inputs.has(id) ? this.generateInputId(i + 1) : id;
+  clearOutputs() {
+    for (const output of this.outputs) {
+      output.clear();
+    }
   }
 
-  generateOutputId(i = this.numOutputs): DflowId {
+  #generateInputId(i = this.numInputs): DflowId {
+    const id = `i${i}`;
+    return this.#inputs.has(id) ? this.#generateInputId(i + 1) : id;
+  }
+
+  #generateOutputId(i = this.numOutputs): DflowId {
     const id = `o${i}`;
-    return this.#outputs.has(id) ? this.generateOutputId(i + 1) : id;
+    return this.#outputs.has(id) ? this.#generateOutputId(i + 1) : id;
   }
 
   getInputById(pinId: DflowId): DflowInput {
@@ -646,7 +652,7 @@ export class DflowNode extends DflowItem {
   newInput(obj: DflowNewInput): DflowInput {
     const id = DflowData.isDflowId(obj.id)
       ? (obj.id as DflowId)
-      : this.generateInputId();
+      : this.#generateInputId();
 
     const pin = new DflowInput({ ...obj, id });
     this.#inputs.set(id, pin);
@@ -657,7 +663,7 @@ export class DflowNode extends DflowItem {
   newOutput(obj: DflowNewOutput): DflowOutput {
     const id = DflowData.isDflowId(obj.id)
       ? (obj.id as DflowId)
-      : this.generateOutputId();
+      : this.#generateOutputId();
 
     const pin = new DflowOutput({ ...obj, id });
     this.#outputs.set(id, pin);
