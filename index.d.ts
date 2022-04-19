@@ -198,8 +198,7 @@ export declare class DflowNode extends DflowItem {
   get outputs(): IterableIterator<DflowOutput>;
   get numInputs(): number;
   get numOutputs(): number;
-  generateInputId(i?: number): DflowId;
-  generateOutputId(i?: number): DflowId;
+  clearOutputs(): void;
   getInputById(pinId: DflowId): DflowInput;
   input(position: number): DflowInput;
   getOutputById(pinId: DflowId): DflowOutput;

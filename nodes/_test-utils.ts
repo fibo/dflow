@@ -275,6 +275,34 @@ export function testOneStrInOneNumOut(
   assertEquals(testNode.output(0).data, output);
 }
 
+export function testOneStrAndTwoNumInOneStrOut(
+  nodeKind: string,
+  input1?: string,
+  input2?: number,
+  input3?: number,
+  output?: string,
+) {
+  const dflow = new DflowHost(catalog);
+  const dataNode1 = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out", types: ["string"], data: input1 }],
+  });
+  const dataNode2 = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out", types: ["number"], data: input2 }],
+  });
+  const dataNode3 = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out", types: ["number"], data: input3 }],
+  });
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode1).to(testNode, 0);
+  dflow.connect(dataNode2).to(testNode, 1);
+  dflow.connect(dataNode3).to(testNode, 2);
+  dflow.run();
+  assertEquals(testNode.output(0).data, output);
+}
+
 export function testTwoAnyInOneBoolOut(
   nodeKind: string,
   input1: DflowValue,
