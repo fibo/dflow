@@ -4,3 +4,5 @@
 # ignore the following files and folders
 --ignore-file=match:/dflow.cjs/
 --ignore-file=match:/dflow.js/
+--ignore-file=match:/nodes.cjs/
+--ignore-file=match:/nodes.js/
