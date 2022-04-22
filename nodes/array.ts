@@ -1,4 +1,4 @@
-import { DflowArray, DflowId, DflowNode } from "../engine.ts";
+import { DflowArray, DflowId, DflowNode } from "../dflow.ts";
 
 class DflowArrayAt extends DflowNode {
   static kind = "arrayAt";
@@ -188,15 +188,26 @@ class DflowArraySlice extends DflowNode {
   ];
   static outputs = DflowNode.out(["array"]);
   run() {
-    const array = this.input(0).data as DflowArray;
-    const start = this.input(1).data as number;
-    const end = this.input(2).data;
+    const array = super.input(0).data as DflowArray;
+    const start = super.input(1).data as number;
+    const end = super.input(2).data;
 
     if (typeof end === "number") {
-      this.output(0).data = array.slice(start, end);
+      super.output(0).data = array.slice(start, end);
     } else {
-      this.output(0).data = array.slice(start);
+      super.output(0).data = array.slice(start);
     }
+  }
+}
+
+class DflowIsArray extends DflowNode {
+  static kind = "isArray";
+  static inputs = DflowNode.out();
+  static outputs = DflowNode.out(["boolean"]);
+
+  run() {
+    const data = this.input(0).data;
+    this.output(0).data = Array.isArray(data);
   }
 }
 
@@ -214,4 +225,5 @@ export const catalog = {
   [DflowArrayReverse.kind]: DflowArrayReverse,
   [DflowArrayShift.kind]: DflowArrayShift,
   [DflowArraySlice.kind]: DflowArraySlice,
+  [DflowIsArray.kind]: DflowIsArray,
 };

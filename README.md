@@ -4,12 +4,12 @@
 
 ## Features
 
-- Implemented in TypeScript, available both on Node and on Deno.
+- Implemented in TypeScript, available both on Node and Deno.
 - Expressive API.
-- Graphic interface implemented with WebComponents
-  ([demo here](https://fibo.github.io/dflow)).
 - Core nodes catalog with basic JavaScript features (to be completed).
 - Supports custom nodes, just extending `DflowNode` class.
+- Graphic interface implemented with WebComponents.
+  ([demo here](https://fibo.github.io/dflow)).
 
 ## Installation
 
@@ -89,12 +89,12 @@ You can run the following code with any of the following:
 You should see a number `1` printed on output.
 
 ```javascript
-// file examples/usage.js
-import { catalog as corenodes, dflowhost } from "../dflow.js";
+import { DflowHost } from "dflow";
+import { nodesCatalog } from "dflow/nodes";
 
 function rungraph() {
   // use builtin nodes
-  const dflow = new DflowHost(coreNodes);
+  const dflow = new DflowHost(nodesCatalog);
 
   // create nodes
   const numNode = dflow.newNode({

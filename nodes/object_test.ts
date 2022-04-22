@@ -1,16 +1,23 @@
+import { DflowHost } from "../dflow.ts";
+import { nodesCatalog } from "../nodes.ts";
 import { testOneObjInOneArrOut } from "./_test-utils.ts";
-import { catalog } from "./catalog.ts";
 
-Deno.test(catalog.objectKeys.kind, () => {
+Deno.test("objectKeys", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.objectKeys.kind;
+
   [{ foo: true }].forEach((input) => {
-    testOneObjInOneArrOut(nodeKind, input, Object.keys(input));
+    testOneObjInOneArrOut(dflow, nodeKind, input, Object.keys(input));
   });
 });
 
-Deno.test(catalog.objectValues.kind, () => {
+Deno.test("objectValues", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.objectValues.kind;
+
   [{ foo: true }].forEach((input) => {
-    testOneObjInOneArrOut(nodeKind, input, Object.values(input));
+    testOneObjInOneArrOut(dflow, nodeKind, input, Object.values(input));
   });
 });

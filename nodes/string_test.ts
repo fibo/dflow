@@ -1,21 +1,28 @@
+import { DflowHost } from "../dflow.ts";
+import { nodesCatalog } from "../nodes.ts";
 import {
   testOneStrAndTwoNumInOneStrOut,
   testOneStrInOneNumOut,
 } from "./_test-utils.ts";
-import { catalog } from "./catalog.ts";
 
-Deno.test(catalog.stringLength.kind, () => {
+Deno.test("stringLength", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.stringLength.kind;
+
   [
     { input: undefined, output: undefined },
     { input: "foo", output: "foo".length },
   ].forEach(({ input, output }) => {
-    testOneStrInOneNumOut(nodeKind, input, output);
+    testOneStrInOneNumOut(dflow, nodeKind, input, output);
   });
 });
 
-Deno.test(catalog.substring.kind, () => {
+Deno.test("substring", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.substring.kind;
+
   [
     {
       input1: undefined,
@@ -36,6 +43,13 @@ Deno.test(catalog.substring.kind, () => {
       output: "ll",
     },
   ].forEach(({ input1, input2, input3, output }) => {
-    testOneStrAndTwoNumInOneStrOut(nodeKind, input1, input2, input3, output);
+    testOneStrAndTwoNumInOneStrOut(
+      dflow,
+      nodeKind,
+      input1,
+      input2,
+      input3,
+      output,
+    );
   });
 });

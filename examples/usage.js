@@ -1,9 +1,11 @@
 // keep in sync with readme
-import { catalog as coreNodes, DflowHost } from "../dflow.js";
+
+import { DflowHost } from "../dflow.js";
+import { nodesCatalog } from "../nodes.js";
 
 function rungraph() {
   // use builtin nodes
-  const dflow = new DflowHost(coreNodes);
+  const dflow = new DflowHost(nodesCatalog);
 
   // create nodes
   const numNode = dflow.newNode({

@@ -1,24 +1,12 @@
-import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
+import { assertEquals } from "std/testing/asserts.ts";
+import { DflowHost, DflowId } from "../dflow.ts";
+import { nodesCatalog } from "../nodes.ts";
 
-import { DflowArray, DflowHost, DflowId } from "../engine.ts";
-import { catalog } from "./catalog.ts";
-
-Deno.test(catalog.dflow.kind, () => {
-  const nodeKind = catalog.dflow.kind;
-
-  // Load a catalog with a single Dflow node.
-  const dflow = new DflowHost({ [nodeKind]: catalog[nodeKind] });
-  const testNode = dflow.newNode({ kind: nodeKind });
-  dflow.run();
-  assertArrayIncludes(testNode.output(0).data as DflowArray, [
-    nodeKind,
-  ]);
-});
-
-Deno.test(catalog.function.kind, () => {
+Deno.test("function", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.function.kind;
 
-  const dflow = new DflowHost(catalog);
   const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
   const additionNode = dflow.newNode({ kind: catalog.addition.kind });
   const returnNode = dflow.newNode({ kind: catalog.return.kind });

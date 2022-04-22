@@ -1,4 +1,4 @@
-import { DflowNode } from "../engine.ts";
+import { DflowNode } from "../dflow.ts";
 
 class DflowIf extends DflowNode {
   static kind = "if";

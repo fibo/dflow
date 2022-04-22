@@ -1,4 +1,4 @@
-import { DflowNode } from "../engine.ts";
+import { DflowNode } from "../dflow.ts";
 
 class DflowData extends DflowNode {
   static kind = "data";
@@ -76,17 +76,6 @@ class DflowString extends DflowNode {
   }
 }
 
-class DflowIsArray extends DflowNode {
-  static kind = "isArray";
-  static inputs = DflowNode.out();
-  static outputs = DflowNode.out(["boolean"]);
-
-  run() {
-    const data = this.input(0).data;
-    this.output(0).data = Array.isArray(data);
-  }
-}
-
 class DflowIsDefined extends DflowNode {
   static kind = "isDefined";
   static inputs = DflowNode.in();
@@ -116,5 +105,4 @@ export const catalog = {
   [DflowNumber.kind]: DflowNumber,
   [DflowObject.kind]: DflowObject,
   [DflowString.kind]: DflowString,
-  [DflowIsArray.kind]: DflowIsArray,
 };

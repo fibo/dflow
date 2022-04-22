@@ -15,7 +15,7 @@ import {
   DflowPinType,
   DflowSerializableNode,
   DflowValue,
-} from "./engine.ts";
+} from "./dflow.ts";
 
 const num = 1;
 const bool = true;
