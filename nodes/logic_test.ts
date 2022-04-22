@@ -1,11 +1,16 @@
+import { DflowHost } from "../dflow.ts";
+import { nodesCatalog } from "../nodes.ts";
+import { nodesCatalog as catalog } from "../nodes.ts";
 import {
   testOneBoolInOneBoolOut,
   testTwoBoolInOneBoolOut,
 } from "./_test-utils.ts";
-import { catalog } from "./catalog.ts";
 
-Deno.test(catalog.and.kind, () => {
+Deno.test("and", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.and.kind;
+
   [
     { inputs: [true, true], output: true && true },
     { inputs: [true, false], output: true && false },
@@ -17,20 +22,26 @@ Deno.test(catalog.and.kind, () => {
     { inputs: [false, undefined], output: undefined },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoBoolInOneBoolOut(nodeKind, input1, input2, output);
+      testTwoBoolInOneBoolOut(dflow, nodeKind, input1, input2, output);
     },
   );
 });
 
-Deno.test(catalog.not.kind, () => {
+Deno.test("not", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.not.kind;
+
   [true, false].forEach((input) => {
-    testOneBoolInOneBoolOut(nodeKind, input, !input);
+    testOneBoolInOneBoolOut(dflow, nodeKind, input, !input);
   });
 });
 
-Deno.test(catalog.or.kind, () => {
+Deno.test("or", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.or.kind;
+
   [
     { inputs: [true, true], output: true || true },
     { inputs: [true, false], output: true || false },
@@ -42,7 +53,7 @@ Deno.test(catalog.or.kind, () => {
     { inputs: [false, undefined], output: undefined },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoBoolInOneBoolOut(nodeKind, input1, input2, output);
+      testTwoBoolInOneBoolOut(dflow, nodeKind, input1, input2, output);
     },
   );
 });

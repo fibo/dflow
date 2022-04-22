@@ -1,14 +1,13 @@
 import { assertEquals } from "std/testing/asserts.ts";
-
-import { DflowArray, DflowHost, DflowObject, DflowValue } from "../engine.ts";
-import { catalog } from "./catalog.ts";
+import { DflowArray, DflowHost, DflowObject, DflowValue } from "../dflow.ts";
 
 export function testOneAnyInOneBoolOut(
+  dflow: DflowHost,
   nodeKind: string,
   input?: DflowValue,
   output?: boolean,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: [], data: input }],
@@ -20,11 +19,12 @@ export function testOneAnyInOneBoolOut(
 }
 
 export function testOneArrInOneNumOut(
+  dflow: DflowHost,
   nodeKind: string,
   input?: DflowArray,
   output?: number,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["array"], data: input }],
@@ -36,12 +36,13 @@ export function testOneArrInOneNumOut(
 }
 
 export function testOneArrAndOneAnyInOneArrOut(
+  dflow: DflowHost,
   nodeKind: string,
   input1?: DflowArray,
   input2?: DflowValue,
   output?: DflowArray,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out1", types: ["array"], data: input1 }],
@@ -58,12 +59,13 @@ export function testOneArrAndOneAnyInOneArrOut(
 }
 
 export function testOneArrAndOneNumInOneAnyOut(
+  dflow: DflowHost,
   nodeKind: string,
   input1?: DflowArray,
   input2?: number,
   output?: DflowValue,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out1", types: ["array"], data: input1 }],
@@ -80,12 +82,13 @@ export function testOneArrAndOneNumInOneAnyOut(
 }
 
 export function testOneArrAndOneStrInOneBoolOut(
+  dflow: DflowHost,
   nodeKind: string,
   input1?: DflowArray,
   input2?: string,
   output?: boolean,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out1", types: ["array"], data: input1 }],
@@ -102,12 +105,13 @@ export function testOneArrAndOneStrInOneBoolOut(
 }
 
 export function testOneArrAndOneStrInOneStrOut(
+  dflow: DflowHost,
   nodeKind: string,
   input1?: DflowArray,
   input2?: string,
   output?: string,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out1", types: ["array"], data: input1 }],
@@ -124,12 +128,13 @@ export function testOneArrAndOneStrInOneStrOut(
 }
 
 export function testOneArrInOneAnyAndOneArrOut(
+  dflow: DflowHost,
   nodeKind: string,
   input?: DflowArray,
   output1?: DflowValue,
   output2?: DflowArray,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["array"], data: input }],
@@ -142,13 +147,14 @@ export function testOneArrInOneAnyAndOneArrOut(
 }
 
 export function testOneArrAndTwoNumInOneArrOut(
+  dflow: DflowHost,
   nodeKind: string,
   input1?: DflowArray,
   input2?: number,
   input3?: number,
   output1?: DflowArray,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out1", types: ["array"], data: input1 }],
@@ -170,11 +176,12 @@ export function testOneArrAndTwoNumInOneArrOut(
 }
 
 export function testOneArrInOneArrOut(
+  dflow: DflowHost,
   nodeKind: string,
   input?: DflowArray,
   output?: DflowArray,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["array"], data: input }],
@@ -186,11 +193,12 @@ export function testOneArrInOneArrOut(
 }
 
 export function testOneBoolInOneBoolOut(
+  dflow: DflowHost,
   nodeKind: string,
   input?: boolean,
   output?: boolean,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["boolean"], data: input }],
@@ -202,11 +210,12 @@ export function testOneBoolInOneBoolOut(
 }
 
 export function testOneObjInOneArrOut(
+  dflow: DflowHost,
   nodeKind: string,
   input: DflowObject,
   output: DflowArray,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["object"], data: input }],
@@ -218,11 +227,12 @@ export function testOneObjInOneArrOut(
 }
 
 export function testOneNumInOneBoolOut(
+  dflow: DflowHost,
   nodeKind: string,
   input?: number,
   output?: boolean,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["number"], data: input }],
@@ -234,11 +244,12 @@ export function testOneNumInOneBoolOut(
 }
 
 export function testOneNumInOneNumOut(
+  dflow: DflowHost,
   nodeKind: string,
   input?: number,
   output?: number,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["number"], data: input }],
@@ -250,21 +261,22 @@ export function testOneNumInOneNumOut(
 }
 
 export function testOneNumOut(
+  dflow: DflowHost,
   nodeKind: string,
   output: number,
 ) {
-  const dflow = new DflowHost(catalog);
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.run();
   assertEquals(testNode.output(0).data, output);
 }
 
 export function testOneStrInOneNumOut(
+  dflow: DflowHost,
   nodeKind: string,
   input?: string,
   output?: number,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["string"], data: input }],
@@ -276,13 +288,14 @@ export function testOneStrInOneNumOut(
 }
 
 export function testOneStrAndTwoNumInOneStrOut(
+  dflow: DflowHost,
   nodeKind: string,
   input1?: string,
   input2?: number,
   input3?: number,
   output?: string,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["string"], data: input1 }],
@@ -304,12 +317,13 @@ export function testOneStrAndTwoNumInOneStrOut(
 }
 
 export function testTwoAnyInOneBoolOut(
+  dflow: DflowHost,
   nodeKind: string,
   input1: DflowValue,
   input2: DflowValue,
   output: boolean,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out1", types: [], data: input1 }],
@@ -326,12 +340,13 @@ export function testTwoAnyInOneBoolOut(
 }
 
 export function testTwoBoolInOneBoolOut(
+  dflow: DflowHost,
   nodeKind: string,
   input1?: boolean,
   input2?: boolean,
   output?: boolean,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out1", types: ["boolean"], data: input1 }],
@@ -348,12 +363,13 @@ export function testTwoBoolInOneBoolOut(
 }
 
 export function testTwoNumInOneBoolOut(
+  dflow: DflowHost,
   nodeKind: string,
   input1?: number,
   input2?: number,
   output?: boolean,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out1", types: ["number"], data: input1 }],
@@ -370,12 +386,13 @@ export function testTwoNumInOneBoolOut(
 }
 
 export function testTwoNumInOneNumOut(
+  dflow: DflowHost,
   nodeKind: string,
   input1?: number,
   input2?: number,
   output?: number,
 ) {
-  const dflow = new DflowHost(catalog);
+  const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out1", types: ["number"], data: input1 }],

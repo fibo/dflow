@@ -1,7 +1,7 @@
-/**
+/*
 [Operators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators)
 */
-import { DflowNode } from "../engine.ts";
+import { DflowNode } from "../dflow.ts";
 
 class DflowAddition extends DflowNode {
   static kind = "addition";

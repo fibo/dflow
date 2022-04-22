@@ -1,4 +1,4 @@
-import { DflowNode } from "../engine.ts";
+import { DflowNode } from "../dflow.ts";
 
 class DflowMathAbs extends DflowNode {
   static kind = "mathAbs";

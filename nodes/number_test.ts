@@ -1,25 +1,32 @@
+import { DflowHost } from "../dflow.ts";
+import { nodesCatalog } from "../nodes.ts";
 import {
   testOneAnyInOneBoolOut,
   testOneNumInOneBoolOut,
   testOneStrInOneNumOut,
 } from "./_test-utils.ts";
-import { catalog } from "./catalog.ts";
 
-Deno.test(catalog.isFinite.kind, () => {
+Deno.test("isFinite", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.isFinite.kind;
+
   [
     { input: 1, output: true },
     { input: undefined, output: undefined },
     { input: Infinity, output: false },
   ].forEach(
     ({ input, output }) => {
-      testOneNumInOneBoolOut(nodeKind, input, output);
+      testOneNumInOneBoolOut(dflow, nodeKind, input, output);
     },
   );
 });
 
-Deno.test(catalog.isInteger.kind, () => {
+Deno.test("isInteger", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.isInteger.kind;
+
   [
     { input: undefined, output: undefined },
     { input: 1, output: true },
@@ -29,12 +36,15 @@ Deno.test(catalog.isInteger.kind, () => {
     { input: "x", output: false },
     { input: NaN, output: false },
   ].forEach((input) => {
-    testOneAnyInOneBoolOut(nodeKind, input, Number.isInteger(input));
+    testOneAnyInOneBoolOut(dflow, nodeKind, input, Number.isInteger(input));
   });
 });
 
-Deno.test(catalog.isNaN.kind, () => {
+Deno.test("isNaN", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.isNaN.kind;
+
   [
     { input: undefined, output: false },
     { input: 1.5, output: false },
@@ -42,27 +52,33 @@ Deno.test(catalog.isNaN.kind, () => {
     { input: "x", output: false },
     { input: NaN, output: true },
   ].forEach(({ input, output }) => {
-    testOneAnyInOneBoolOut(nodeKind, input, output);
+    testOneAnyInOneBoolOut(dflow, nodeKind, input, output);
   });
 });
 
-Deno.test(catalog.parseFloat.kind, () => {
+Deno.test("parseFloat", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.parseFloat.kind;
+
   [
     { input: undefined, output: undefined },
     { input: "1.5", output: 1.5 },
   ].forEach(({ input, output }) => {
-    testOneStrInOneNumOut(nodeKind, input, output);
+    testOneStrInOneNumOut(dflow, nodeKind, input, output);
   });
 });
 
-Deno.test(catalog.parseInt.kind, () => {
+Deno.test("parseInt", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.parseInt.kind;
+
   [
     { input: undefined, output: undefined },
     { input: "1.2", output: 1 },
     { input: "1", output: 1 },
   ].forEach(({ input, output }) => {
-    testOneStrInOneNumOut(nodeKind, input, output);
+    testOneStrInOneNumOut(dflow, nodeKind, input, output);
   });
 });

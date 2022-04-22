@@ -1,7 +1,8 @@
 import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
-
-import { DflowArray, DflowHost } from "../engine.ts";
+import { DflowArray, DflowHost } from "../dflow.ts";
+import { nodesCatalog } from "../nodes.ts";
 import {
+  testOneAnyInOneBoolOut,
   testOneArrAndOneAnyInOneArrOut,
   testOneArrAndOneNumInOneAnyOut,
   testOneArrAndOneStrInOneBoolOut,
@@ -11,10 +12,12 @@ import {
   testOneArrInOneArrOut,
   testOneArrInOneNumOut,
 } from "./_test-utils.ts";
-import { catalog } from "./catalog.ts";
 
-Deno.test(catalog.arrayAt.kind, () => {
+Deno.test("arrayAt", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayAt.kind;
+
   [
     { input1: undefined, input2: undefined, output: undefined },
     { input1: ["a"], input2: 0, output: "a" },
@@ -22,21 +25,22 @@ Deno.test(catalog.arrayAt.kind, () => {
     { input1: ["a", true], input2: 1, output: true },
     { input1: ["a", true, 42], input2: -1, output: 42 },
   ].forEach(({ input1, input2, output }) => {
-    testOneArrAndOneNumInOneAnyOut(nodeKind, input1, input2, output);
+    testOneArrAndOneNumInOneAnyOut(dflow, nodeKind, input1, input2, output);
   });
 });
 
-Deno.test(catalog.arrayFindIndex.kind, () => {
+Deno.test("arrayFindIndex", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayFindIndex.kind;
 
-  const dflow = new DflowHost(catalog);
   const testNode = dflow.newNode({ kind: nodeKind });
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4, 5, 6, 7] }],
   });
   const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
-  const typeNumNode = dflow.newNode({ kind: catalog.typeNumber.kind });
+  const numberNode = dflow.newNode({ kind: catalog.number.kind });
   const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
   const greaterThanNode = dflow.newNode({ kind: catalog.greaterThan.kind });
   const returnNode = dflow.newNode({ kind: catalog.return.kind });
@@ -44,8 +48,8 @@ Deno.test(catalog.arrayFindIndex.kind, () => {
 
   dflow.connect(functionNode).to(returnNode);
   dflow.connect(greaterThanNode).to(returnNode, 1);
-  dflow.connect(typeNumNode).to(argumentNode);
-  dflow.connect(argumentNode).to(greaterThanNode, 0);
+  dflow.connect(argumentNode).to(numberNode);
+  dflow.connect(numberNode).to(greaterThanNode, 0);
   dflow.connect(numNode).to(greaterThanNode, 1);
   dflow.connect(dataNode).to(testNode);
   dflow.connect(functionNode).to(testNode, 1);
@@ -58,26 +62,27 @@ Deno.test(catalog.arrayFindIndex.kind, () => {
   assertEquals(result, output);
 });
 
-Deno.test(catalog.arrayFindLastIndex.kind, () => {
+Deno.test("arrayFindLastIndex", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayFindLastIndex.kind;
 
-  const dflow = new DflowHost(catalog);
   const testNode = dflow.newNode({ kind: nodeKind });
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4, 5, 6, 0] }],
   });
   const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
-  const typeNumNode = dflow.newNode({ kind: catalog.typeNumber.kind });
   const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
+  const numberNode = dflow.newNode({ kind: catalog.number.kind });
   const greaterThanNode = dflow.newNode({ kind: catalog.greaterThan.kind });
   const returnNode = dflow.newNode({ kind: catalog.return.kind });
   const functionNode = dflow.newNode({ kind: catalog.function.kind });
 
   dflow.connect(functionNode).to(returnNode);
   dflow.connect(greaterThanNode).to(returnNode, 1);
-  dflow.connect(typeNumNode).to(argumentNode);
-  dflow.connect(argumentNode).to(greaterThanNode, 0);
+  dflow.connect(argumentNode).to(numberNode);
+  dflow.connect(numberNode).to(greaterThanNode, 0);
   dflow.connect(numNode).to(greaterThanNode, 1);
   dflow.connect(dataNode).to(testNode);
   dflow.connect(functionNode).to(testNode, 1);
@@ -90,26 +95,27 @@ Deno.test(catalog.arrayFindLastIndex.kind, () => {
   assertEquals(result, output);
 });
 
-Deno.test(catalog.arrayFilter.kind, () => {
+Deno.test("arrayFilter", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayFilter.kind;
 
-  const dflow = new DflowHost(catalog);
   const testNode = dflow.newNode({ kind: nodeKind });
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4, 5, 6, 7] }],
   });
   const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
-  const typeNumNode = dflow.newNode({ kind: catalog.typeNumber.kind });
   const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
+  const numberNode = dflow.newNode({ kind: catalog.number.kind });
   const greaterThanNode = dflow.newNode({ kind: catalog.greaterThan.kind });
   const returnNode = dflow.newNode({ kind: catalog.return.kind });
   const functionNode = dflow.newNode({ kind: catalog.function.kind });
 
   dflow.connect(functionNode).to(returnNode);
   dflow.connect(greaterThanNode).to(returnNode, 1);
-  dflow.connect(typeNumNode).to(argumentNode);
-  dflow.connect(argumentNode).to(greaterThanNode, 0);
+  dflow.connect(argumentNode).to(numberNode);
+  dflow.connect(numberNode).to(greaterThanNode, 0);
   dflow.connect(numNode).to(greaterThanNode, 1);
   dflow.connect(dataNode).to(testNode);
   dflow.connect(functionNode).to(testNode, 1);
@@ -123,21 +129,27 @@ Deno.test(catalog.arrayFilter.kind, () => {
   assertEquals(result.length, output.length);
 });
 
-Deno.test(catalog.arrayIncludes.kind, () => {
+Deno.test("arrayIncludes", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayIncludes.kind;
+
   [
     { inputs: { array: undefined, element: undefined }, output: undefined },
     { inputs: { array: ["a", "b"], element: "c" }, output: false },
     { inputs: { array: ["a", "b"], element: "a" }, output: true },
   ].forEach(
     ({ inputs: { array, element }, output }) => {
-      testOneArrAndOneStrInOneBoolOut(nodeKind, array, element, output);
+      testOneArrAndOneStrInOneBoolOut(dflow, nodeKind, array, element, output);
     },
   );
 });
 
-Deno.test(catalog.arrayJoin.kind, () => {
+Deno.test("arrayJoin", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayJoin.kind;
+
   [
     { inputs: { array: undefined, separator: undefined }, output: undefined },
     { inputs: { array: ["a", "b"], separator: "/" }, output: "a/b" },
@@ -145,25 +157,29 @@ Deno.test(catalog.arrayJoin.kind, () => {
     { inputs: { array: ["a", "b"], separator: undefined }, output: "a,b" },
   ].forEach(
     ({ inputs: { array, separator }, output }) => {
-      testOneArrAndOneStrInOneStrOut(nodeKind, array, separator, output);
+      testOneArrAndOneStrInOneStrOut(dflow, nodeKind, array, separator, output);
     },
   );
 });
 
-Deno.test(catalog.arrayLength.kind, () => {
+Deno.test("arrayLength", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayLength.kind;
+
   [
     { input: undefined, output: undefined },
     { input: ["a"], output: 1 },
   ].forEach(({ input, output }) => {
-    testOneArrInOneNumOut(nodeKind, input, output);
+    testOneArrInOneNumOut(dflow, nodeKind, input, output);
   });
 });
 
-Deno.test(catalog.arrayMap.kind, () => {
+Deno.test("arrayMap", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayMap.kind;
 
-  const dflow = new DflowHost(catalog);
   const testNode = dflow.newNode({ kind: nodeKind });
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
@@ -173,8 +189,8 @@ Deno.test(catalog.arrayMap.kind, () => {
     kind: catalog.data.kind,
     outputs: [{ id: "out", types: ["number"], data: 1 }],
   });
-  const typeNumNode = dflow.newNode({ kind: catalog.typeNumber.kind });
   const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
+  const numberNode = dflow.newNode({ kind: catalog.number.kind });
   const additionNode = dflow.newNode({ kind: catalog.addition.kind });
   const returnNode = dflow.newNode({ kind: catalog.return.kind });
   const functionNode = dflow.newNode({ kind: catalog.function.kind });
@@ -184,8 +200,8 @@ Deno.test(catalog.arrayMap.kind, () => {
 
   dflow.connect(functionNode).to(returnNode);
   dflow.connect(additionNode).to(returnNode, 1);
-  dflow.connect(typeNumNode).to(argumentNode);
-  dflow.connect(argumentNode).to(additionNode, 0);
+  dflow.connect(argumentNode).to(numberNode);
+  dflow.connect(numberNode).to(additionNode, 0);
   dflow.connect(numNode).to(additionNode, 1);
   dflow.connect(dataNode).to(testNode);
   dflow.connect(functionNode).to(testNode, 1);
@@ -199,18 +215,24 @@ Deno.test(catalog.arrayMap.kind, () => {
   assertEquals(result.length, output.length);
 });
 
-Deno.test(catalog.arrayPop.kind, () => {
+Deno.test("arrayPop", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayPop.kind;
+
   [
     { input: undefined, output1: undefined, output2: undefined },
     { input: [1, 2, 3], output1: 3, output2: [1, 2] },
   ].forEach(({ input, output1, output2 }) => {
-    testOneArrInOneAnyAndOneArrOut(nodeKind, input, output1, output2);
+    testOneArrInOneAnyAndOneArrOut(dflow, nodeKind, input, output1, output2);
   });
 });
 
-Deno.test(catalog.arrayPush.kind, () => {
+Deno.test("arrayPush", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayPush.kind;
+
   [
     { input1: undefined, input2: undefined, output: undefined },
     { input1: undefined, input2: "foo", output: undefined },
@@ -219,32 +241,41 @@ Deno.test(catalog.arrayPush.kind, () => {
     { input1: [1, 2], input2: 3, output: [1, 2, 3] },
     { input1: [1, "a"], input2: true, output: [1, "a", true] },
   ].forEach(({ input1, input2, output }) => {
-    testOneArrAndOneAnyInOneArrOut(nodeKind, input1, input2, output);
+    testOneArrAndOneAnyInOneArrOut(dflow, nodeKind, input1, input2, output);
   });
 });
 
-Deno.test(catalog.arrayReverse.kind, () => {
+Deno.test("arrayReverse", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayReverse.kind;
+
   [
     { input: undefined, output: undefined },
     { input: [1, 2, 3], output: [3, 2, 1] },
   ].forEach(({ input, output }) => {
-    testOneArrInOneArrOut(nodeKind, input, output);
+    testOneArrInOneArrOut(dflow, nodeKind, input, output);
   });
 });
 
-Deno.test(catalog.arrayShift.kind, () => {
+Deno.test("arrayShift", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayShift.kind;
+
   [
     { input: undefined, output1: undefined, output2: undefined },
     { input: [1, 2, 3], output1: 1, output2: [2, 3] },
   ].forEach(({ input, output1, output2 }) => {
-    testOneArrInOneAnyAndOneArrOut(nodeKind, input, output1, output2);
+    testOneArrInOneAnyAndOneArrOut(dflow, nodeKind, input, output1, output2);
   });
 });
 
-Deno.test(catalog.arraySlice.kind, () => {
+Deno.test("arraySlice", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arraySlice.kind;
+
   [
     {
       input1: undefined,
@@ -277,6 +308,29 @@ Deno.test(catalog.arraySlice.kind, () => {
       output: ["camel", "duck"],
     },
   ].forEach(({ input1, input2, input3, output }) => {
-    testOneArrAndTwoNumInOneArrOut(nodeKind, input1, input2, input3, output);
+    testOneArrAndTwoNumInOneArrOut(
+      dflow,
+      nodeKind,
+      input1,
+      input2,
+      input3,
+      output,
+    );
+  });
+});
+
+Deno.test("isArray", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
+  const nodeKind = catalog.isArray.kind;
+
+  [
+    { input: undefined, output: false },
+    { input: [], output: true },
+    { input: [1, 2, 3], output: true },
+    { input: true, output: false },
+    { input: { foo: "bar" }, output: false },
+  ].forEach(({ input, output }) => {
+    testOneAnyInOneBoolOut(dflow, nodeKind, input, output);
   });
 });

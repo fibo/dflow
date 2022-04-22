@@ -1,4 +1,4 @@
-import { DflowNode, DflowObject } from "../engine.ts";
+import { DflowNode, DflowObject } from "../dflow.ts";
 
 class DflowObjectKeys extends DflowNode {
   static kind = "objectKeys";

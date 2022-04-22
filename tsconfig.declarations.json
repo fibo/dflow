@@ -7,7 +7,5 @@
     "emitDeclarationOnly": true,
     "strict": true
   },
-  "files": [
-    "engine.ts"
-  ]
+  "files": ["dflow.ts"]
 }
