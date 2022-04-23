@@ -499,9 +499,6 @@ export class DflowNode extends DflowItem {
     for (const pin of outputs) {
       this.newOutput(pin);
     }
-
-    // Finally, call the onCreate() hook.
-    this.onCreate();
   }
 
   get inputs() {
@@ -603,11 +600,6 @@ export class DflowNode extends DflowItem {
     this.#outputs.delete(pinId);
     this.#outputPosition.splice(this.#outputPosition.indexOf(pinId), 1);
   }
-
-  /**
-   The `onCreate()` method is a hook run after node instance is created.
-   */
-  onCreate() {}
 
   newInput(obj: DflowNewInput): DflowInput {
     const id = DflowData.isDflowId(obj.id)
@@ -1051,14 +1043,15 @@ export class DflowGraph extends DflowItem {
   }
 }
 
+// Core nodes.
+
+const { input, output } = DflowNode;
+
 class DflowNodeArgument extends DflowNode {
   static kind = "argument";
   static isConstant = true;
-  static inputs = DflowNode.in(["number"], {
-    name: "position",
-    optional: true,
-  });
-  static outputs = DflowNode.out();
+  static inputs = [input("number", { name: "position", optional: true })];
+  static outputs = [output()];
 }
 
 class DflowNodeArray extends DflowNode {
@@ -1067,7 +1060,7 @@ class DflowNodeArray extends DflowNode {
   static outputs = DflowNode.out(["array"]);
   run() {
     const data = this.input(0).data;
-    if (Array.isArray(data)) {
+    if (DflowData.isArray(data)) {
       this.output(0).data = data;
     } else {
       this.output(0).clear();
@@ -1077,8 +1070,8 @@ class DflowNodeArray extends DflowNode {
 
 class DflowNodeBoolean extends DflowNode {
   static kind = "boolean";
-  static inputs = DflowNode.in();
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input()];
+  static outputs = [output("boolean")];
   run() {
     const data = this.input(0).data;
     if (DflowData.isBoolean(data)) {
@@ -1099,7 +1092,8 @@ class DflowNodeFunction extends DflowNode {
   static kind = "function";
   static isConstant = true;
   static outputs = DflowNode.out(["DflowId"], { name: "id" });
-  onCreate() {
+  constructor(...args: ConstructorParameters<typeof DflowNode>) {
+    super(...args);
     this.output(0).data = this.id;
   }
 }

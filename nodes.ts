@@ -8,7 +8,13 @@ import { catalog as mathCatalog } from "./nodes/math.ts";
 import { catalog as numberCatalog } from "./nodes/number.ts";
 import { catalog as objectCatalog } from "./nodes/object.ts";
 import { catalog as operatorCatalog } from "./nodes/operator.ts";
-import { catalog as stringatalog } from "./nodes/string.ts";
+// TODO DflowNode implementation class should be exported
+import * as stringNodes from "./nodes/string.ts";
+
+const stringCatalog = Object.values(stringNodes).reduce(
+  (catalog, NodeClass) => ({ [NodeClass.kind]: NodeClass, ...catalog }),
+  {},
+);
 
 export const nodesCatalog: DflowNodesCatalog = {
   ...arrayCatalog,
@@ -20,5 +26,5 @@ export const nodesCatalog: DflowNodesCatalog = {
   ...numberCatalog,
   ...objectCatalog,
   ...operatorCatalog,
-  ...stringatalog,
+  ...stringCatalog,
 };
