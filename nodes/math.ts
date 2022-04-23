@@ -1,5 +1,7 @@
 import { DflowNode } from "../dflow.ts";
 
+const { input } = DflowNode;
+
 class DflowMathAbs extends DflowNode {
   static kind = "mathAbs";
   static inputs = DflowNode.in(["number"]);
@@ -11,7 +13,7 @@ class DflowMathAbs extends DflowNode {
 
 class DflowMathCos extends DflowNode {
   static kind = "mathCos";
-  static inputs = DflowNode.in(["number"]);
+  static inputs = [input("number")];
   static outputs = DflowNode.out(["number"]);
   run() {
     this.output(0).data = Math.cos(this.input(0).data as number);

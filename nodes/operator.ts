@@ -1,12 +1,14 @@
 /*
-[Operators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators)
+Operators reference:
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators
 */
 import { DflowNode } from "../dflow.ts";
+const { input, output } = DflowNode;
 
 class DflowAddition extends DflowNode {
   static kind = "addition";
-  static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("number"), input("number")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = (this.input(0).data as number) +
       (this.input(1).data as number);
@@ -15,8 +17,8 @@ class DflowAddition extends DflowNode {
 
 class DflowDivision extends DflowNode {
   static kind = "division";
-  static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("number"), input("number")];
+  static outputs = [output("number")];
   run() {
     if (this.input(1).data) {
       this.output(0).data = (this.input(0).data as number) /
@@ -29,8 +31,8 @@ class DflowDivision extends DflowNode {
 
 class DflowEquality extends DflowNode {
   static kind = "equality";
-  static inputs = DflowNode.ins(2);
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input(), input()];
+  static outputs = [output("boolean")];
   run() {
     this.output(0).data = this.input(0).data == this.input(1).data;
   }
@@ -38,8 +40,8 @@ class DflowEquality extends DflowNode {
 
 class DflowLessThan extends DflowNode {
   static kind = "lessThan";
-  static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input("number"), input("number")];
+  static outputs = [output("boolean")];
   run() {
     this.output(0).data =
       (this.input(0).data as number) < (this.input(1).data as number);
@@ -48,8 +50,8 @@ class DflowLessThan extends DflowNode {
 
 class DflowLessThanOrEqual extends DflowNode {
   static kind = "lessThanOrEqual";
-  static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input("number"), input("number")];
+  static outputs = [output("boolean")];
   run() {
     this.output(0).data =
       (this.input(0).data as number) <= (this.input(1).data as number);
@@ -58,8 +60,8 @@ class DflowLessThanOrEqual extends DflowNode {
 
 class DflowGreaterThan extends DflowNode {
   static kind = "greaterThan";
-  static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input("number"), input("number")];
+  static outputs = [output("boolean")];
   run() {
     this.output(0).data =
       (this.input(0).data as number) > (this.input(1).data as number);
@@ -68,8 +70,8 @@ class DflowGreaterThan extends DflowNode {
 
 class DflowGreaterThanOrEqual extends DflowNode {
   static kind = "greaterThanOrEqual";
-  static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input("number"), input("number")];
+  static outputs = [output("boolean")];
   run() {
     this.output(0).data =
       (this.input(0).data as number) >= (this.input(1).data as number);
@@ -78,8 +80,8 @@ class DflowGreaterThanOrEqual extends DflowNode {
 
 class DflowInequality extends DflowNode {
   static kind = "inequality";
-  static inputs = DflowNode.ins(2);
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input(), input()];
+  static outputs = [output("boolean")];
   run() {
     this.output(0).data = this.input(0).data != this.input(1).data;
   }
@@ -87,8 +89,8 @@ class DflowInequality extends DflowNode {
 
 class DflowMultiplication extends DflowNode {
   static kind = "multiplication";
-  static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("number"), input("number")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = (this.input(0).data as number) *
       (this.input(1).data as number);
@@ -97,8 +99,8 @@ class DflowMultiplication extends DflowNode {
 
 class DflowSubtraction extends DflowNode {
   static kind = "subtraction";
-  static inputs = DflowNode.ins(2, ["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("number"), input("number")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = (this.input(0).data as number) -
       (this.input(1).data as number);

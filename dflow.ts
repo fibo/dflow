@@ -247,12 +247,18 @@ export class DflowPin extends DflowItem {
   static isDflowPin({ types = [], ...item }: DflowSerializablePin) {
     return (
       DflowItem.isDflowItem(item) &&
-      types.every((pinType) => DflowPin.isDflowPinType(pinType))
+      DflowPin.isDflowPinTypes(types)
     );
   }
 
-  static isDflowPinType(pinType: DflowPinType) {
-    DflowPin.types.includes(pinType);
+  static isDflowPinType(type: unknown): type is DflowPinType {
+    if (typeof type !== "string") return false;
+    return DflowPin.types.includes(type);
+  }
+
+  static isDflowPinTypes(types: unknown): types is DflowPinType[] {
+    if (!Array.isArray(types)) return false;
+    return types.every((type) => DflowPin.isDflowPinType(type));
   }
 
   constructor(
@@ -413,14 +419,33 @@ export class DflowNode extends DflowItem {
   static inputs?: DflowNewInput[];
   static outputs?: DflowNewOutput[];
 
-  static generateInputIds(pins: DflowNewInput[] = []) {
-    return pins.map((pin, i) => ({ ...pin, id: `i${i}` }));
+  static input(
+    typing: DflowPinType | DflowPinType[] = [],
+    rest?: Omit<DflowNewInput, "types">,
+  ): DflowNewInput {
+    if (DflowPin.isDflowPinType(typing)) {
+      return { types: [typing], ...rest };
+    }
+    if (DflowPin.isDflowPinTypes(typing)) {
+      return { types: typing, ...rest };
+    }
+    throw new TypeError("invalid input definition");
   }
 
-  static generateOutputIds(pins: DflowNewOutput[] = []) {
-    return pins.map((pin, i) => ({ ...pin, id: `o${i}` }));
+  static output(
+    typing: DflowPinType | DflowPinType[] = [],
+    rest?: Omit<DflowNewOutput, "types">,
+  ): DflowNewOutput {
+    if (DflowPin.isDflowPinType(typing)) {
+      return { types: [typing], ...rest };
+    }
+    if (DflowPin.isDflowPinTypes(typing)) {
+      return { types: typing, ...rest };
+    }
+    throw new TypeError("invalid output definition");
   }
 
+  // TODO depreacate this
   static in(
     types: DflowPinType[] = [],
     rest?: Omit<DflowNewInput, "types">,
@@ -428,23 +453,12 @@ export class DflowNode extends DflowItem {
     return [{ types, ...rest }];
   }
 
-  static ins(num: number, types: DflowPinType[] = []): DflowNewOutput[] {
-    return Array(num).fill(DflowNode.in(types)).flat();
-  }
-
+  // TODO depreacate this
   static out(
     types: DflowPinType[] = [],
     rest?: Omit<DflowNewOutput, "types">,
   ): DflowNewOutput[] {
     return [{ types, ...rest }];
-  }
-
-  static outs(num: number, types: DflowPinType[] = []): DflowNewOutput[] {
-    return Array(num).fill(DflowNode.out(types)).flat();
-  }
-
-  static outputNumber(obj: Omit<DflowNewOutput, "types">): DflowNewOutput {
-    return { ...obj, types: ["number"] };
   }
 
   static isDflowNode({
@@ -1179,6 +1193,14 @@ export class DflowHost {
   readonly nodesCatalog: DflowNodesCatalog;
   readonly context: Record<string, unknown>;
 
+  static #generateInputIds(pins: DflowNewInput[] = []) {
+    return pins.map((pin, i) => ({ ...pin, id: `i${i}` }));
+  }
+
+  static #generateOutputIds(pins: DflowNewOutput[] = []) {
+    return pins.map((pin, i) => ({ ...pin, id: `o${i}` }));
+  }
+
   constructor(nodesCatalog: DflowNodesCatalog = {}) {
     this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
     this.#graph = new DflowGraph({ id: "g1" });
@@ -1408,10 +1430,10 @@ export class DflowHost {
 
     const inputs = Array.isArray(obj.inputs)
       ? obj.inputs
-      : DflowNode.generateInputIds(NodeClass.inputs);
+      : DflowHost.#generateInputIds(NodeClass.inputs);
     const outputs = Array.isArray(obj.outputs)
       ? obj.outputs
-      : DflowNode.generateOutputIds(NodeClass.outputs);
+      : DflowHost.#generateOutputIds(NodeClass.outputs);
 
     const node = new NodeClass({ ...obj, id, inputs, outputs }, this, meta);
 
