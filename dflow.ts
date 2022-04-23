@@ -2,7 +2,6 @@ export type DflowId = string;
 export type DflowNewItem<Item> = Omit<Item, "id"> & { id?: DflowId };
 
 export type DflowNodeMetadata = {
-  label?: string;
   isAsync?: boolean;
   isConstant?: boolean;
 };
@@ -444,7 +443,6 @@ export class DflowNode extends DflowItem {
   readonly #outputs: Map<DflowId, DflowOutput> = new Map();
   readonly #inputPosition: DflowId[] = [];
   readonly #outputPosition: DflowId[] = [];
-  readonly #label?: string;
   readonly kind: string;
   readonly meta: DflowNodeMetadata;
   readonly host: DflowHost;
@@ -452,7 +450,6 @@ export class DflowNode extends DflowItem {
   static kind: string;
   static isAsync?: DflowNodeMetadata["isAsync"];
   static isConstant?: DflowNodeMetadata["isConstant"];
-  static label?: DflowNodeMetadata["label"];
   static inputs?: DflowNewInput[];
   static outputs?: DflowNewOutput[];
 
@@ -509,11 +506,10 @@ export class DflowNode extends DflowItem {
   constructor(
     { kind, inputs = [], outputs = [], ...item }: DflowSerializableNode,
     host: DflowHost,
-    { isAsync = false, isConstant = false, label }: DflowNodeMetadata = {},
+    { isAsync = false, isConstant = false }: DflowNodeMetadata = {},
   ) {
     super(item);
 
-    this.#label = label;
     this.host = host;
     this.kind = kind;
 
@@ -532,10 +528,6 @@ export class DflowNode extends DflowItem {
 
     // Finally, call the onCreate() hook.
     this.onCreate();
-  }
-
-  get label() {
-    return this.#label || this.kind;
   }
 
   get inputs() {
@@ -1452,7 +1444,6 @@ export class DflowHost {
     const meta = {
       isAsync: NodeClass.isAsync,
       isConstant: NodeClass.isConstant,
-      label: NodeClass.label,
     };
 
     const inputs = Array.isArray(obj.inputs)
