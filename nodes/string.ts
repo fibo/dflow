@@ -1,9 +1,11 @@
 import { DflowNode } from "../dflow.ts";
 
+const { input, output } = DflowNode;
+
 class DflowStringLength extends DflowNode {
   static kind = "stringLength";
-  static inputs = DflowNode.in(["string"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("string")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = (this.input(0).data as string).length;
   }
@@ -12,9 +14,9 @@ class DflowStringLength extends DflowNode {
 class DflowSubstring extends DflowNode {
   static kind = "substring";
   static inputs = [
-    ...DflowNode.in(["string"]),
-    ...DflowNode.in(["number"], { name: "start" }),
-    ...DflowNode.in(["number"], { name: "end", optional: true }),
+    input("string"),
+    input("number", { name: "start" }),
+    input("number", { name: "end", optional: true }),
   ];
   static outputs = DflowNode.out(["string"]);
   run() {

@@ -1,9 +1,11 @@
 import { DflowNode } from "../dflow.ts";
 
+const { input, output } = DflowNode;
+
 class DflowNodeAnd extends DflowNode {
   static kind = "and";
-  static inputs = DflowNode.ins(2, ["boolean"]);
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input("boolean"), input("boolean")];
+  static outputs = [output("boolean")];
   run() {
     this.output(0).data = this.input(0).data && this.input(1).data;
   }
@@ -29,7 +31,7 @@ class DflowNodeNullishCoaleshing extends DflowNode {
 
 class DflowNodeOr extends DflowNode {
   static kind = "or";
-  static inputs = DflowNode.ins(2, ["boolean"]);
+  static inputs = [input("boolean"), input("boolean")];
   static outputs = DflowNode.out(["boolean"]);
   run() {
     this.output(0).data = this.input(0).data || this.input(1).data;
