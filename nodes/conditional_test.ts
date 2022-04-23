@@ -3,7 +3,7 @@ import { DflowHost, DflowValue } from "../dflow.ts";
 import { nodesCatalog } from "../nodes.ts";
 
 function testConditionalIf(
-  input1?: boolean,
+  input1?: DflowValue,
   input2?: DflowValue,
   input3?: DflowValue,
   output?: DflowValue,
@@ -13,7 +13,7 @@ function testConditionalIf(
 
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ id: "out1", types: ["boolean"], data: input1 }],
+    outputs: [{ id: "out1", types: [], data: input1 }],
   });
   const dataNode2 = dflow.newNode({
     kind: catalog.data.kind,
@@ -41,6 +41,9 @@ Deno.test("DflowNodeIf", () => {
       output: undefined,
     },
     { input1: true, input2: 1, input3: 2, output: 1 },
+    { input1: false, input2: 1, input3: 2, output: 2 },
+    { input1: "", input2: 1, input3: 2, output: 2 },
+    { input1: "str", input2: 1, input3: 2, output: 1 },
   ].forEach(
     ({ input1, input2, input3, output }) => {
       testConditionalIf(input1, input2, input3, output);

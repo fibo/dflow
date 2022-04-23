@@ -3,7 +3,7 @@ import { DflowNode } from "../dflow.ts";
 class DflowNodeIf extends DflowNode {
   static kind = "if";
   static inputs = [
-    ...DflowNode.in(["boolean"], { name: "condition" }),
+    ...DflowNode.in([], { name: "condition" }),
     ...DflowNode.in([], { name: "then" }),
     ...DflowNode.in([], { name: "else" }),
   ];
