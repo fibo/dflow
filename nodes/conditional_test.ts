@@ -1,6 +1,6 @@
 import { assertEquals } from "std/testing/asserts.ts";
 import { DflowHost, DflowValue } from "../dflow.ts";
-import { nodesCatalog as catalog } from "../nodes.ts";
+import { nodesCatalog } from "../nodes.ts";
 
 function testConditionalIf(
   input1?: boolean,
@@ -8,7 +8,8 @@ function testConditionalIf(
   input3?: DflowValue,
   output?: DflowValue,
 ) {
-  const dflow = new DflowHost(catalog);
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
 
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
@@ -31,7 +32,7 @@ function testConditionalIf(
   assertEquals(testNode.output(0).data, output);
 }
 
-Deno.test(catalog.if.kind, () => {
+Deno.test("DflowNodeIf", () => {
   [
     {
       input1: undefined,

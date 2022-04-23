@@ -1,40 +1,6 @@
-import { assertEquals } from "std/testing/asserts.ts";
 import { nodesCatalog } from "../nodes.ts";
 import { DflowHost } from "../dflow.ts";
 import { testOneAnyInOneBoolOut } from "./_test-utils.ts";
-
-Deno.test("boolean", () => {
-  const dflow = new DflowHost(nodesCatalog);
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.boolean.kind;
-
-  const bool = true;
-  const testNode = dflow.newNode({ kind: nodeKind });
-  testNode.output(0).data = bool;
-  assertEquals(testNode.output(0).data, bool);
-});
-
-Deno.test("number", () => {
-  const dflow = new DflowHost(nodesCatalog);
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.number.kind;
-
-  const num = Math.random();
-  const testNode = dflow.newNode({ kind: nodeKind });
-  testNode.output(0).data = num;
-  assertEquals(testNode.output(0).data, num);
-});
-
-Deno.test("string", () => {
-  const dflow = new DflowHost(nodesCatalog);
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.string.kind;
-
-  const str = "foo";
-  const testNode = dflow.newNode({ kind: nodeKind });
-  testNode.output(0).data = str;
-  assertEquals(testNode.output(0).data, str);
-});
 
 Deno.test("isDefined", () => {
   const dflow = new DflowHost(nodesCatalog);

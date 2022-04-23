@@ -1,6 +1,6 @@
 import { DflowNode } from "../dflow.ts";
 
-class DflowIf extends DflowNode {
+class DflowNodeIf extends DflowNode {
   static kind = "if";
   static inputs = [
     ...DflowNode.in(["boolean"], { name: "condition" }),
@@ -16,5 +16,5 @@ class DflowIf extends DflowNode {
 }
 
 export const catalog = {
-  [DflowIf.kind]: DflowIf,
+  [DflowNodeIf.kind]: DflowNodeIf,
 };
