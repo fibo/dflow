@@ -155,7 +155,7 @@ export class DflowData {
   }
 
   static isNumber(data: DflowValue) {
-    return typeof data === "number";
+    return typeof data === "number" && !isNaN(data);
   }
 
   static isString(data: DflowValue) {
@@ -1129,6 +1129,15 @@ class DflowNodeData extends DflowNode {
   static outputs = DflowNode.out();
 }
 
+class DflowNodeFunction extends DflowNode {
+  static kind = "function";
+  static isConstant = true;
+  static outputs = DflowNode.out(["DflowId"], { name: "id" });
+  onCreate() {
+    this.output(0).data = this.id;
+  }
+}
+
 class DflowNodeHost extends DflowNode {
   static kind = "dflow";
   static outputs = DflowNode.out(["array"], { name: "nodeKinds" });
@@ -1139,12 +1148,12 @@ class DflowNodeHost extends DflowNode {
   }
 }
 
-class DflowNodeFunction extends DflowNode {
-  static kind = "function";
-  static isConstant = true;
-  static outputs = DflowNode.out(["DflowId"], { name: "id" });
-  onCreate() {
-    this.output(0).data = this.id;
+class DflowNodeIsUndefined extends DflowNode {
+  static kind = "isUndefined";
+  static inputs = DflowNode.in();
+  static outputs = DflowNode.out(["boolean"]);
+  run() {
+    this.output(0).data = DflowData.isUndefined(this.input(0).data);
   }
 }
 
@@ -1154,7 +1163,7 @@ class DflowNodeNumber extends DflowNode {
   static outputs = DflowNode.out(["number"]);
   run() {
     const data = this.input(0).data;
-    if (typeof data === "number") {
+    if (typeof data === "number" && !isNaN(data)) {
       this.output(0).data = data;
     } else {
       this.output(0).clear();
@@ -1205,6 +1214,7 @@ const coreNodesCatalog: DflowNodesCatalog = {
   [DflowNodeBoolean.kind]: DflowNodeBoolean,
   [DflowNodeData.kind]: DflowNodeData,
   [DflowNodeHost.kind]: DflowNodeHost,
+  [DflowNodeIsUndefined.kind]: DflowNodeIsUndefined,
   [DflowNodeNumber.kind]: DflowNodeNumber,
   [DflowNodeObject.kind]: DflowNodeObject,
   [DflowNodeFunction.kind]: DflowNodeFunction,

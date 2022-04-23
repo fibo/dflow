@@ -11,17 +11,6 @@ class DflowIsDefined extends DflowNode {
   }
 }
 
-class DflowIsUndefined extends DflowNode {
-  static kind = "isUndefined";
-  static inputs = DflowNode.in();
-  static outputs = DflowNode.out(["boolean"]);
-  run() {
-    const data = this.input(0).data;
-    this.output(0).data = typeof data === "undefined";
-  }
-}
-
 export const catalog = {
   [DflowIsDefined.kind]: DflowIsDefined,
-  [DflowIsUndefined.kind]: DflowIsUndefined,
 };
