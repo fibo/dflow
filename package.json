@@ -6,8 +6,14 @@
   "type": "module",
   "main": "./dflow.cjs",
   "exports": {
-    "import": "./dflow.js",
-    "require": "./dflow.cjs"
+    ".": {
+      "import": "./dflow.js",
+      "require": "./dflow.cjs"
+    },
+    "./nodes": {
+      "import": "./nodes.js",
+      "require": "./nodes.cjs"
+    }
   },
   "funding": "https://github.com/sponsors/fibo",
   "engines": {
