@@ -3,7 +3,6 @@ export declare type DflowNewItem<Item> = Omit<Item, "id"> & {
   id?: DflowId;
 };
 export declare type DflowNodeMetadata = {
-  label?: string;
   isAsync?: boolean;
   isConstant?: boolean;
 };
@@ -116,20 +115,11 @@ export declare class DflowPin extends DflowItem {
   readonly types: DflowPinType[];
   static types: string[];
   static isDflowPin({ types, ...item }: DflowSerializablePin): boolean;
-  static isDflowPinType(pinType: DflowPinType): void;
+  static isDflowPinType(type: unknown): type is DflowPinType;
+  static isDflowPinTypes(types: unknown): types is DflowPinType[];
   constructor(kind: DflowPinKind, { types, ...pin }: DflowSerializablePin);
   get hasTypeAny(): boolean;
-  get hasTypeDflowId(): boolean;
-  get hasTypeDflowGraph(): boolean;
-  get hasTypeDflowType(): boolean;
-  get hasTypeString(): boolean;
-  get hasTypeNumber(): boolean;
-  get hasTypeBoolean(): boolean;
-  get hasTypeNull(): boolean;
-  get hasTypeObject(): boolean;
-  get hasTypeArray(): boolean;
-  addType(pinType: DflowPinType): void;
-  removeType(pinType: DflowPinType): void;
+  hasType(type: DflowPinType): boolean;
 }
 export declare class DflowInput extends DflowPin {
   #private;
@@ -159,41 +149,32 @@ export declare class DflowNode extends DflowItem {
   static kind: string;
   static isAsync?: DflowNodeMetadata["isAsync"];
   static isConstant?: DflowNodeMetadata["isConstant"];
-  static label?: DflowNodeMetadata["label"];
   static inputs?: DflowNewInput[];
   static outputs?: DflowNewOutput[];
-  static generateInputIds(pins?: DflowNewInput[]): {
-    id: string;
-    optional?: boolean | undefined;
-    name?: string | undefined;
-    types?: DflowPinType[] | undefined;
-  }[];
-  static generateOutputIds(pins?: DflowNewOutput[]): {
-    id: string;
-    data?: DflowValue;
-    name?: string | undefined;
-    types?: DflowPinType[] | undefined;
-  }[];
+  static input(
+    typing?: DflowPinType | DflowPinType[],
+    rest?: Omit<DflowNewInput, "types">,
+  ): DflowNewInput;
+  static output(
+    typing?: DflowPinType | DflowPinType[],
+    rest?: Omit<DflowNewOutput, "types">,
+  ): DflowNewOutput;
   static in(
     types?: DflowPinType[],
     rest?: Omit<DflowNewInput, "types">,
   ): DflowNewInput[];
-  static ins(num: number, types?: DflowPinType[]): DflowNewOutput[];
   static out(
     types?: DflowPinType[],
     rest?: Omit<DflowNewOutput, "types">,
   ): DflowNewOutput[];
-  static outs(num: number, types?: DflowPinType[]): DflowNewOutput[];
-  static outputNumber(obj: Omit<DflowNewOutput, "types">): DflowNewOutput;
   static isDflowNode(
     { kind, inputs, outputs, ...item }: DflowSerializableNode,
   ): boolean;
   constructor(
     { kind, inputs, outputs, ...item }: DflowSerializableNode,
     host: DflowHost,
-    { isAsync, isConstant, label }?: DflowNodeMetadata,
+    { isAsync, isConstant }?: DflowNodeMetadata,
   );
-  get label(): string;
   get inputs(): IterableIterator<DflowInput>;
   get outputs(): IterableIterator<DflowOutput>;
   get numInputs(): number;
@@ -205,10 +186,6 @@ export declare class DflowNode extends DflowItem {
   output(position: number): DflowOutput;
   deleteInput(pinId: DflowId): void;
   deleteOutput(pinId: DflowId): void;
-  /**
-     The `onCreate()` method is a hook run after node instance is created.
-     */
-  onCreate(): void;
   newInput(obj: DflowNewInput): DflowInput;
   newOutput(obj: DflowNewOutput): DflowOutput;
   run(): void;

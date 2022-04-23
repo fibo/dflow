@@ -1,8 +1,9 @@
-import { DflowHost } from "../engine.ts";
-import { catalog } from "../nodes/catalog.ts";
+import { DflowHost } from "../dflow.ts";
+import { nodesCatalog } from "../nodes.ts";
 
 function rungraph() {
-  const dflow = new DflowHost(catalog);
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
 
   const mapNode = dflow.newNode({ kind: catalog.arrayMap.kind });
   const dataNode = dflow.newNode({ kind: catalog.array.kind });

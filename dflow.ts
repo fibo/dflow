@@ -540,7 +540,7 @@ export class DflowNode extends DflowItem {
 
     const pin = this.#inputs.get(pinId);
 
-    if (pin instanceof DflowInput) {
+    if (pin) {
       return pin;
     } else {
       throw new Error(_missingPinById(this.id, "input", pinId));
@@ -568,7 +568,7 @@ export class DflowNode extends DflowItem {
 
     const pin = this.#outputs.get(pinId);
 
-    if (pin instanceof DflowOutput) {
+    if (pin) {
       return pin;
     } else {
       throw new Error(_missingPinById(this.id, "output", pinId));
@@ -885,7 +885,7 @@ export class DflowGraph extends DflowItem {
 
     const node = this.#nodes.get(nodeId);
 
-    if (node instanceof DflowNode) {
+    if (node) {
       return node;
     } else {
       throw new Error(`DflowNode not found, id=${nodeId}`);
@@ -899,7 +899,7 @@ export class DflowGraph extends DflowItem {
 
     const edge = this.#edges.get(edgeId);
 
-    if (edge instanceof DflowEdge) {
+    if (edge) {
       return edge;
     } else {
       throw new Error(`DflowEdge not found, id=${edgeId}`);
@@ -1269,7 +1269,7 @@ export class DflowHost {
 
     const edge = this.#graph.getEdgeById(edgeId);
 
-    if (edge instanceof DflowEdge) {
+    if (edge) {
       // 1. Cleanup target pin.
       const [targetNodeId, targetPinId] = edge.target;
       const targetNode = this.getNodeById(targetNodeId);
@@ -1290,7 +1290,7 @@ export class DflowHost {
 
     const node = this.getNodeById(nodeId);
 
-    if (node instanceof DflowNode) {
+    if (node) {
       // 1. Delete all edges connected to node.
       for (const edge of this.#graph.edges) {
         const {

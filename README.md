@@ -36,10 +36,10 @@ Create an _import_map.json_ file like this.
 Then you can import for example the following.
 
 ```typescript
-import { DflowHost } from "dflow/engine.ts";
-import { catalog as coreNodes } from "dflow/nodes/catalog.ts";
+import { DflowHost } from "dflow/dflow.ts";
+import { nodesCatalog } from "dflow/nodes.ts";
 
-const dflow = new DflowHost(coreNodes);
+const dflow = new DflowHost(nodesCatalog);
 ```
 
 With [deno](https://deno.land/) you can then launch your script like this
@@ -95,20 +95,20 @@ import { nodesCatalog } from "dflow/nodes";
 function rungraph() {
   // use builtin nodes
   const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog
 
   // create nodes
   const numNode = dflow.newNode({
-    kind: "number",
+    kind: catalog.data.kind,
+    // set numNode output to π / 2
+    outputs: [{ id: "out", types: ["number"], data: Math.PI / 2 }],
   });
   const sinNode = dflow.newNode({
-    kind: coreNodes.mathSin.kind,
+    kind: catalog.mathSin.kind,
   });
   const consoleLogNode = dflow.newNode({
-    kind: coreNodes.consoleLog.kind,
+    kind: catalog.consoleLog.kind,
   });
-
-  // set numNode output to π / 2
-  numNode.output(0).data = Math.PI / 2;
 
   // connect numNode to sinNode and sinNode to consoleLog
   dflow.connect(numNode).to(sinNode);
