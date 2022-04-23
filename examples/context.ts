@@ -1,7 +1,7 @@
 /*
 Create a host with an API context.
 */
-import { DflowHost, DflowNode } from "../engine.ts";
+import { DflowHost, DflowNode } from "../dflow.ts";
 
 class ApiClient {
   apiKey: string;
