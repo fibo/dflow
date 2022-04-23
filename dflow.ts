@@ -269,48 +269,8 @@ export class DflowPin extends DflowItem {
     return this.types.length === 0;
   }
 
-  get hasTypeDflowId() {
-    return this.hasTypeAny || this.types.includes("DflowId");
-  }
-
-  get hasTypeDflowGraph() {
-    return this.hasTypeAny || this.types.includes("DflowGraph");
-  }
-
-  get hasTypeDflowType() {
-    return this.hasTypeAny || this.types.includes("DflowType");
-  }
-
-  get hasTypeString() {
-    return this.hasTypeAny || this.types.includes("string");
-  }
-
-  get hasTypeNumber() {
-    return this.hasTypeAny || this.types.includes("number");
-  }
-
-  get hasTypeBoolean() {
-    return this.hasTypeAny || this.types.includes("boolean");
-  }
-
-  get hasTypeNull() {
-    return this.hasTypeAny || this.types.includes("null");
-  }
-
-  get hasTypeObject() {
-    return this.hasTypeAny || this.types.includes("object");
-  }
-
-  get hasTypeArray() {
-    return this.hasTypeAny || this.types.includes("array");
-  }
-
-  addType(pinType: DflowPinType) {
-    this.types.push(pinType);
-  }
-
-  removeType(pinType: DflowPinType) {
-    this.types.splice(this.types.indexOf(pinType), 1);
+  hasType(type: DflowPinType) {
+    return this.hasTypeAny || this.types.includes(type);
   }
 }
 
@@ -400,14 +360,14 @@ export class DflowOutput extends DflowPin {
         this.clear();
         break;
       case this.hasTypeAny:
-      case DflowData.isDflowGraph(data) && this.hasTypeDflowGraph:
-      case DflowData.isDflowId(data) && this.hasTypeDflowId:
-      case DflowData.isString(data) && this.hasTypeString:
-      case DflowData.isNumber(data) && this.hasTypeNumber:
-      case DflowData.isBoolean(data) && this.hasTypeBoolean:
-      case DflowData.isNull(data) && this.hasTypeNull:
-      case DflowData.isObject(data) && this.hasTypeObject:
-      case DflowData.isArray(data) && this.hasTypeArray: {
+      case DflowData.isDflowGraph(data) && this.hasType("DflowGraph"):
+      case DflowData.isDflowId(data) && this.hasType("DflowId"):
+      case DflowData.isString(data) && this.hasType("string"):
+      case DflowData.isNumber(data) && this.hasType("number"):
+      case DflowData.isBoolean(data) && this.hasType("boolean"):
+      case DflowData.isNull(data) && this.hasType("null"):
+      case DflowData.isObject(data) && this.hasType("object"):
+      case DflowData.isArray(data) && this.hasType("array"): {
         this.#data = data;
         break;
       }
@@ -1107,7 +1067,7 @@ class DflowNodeBoolean extends DflowNode {
   static outputs = DflowNode.out(["boolean"]);
   run() {
     const data = this.input(0).data;
-    if (typeof data === "boolean") {
+    if (DflowData.isBoolean(data)) {
       this.output(0).data = data;
     } else {
       this.output(0).clear();
@@ -1155,7 +1115,7 @@ class DflowNodeNumber extends DflowNode {
   static outputs = DflowNode.out(["number"]);
   run() {
     const data = this.input(0).data;
-    if (typeof data === "number" && !isNaN(data)) {
+    if (DflowData.isNumber(data)) {
       this.output(0).data = data;
     } else {
       this.output(0).clear();
@@ -1169,7 +1129,7 @@ class DflowNodeObject extends DflowNode {
   static outputs = DflowNode.out(["object"]);
   run() {
     const data = this.input(0).data;
-    if (typeof data === "object" && data !== null) {
+    if (DflowData.isObject(data)) {
       this.output(0).data = data;
     } else {
       this.output(0).clear();
@@ -1192,7 +1152,7 @@ class DflowNodeString extends DflowNode {
   static outputs = DflowNode.out(["string"]);
   run() {
     const data = this.input(0).data;
-    if (typeof data === "string") {
+    if (DflowData.isString(data)) {
       this.output(0).data = data;
     } else {
       this.output(0).clear();
