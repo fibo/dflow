@@ -84,12 +84,9 @@ class DflowArrayJoin extends DflowNode {
   ];
   static outputs = DflowNode.out(["string"]);
   run() {
-    const data = this.input(0).data;
-    const separator = this.input(1).data ?? ",";
-
-    if (Array.isArray(data)) {
-      this.output(0).data = data.join(separator as string);
-    }
+    this.output(0).data = (this.input(0).data as Array<unknown>).join(
+      this.input(1).data as string | undefined,
+    );
   }
 }
 
@@ -200,17 +197,6 @@ class DflowArraySlice extends DflowNode {
   }
 }
 
-class DflowIsArray extends DflowNode {
-  static kind = "isArray";
-  static inputs = DflowNode.out();
-  static outputs = DflowNode.out(["boolean"]);
-
-  run() {
-    const data = this.input(0).data;
-    this.output(0).data = Array.isArray(data);
-  }
-}
-
 export const catalog = {
   [DflowArrayAt.kind]: DflowArrayAt,
   [DflowArrayFilter.kind]: DflowArrayFilter,
@@ -225,5 +211,4 @@ export const catalog = {
   [DflowArrayReverse.kind]: DflowArrayReverse,
   [DflowArrayShift.kind]: DflowArrayShift,
   [DflowArraySlice.kind]: DflowArraySlice,
-  [DflowIsArray.kind]: DflowIsArray,
 };

@@ -639,12 +639,6 @@ export class DflowNode extends DflowItem {
   }
 
   /**
-   The `onBeforeConnectInput()` method is a hook run just before edge creation
-   when a node output is connected to another node input.
-   */
-  onBeforeConnectInput(_sourceNode: DflowNode, _sourcePosition: number) {}
-
-  /**
    The `onCreate()` method is a hook run after node instance is created.
    */
   onCreate() {}
@@ -1091,6 +1085,50 @@ export class DflowGraph extends DflowItem {
   }
 }
 
+class DflowNodeArgument extends DflowNode {
+  static kind = "argument";
+  static isConstant = true;
+  static inputs = DflowNode.in(["number"], {
+    name: "position",
+    optional: true,
+  });
+  static outputs = DflowNode.out();
+}
+
+class DflowNodeArray extends DflowNode {
+  static kind = "array";
+  static inputs = DflowNode.in();
+  static outputs = DflowNode.out(["array"]);
+  run() {
+    const data = this.input(0).data;
+    if (Array.isArray(data)) {
+      this.output(0).data = data;
+    } else {
+      this.output(0).clear();
+    }
+  }
+}
+
+class DflowNodeBoolean extends DflowNode {
+  static kind = "boolean";
+  static inputs = DflowNode.in();
+  static outputs = DflowNode.out(["boolean"]);
+  run() {
+    const data = this.input(0).data;
+    if (typeof data === "boolean") {
+      this.output(0).data = data;
+    } else {
+      this.output(0).clear();
+    }
+  }
+}
+
+class DflowNodeData extends DflowNode {
+  static kind = "data";
+  static isConstant = true;
+  static outputs = DflowNode.out();
+}
+
 class DflowNodeHost extends DflowNode {
   static kind = "dflow";
   static outputs = DflowNode.out(["array"], { name: "nodeKinds" });
@@ -1101,12 +1139,40 @@ class DflowNodeHost extends DflowNode {
   }
 }
 
-export class DflowNodeFunction extends DflowNode {
+class DflowNodeFunction extends DflowNode {
   static kind = "function";
   static isConstant = true;
   static outputs = DflowNode.out(["DflowId"], { name: "id" });
   onCreate() {
     this.output(0).data = this.id;
+  }
+}
+
+class DflowNodeNumber extends DflowNode {
+  static kind = "number";
+  static inputs = DflowNode.in();
+  static outputs = DflowNode.out(["number"]);
+  run() {
+    const data = this.input(0).data;
+    if (typeof data === "number") {
+      this.output(0).data = data;
+    } else {
+      this.output(0).clear();
+    }
+  }
+}
+
+class DflowNodeObject extends DflowNode {
+  static kind = "object";
+  static inputs = DflowNode.in();
+  static outputs = DflowNode.out(["object"]);
+  run() {
+    const data = this.input(0).data;
+    if (typeof data === "object" && data !== null) {
+      this.output(0).data = data;
+    } else {
+      this.output(0).clear();
+    }
   }
 }
 
@@ -1119,9 +1185,30 @@ class DflowNodeReturn extends DflowNode {
   ];
 }
 
+class DflowNodeString extends DflowNode {
+  static kind = "string";
+  static inputs = DflowNode.in();
+  static outputs = DflowNode.out(["string"]);
+  run() {
+    const data = this.input(0).data;
+    if (typeof data === "string") {
+      this.output(0).data = data;
+    } else {
+      this.output(0).clear();
+    }
+  }
+}
+
 const coreNodesCatalog: DflowNodesCatalog = {
+  [DflowNodeArgument.kind]: DflowNodeArgument,
+  [DflowNodeArray.kind]: DflowNodeArray,
+  [DflowNodeBoolean.kind]: DflowNodeBoolean,
+  [DflowNodeData.kind]: DflowNodeData,
   [DflowNodeHost.kind]: DflowNodeHost,
+  [DflowNodeNumber.kind]: DflowNodeNumber,
+  [DflowNodeObject.kind]: DflowNodeObject,
   [DflowNodeFunction.kind]: DflowNodeFunction,
+  [DflowNodeString.kind]: DflowNodeString,
   [DflowNodeReturn.kind]: DflowNodeReturn,
 };
 
@@ -1186,11 +1273,7 @@ export class DflowHost {
         const edgeId = this.#graph.generateEdgeId();
 
         const sourcePin = sourceNode.output(sourcePosition);
-
         const targetPin = targetNode.input(targetPosition);
-
-        // Hook.
-        targetNode.onBeforeConnectInput(sourceNode, sourcePosition);
 
         this.newEdge({
           id: edgeId,
@@ -1307,13 +1390,16 @@ export class DflowHost {
       const node = this.getNodeById(nodeId);
       try {
         switch (node.kind) {
-          case "argument": {
-            // argumentPosition default to 0, must be >= 0.
-            const argumentPosition = Math.max(
-              node.input(1).data as number ?? 0,
-              0,
-            );
-            node.output(0).data = args[argumentPosition];
+          case DflowNodeArgument.kind: {
+            const position = node.input(0).data;
+            // Argument position default to 0, must be >= 0.
+            const index = typeof position === "number" && !isNaN(position)
+              ? Math.max(
+                position,
+                0,
+              )
+              : 0;
+            node.output(0).data = args[index];
             break;
           }
           case DflowNodeReturn.kind: {

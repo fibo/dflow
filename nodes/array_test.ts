@@ -318,19 +318,3 @@ Deno.test("arraySlice", () => {
     );
   });
 });
-
-Deno.test("isArray", () => {
-  const dflow = new DflowHost(nodesCatalog);
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.isArray.kind;
-
-  [
-    { input: undefined, output: false },
-    { input: [], output: true },
-    { input: [1, 2, 3], output: true },
-    { input: true, output: false },
-    { input: { foo: "bar" }, output: false },
-  ].forEach(({ input, output }) => {
-    testOneAnyInOneBoolOut(dflow, nodeKind, input, output);
-  });
-});

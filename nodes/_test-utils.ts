@@ -1,6 +1,23 @@
 import { assertEquals } from "std/testing/asserts.ts";
 import { DflowArray, DflowHost, DflowObject, DflowValue } from "../dflow.ts";
 
+export function testOneAnyInOneArrOut(
+  dflow: DflowHost,
+  nodeKind: string,
+  input?: DflowValue,
+  output?: DflowArray,
+) {
+  const catalog = dflow.nodesCatalog;
+  const dataNode = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out", types: [], data: input }],
+  });
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode).to(testNode);
+  dflow.run();
+  assertEquals(testNode.output(0).data, output);
+}
+
 export function testOneAnyInOneBoolOut(
   dflow: DflowHost,
   nodeKind: string,
@@ -316,12 +333,35 @@ export function testOneStrAndTwoNumInOneStrOut(
   assertEquals(testNode.output(0).data, output);
 }
 
-export function testTwoAnyInOneBoolOut(
+export function testTwoAnyInOneAnyOut(
   dflow: DflowHost,
   nodeKind: string,
   input1: DflowValue,
   input2: DflowValue,
-  output: boolean,
+  output: DflowValue,
+) {
+  const catalog = dflow.nodesCatalog;
+  const dataNode1 = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out1", types: [], data: input1 }],
+  });
+  const dataNode2 = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ id: "out2", types: [], data: input2 }],
+  });
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode1).to(testNode, 0);
+  dflow.connect(dataNode2).to(testNode, 1);
+  dflow.run();
+  assertEquals(testNode.output(0).data, output);
+}
+
+export function testTwoAnyInOneBoolOut(
+  dflow: DflowHost,
+  nodeKind: string,
+  input1?: DflowValue,
+  input2?: DflowValue,
+  output?: boolean,
 ) {
   const catalog = dflow.nodesCatalog;
   const dataNode1 = dflow.newNode({

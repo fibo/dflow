@@ -4,7 +4,6 @@ import { catalog as conditionalCatalog } from "./nodes/conditional.ts";
 import { catalog as consoleCatalog } from "./nodes/console.ts";
 import { catalog as dateCatalog } from "./nodes/date.ts";
 import { catalog as dataTypesCatalog } from "./nodes/data-types.ts";
-import { catalog as dflowCatalog } from "./nodes/dflow.ts";
 import { catalog as logicCatalog } from "./nodes/logic.ts";
 import { catalog as mathCatalog } from "./nodes/math.ts";
 import { catalog as numberCatalog } from "./nodes/number.ts";
@@ -18,7 +17,6 @@ export const nodesCatalog: DflowNodesCatalog = {
   ...consoleCatalog,
   ...dataTypesCatalog,
   ...dateCatalog,
-  ...dflowCatalog,
   ...logicCatalog,
   ...mathCatalog,
   ...numberCatalog,
