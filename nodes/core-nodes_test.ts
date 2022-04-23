@@ -77,6 +77,22 @@ Deno.test("DflowNodeFunction", () => {
   assertEquals(testNode.output(0).data as DflowId, testNode.id);
 });
 
+Deno.test("DflowNodeIsUndefined", () => {
+  const dflow = new DflowHost(nodesCatalog);
+  const catalog = dflow.nodesCatalog;
+  const nodeKind = catalog.isUndefined.kind;
+
+  [
+    { input: undefined, output: true },
+    { input: false, output: false },
+    { input: [], output: false },
+    { input: [1, 2, 3], output: false },
+    { input: { foo: "bar" }, output: false },
+  ].forEach(({ input, output }) => {
+    testOneAnyInOneBoolOut(dflow, nodeKind, input, output);
+  });
+});
+
 Deno.test("DflowNodeNumber", () => {
   const dflow = new DflowHost();
   const catalog = dflow.nodesCatalog;
