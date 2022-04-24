@@ -279,12 +279,6 @@ Deno.test("DflowData.validate()", () => {
 // DflowGraph
 // ////////////////////////////////////////////////////////////////////////////
 
-Deno.test("DflowGraph.isDflowGraph", () => {
-  [{ id: "g1", nodes: [], edges: [] }].forEach((graph) => {
-    assertEquals(DflowGraph.isDflowGraph(graph), true);
-  });
-});
-
 Deno.test("DflowGraph.ancestorsOfNodeId", () => {
   assertArrayIncludes(
     DflowGraph.ancestorsOfNodeId("n", [

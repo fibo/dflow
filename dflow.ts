@@ -15,7 +15,6 @@ export type DflowPinType =
   | "object"
   | "array"
   | "DflowId"
-  | "DflowGraph"
   | "DflowType";
 
 export type DflowRunStatus = "waiting" | "success" | "failure";
@@ -121,17 +120,6 @@ export class DflowData {
     return typeof data === "boolean";
   }
 
-  static isDflowGraph(data: DflowValue) {
-    return (
-      typeof data === "object" &&
-      data !== null &&
-      !Array.isArray(data) &&
-      Array.isArray(data.nodes) &&
-      Array.isArray(data.edges) &&
-      DflowGraph.isDflowGraph(data as DflowSerializableGraph)
-    );
-  }
-
   static isDflowId(data: DflowValue) {
     return DflowData.isStringNotEmpty(data);
   }
@@ -188,8 +176,6 @@ export class DflowData {
           return DflowData.isObject(data);
         case "string":
           return DflowData.isString(data);
-        case "DflowGraph":
-          return DflowData.isDflowGraph(data);
         case "DflowId":
           return DflowData.isDflowId(data);
         case "DflowType":
@@ -366,7 +352,6 @@ export class DflowOutput extends DflowPin {
         this.clear();
         break;
       case this.hasTypeAny:
-      case DflowData.isDflowGraph(data) && this.hasType("DflowGraph"):
       case DflowData.isDflowId(data) && this.hasType("DflowId"):
       case DflowData.isString(data) && this.hasType("string"):
       case DflowData.isNumber(data) && this.hasType("number"):
@@ -730,13 +715,6 @@ export class DflowGraph extends DflowItem {
   runOptions: DflowRunOptions = { verbose: false };
   runStatus: DflowRunStatus | null = null;
   executionReport: DflowExecutionReport | null = null;
-
-  static isDflowGraph(graph: DflowSerializableGraph): boolean {
-    return (
-      graph.nodes.every((node) => DflowNode.isDflowNode(node)) &&
-      graph.edges.every((edge) => DflowEdge.isDflowEdge(edge, graph))
-    );
-  }
 
   static childrenOfNodeId(
     nodeId: DflowId,
