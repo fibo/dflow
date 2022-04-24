@@ -14,15 +14,16 @@ export type DflowPinType =
   | "null"
   | "object"
   | "array"
-  | "DflowId"
-  | "DflowType";
+  | "DflowId";
 
 export type DflowRunStatus = "waiting" | "success" | "failure";
 
-type DflowExecutionNodeInfo = Pick<
-  DflowSerializableNode,
-  "id" | "kind" | "outputs"
->;
+type DflowExecutionNodeInfo =
+  & Pick<
+    DflowSerializableNode,
+    "id" | "kind" | "outputs"
+  >
+  & { error?: string };
 
 export type DflowExecutionReport = {
   status: DflowRunStatus;
@@ -94,7 +95,6 @@ export type DflowNodeConnection = { sourceId: DflowId; targetId: DflowId };
 type DflowRunOptions = { verbose: boolean };
 
 const _missingString = (stringName: string) => `${stringName} must be a string`;
-const _missingNumber = (numberName: string) => `${numberName} must be a number`;
 const _missingPin = (nodeId: DflowId, kind: DflowPinKind) =>
   `${kind} pin not found nodeId=${nodeId}`;
 const _missingPinAtPosition = (
@@ -105,11 +105,22 @@ const _missingPinAtPosition = (
 const _missingPinById = (nodeId: DflowId, kind: DflowPinKind, pinId: DflowId) =>
   `${_missingPin(nodeId, kind)} pinId=${pinId}`;
 
-const _executionNodeInfo = ({ id, kind, outputs }: DflowSerializableNode) => ({
-  id,
-  kind,
-  outputs: outputs?.map(({ id, data, name }) => ({ id, data, name })),
-});
+const _executionNodeInfo = (
+  { id, kind, outputs }: DflowSerializableNode,
+  error?: string,
+): DflowExecutionNodeInfo => {
+  const obj = {
+    id,
+    kind,
+    outputs: outputs?.map(({ id, data, name }) => ({ id, data, name })),
+  } as DflowExecutionNodeInfo;
+
+  if (error) {
+    obj.error = error;
+  }
+
+  return obj;
+};
 
 export class DflowData {
   static isArray(data: DflowValue) {
@@ -122,10 +133,6 @@ export class DflowData {
 
   static isDflowId(data: DflowValue) {
     return DflowData.isStringNotEmpty(data);
-  }
-
-  static isDflowType(data: DflowValue) {
-    return typeof data === "string" && DflowPin.types.includes(data);
   }
 
   static isObject(data: DflowValue) {
@@ -178,8 +185,6 @@ export class DflowData {
           return DflowData.isString(data);
         case "DflowId":
           return DflowData.isDflowId(data);
-        case "DflowType":
-          return DflowData.isDflowType(data);
         default:
           return false;
       }
@@ -226,8 +231,6 @@ export class DflowPin extends DflowItem {
     "object",
     "array",
     "DflowId",
-    "DflowGraph",
-    "DflowType",
   ];
 
   static isDflowPin({ types = [], ...item }: DflowSerializablePin) {
@@ -263,6 +266,16 @@ export class DflowPin extends DflowItem {
 
   hasType(type: DflowPinType) {
     return this.hasTypeAny || this.types.includes(type);
+  }
+
+  toObject() {
+    const obj = super.toObject() as DflowSerializablePin;
+
+    if (this.types.length > 0) {
+      obj.types = this.types;
+    }
+
+    return obj;
   }
 }
 
@@ -313,13 +326,7 @@ export class DflowInput extends DflowPin {
   }
 
   toObject(): DflowSerializableInput {
-    const obj = { id: this.id } as DflowSerializableInput;
-
-    if (this.types.length > 0) {
-      obj.types = this.types;
-    }
-
-    return obj;
+    return super.toObject() as DflowSerializableInput;
   }
 }
 
@@ -375,14 +382,10 @@ export class DflowOutput extends DflowPin {
   }
 
   toObject(): DflowSerializableOutput {
-    const obj = { ...super.toObject() } as DflowSerializableOutput;
+    const obj = super.toObject() as DflowSerializableOutput;
 
-    if (!DflowData.isUndefined(this.#data)) {
+    if (typeof this.#data !== "undefined") {
       obj.data = this.#data;
-    }
-
-    if (this.types.length > 0) {
-      obj.types = this.types;
     }
 
     return obj;
@@ -533,13 +536,9 @@ export class DflowNode extends DflowItem {
   }
 
   input(position: number): DflowInput {
-    if (typeof position !== "number") {
-      throw new TypeError(_missingNumber("position"));
-    }
-
     const pinId = this.#inputPosition[position];
 
-    if (DflowData.isUndefined(pinId)) {
+    if (!pinId) {
       throw new Error(_missingPinAtPosition(this.id, "input", position));
     }
 
@@ -561,13 +560,9 @@ export class DflowNode extends DflowItem {
   }
 
   output(position: number): DflowOutput {
-    if (typeof position !== "number") {
-      throw new TypeError(_missingNumber("position"));
-    }
-
     const pinId = this.#outputPosition[position];
 
-    if (DflowData.isUndefined(pinId)) {
+    if (!pinId) {
       throw new Error(_missingPinAtPosition(this.id, "output", position));
     }
 
@@ -953,7 +948,7 @@ export class DflowGraph extends DflowItem {
           // 2. INPUTS_LOOP
           // //////////////
           INPUTS_LOOP:
-          for (const { data, types, isOptional } of node.inputs) {
+          for (const { id, data, types, isOptional } of node.inputs) {
             // Ignore optional inputs.
             if (isOptional && typeof data === "undefined") {
               continue INPUTS_LOOP;
@@ -962,6 +957,14 @@ export class DflowGraph extends DflowItem {
             // Validate input data.
             if (!DflowData.validate(data, types)) {
               someInputIsNotValid = true;
+              if (verbose) {
+                this.executionReport.steps?.push(
+                  _executionNodeInfo(
+                    node.toObject(),
+                    `invalid input data nodeId=${nodeId} inputId=${id} data=${data}`,
+                  ),
+                );
+              }
               break INPUTS_LOOP;
             }
           }
@@ -969,11 +972,6 @@ export class DflowGraph extends DflowItem {
           if (someInputIsNotValid) {
             for (const output of node.outputs) {
               output.clear();
-            }
-            if (verbose) {
-              this.executionReport.steps?.push(
-                _executionNodeInfo(node.toObject()),
-              );
             }
             continue NODES_LOOP;
           }

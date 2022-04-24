@@ -30,14 +30,16 @@
   </main>
 
   <script type="module">
-    import { FlowView } from 'https://unpkg.com/flow-view@5.4.0';
-    import { catalog, DflowHost } from './dflow.js';
+    import { FlowView } from 'https://unpkg.com/flow-view';
+    import { DflowHost } from './dflow.js';
+    import { nodesCatalog } from './nodes.js';
 
     const flowView = new FlowView({
       container: document.querySelector('.container')
     });
 
-    const dflow = new DflowHost(catalog)
+    const dflow = new DflowHost(nodesCatalog);
+    const catalog = dflow.nodesCatalog;
     dflow.verbose = true;
 
     const nodeLabels = Object.keys(catalog);
@@ -64,14 +66,7 @@
           label: 'mathPi',
           x: 170, y: 70,
           outputs: [ { id: 'pi' } ]
-        },
-        {
-          id: 'x',
-          label: '',
-          x: 170, y: 170,
-          inputs: [ { id: 'in' } ],
-          outputs: [ { id: 'out' } ]
-        },
+        }
       ],
       edges: [
         { from: ['a', 'ao1'], to: ['b', 'bi1'] },
@@ -127,43 +122,59 @@
           } else {
             try {
               const maybeJson = JSON.parse(label);
-              console.log(maybeJson, typeof maybeJson)
 
               if (view.outputs.length === 0) {
                 view.newOutput({});
               }
 
-              if (typeof maybeJson === 'number') {
-                const node = dflow.newNode({ kind: 'number' });
-                node.output(0).data = maybeJson;
+              const typeofMaybeJson = typeof maybeJson;
 
-                view.outputs[0].text = 'number';
+              if (['boolean', 'number', 'string'].includes(typeofMaybeJson)) {
+                const node = dflow.newNode({
+                  kind: catalog.data.kind,
+                  outputs: [{ types: [typeofMaybeJson], data: maybeJson }]
+                });
+
+                view.outputs[0].text = typeofMaybeJson;
               }
 
-              if (typeof maybeJson === 'string') {
-                const node = dflow.newNode({ kind: 'string' });
-                node.output(0).data = maybeJson;
+              if (typeofMaybeJson === "object") {
+                const dataType = Array.isArray(maybeJson)
+                  ? "array"
+                  : "object";
+                dflow.newNode({
+                  id: id,
+                  kind: "data",
+                  outputs: [
+                    {
+                      types: [dataType],
+                      data: maybeJson,
+                    },
+                  ],
+                });
 
-                view.outputs[0].text = 'string';
-              }
-
-              if (typeof maybeJson === 'object') {
-                view.label = JSON.stringify(maybeJson);
-
-                if (Array.isArray(maybeJson)) {
-                  const node = dflow.newNode({ kind: 'array' });
-                  node.output(0).data = maybeJson;
-
-                  view.outputs[0].text = 'array';
-                } else {
-                  const node = dflow.newNode({ kind: 'object' });
-                  node.output(0).data = maybeJson;
-
-                  view.outputs[0].text = 'object';
-                }
+                view.outputs[0].text = dataType;
               }
             } catch (ignore) {}
           }
+
+          break;
+        }
+
+        case 'CREATE_EDGE': {
+          const {
+            id,
+            from: [sourceNodeId, sourcePinId],
+            to: [targetNodeId, targetPinId],
+          } = data
+          console.log(data)
+
+          // dflow.newEdge({
+          //   id,
+          //   source: [sourceNodeId, sourcePinId],
+          //   target: [targetNodeId, targetPinId],
+          // });
+          break;
         }
 
         default: {

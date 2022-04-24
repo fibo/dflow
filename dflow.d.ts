@@ -14,14 +14,13 @@ export declare type DflowPinType =
   | "null"
   | "object"
   | "array"
-  | "DflowId"
-  | "DflowGraph"
-  | "DflowType";
+  | "DflowId";
 export declare type DflowRunStatus = "waiting" | "success" | "failure";
-declare type DflowExecutionNodeInfo = Pick<
-  DflowSerializableNode,
-  "id" | "kind" | "outputs"
->;
+declare type DflowExecutionNodeInfo =
+  & Pick<DflowSerializableNode, "id" | "kind" | "outputs">
+  & {
+    error?: string;
+  };
 export declare type DflowExecutionReport = {
   status: DflowRunStatus;
   start: Date;
@@ -92,9 +91,7 @@ declare type DflowRunOptions = {
 export declare class DflowData {
   static isArray(data: DflowValue): boolean;
   static isBoolean(data: DflowValue): boolean;
-  static isDflowGraph(data: DflowValue): boolean;
   static isDflowId(data: DflowValue): boolean;
-  static isDflowType(data: DflowValue): boolean;
   static isObject(data: DflowValue): boolean;
   static isNull(data: DflowValue): boolean;
   static isNumber(data: DflowValue): boolean;
@@ -120,6 +117,7 @@ export declare class DflowPin extends DflowItem {
   constructor(kind: DflowPinKind, { types, ...pin }: DflowSerializablePin);
   get hasTypeAny(): boolean;
   hasType(type: DflowPinType): boolean;
+  toObject(): DflowSerializablePin;
 }
 export declare class DflowInput extends DflowPin {
   #private;
@@ -211,7 +209,6 @@ export declare class DflowGraph extends DflowItem {
   runOptions: DflowRunOptions;
   runStatus: DflowRunStatus | null;
   executionReport: DflowExecutionReport | null;
-  static isDflowGraph(graph: DflowSerializableGraph): boolean;
   static childrenOfNodeId(nodeId: DflowId, nodeConnections: {
     sourceId: DflowId;
     targetId: DflowId;
