@@ -1,6 +1,6 @@
 import { DflowNode } from "../dflow.ts";
 
-const { input } = DflowNode;
+const { input, output } = DflowNode;
 
 class DflowMathAbs extends DflowNode {
   static kind = "mathAbs";
@@ -75,7 +75,7 @@ class DflowMathMin extends DflowNode {
 class DflowMathPI extends DflowNode {
   static kind = "mathPI";
   static isConstant = true;
-  static outputs = DflowNode.out(["number"], { name: "π", data: Math.PI });
+  static outputs = [output("number", { name: "π", data: Math.PI })];
 }
 
 class DflowMathRound extends DflowNode {
