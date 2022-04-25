@@ -52,7 +52,7 @@ Deno.test("DflowNodeNullishCoaleshing", () => {
     { inputs: [undefined, true], output: true },
     { inputs: [undefined, false], output: false },
     { inputs: [42, undefined], output: 42 },
-    { inputs: [null, 42], output: 42 },
+    { inputs: [undefined, 42], output: 42 },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
       testTwoAnyInOneAnyOut(dflow, nodeKind, input1, input2, output);

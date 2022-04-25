@@ -13,8 +13,6 @@ import {
   DflowNode,
   DflowOutput,
   DflowPinType,
-  DflowSerializableNode,
-  DflowValue,
 } from "./dflow.ts";
 
 const num = 1;
@@ -131,17 +129,6 @@ Deno.test("DflowData isBoolean()", () => {
   assertEquals(DflowData.isBoolean(undefined), false);
 });
 
-Deno.test("DflowData isNull()", () => {
-  assertEquals(DflowData.isNull(arr), false);
-  assertEquals(DflowData.isNull(bool), false);
-  assertEquals(DflowData.isNull(num), false);
-  assertEquals(DflowData.isNull(NaN), false);
-  assertEquals(DflowData.isNull(null), true);
-  assertEquals(DflowData.isNull(obj), false);
-  assertEquals(DflowData.isNull(str), false);
-  assertEquals(DflowData.isNull(undefined), false);
-});
-
 Deno.test("DflowData isNumber()", () => {
   assertEquals(DflowData.isNumber(arr), false);
   assertEquals(DflowData.isNumber(bool), false);
@@ -175,23 +162,11 @@ Deno.test("DflowData isString()", () => {
   assertEquals(DflowData.isString(undefined), false);
 });
 
-Deno.test("DflowData isUndefined()", () => {
-  assertEquals(DflowData.isUndefined(arr), false);
-  assertEquals(DflowData.isUndefined(bool), false);
-  assertEquals(DflowData.isUndefined(num), false);
-  assertEquals(DflowData.isUndefined(NaN), false);
-  assertEquals(DflowData.isUndefined(null), false);
-  assertEquals(DflowData.isUndefined(obj), false);
-  assertEquals(DflowData.isUndefined(str), false);
-  assertEquals(DflowData.isUndefined(undefined), true);
-});
-
 Deno.test("DflowData validate()", () => {
   assertEquals(DflowData.validate(arr, ["array"]), true);
   assertEquals(DflowData.validate(bool, ["boolean"]), true);
   assertEquals(DflowData.validate(num, ["number"]), true);
   assertEquals(DflowData.validate(NaN, ["number"]), false);
-  assertEquals(DflowData.validate(null, ["null"]), true);
   assertEquals(DflowData.validate(obj, ["object"]), true);
   assertEquals(DflowData.validate(str, ["string"]), true);
 
@@ -206,13 +181,11 @@ Deno.test("DflowData validate()", () => {
 
   assertEquals(DflowData.validate(arr, ["boolean"]), false);
   assertEquals(DflowData.validate(arr, ["number"]), false);
-  assertEquals(DflowData.validate(arr, ["null"]), false);
   assertEquals(DflowData.validate(arr, ["object"]), false);
   assertEquals(DflowData.validate(arr, ["string"]), false);
 
   assertEquals(DflowData.validate(bool, ["array"]), false);
   assertEquals(DflowData.validate(bool, ["number"]), false);
-  assertEquals(DflowData.validate(bool, ["null"]), false);
   assertEquals(DflowData.validate(bool, ["object"]), false);
   assertEquals(DflowData.validate(bool, ["string"]), false);
 
@@ -224,51 +197,46 @@ Deno.test("DflowData validate()", () => {
 
   assertEquals(DflowData.validate(num, ["array"]), false);
   assertEquals(DflowData.validate(num, ["boolean"]), false);
-  assertEquals(DflowData.validate(num, ["null"]), false);
   assertEquals(DflowData.validate(num, ["object"]), false);
   assertEquals(DflowData.validate(num, ["string"]), false);
 
   assertEquals(DflowData.validate(NaN, ["array"]), false);
   assertEquals(DflowData.validate(NaN, ["boolean"]), false);
-  assertEquals(DflowData.validate(NaN, ["null"]), false);
   assertEquals(DflowData.validate(NaN, ["object"]), false);
   assertEquals(DflowData.validate(NaN, ["string"]), false);
 
   assertEquals(DflowData.validate(obj, ["array"]), false);
   assertEquals(DflowData.validate(obj, ["boolean"]), false);
   assertEquals(DflowData.validate(obj, ["number"]), false);
-  assertEquals(DflowData.validate(obj, ["null"]), false);
   assertEquals(DflowData.validate(obj, ["string"]), false);
 
   assertEquals(DflowData.validate(str, ["array"]), false);
   assertEquals(DflowData.validate(str, ["boolean"]), false);
   assertEquals(DflowData.validate(str, ["number"]), false);
-  assertEquals(DflowData.validate(str, ["null"]), false);
   assertEquals(DflowData.validate(str, ["object"]), false);
 
   assertEquals(DflowData.validate(undefined, ["array"]), false);
   assertEquals(DflowData.validate(undefined, ["boolean"]), false);
   assertEquals(DflowData.validate(undefined, ["number"]), false);
-  assertEquals(DflowData.validate(undefined, ["null"]), false);
   assertEquals(DflowData.validate(undefined, ["object"]), false);
   assertEquals(DflowData.validate(undefined, ["string"]), false);
 
   // No particular order here.
   assertEquals(DflowData.validate(arr, ["boolean", "array"]), true);
-  assertEquals(DflowData.validate(bool, ["null", "number", "boolean"]), true);
+  assertEquals(DflowData.validate(bool, ["string", "number", "boolean"]), true);
   assertEquals(
-    DflowData.validate(num, ["null", "number", "object", "string"]),
+    DflowData.validate(num, ["number", "object", "string"]),
     true,
   );
-  assertEquals(DflowData.validate(null, ["object", "null"]), true);
-  assertEquals(DflowData.validate(obj, ["array", "object"]), true);
-  assertEquals(DflowData.validate(str, ["null", "string"]), true);
-  assertEquals(DflowData.validate(arr, ["boolean", "string"]), false);
-  assertEquals(DflowData.validate(bool, ["null", "number", "array"]), false);
-  assertEquals(DflowData.validate(num, ["null", "object", "string"]), false);
   assertEquals(DflowData.validate(null, ["object", "string"]), false);
-  assertEquals(DflowData.validate(obj, ["array", "null"]), false);
-  assertEquals(DflowData.validate(str, ["null", "array"]), false);
+  assertEquals(DflowData.validate(obj, ["array", "object"]), true);
+  assertEquals(DflowData.validate(str, ["array", "string"]), true);
+  assertEquals(DflowData.validate(arr, ["boolean", "string"]), false);
+  assertEquals(DflowData.validate(bool, ["number", "array"]), false);
+  assertEquals(DflowData.validate(num, ["boolean", "object", "string"]), false);
+  assertEquals(DflowData.validate(null, ["object", "string"]), false);
+  assertEquals(DflowData.validate(obj, ["array", "boolean"]), false);
+  assertEquals(DflowData.validate(str, ["number", "array"]), false);
 });
 
 // DflowGraph
@@ -411,13 +379,13 @@ Deno.test("DflowHost newOutput()", () => {
 // DflowOutput
 // ////////////////////////////////////////////////////////////////////////////
 
-function testOutputSetData(data: DflowValue, types?: DflowPinType[]) {
+function testOutputSetData(data: unknown, types?: DflowPinType[]) {
   const output = new DflowOutput({ id: "test", types });
   output.data = data;
   assertStrictEquals(data, output.data);
 }
 
-function testOutputSetDataThrows(data: DflowValue, types: DflowPinType[]) {
+function testOutputSetDataThrows(data: unknown, types: DflowPinType[]) {
   assertThrows(
     () => {
       const output = new DflowOutput({ id: "test", types });
@@ -471,13 +439,6 @@ Deno.test("DflowOutput set data", () => {
   testOutputSetDataThrows(obj, ["boolean"]);
   testOutputSetDataThrows(arr, ["boolean"]);
 
-  testOutputSetDataThrows(str, ["null"]);
-  testOutputSetDataThrows(num, ["null"]);
-  testOutputSetDataThrows(bool, ["null"]);
-  testOutputSetData(null, ["null"]);
-  testOutputSetDataThrows(obj, ["null"]);
-  testOutputSetDataThrows(arr, ["null"]);
-
   testOutputSetDataThrows(str, ["object"]);
   testOutputSetDataThrows(num, ["object"]);
   testOutputSetDataThrows(bool, ["object"]);
@@ -506,13 +467,6 @@ Deno.test("DflowOutput set data", () => {
   testOutputSetDataThrows(obj, ["string", "boolean"]);
   testOutputSetDataThrows(arr, ["string", "boolean"]);
 
-  testOutputSetData(str, ["string", "null"]);
-  testOutputSetDataThrows(num, ["string", "null"]);
-  testOutputSetDataThrows(bool, ["string", "null"]);
-  testOutputSetData(null, ["string", "null"]);
-  testOutputSetDataThrows(obj, ["string", "null"]);
-  testOutputSetDataThrows(arr, ["string", "null"]);
-
   testOutputSetData(str, ["string", "object"]);
   testOutputSetDataThrows(num, ["string", "object"]);
   testOutputSetDataThrows(bool, ["string", "object"]);
@@ -534,13 +488,6 @@ Deno.test("DflowOutput set data", () => {
   testOutputSetDataThrows(obj, ["number", "boolean"]);
   testOutputSetDataThrows(arr, ["number", "boolean"]);
 
-  testOutputSetDataThrows(str, ["number", "null"]);
-  testOutputSetData(num, ["number", "null"]);
-  testOutputSetDataThrows(bool, ["number", "null"]);
-  testOutputSetData(null, ["number", "null"]);
-  testOutputSetDataThrows(obj, ["number", "null"]);
-  testOutputSetDataThrows(arr, ["number", "null"]);
-
   testOutputSetDataThrows(str, ["number", "object"]);
   testOutputSetData(num, ["number", "object"]);
   testOutputSetDataThrows(bool, ["number", "object"]);
@@ -555,13 +502,6 @@ Deno.test("DflowOutput set data", () => {
   testOutputSetDataThrows(obj, ["number", "array"]);
   testOutputSetData(arr, ["number", "array"]);
 
-  testOutputSetDataThrows(str, ["boolean", "null"]);
-  testOutputSetDataThrows(num, ["boolean", "null"]);
-  testOutputSetData(bool, ["boolean", "null"]);
-  testOutputSetData(null, ["boolean", "null"]);
-  testOutputSetDataThrows(obj, ["boolean", "null"]);
-  testOutputSetDataThrows(arr, ["boolean", "null"]);
-
   testOutputSetDataThrows(str, ["boolean", "object"]);
   testOutputSetDataThrows(num, ["boolean", "object"]);
   testOutputSetData(bool, ["boolean", "object"]);
@@ -575,20 +515,6 @@ Deno.test("DflowOutput set data", () => {
   testOutputSetDataThrows(null, ["boolean", "array"]);
   testOutputSetDataThrows(obj, ["boolean", "array"]);
   testOutputSetData(arr, ["boolean", "array"]);
-
-  testOutputSetDataThrows(str, ["null", "object"]);
-  testOutputSetDataThrows(num, ["null", "object"]);
-  testOutputSetDataThrows(bool, ["null", "object"]);
-  testOutputSetData(null, ["null", "object"]);
-  testOutputSetData(obj, ["null", "object"]);
-  testOutputSetDataThrows(arr, ["null", "object"]);
-
-  testOutputSetDataThrows(str, ["null", "array"]);
-  testOutputSetDataThrows(num, ["null", "array"]);
-  testOutputSetDataThrows(bool, ["null", "array"]);
-  testOutputSetData(null, ["null", "array"]);
-  testOutputSetDataThrows(obj, ["null", "array"]);
-  testOutputSetData(arr, ["null", "array"]);
 
   testOutputSetDataThrows(str, ["object", "array"]);
   testOutputSetDataThrows(num, ["object", "array"]);
