@@ -433,7 +433,9 @@ export class DflowNode extends DflowItem {
     throw new TypeError("invalid output definition");
   }
 
-  // TODO depreacate this
+  /**
+   * @deprecated Use DflowNode.input
+   */
   static in(
     types: DflowPinType[] = [],
     rest?: Omit<DflowNewInput, "types">,
@@ -441,7 +443,9 @@ export class DflowNode extends DflowItem {
     return [{ types, ...rest }];
   }
 
-  // TODO depreacate this
+  /**
+   * @deprecated use DflowNode.output
+   */
   static out(
     types: DflowPinType[] = [],
     rest?: Omit<DflowNewOutput, "types">,
@@ -630,16 +634,6 @@ export class DflowNode extends DflowItem {
 
     return obj;
   }
-}
-
-export class DflowUnknownNode extends DflowNode {
-  static kind = "Unknown";
-
-  constructor(obj: DflowSerializableNode, host: DflowHost) {
-    super({ ...obj, kind: DflowUnknownNode.kind }, host);
-  }
-
-  run() {}
 }
 
 export class DflowEdge extends DflowItem {
@@ -1019,145 +1013,6 @@ export class DflowGraph extends DflowItem {
   }
 }
 
-// Core nodes.
-
-const { input, output } = DflowNode;
-
-class DflowNodeArgument extends DflowNode {
-  static kind = "argument";
-  static isConstant = true;
-  static inputs = [input("number", { name: "position", optional: true })];
-  static outputs = [output()];
-}
-
-class DflowNodeArray extends DflowNode {
-  static kind = "array";
-  static inputs = DflowNode.in();
-  static outputs = DflowNode.out(["array"]);
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isArray(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-
-class DflowNodeBoolean extends DflowNode {
-  static kind = "boolean";
-  static inputs = [input()];
-  static outputs = [output("boolean")];
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isBoolean(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-
-class DflowNodeData extends DflowNode {
-  static kind = "data";
-  static isConstant = true;
-  static outputs = DflowNode.out();
-}
-
-class DflowNodeFunction extends DflowNode {
-  static kind = "function";
-  static isConstant = true;
-  static outputs = DflowNode.out(["DflowId"], { name: "id" });
-  constructor(...args: ConstructorParameters<typeof DflowNode>) {
-    super(...args);
-    this.output(0).data = this.id;
-  }
-}
-
-class DflowNodeHost extends DflowNode {
-  static kind = "dflow";
-  static outputs = DflowNode.out(["array"], { name: "nodeKinds" });
-
-  run() {
-    const nodeKinds = this.output(0);
-    nodeKinds.data = this.host.nodeKinds;
-  }
-}
-
-class DflowNodeIsUndefined extends DflowNode {
-  static kind = "isUndefined";
-  static inputs = DflowNode.in();
-  static outputs = DflowNode.out(["boolean"]);
-  run() {
-    this.output(0).data = DflowData.isUndefined(this.input(0).data);
-  }
-}
-
-class DflowNodeNumber extends DflowNode {
-  static kind = "number";
-  static inputs = DflowNode.in();
-  static outputs = DflowNode.out(["number"]);
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isNumber(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-
-class DflowNodeObject extends DflowNode {
-  static kind = "object";
-  static inputs = DflowNode.in();
-  static outputs = DflowNode.out(["object"]);
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isObject(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-
-class DflowNodeReturn extends DflowNode {
-  static kind = "return";
-  static isConstant = true;
-  static inputs = [
-    ...DflowNode.in(["DflowId"], { name: "functionId" }),
-    ...DflowNode.in([], { name: "value" }),
-  ];
-}
-
-class DflowNodeString extends DflowNode {
-  static kind = "string";
-  static inputs = DflowNode.in();
-  static outputs = DflowNode.out(["string"]);
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isString(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-
-const coreNodesCatalog: DflowNodesCatalog = {
-  [DflowNodeArgument.kind]: DflowNodeArgument,
-  [DflowNodeArray.kind]: DflowNodeArray,
-  [DflowNodeBoolean.kind]: DflowNodeBoolean,
-  [DflowNodeData.kind]: DflowNodeData,
-  [DflowNodeHost.kind]: DflowNodeHost,
-  [DflowNodeIsUndefined.kind]: DflowNodeIsUndefined,
-  [DflowNodeNumber.kind]: DflowNodeNumber,
-  [DflowNodeObject.kind]: DflowNodeObject,
-  [DflowNodeFunction.kind]: DflowNodeFunction,
-  [DflowNodeString.kind]: DflowNodeString,
-  [DflowNodeReturn.kind]: DflowNodeReturn,
-};
-
 export class DflowHost {
   readonly #graph: DflowGraph;
   readonly nodesCatalog: DflowNodesCatalog;
@@ -1387,7 +1242,7 @@ export class DflowHost {
   }
 
   newNode(obj: DflowNewNode): DflowNode {
-    const NodeClass = this.nodesCatalog[obj.kind] ?? DflowUnknownNode;
+    const NodeClass = this.nodesCatalog[obj.kind] ?? DflowNodeUnknown;
 
     const id = DflowData.isDflowId(obj.id)
       ? (obj.id as DflowId)
@@ -1451,3 +1306,134 @@ export class DflowHost {
     await this.#graph.run();
   }
 }
+
+// Core nodes.
+
+const { input, output } = DflowNode;
+
+class DflowNodeArgument extends DflowNode {
+  static kind = "argument";
+  static isConstant = true;
+  static inputs = [input("number", { name: "position", optional: true })];
+  static outputs = [output()];
+}
+
+class DflowNodeArray extends DflowNode {
+  static kind = "array";
+  static inputs = DflowNode.in();
+  static outputs = DflowNode.out(["array"]);
+  run() {
+    const data = this.input(0).data;
+    if (DflowData.isArray(data)) {
+      this.output(0).data = data;
+    } else {
+      this.output(0).clear();
+    }
+  }
+}
+
+class DflowNodeBoolean extends DflowNode {
+  static kind = "boolean";
+  static inputs = [input()];
+  static outputs = [output("boolean")];
+  run() {
+    const data = this.input(0).data;
+    if (DflowData.isBoolean(data)) {
+      this.output(0).data = data;
+    } else {
+      this.output(0).clear();
+    }
+  }
+}
+
+class DflowNodeData extends DflowNode {
+  static kind = "data";
+  static isConstant = true;
+  static outputs = DflowNode.out();
+}
+
+class DflowNodeFunction extends DflowNode {
+  static kind = "function";
+  static isConstant = true;
+  static outputs = DflowNode.out(["DflowId"], { name: "id" });
+  constructor(...args: ConstructorParameters<typeof DflowNode>) {
+    super(...args);
+    this.output(0).data = this.id;
+  }
+}
+
+class DflowNodeIsUndefined extends DflowNode {
+  static kind = "isUndefined";
+  static inputs = [input()];
+  static outputs = [output("boolean")];
+  run() {
+    this.output(0).data = DflowData.isUndefined(this.input(0).data);
+  }
+}
+
+class DflowNodeNumber extends DflowNode {
+  static kind = "number";
+  static inputs = [input()];
+  static outputs = [output("number")];
+  run() {
+    const data = this.input(0).data;
+    if (DflowData.isNumber(data)) {
+      this.output(0).data = data;
+    } else {
+      this.output(0).clear();
+    }
+  }
+}
+
+class DflowNodeObject extends DflowNode {
+  static kind = "object";
+  static inputs = [input()];
+  static outputs = [output("object")];
+  run() {
+    const data = this.input(0).data;
+    if (DflowData.isObject(data)) {
+      this.output(0).data = data;
+    } else {
+      this.output(0).clear();
+    }
+  }
+}
+
+class DflowNodeReturn extends DflowNode {
+  static kind = "return";
+  static isConstant = true;
+  static inputs = [
+    input("DflowId", { name: "functionId" }),
+    input([], { name: "value" }),
+  ];
+}
+
+class DflowNodeString extends DflowNode {
+  static kind = "string";
+  static inputs = [input()];
+  static outputs = [output("string")];
+  run() {
+    const data = this.input(0).data;
+    if (DflowData.isString(data)) {
+      this.output(0).data = data;
+    } else {
+      this.output(0).clear();
+    }
+  }
+}
+
+// The "Unknown" node is not inclued in core nodes catalog.
+class DflowNodeUnknown extends DflowNode {}
+
+const coreNodesCatalog: DflowNodesCatalog = {
+  [DflowNodeArgument.kind]: DflowNodeArgument,
+  [DflowNodeArray.kind]: DflowNodeArray,
+  [DflowNodeBoolean.kind]: DflowNodeBoolean,
+  [DflowNodeData.kind]: DflowNodeData,
+  [DflowNodeIsUndefined.kind]: DflowNodeIsUndefined,
+  [DflowNodeNumber.kind]: DflowNodeNumber,
+  [DflowNodeObject.kind]: DflowNodeObject,
+  [DflowNodeFunction.kind]: DflowNodeFunction,
+  [DflowNodeString.kind]: DflowNodeString,
+  [DflowNodeReturn.kind]: DflowNodeReturn,
+};
