@@ -65,6 +65,7 @@ export type DflowSerializablePin = DflowSerializableItem & {
 };
 
 export type DflowSerializableInput = DflowSerializablePin & {
+  multi?: boolean;
   optional?: boolean;
 };
 
@@ -127,15 +128,16 @@ export class DflowData {
     return Array.isArray(data);
   }
 
-  static isBoolean(data: DflowValue) {
+  static isBoolean(data: unknown): data is boolean {
     return typeof data === "boolean";
   }
 
-  static isDflowId(data: DflowValue) {
+  static isDflowId(data: unknown): data is DflowId {
     return DflowData.isStringNotEmpty(data);
   }
 
-  static isObject(data: DflowValue) {
+  static isObject(data: DflowValue): data is DflowObject {
+    // TODO improve this
     return (
       !DflowData.isUndefined(data) &&
       !DflowData.isNull(data) &&
@@ -148,19 +150,19 @@ export class DflowData {
     return data === null;
   }
 
-  static isNumber(data: DflowValue) {
+  static isNumber(data: unknown): data is number {
     return typeof data === "number" && !isNaN(data);
   }
 
-  static isString(data: DflowValue) {
+  static isString(data: unknown): data is string {
     return typeof data === "string";
   }
 
-  static isStringNotEmpty(data: DflowValue) {
+  static isStringNotEmpty(data: unknown) {
     return DflowData.isString(data) && (data as string).length > 0;
   }
 
-  static isUndefined(data: DflowValue) {
+  static isUndefined(data: unknown): data is undefined {
     return typeof data === "undefined";
   }
 
@@ -196,7 +198,9 @@ export class DflowItem {
   readonly id: DflowId;
   name?: string;
 
-  static isDflowItem({ id, name }: DflowSerializableItem) {
+  static isDflowItem(item: unknown): item is DflowSerializableItem {
+    if (typeof item !== "object" || item === null) return false;
+    const { id, name } = item as Partial<DflowSerializableItem>;
     return (
       DflowData.isDflowId(id) &&
       (DflowData.isUndefined(name) || DflowData.isStringNotEmpty(name))
@@ -233,7 +237,9 @@ export class DflowPin extends DflowItem {
     "DflowId",
   ];
 
-  static isDflowPin({ types = [], ...item }: DflowSerializablePin) {
+  static isDflowPin(pin: unknown): pin is DflowSerializablePin {
+    if (typeof pin !== "object" || pin === null) return false;
+    const { types, ...item } = pin as Partial<DflowSerializablePin>;
     return (
       DflowItem.isDflowItem(item) &&
       DflowPin.isDflowPinTypes(types)
@@ -280,25 +286,40 @@ export class DflowPin extends DflowItem {
 }
 
 export class DflowInput extends DflowPin {
-  #source?: DflowOutput;
+  #multi?: boolean;
   #optional?: boolean;
+  #source?: DflowOutput;
+  #sources?: Set<DflowOutput>;
 
-  static isDflowInput({ id, types }: DflowSerializableInput) {
-    return DflowPin.isDflowPin({ id, types });
+  static isDflowInput(item: unknown): item is DflowSerializableInput {
+    if (typeof item !== "object" || item === null) return false;
+    const { id, types, optional, multi } = item as Partial<
+      DflowSerializableInput
+    >;
+    return DflowPin.isDflowPin({ id, types }) &&
+      (typeof multi === "undefined" || typeof multi === "boolean") &&
+      (typeof optional === "undefined" || typeof optional === "boolean");
   }
 
-  constructor({ optional, ...pin }: DflowSerializableInput) {
+  constructor({ multi, optional, ...pin }: DflowSerializableInput) {
     super("input", pin);
 
+    this.#multi = multi;
     this.#optional = optional;
   }
 
   get data(): DflowValue {
-    return this.#source?.data;
+    return this.#source?.data ||
+      Array.from(this.#sources ?? []).map((output) => output.data);
   }
 
   get isConnected() {
-    return typeof this.#source === "undefined";
+    return typeof this.#source === "undefined" ||
+      (Array.from(this.#sources ?? [])).length > 0;
+  }
+
+  get isMulti() {
+    return this.#multi;
   }
 
   get isOptional() {
@@ -309,11 +330,18 @@ export class DflowInput extends DflowPin {
     const { hasTypeAny: targetHasTypeAny, types: targetTypes } = this;
     const { types: sourceTypes } = pin;
 
-    if (
-      targetHasTypeAny ||
-      targetTypes.some((pinType) => sourceTypes.includes(pinType))
-    ) {
-      this.#source = pin;
+    const canConnect = targetHasTypeAny ||
+      targetTypes.some((pinType) => sourceTypes.includes(pinType));
+
+    if (canConnect) {
+      if (this.#multi) {
+        if (!this.#sources) {
+          this.#sources = new Set();
+        }
+        this.#sources.add(pin);
+      } else {
+        this.#source = pin;
+      }
     } else {
       throw new Error(
         `mismatching pinTypes, source has types [${sourceTypes.join()}] and target has types [${targetTypes.join()}]`,
@@ -453,12 +481,14 @@ export class DflowNode extends DflowItem {
     return [{ types, ...rest }];
   }
 
-  static isDflowNode({
-    kind,
-    inputs = [],
-    outputs = [],
-    ...item
-  }: DflowSerializableNode) {
+  static isDflowNode(node: unknown): node is DflowSerializableNode {
+    if (typeof node !== "object" || node === null) return false;
+    const {
+      kind,
+      inputs = [],
+      outputs = [],
+      ...item
+    } = node as Partial<DflowSerializableNode>;
     return (
       DflowItem.isDflowItem(item) &&
       DflowData.isStringNotEmpty(kind) &&
@@ -641,26 +671,30 @@ export class DflowEdge extends DflowItem {
   readonly target: DflowSerializablePinPath;
 
   static isDflowEdge(
-    { source, target, ...item }: DflowSerializableEdge,
+    edge: DflowSerializableEdge,
     graph: DflowSerializableGraph,
-  ) {
-    return (
-      DflowItem.isDflowItem(item) &&
-      // Check source.
-      Array.isArray(source) &&
-      source.length === 2 &&
-      graph.nodes.find(
-        ({ id, outputs = [] }) =>
-          id === source[0] && outputs.find(({ id }) => id === source[1]),
-      ) &&
-      // Check target.
-      Array.isArray(target) &&
-      target.length === 2 &&
-      graph.nodes.find(
-        ({ id, inputs = [] }) =>
-          id === target[0] && inputs.find(({ id }) => id === target[1]),
-      )
+  ): edge is DflowSerializableEdge {
+    if (typeof edge !== "object" || edge === null) return false;
+    const { source, target, ...item } = edge as Partial<DflowSerializableEdge>;
+    if (DflowItem.isDflowItem(item)) return false;
+    // Check source pin.
+    if (!Array.isArray(source)) return false;
+    if (source.length !== 2) return false;
+    const sourceNode = graph.nodes.find(
+      ({ id, outputs = [] }) =>
+        id === source[0] && outputs.find(({ id }) => id === source[1]),
     );
+    if (!DflowNode.isDflowNode(sourceNode)) return false;
+    // Check target pin.
+    if (!Array.isArray(target)) return false;
+    if (target.length !== 2) return false;
+    const targetNode = graph.nodes.find(
+      ({ id, inputs = [] }) =>
+        id === target[0] && inputs.find(({ id }) => id === target[1]),
+    );
+    if (!DflowNode.isDflowNode(targetNode)) return false;
+    // All checks passed.
+    return true;
   }
 
   constructor({ source, target, ...item }: DflowSerializableEdge) {
@@ -1320,8 +1354,8 @@ class DflowNodeArgument extends DflowNode {
 
 class DflowNodeArray extends DflowNode {
   static kind = "array";
-  static inputs = DflowNode.in();
-  static outputs = DflowNode.out(["array"]);
+  static inputs = [input()];
+  static outputs = [output("array")];
   run() {
     const data = this.input(0).data;
     if (DflowData.isArray(data)) {
@@ -1349,13 +1383,13 @@ class DflowNodeBoolean extends DflowNode {
 class DflowNodeData extends DflowNode {
   static kind = "data";
   static isConstant = true;
-  static outputs = DflowNode.out();
+  static outputs = [output()];
 }
 
 class DflowNodeFunction extends DflowNode {
   static kind = "function";
   static isConstant = true;
-  static outputs = DflowNode.out(["DflowId"], { name: "id" });
+  static outputs = [output("DflowId", { name: "id" })];
   constructor(...args: ConstructorParameters<typeof DflowNode>) {
     super(...args);
     this.output(0).data = this.id;
@@ -1367,7 +1401,7 @@ class DflowNodeIsUndefined extends DflowNode {
   static inputs = [input()];
   static outputs = [output("boolean")];
   run() {
-    this.output(0).data = DflowData.isUndefined(this.input(0).data);
+    this.output(0).data = typeof this.input(0).data === "undefined";
   }
 }
 
