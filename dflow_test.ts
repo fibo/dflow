@@ -25,8 +25,6 @@ const obj = { foo: num, bar: str };
 
 class EmptyNode extends DflowNode {
   static kind = "Empty";
-
-  run() {}
 }
 
 class NumNode extends EmptyNode {
@@ -62,10 +60,6 @@ function sleep(seconds = 1) {
 class SleepNode extends DflowNode {
   static kind = "Sleep";
   static isAsync = true;
-
-  constructor(arg: DflowSerializableNode, host: DflowHost) {
-    super(arg, host, { isAsync: SleepNode.isAsync });
-  }
 
   async run() {
     console.log("sleep node start");
