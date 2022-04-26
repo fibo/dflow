@@ -7,7 +7,7 @@ const { input, output } = DflowNode;
 
 class DflowAddition extends DflowNode {
   static kind = "addition";
-  static inputs = [input("number"), input("number")];
+  static inputs = [input("number"), input("number", { multi: true })];
   static outputs = [output("number")];
   run() {
     this.output(0).data = (this.input(0).data as number) +
