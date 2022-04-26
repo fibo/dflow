@@ -297,13 +297,18 @@ export class DflowInput extends DflowPin {
   }
 
   get data(): DflowValue {
-    return this.#source?.data ||
-      Array.from(this.#sources ?? []).map((output) => output.data);
+    if (this.#multi) {
+      const sources = Array.from(this.#sources ?? []);
+      return sources.length ? sources.map((output) => output.data) : undefined;
+    } else {
+      return this.#source?.data;
+    }
   }
 
   get isConnected() {
-    return typeof this.#source === "undefined" ||
-      (Array.from(this.#sources ?? [])).length > 0;
+    return this.#multi
+      ? ((Array.from(this.#sources ?? [])).length > 0)
+      : typeof this.#source === "undefined";
   }
 
   get isMulti() {
@@ -338,7 +343,7 @@ export class DflowInput extends DflowPin {
   }
 
   disconnect() {
-    this.#source = undefined;
+    this.#multi ? this.#sources?.clear() : this.#source = undefined;
   }
 
   toObject(): DflowSerializableInput {
