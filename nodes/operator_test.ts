@@ -1,6 +1,7 @@
 import { DflowHost } from "../dflow.ts";
 import { nodesCatalog } from "../nodes.ts";
 import {
+  testOneNumAndOneMultiNumInOneNumOut,
   testTwoAnyInOneBoolOut,
   testTwoNumInOneBoolOut,
   testTwoNumInOneNumOut,
@@ -11,9 +12,29 @@ Deno.test("addition", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.addition.kind;
 
-  [{ inputs: [2, 2], output: 4 }].forEach(
+  [
+    { inputs: [undefined, undefined], output: undefined },
+    { inputs: [2, 2], output: 4 },
+  ].forEach(
     ({ inputs: [input1, input2], output }) => {
       testTwoNumInOneNumOut(dflow, nodeKind, input1, input2, output);
+    },
+  );
+
+  [
+    { input1: undefined, input2: undefined, output: undefined },
+    { input1: 2, input2: [1], output: 3 },
+    { input1: 2, input2: [1, 2], output: 5 },
+    { input1: 2, input2: [1, 2, 3], output: 8 },
+  ].forEach(
+    ({ input1, input2, output }) => {
+      testOneNumAndOneMultiNumInOneNumOut(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });

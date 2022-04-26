@@ -87,7 +87,12 @@ export type DflowNewGraph = DflowNewItem<DflowSerializableGraph>;
 export type DflowNewEdge = DflowNewItem<DflowSerializableEdge>;
 export type DflowNewInput = DflowNewItem<DflowSerializableInput>;
 export type DflowNewOutput = DflowNewItem<DflowSerializableOutput>;
-export type DflowNewNode = DflowNewItem<DflowSerializableNode>;
+export type DflowNewNode =
+  & Omit<DflowNewItem<DflowSerializableNode>, "inputs" | "outputs">
+  & {
+    inputs?: DflowNewInput[];
+    outputs?: DflowNewOutput[];
+  };
 
 export type DflowNodeConnection = { sourceId: DflowId; targetId: DflowId };
 
@@ -1024,11 +1029,17 @@ export class DflowHost {
   readonly context: Record<string, unknown>;
 
   static #generateInputIds(pins: DflowNewInput[] = []) {
-    return pins.map((pin, i) => ({ ...pin, id: `i${i}` }));
+    return pins.map((pin, i) => ({
+      ...pin,
+      id: DflowData.isDflowId(pin.id) ? pin.id : `i${i}`,
+    }));
   }
 
   static #generateOutputIds(pins: DflowNewOutput[] = []) {
-    return pins.map((pin, i) => ({ ...pin, id: `o${i}` }));
+    return pins.map((pin, i) => ({
+      ...pin,
+      id: DflowData.isDflowId(pin.id) ? pin.id : `o${i}`,
+    }));
   }
 
   constructor(nodesCatalog: DflowNodesCatalog = {}) {
@@ -1259,11 +1270,11 @@ export class DflowHost {
     };
 
     const inputs = Array.isArray(obj.inputs)
-      ? obj.inputs
-      : DflowHost.#generateInputIds(NodeClass.inputs);
+      ? DflowHost.#generateInputIds(obj.inputs)
+      : DflowHost.#generateInputIds(NodeClass.inputs ?? []);
     const outputs = Array.isArray(obj.outputs)
-      ? obj.outputs
-      : DflowHost.#generateOutputIds(NodeClass.outputs);
+      ? DflowHost.#generateOutputIds(obj.outputs)
+      : DflowHost.#generateOutputIds(NodeClass.outputs ?? []);
 
     const node = new NodeClass({ ...obj, id, inputs, outputs }, this, meta);
 
