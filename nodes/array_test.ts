@@ -1,8 +1,7 @@
 import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
 import { DflowArray, DflowHost } from "../dflow.ts";
-import { nodesCatalog } from "../nodes.ts";
+import { nodesCatalog } from "./index.ts";
 import {
-  testOneAnyInOneBoolOut,
   testOneArrAndOneAnyInOneArrOut,
   testOneArrAndOneNumInOneAnyOut,
   testOneArrAndOneStrInOneBoolOut,

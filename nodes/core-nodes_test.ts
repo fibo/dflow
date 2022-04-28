@@ -1,10 +1,13 @@
-import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
-import { DflowArray, DflowHost, DflowId, DflowNode } from "../dflow.ts";
-import { nodesCatalog } from "../nodes.ts";
+import { assertEquals } from "std/testing/asserts.ts";
+import { DflowHost, DflowId } from "../dflow.ts";
 import {
   testOneAnyInOneArrOut,
   testOneAnyInOneBoolOut,
+  testOneAnyInOneNumOut,
+  testOneAnyInOneStrOut,
 } from "./_test-utils.ts";
+import { catalog as mathCatalog } from "./math.ts";
+import { catalog as operatorCatalog } from "./operator.ts";
 
 Deno.test("DflowNodeArray", () => {
   const dflow = new DflowHost();
@@ -39,25 +42,8 @@ Deno.test("DflowNodeBoolean", () => {
   });
 });
 
-Deno.test("DflowNodeHost", () => {
-  // Load a catalog with a single Dflow node.
-  class CustomNode extends DflowNode {
-    static kind = "customNode";
-    static isConstant = true;
-  }
-  const nodeKind = CustomNode.kind;
-  const singleNodeCatalog = { [nodeKind]: CustomNode };
-  const dflow = new DflowHost(singleNodeCatalog);
-  const catalog = dflow.nodesCatalog;
-
-  const testNode = dflow.newNode({ kind: catalog.dflow.kind });
-  dflow.run();
-  assertArrayIncludes(testNode.output(0).data as DflowArray, [
-    nodeKind,
-  ]);
-});
-
 Deno.test("DflowNodeFunction", () => {
+  const nodesCatalog = { ...mathCatalog, ...operatorCatalog };
   const dflow = new DflowHost(nodesCatalog);
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.function.kind;
@@ -78,7 +64,7 @@ Deno.test("DflowNodeFunction", () => {
 });
 
 Deno.test("DflowNodeIsUndefined", () => {
-  const dflow = new DflowHost(nodesCatalog);
+  const dflow = new DflowHost();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.isUndefined.kind;
 
@@ -98,11 +84,17 @@ Deno.test("DflowNodeNumber", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.number.kind;
 
-  // TODO update test
-  const num = Math.random();
-  const testNode = dflow.newNode({ kind: nodeKind });
-  testNode.output(0).data = num;
-  assertEquals(testNode.output(0).data, num);
+  [
+    { input: undefined, output: undefined },
+    { input: false, output: undefined },
+    { input: [], output: undefined },
+    { input: [1, 2, 3], output: undefined },
+    { input: { foo: "bar" }, output: undefined },
+    { input: "foo", output: undefined },
+    { input: 1, output: 1 },
+  ].forEach(({ input, output }) => {
+    testOneAnyInOneNumOut(dflow, nodeKind, input, output);
+  });
 });
 
 Deno.test("DflowNodeString", () => {
@@ -110,9 +102,15 @@ Deno.test("DflowNodeString", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.string.kind;
 
-  // TODO update test
-  const str = "foo";
-  const testNode = dflow.newNode({ kind: nodeKind });
-  testNode.output(0).data = str;
-  assertEquals(testNode.output(0).data, str);
+  [
+    { input: undefined, output: undefined },
+    { input: false, output: undefined },
+    { input: [], output: undefined },
+    { input: [1, 2, 3], output: undefined },
+    { input: { foo: "bar" }, output: undefined },
+    { input: 1, output: undefined },
+    { input: "foo", output: "foo" },
+  ].forEach(({ input, output }) => {
+    testOneAnyInOneStrOut(dflow, nodeKind, input, output);
+  });
 });
