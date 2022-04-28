@@ -35,6 +35,40 @@ export function testOneAnyInOneBoolOut(
   assertEquals(testNode.output(0).data, output);
 }
 
+export function testOneAnyInOneNumOut(
+  dflow: DflowHost,
+  nodeKind: string,
+  input?: DflowValue,
+  output?: number,
+) {
+  const catalog = dflow.nodesCatalog;
+  const dataNode = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ types: [], data: input }],
+  });
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode).to(testNode);
+  dflow.run();
+  assertEquals(testNode.output(0).data, output);
+}
+
+export function testOneAnyInOneStrOut(
+  dflow: DflowHost,
+  nodeKind: string,
+  input?: DflowValue,
+  output?: string,
+) {
+  const catalog = dflow.nodesCatalog;
+  const dataNode = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ types: [], data: input }],
+  });
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode).to(testNode);
+  dflow.run();
+  assertEquals(testNode.output(0).data, output);
+}
+
 export function testOneArrInOneNumOut(
   dflow: DflowHost,
   nodeKind: string,

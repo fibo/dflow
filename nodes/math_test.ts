@@ -1,5 +1,5 @@
 import { DflowHost } from "../dflow.ts";
-import { nodesCatalog } from "../nodes.ts";
+import { nodesCatalog } from "./index.ts";
 import {
   testOneArrInOneNumOut,
   testOneNumInOneNumOut,

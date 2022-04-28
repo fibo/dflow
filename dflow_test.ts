@@ -271,8 +271,9 @@ Deno.test("DflowHost clearGraph()", () => {
   const { dflow } = sample01();
   dflow.clearGraph();
 
-  assertEquals(dflow.numNodes, 0);
-  assertEquals(dflow.numEdges, 0);
+  const graph = dflow.toObject();
+  assertEquals(graph.nodes.length, 0);
+  assertEquals(graph.edges.length, 0);
 });
 
 Deno.test("DflowHost runStatusIsSuccess", () => {
@@ -336,7 +337,7 @@ Deno.test("DflowHost newEdge()", () => {
   const { dflow, edgeId1 } = sample01();
 
   const edge1 = dflow.getEdgeById(edgeId1);
-  assertEquals(edgeId1, edge1.id);
+  assertEquals(edgeId1, edge1?.id);
 });
 
 Deno.test("DflowHost deleteNode()", () => {
