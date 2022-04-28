@@ -11,7 +11,6 @@ export declare type DflowPinType =
   | "string"
   | "number"
   | "boolean"
-  | "null"
   | "object"
   | "array"
   | "DflowId";
@@ -35,7 +34,6 @@ export declare type DflowValue =
   | string
   | number
   | boolean
-  | null
   | undefined
   | DflowArray
   | DflowObject
@@ -59,6 +57,7 @@ export declare type DflowSerializablePin = DflowSerializableItem & {
   types?: DflowPinType[];
 };
 export declare type DflowSerializableInput = DflowSerializablePin & {
+  multi?: boolean;
   optional?: boolean;
 };
 export declare type DflowSerializableOutput = DflowSerializablePin & {
@@ -80,7 +79,12 @@ export declare type DflowNewGraph = DflowNewItem<DflowSerializableGraph>;
 export declare type DflowNewEdge = DflowNewItem<DflowSerializableEdge>;
 export declare type DflowNewInput = DflowNewItem<DflowSerializableInput>;
 export declare type DflowNewOutput = DflowNewItem<DflowSerializableOutput>;
-export declare type DflowNewNode = DflowNewItem<DflowSerializableNode>;
+export declare type DflowNewNode =
+  & Omit<DflowNewItem<DflowSerializableNode>, "inputs" | "outputs">
+  & {
+    inputs?: DflowNewInput[];
+    outputs?: DflowNewOutput[];
+  };
 export declare type DflowNodeConnection = {
   sourceId: DflowId;
   targetId: DflowId;
@@ -89,21 +93,19 @@ declare type DflowRunOptions = {
   verbose: boolean;
 };
 export declare class DflowData {
-  static isArray(data: DflowValue): boolean;
-  static isBoolean(data: DflowValue): boolean;
-  static isDflowId(data: DflowValue): boolean;
-  static isObject(data: DflowValue): boolean;
-  static isNull(data: DflowValue): boolean;
-  static isNumber(data: DflowValue): boolean;
-  static isString(data: DflowValue): boolean;
-  static isStringNotEmpty(data: DflowValue): boolean;
-  static isUndefined(data: DflowValue): boolean;
-  static validate(data: DflowValue, types: DflowPinType[]): boolean;
+  static isArray(data: unknown): data is DflowArray;
+  static isBoolean(data: unknown): data is boolean;
+  static isDflowId(data: unknown): data is DflowId;
+  static isObject(data: unknown): data is DflowObject;
+  static isNumber(data: unknown): data is number;
+  static isString(data: unknown): data is string;
+  static isStringNotEmpty(data: unknown): boolean;
+  static validate(data: unknown, types: DflowPinType[]): boolean;
 }
 export declare class DflowItem {
   readonly id: DflowId;
   name?: string;
-  static isDflowItem({ id, name }: DflowSerializableItem): boolean;
+  static isDflowItem(item: unknown): item is DflowSerializableItem;
   constructor({ id, name }: DflowSerializablePin);
   toObject(): DflowSerializableItem;
 }
@@ -111,7 +113,7 @@ export declare class DflowPin extends DflowItem {
   readonly kind: DflowPinKind;
   readonly types: DflowPinType[];
   static types: string[];
-  static isDflowPin({ types, ...item }: DflowSerializablePin): boolean;
+  static isDflowPin(pin: unknown): pin is DflowSerializablePin;
   static isDflowPinType(type: unknown): type is DflowPinType;
   static isDflowPinTypes(types: unknown): types is DflowPinType[];
   constructor(kind: DflowPinKind, { types, ...pin }: DflowSerializablePin);
@@ -121,10 +123,11 @@ export declare class DflowPin extends DflowItem {
 }
 export declare class DflowInput extends DflowPin {
   #private;
-  static isDflowInput({ id, types }: DflowSerializableInput): boolean;
-  constructor({ optional, ...pin }: DflowSerializableInput);
+  static isDflowInput(item: unknown): item is DflowSerializableInput;
+  constructor({ multi, optional, ...pin }: DflowSerializableInput);
   get data(): DflowValue;
   get isConnected(): boolean;
+  get isMulti(): boolean | undefined;
   get isOptional(): boolean | undefined;
   connectTo(pin: DflowOutput): void;
   disconnect(): void;
@@ -136,7 +139,7 @@ export declare class DflowOutput extends DflowPin {
   constructor({ data, ...pin }: DflowSerializableOutput);
   clear(): void;
   get data(): DflowValue;
-  set data(data: DflowValue);
+  set data(data: unknown);
   toObject(): DflowSerializableOutput;
 }
 export declare class DflowNode extends DflowItem {
@@ -157,17 +160,21 @@ export declare class DflowNode extends DflowItem {
     typing?: DflowPinType | DflowPinType[],
     rest?: Omit<DflowNewOutput, "types">,
   ): DflowNewOutput;
+  /**
+   * @deprecated Use DflowNode.input
+   */
   static in(
     types?: DflowPinType[],
     rest?: Omit<DflowNewInput, "types">,
   ): DflowNewInput[];
+  /**
+   * @deprecated use DflowNode.output
+   */
   static out(
     types?: DflowPinType[],
     rest?: Omit<DflowNewOutput, "types">,
   ): DflowNewOutput[];
-  static isDflowNode(
-    { kind, inputs, outputs, ...item }: DflowSerializableNode,
-  ): boolean;
+  static isDflowNode(node: unknown): node is DflowSerializableNode;
   constructor(
     { kind, inputs, outputs, ...item }: DflowSerializableNode,
     host: DflowHost,
@@ -189,18 +196,10 @@ export declare class DflowNode extends DflowItem {
   run(): void;
   toObject(): DflowSerializableNode;
 }
-export declare class DflowUnknownNode extends DflowNode {
-  static kind: string;
-  constructor(obj: DflowSerializableNode, host: DflowHost);
-  run(): void;
-}
 export declare class DflowEdge extends DflowItem {
   readonly source: DflowSerializablePinPath;
   readonly target: DflowSerializablePinPath;
-  static isDflowEdge(
-    { source, target, ...item }: DflowSerializableEdge,
-    graph: DflowSerializableGraph,
-  ): false | DflowSerializableNode | undefined;
+  static isDflowEdge(edge: unknown): edge is DflowSerializableEdge;
   constructor({ source, target, ...item }: DflowSerializableEdge);
   toObject(): DflowSerializableEdge;
 }
