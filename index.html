@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="icon" href="data:;base64,=">
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, minimum-scale=1.0, maximum-scale=2.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>dflow</title>
   <meta name="description" content="is a minimal Dataflow programming engine">
@@ -77,7 +77,8 @@
     flowView.onChange(({ action, data }) => {
       switch(action) {
         case "CREATE_NODE": {
-          const view = flowView.node(data.id);
+          const nodeId = data.id;
+          const view = flowView.node(nodeId);
 
           // Make it case insensitive.
           const label = nodeLabels.find((nodeLabel) => {
@@ -87,7 +88,7 @@
 
           if (nodeLabels.includes(label)) {
             // Create node on dflow
-            dflow.newNode({ kind: label })
+            dflow.newNode({ kind: label, id: nodeId })
 
             // Complete node view with inputs and outputs.
             const NodeClass = catalog[label];
@@ -131,6 +132,7 @@
 
               if (['boolean', 'number', 'string'].includes(typeofMaybeJson)) {
                 const node = dflow.newNode({
+                  id: nodeId,
                   kind: catalog.data.kind,
                   outputs: [{ types: [typeofMaybeJson], data: maybeJson }]
                 });
@@ -143,7 +145,7 @@
                   ? "array"
                   : "object";
                 dflow.newNode({
-                  id: id,
+                  id: nodeId,
                   kind: "data",
                   outputs: [
                     {
@@ -161,21 +163,22 @@
           break;
         }
 
+        /*
         case 'CREATE_EDGE': {
           const {
             id,
             from: [sourceNodeId, sourcePinId],
             to: [targetNodeId, targetPinId],
           } = data
-          console.log(data)
 
-          // dflow.newEdge({
-          //   id,
-          //   source: [sourceNodeId, sourcePinId],
-          //   target: [targetNodeId, targetPinId],
-          // });
+          dflow.newEdge({
+            id,
+            source: [sourceNodeId, sourcePinId],
+            target: [targetNodeId, targetPinId],
+          });
           break;
         }
+          */
 
         default: {
           console.log(action, data);
