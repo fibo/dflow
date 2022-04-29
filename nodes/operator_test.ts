@@ -1,7 +1,7 @@
 import { DflowHost } from "../dflow.ts";
 import { nodesCatalog } from "./index.ts";
 import {
-  testOneNumAndOneMultiNumInOneNumOut,
+  // TODO testOneNumAndOneMultiNumInOneNumOut,
   testTwoAnyInOneBoolOut,
   testTwoNumInOneBoolOut,
   testTwoNumInOneNumOut,
@@ -21,6 +21,7 @@ Deno.test("addition", () => {
     },
   );
 
+  /*
   [
     { input1: undefined, input2: undefined, output: undefined },
     { input1: 2, input2: [1], output: 3 },
@@ -37,6 +38,7 @@ Deno.test("addition", () => {
       );
     },
   );
+  */
 });
 
 Deno.test("division", () => {

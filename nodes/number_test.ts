@@ -1,7 +1,7 @@
 import { DflowHost } from "../dflow.ts";
 import { nodesCatalog } from "./index.ts";
 import {
-  testOneAnyInOneBoolOut,
+  testOneInOneOut,
   testOneNumInOneBoolOut,
   testOneStrInOneNumOut,
 } from "./_test-utils.ts";
@@ -36,7 +36,7 @@ Deno.test("isInteger", () => {
     { input: "x", output: false },
     { input: NaN, output: false },
   ].forEach((input) => {
-    testOneAnyInOneBoolOut(dflow, nodeKind, input, Number.isInteger(input));
+    testOneInOneOut<boolean>(dflow, nodeKind, input, Number.isInteger(input));
   });
 });
 
@@ -52,7 +52,7 @@ Deno.test("isNaN", () => {
     { input: "x", output: false },
     { input: NaN, output: true },
   ].forEach(({ input, output }) => {
-    testOneAnyInOneBoolOut(dflow, nodeKind, input, output);
+    testOneInOneOut<boolean>(dflow, nodeKind, input, output);
   });
 });
 

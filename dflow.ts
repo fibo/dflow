@@ -107,8 +107,6 @@ class DflowErrorItemNotFound extends Error {
 }
 
 const _missingString = (stringName: string) => `${stringName} must be a string`;
-const _missingItem = (kind: DflowPinKind | "node" | "edge", id: DflowId) =>
-  `${kind} not found id=${id}`;
 const _missingPin = (nodeId: DflowId, kind: DflowPinKind) =>
   `${kind} pin not found nodeId=${nodeId}`;
 const _missingPinAtPosition = (
@@ -116,8 +114,6 @@ const _missingPinAtPosition = (
   kind: DflowPinKind,
   position: number,
 ) => `${_missingPin(nodeId, kind)} position=${position}`;
-const _missingPinById = (nodeId: DflowId, kind: DflowPinKind, pinId: DflowId) =>
-  `${_missingPin(nodeId, kind)} pinId=${pinId}`;
 
 const _executionNodeInfo = (
   { id, kind, outputs }: DflowSerializableNode,
@@ -197,15 +193,6 @@ export class DflowItem {
   readonly id: DflowId;
   name?: string;
 
-  static isDflowItem(item: unknown): item is DflowSerializableItem {
-    if (typeof item !== "object" || !item) return false;
-    const { id, name } = item as Partial<DflowSerializableItem>;
-    return (
-      DflowData.isDflowId(id) &&
-      (typeof name === "undefined" || DflowData.isStringNotEmpty(name))
-    );
-  }
-
   constructor({ id, name }: DflowSerializablePin) {
     this.id = id;
     this.name = name;
@@ -234,25 +221,6 @@ export class DflowPin extends DflowItem {
     "array",
     "DflowId",
   ];
-
-  static isDflowPin(pin: unknown): pin is DflowSerializablePin {
-    if (typeof pin !== "object" || !pin) return false;
-    const { types, ...item } = pin as Partial<DflowSerializablePin>;
-    return (
-      DflowItem.isDflowItem(item) &&
-      DflowPin.isDflowPinTypes(types)
-    );
-  }
-
-  static isDflowPinType(type: unknown): type is DflowPinType {
-    if (typeof type !== "string") return false;
-    return DflowPin.types.includes(type);
-  }
-
-  static isDflowPinTypes(types: unknown): types is DflowPinType[] {
-    if (!Array.isArray(types)) return false;
-    return types.every((type) => DflowPin.isDflowPinType(type));
-  }
 
   constructor(
     kind: DflowPinKind,
@@ -288,16 +256,6 @@ export class DflowInput extends DflowPin {
   #optional?: boolean;
   #source?: DflowOutput;
   #sources?: Set<DflowOutput>;
-
-  static isDflowInput(item: unknown): item is DflowSerializableInput {
-    if (typeof item !== "object" || !item) return false;
-    const { id, types, optional, multi } = item as Partial<
-      DflowSerializableInput
-    >;
-    return DflowPin.isDflowPin({ id, types }) &&
-      (typeof multi === "undefined" || typeof multi === "boolean") &&
-      (typeof optional === "undefined" || typeof optional === "boolean");
-  }
 
   constructor({ multi, optional, ...pin }: DflowSerializableInput) {
     super("input", pin);
@@ -364,12 +322,6 @@ export class DflowInput extends DflowPin {
 export class DflowOutput extends DflowPin {
   #data?: DflowValue;
 
-  static isDflowOutput({ id, data, types = [] }: DflowSerializableOutput) {
-    return (
-      DflowPin.isDflowPin({ id, types }) && DflowData.validate(data, types)
-    );
-  }
-
   constructor({ data, ...pin }: DflowSerializableOutput) {
     super("output", pin);
 
@@ -405,7 +357,7 @@ export class DflowOutput extends DflowPin {
             JSON.stringify(
               this.types,
             )
-          } typeof=${typeof data}`,
+          } typeof data is ${typeof data}`,
         );
       }
     }
@@ -441,64 +393,20 @@ export class DflowNode extends DflowItem {
     typing: DflowPinType | DflowPinType[] = [],
     rest?: Omit<DflowNewInput, "types">,
   ): DflowNewInput {
-    if (DflowPin.isDflowPinType(typing)) {
+    if (typeof typing === "string") {
       return { types: [typing], ...rest };
     }
-    if (DflowPin.isDflowPinTypes(typing)) {
-      return { types: typing, ...rest };
-    }
-    throw new TypeError("invalid input definition");
+    return { types: typing, ...rest };
   }
 
   static output(
     typing: DflowPinType | DflowPinType[] = [],
     rest?: Omit<DflowNewOutput, "types">,
   ): DflowNewOutput {
-    if (DflowPin.isDflowPinType(typing)) {
+    if (typeof typing === "string") {
       return { types: [typing], ...rest };
     }
-    if (DflowPin.isDflowPinTypes(typing)) {
-      return { types: typing, ...rest };
-    }
-    throw new TypeError("invalid output definition");
-  }
-
-  /**
-   * @deprecated Use DflowNode.input
-   */
-  static in(
-    types: DflowPinType[] = [],
-    rest?: Omit<DflowNewInput, "types">,
-  ): DflowNewInput[] {
-    return [{ types, ...rest }];
-  }
-
-  /**
-   * @deprecated use DflowNode.output
-   */
-  static out(
-    types: DflowPinType[] = [],
-    rest?: Omit<DflowNewOutput, "types">,
-  ): DflowNewOutput[] {
-    return [{ types, ...rest }];
-  }
-
-  static isDflowNode(node: unknown): node is DflowSerializableNode {
-    if (typeof node !== "object" || !node) return false;
-    const {
-      kind,
-      inputs = [],
-      outputs = [],
-      ...item
-    } = node as Partial<DflowSerializableNode>;
-    return (
-      DflowItem.isDflowItem(item) &&
-      DflowData.isStringNotEmpty(kind) &&
-      // Check inputs.
-      inputs.every((input) => DflowInput.isDflowInput(input)) &&
-      // Check outputs.
-      outputs.every((output) => DflowOutput.isDflowOutput(output))
-    );
+    return { types: typing, ...rest };
   }
 
   constructor(
@@ -650,50 +558,9 @@ export class DflowEdge extends DflowItem {
   readonly source: DflowSerializablePinPath;
   readonly target: DflowSerializablePinPath;
 
-  static isDflowEdge(
-    edge: unknown,
-  ): edge is DflowSerializableEdge {
-    if (typeof edge !== "object" || !edge) return false;
-    const { source, target, ...item } = edge as Partial<DflowSerializableEdge>;
-    if (DflowItem.isDflowItem(item)) return false;
-    // Check source pin.
-    if (!Array.isArray(source)) return false;
-    if (source.length !== 2) return false;
-    if (DflowData.isDflowId(source[0]) || DflowData.isDflowId(source[1])) {
-      return false;
-    }
-    // Check target pin.
-    if (!Array.isArray(target)) return false;
-    if (target.length !== 2) return false;
-    if (DflowData.isDflowId(target[0]) || DflowData.isDflowId(target[1])) {
-      return false;
-    }
-    // All checks passed.
-    return true;
-  }
-
   constructor({ source, target, ...item }: DflowSerializableEdge) {
     super(item);
 
-    // 1. Read source and target.
-    const [sourceNodeId, sourcePinId] = source;
-    const [targetNodeId, targetPinId] = target;
-
-    // 2. Check their types.
-    if (typeof sourceNodeId !== "string") {
-      throw new TypeError(_missingString("sourceNodeId"));
-    }
-    if (typeof sourcePinId !== "string") {
-      throw new TypeError(_missingString("sourcePinId"));
-    }
-    if (typeof targetNodeId !== "string") {
-      throw new TypeError(_missingString("targetNodeId"));
-    }
-    if (typeof targetPinId !== "string") {
-      throw new TypeError(_missingString("targetPinId"));
-    }
-
-    // 3. Store in memory.
     this.source = source;
     this.target = target;
   }

@@ -1,6 +1,23 @@
 import { assertEquals } from "std/testing/asserts.ts";
 import { DflowArray, DflowHost, DflowObject, DflowValue } from "../dflow.ts";
 
+export function testOneInOneOut<T>(
+  dflow: DflowHost,
+  nodeKind: string,
+  input?: DflowValue,
+  output?: T,
+) {
+  const catalog = dflow.nodesCatalog;
+  const dataNode = dflow.newNode({
+    kind: catalog.data.kind,
+    outputs: [{ types: [], data: input }],
+  });
+  const testNode = dflow.newNode({ kind: nodeKind });
+  dflow.connect(dataNode).to(testNode);
+  dflow.run();
+  assertEquals(testNode.output(0).data, output);
+}
+
 export function testOneAnyInOneArrOut(
   dflow: DflowHost,
   nodeKind: string,
@@ -10,7 +27,7 @@ export function testOneAnyInOneArrOut(
   const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ id: "out", types: [], data: input }],
+    outputs: [{ types: [], data: input }],
   });
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);

@@ -1,13 +1,15 @@
 import { DflowNode } from "../dflow.ts";
 
+const { input, output } = DflowNode;
+
 class DflowNodeIf extends DflowNode {
   static kind = "if";
   static inputs = [
-    ...DflowNode.in([], { name: "condition" }),
-    ...DflowNode.in([], { name: "then" }),
-    ...DflowNode.in([], { name: "else" }),
+    input([], { name: "condition" }),
+    input([], { name: "then" }),
+    input([], { name: "else" }),
   ];
-  static outputs = DflowNode.out();
+  static outputs = [output()];
   run() {
     this.output(0).data = this.input(0).data
       ? this.input(1).data
