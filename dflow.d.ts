@@ -105,7 +105,6 @@ export declare class DflowData {
 export declare class DflowItem {
   readonly id: DflowId;
   name?: string;
-  static isDflowItem(item: unknown): item is DflowSerializableItem;
   constructor({ id, name }: DflowSerializablePin);
   toObject(): DflowSerializableItem;
 }
@@ -113,9 +112,6 @@ export declare class DflowPin extends DflowItem {
   readonly kind: DflowPinKind;
   readonly types: DflowPinType[];
   static types: string[];
-  static isDflowPin(pin: unknown): pin is DflowSerializablePin;
-  static isDflowPinType(type: unknown): type is DflowPinType;
-  static isDflowPinTypes(types: unknown): types is DflowPinType[];
   constructor(kind: DflowPinKind, { types, ...pin }: DflowSerializablePin);
   get hasTypeAny(): boolean;
   hasType(type: DflowPinType): boolean;
@@ -123,7 +119,6 @@ export declare class DflowPin extends DflowItem {
 }
 export declare class DflowInput extends DflowPin {
   #private;
-  static isDflowInput(item: unknown): item is DflowSerializableInput;
   constructor({ multi, optional, ...pin }: DflowSerializableInput);
   get data(): DflowValue;
   get isConnected(): boolean;
@@ -135,7 +130,6 @@ export declare class DflowInput extends DflowPin {
 }
 export declare class DflowOutput extends DflowPin {
   #private;
-  static isDflowOutput({ id, data, types }: DflowSerializableOutput): boolean;
   constructor({ data, ...pin }: DflowSerializableOutput);
   clear(): void;
   get data(): DflowValue;
@@ -160,21 +154,6 @@ export declare class DflowNode extends DflowItem {
     typing?: DflowPinType | DflowPinType[],
     rest?: Omit<DflowNewOutput, "types">,
   ): DflowNewOutput;
-  /**
-   * @deprecated Use DflowNode.input
-   */
-  static in(
-    types?: DflowPinType[],
-    rest?: Omit<DflowNewInput, "types">,
-  ): DflowNewInput[];
-  /**
-   * @deprecated use DflowNode.output
-   */
-  static out(
-    types?: DflowPinType[],
-    rest?: Omit<DflowNewOutput, "types">,
-  ): DflowNewOutput[];
-  static isDflowNode(node: unknown): node is DflowSerializableNode;
   constructor(
     { kind, inputs, outputs, ...item }: DflowSerializableNode,
     host: DflowHost,
@@ -183,9 +162,9 @@ export declare class DflowNode extends DflowItem {
   get inputs(): IterableIterator<DflowInput>;
   get outputs(): IterableIterator<DflowOutput>;
   clearOutputs(): void;
-  getInputById(pinId: DflowId): DflowInput;
+  getInputById(id: DflowId): DflowInput;
   input(position: number): DflowInput;
-  getOutputById(pinId: DflowId): DflowOutput;
+  getOutputById(id: DflowId): DflowOutput;
   output(position: number): DflowOutput;
   deleteInput(pinId: DflowId): void;
   deleteOutput(pinId: DflowId): void;
@@ -197,12 +176,13 @@ export declare class DflowNode extends DflowItem {
 export declare class DflowEdge extends DflowItem {
   readonly source: DflowSerializablePinPath;
   readonly target: DflowSerializablePinPath;
-  static isDflowEdge(edge: unknown): edge is DflowSerializableEdge;
   constructor({ source, target, ...item }: DflowSerializableEdge);
   toObject(): DflowSerializableEdge;
 }
 export declare class DflowGraph extends DflowItem {
   #private;
+  readonly nodes: Map<DflowId, DflowNode>;
+  readonly edges: Map<DflowId, DflowEdge>;
   runOptions: DflowRunOptions;
   runStatus: DflowRunStatus | null;
   executionReport: DflowExecutionReport | null;
@@ -229,23 +209,7 @@ export declare class DflowGraph extends DflowItem {
     nodeIds: DflowId[],
     nodeConnections: DflowNodeConnection[],
   ): DflowId[];
-  get edges(): IterableIterator<DflowEdge>;
-  get nodes(): IterableIterator<DflowNode>;
   get nodeConnections(): DflowNodeConnection[];
-  get edgeIds(): string[];
-  get nodeIds(): string[];
-  get numEdges(): number;
-  get numNodes(): number;
-  addEdge(edge: DflowEdge): void;
-  addNode(node: DflowNode): void;
-  clear(): void;
-  deleteEdge(edgeId: DflowId): void;
-  deleteNode(nodeId: DflowId): void;
-  getNodeById(nodeId: DflowId): DflowNode;
-  getEdgeById(edgeId: DflowId): DflowEdge;
-  generateEdgeId(i?: number): DflowId;
-  generateNodeId(i?: number): DflowId;
-  nodeIdsInsideFunctions(): string[];
   run(): Promise<void>;
   toObject(): DflowSerializableGraph;
 }
@@ -255,11 +219,8 @@ export declare class DflowHost {
   readonly context: Record<string, unknown>;
   constructor(nodesCatalog?: DflowNodesCatalog);
   get executionReport(): DflowExecutionReport | null;
-  get edges(): IterableIterator<DflowEdge>;
-  get nodes(): IterableIterator<DflowNode>;
-  get numEdges(): number;
-  get numNodes(): number;
-  get nodeKinds(): string[];
+  get edges(): DflowEdge[];
+  get nodes(): Map<string, DflowNode>;
   get runStatusIsSuccess(): boolean;
   get runStatusIsWaiting(): boolean;
   get runStatusIsFailure(): boolean;
@@ -272,8 +233,8 @@ export declare class DflowHost {
   deleteNode(nodeId: DflowId): void;
   deleteEdgesConnectedToPin([nodeId, pinId]: DflowSerializablePinPath): void;
   executeFunction(functionId: DflowId, args: DflowArray): DflowValue;
-  getEdgeById(edgeId: DflowId): DflowEdge;
-  getNodeById(nodeId: DflowId): DflowNode;
+  getEdgeById(id: DflowId): DflowEdge | undefined;
+  getNodeById(id: DflowId): DflowNode;
   newNode(obj: DflowNewNode): DflowNode;
   newEdge(obj: DflowNewEdge): DflowEdge;
   newInput(nodeId: DflowId, obj: DflowNewInput): DflowInput;
