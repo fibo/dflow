@@ -37,7 +37,7 @@
     "example:usage": "deno run examples/usage.js",
     "fmt": "deno fmt --ignore=./dflow.js,./dflow.cjs",
     "emit_typescript_declarations": "tsc --project ./tsconfig.declarations.json",
-    "postemit_typescript_declarations": "deno fmt dflow.d.ts",
+    "postemit_typescript_declarations": "mv dflow.d.ts index.d.ts",
     "lint": "deno lint --ignore=./dflow.js,./dflow.cjs",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
     "start": "serve",
