@@ -4,8 +4,8 @@ const { input, output } = DflowNode;
 
 class DflowMathAbs extends DflowNode {
   static kind = "mathAbs";
-  static inputs = DflowNode.in(["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("number")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = Math.abs(this.input(0).data as number);
   }
@@ -14,7 +14,7 @@ class DflowMathAbs extends DflowNode {
 class DflowMathCos extends DflowNode {
   static kind = "mathCos";
   static inputs = [input("number")];
-  static outputs = DflowNode.out(["number"]);
+  static outputs = [output("number")];
   run() {
     this.output(0).data = Math.cos(this.input(0).data as number);
   }
@@ -22,8 +22,8 @@ class DflowMathCos extends DflowNode {
 
 class DflowMathCosh extends DflowNode {
   static kind = "mathCosh";
-  static inputs = DflowNode.in(["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("number")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = Math.cosh(this.input(0).data as number);
   }
@@ -31,8 +31,8 @@ class DflowMathCosh extends DflowNode {
 
 class DflowMathFloor extends DflowNode {
   static kind = "mathFloor";
-  static inputs = DflowNode.in(["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("number")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = Math.floor(this.input(0).data as number);
   }
@@ -40,8 +40,8 @@ class DflowMathFloor extends DflowNode {
 
 class DflowMathMax extends DflowNode {
   static kind = "mathMax";
-  static inputs = DflowNode.in(["array"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("array")];
+  static outputs = [output("number")];
   run() {
     // Suppose input is a list of numbers, just to make TS happy.
     // Then check that result is not `NaN`, in case some input is not ok.
@@ -57,8 +57,8 @@ class DflowMathMax extends DflowNode {
 
 class DflowMathMin extends DflowNode {
   static kind = "mathMin";
-  static inputs = DflowNode.in(["array"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("array")];
+  static outputs = [output("number")];
   run() {
     // Suppose input is a list of numbers, just to make TS happy.
     // Then check that result is not `NaN`, in case some input is not ok.
@@ -80,8 +80,8 @@ class DflowMathPI extends DflowNode {
 
 class DflowMathRound extends DflowNode {
   static kind = "mathRound";
-  static inputs = DflowNode.in(["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("number")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = Math.round(this.input(0).data as number);
   }
@@ -89,8 +89,8 @@ class DflowMathRound extends DflowNode {
 
 class DflowMathSin extends DflowNode {
   static kind = "mathSin";
-  static inputs = DflowNode.in(["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("number")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = Math.sin(this.input(0).data as number);
   }
@@ -98,8 +98,8 @@ class DflowMathSin extends DflowNode {
 
 class DflowMathSinh extends DflowNode {
   static kind = "mathSinh";
-  static inputs = DflowNode.in(["number"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("number")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = Math.sinh(this.input(0).data as number);
   }

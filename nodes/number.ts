@@ -1,9 +1,11 @@
 import { DflowNode } from "../dflow.ts";
 
+const { input, output } = DflowNode;
+
 class DflowIsFinite extends DflowNode {
   static kind = "isFinite";
-  static inputs = DflowNode.in(["number"]);
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input("number")];
+  static outputs = [output("boolean")];
   run() {
     this.output(0).data = Number.isFinite(this.input(0).data);
   }
@@ -11,8 +13,8 @@ class DflowIsFinite extends DflowNode {
 
 class DflowIsInteger extends DflowNode {
   static kind = "isInteger";
-  static inputs = DflowNode.in([]);
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input()];
+  static outputs = [output("boolean")];
   run() {
     this.output(0).data = Number.isInteger(this.input(0).data);
   }
@@ -20,8 +22,8 @@ class DflowIsInteger extends DflowNode {
 
 class DflowIsNaN extends DflowNode {
   static kind = "isNaN";
-  static inputs = DflowNode.in([]);
-  static outputs = DflowNode.out(["boolean"]);
+  static inputs = [input()];
+  static outputs = [output("boolean")];
 
   run() {
     this.output(0).data = Number.isNaN(this.input(0).data);
@@ -30,8 +32,8 @@ class DflowIsNaN extends DflowNode {
 
 class DflowParseFloat extends DflowNode {
   static kind = "parseFloat";
-  static inputs = DflowNode.in(["string"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("string")];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = parseFloat(this.input(0).data as string);
   }
@@ -39,8 +41,8 @@ class DflowParseFloat extends DflowNode {
 
 class DflowParseInt extends DflowNode {
   static kind = "parseInt";
-  static inputs = DflowNode.in(["number", "string"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input(["number", "string"])];
+  static outputs = [output("number")];
   run() {
     this.output(0).data = parseInt(this.input(0).data as string);
   }

@@ -1,12 +1,14 @@
 import { DflowArray, DflowId, DflowNode } from "../dflow.ts";
 
+const { input, output } = DflowNode;
+
 class DflowArrayAt extends DflowNode {
   static kind = "arrayAt";
   static inputs = [
-    ...DflowNode.in(["array"]),
-    ...DflowNode.in(["number"], { name: "index" }),
+    input("array"),
+    input("number", { name: "index" }),
   ];
-  static outputs = DflowNode.out();
+  static outputs = [output()];
   run() {
     const array = this.input(0).data as DflowArray;
     const index = this.input(1).data as number;
@@ -17,10 +19,10 @@ class DflowArrayAt extends DflowNode {
 class DflowArrayFilter extends DflowNode {
   static kind = "arrayFilter";
   static inputs = [
-    ...DflowNode.in(["array"]),
-    ...DflowNode.in(["DflowId"], { name: "functionId" }),
+    input("array"),
+    input("DflowId", { name: "functionId" }),
   ];
-  static outputs = DflowNode.out(["array"]);
+  static outputs = [output("array")];
   run() {
     this.output(0).data = (this.input(0).data as DflowArray).filter(
       (...args) =>
@@ -32,10 +34,10 @@ class DflowArrayFilter extends DflowNode {
 class DflowArrayFindLastIndex extends DflowNode {
   static kind = "arrayFindLastIndex";
   static inputs = [
-    ...DflowNode.in(["array"]),
-    ...DflowNode.in(["DflowId"], { name: "functionId" }),
+    input("array"),
+    input("DflowId", { name: "functionId" }),
   ];
-  static outputs = DflowNode.out(["number"]);
+  static outputs = [output("number")];
   run() {
     this.output(0).data = (this.input(0).data as DflowArray).findLastIndex(
       (...args) =>
@@ -47,10 +49,10 @@ class DflowArrayFindLastIndex extends DflowNode {
 class DflowArrayFindIndex extends DflowNode {
   static kind = "arrayFindIndex";
   static inputs = [
-    ...DflowNode.in(["array"]),
-    ...DflowNode.in(["DflowId"], { name: "functionId" }),
+    input("array"),
+    input("DflowId", { name: "functionId" }),
   ];
-  static outputs = DflowNode.out(["number"]);
+  static outputs = [output("number")];
   run() {
     this.output(0).data = (this.input(0).data as DflowArray).findIndex(
       (...args) =>
@@ -62,10 +64,10 @@ class DflowArrayFindIndex extends DflowNode {
 class DflowArrayIncludes extends DflowNode {
   static kind = "arrayIncludes";
   static inputs = [
-    ...DflowNode.in(["array"], { name: "array" }),
-    ...DflowNode.in(["string"], { name: "element" }),
+    input("array", { name: "array" }),
+    input("string", { name: "element" }),
   ];
-  static outputs = DflowNode.out(["boolean"]);
+  static outputs = [output("boolean")];
   run() {
     const data = this.input(0).data;
     const element = this.input(1).data;
@@ -79,10 +81,10 @@ class DflowArrayIncludes extends DflowNode {
 class DflowArrayJoin extends DflowNode {
   static kind = "arrayJoin";
   static inputs = [
-    ...DflowNode.in(["array"], { name: "array" }),
-    ...DflowNode.in(["string"], { name: "separator", optional: true }),
+    input("array", { name: "array" }),
+    input("string", { name: "separator", optional: true }),
   ];
-  static outputs = DflowNode.out(["string"]);
+  static outputs = [output("string")];
   run() {
     this.output(0).data = (this.input(0).data as Array<unknown>).join(
       this.input(1).data as string | undefined,
@@ -92,8 +94,8 @@ class DflowArrayJoin extends DflowNode {
 
 class DflowArrayLength extends DflowNode {
   static kind = "arrayLength";
-  static inputs = DflowNode.in(["array"]);
-  static outputs = DflowNode.out(["number"]);
+  static inputs = [input("array")];
+  static outputs = [output("number")];
   run() {
     const data = this.input(0).data;
     if (Array.isArray(data)) {
@@ -107,10 +109,10 @@ class DflowArrayLength extends DflowNode {
 class DflowArrayMap extends DflowNode {
   static kind = "arrayMap";
   static inputs = [
-    ...DflowNode.in(["array"]),
-    ...DflowNode.in(["DflowId"], { name: "functionId" }),
+    input("array"),
+    input("DflowId", { name: "functionId" }),
   ];
-  static outputs = DflowNode.out(["array"]);
+  static outputs = [output("array")];
   run() {
     this.output(0).data = (this.input(0).data as DflowArray).map(
       (...args) =>
@@ -121,10 +123,10 @@ class DflowArrayMap extends DflowNode {
 
 class DflowArrayPop extends DflowNode {
   static kind = "arrayPop";
-  static inputs = DflowNode.in(["array"]);
+  static inputs = [input("array")];
   static outputs = [
-    ...DflowNode.out([], { name: "element" }),
-    ...DflowNode.out(["array"], { name: "rest" }),
+    output([], { name: "element" }),
+    output("array", { name: "rest" }),
   ];
   run() {
     const array = (this.input(0).data as DflowArray).slice();
@@ -137,10 +139,10 @@ class DflowArrayPop extends DflowNode {
 class DflowArrayPush extends DflowNode {
   static kind = "arrayPush";
   static inputs = [
-    ...DflowNode.in(["array"]),
-    ...DflowNode.in([], { name: "element" }),
+    input("array"),
+    input([], { name: "element" }),
   ];
-  static outputs = DflowNode.out(["array"]);
+  static outputs = [output("array")];
   run() {
     const array = (this.input(0).data as DflowArray).slice();
     const element = this.input(1).data;
@@ -153,8 +155,8 @@ class DflowArrayPush extends DflowNode {
 
 class DflowArrayReverse extends DflowNode {
   static kind = "arrayReverse";
-  static inputs = DflowNode.in(["array"]);
-  static outputs = DflowNode.in(["array"]);
+  static inputs = [input("array")];
+  static outputs = [input("array")];
   run() {
     const array = (this.input(0).data as DflowArray).slice();
     this.output(0).data = array.reverse();
@@ -163,10 +165,10 @@ class DflowArrayReverse extends DflowNode {
 
 class DflowArrayShift extends DflowNode {
   static kind = "arrayShift";
-  static inputs = DflowNode.in(["array"]);
+  static inputs = [input("array")];
   static outputs = [
-    ...DflowNode.out([], { name: "element" }),
-    ...DflowNode.out(["array"], { name: "rest" }),
+    output([], { name: "element" }),
+    output("array", { name: "rest" }),
   ];
   run() {
     const array = (this.input(0).data as DflowArray).slice();
@@ -179,11 +181,11 @@ class DflowArrayShift extends DflowNode {
 class DflowArraySlice extends DflowNode {
   static kind = "arraySlice";
   static inputs = [
-    ...DflowNode.in(["array"]),
-    ...DflowNode.in(["number"], { name: "start" }),
-    ...DflowNode.in(["number"], { name: "end", optional: true }),
+    input("array"),
+    input("number", { name: "start" }),
+    input("number", { name: "end", optional: true }),
   ];
-  static outputs = DflowNode.out(["array"]);
+  static outputs = [output("array")];
   run() {
     const array = super.input(0).data as DflowArray;
     const start = super.input(1).data as number;

@@ -1,13 +1,10 @@
-/*
-Operators reference:
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators
-*/
 import { DflowNode } from "../dflow.ts";
+
 const { input, output } = DflowNode;
 
 class DflowAddition extends DflowNode {
   static kind = "addition";
-  static inputs = [input("number"), input("number", { multi: true })];
+  static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
   run() {
     this.output(0).data = (this.input(0).data as number) +

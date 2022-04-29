@@ -1,13 +1,15 @@
 import { DflowNode } from "../dflow.ts";
 
+const { input, output } = DflowNode;
+
 const dateOutputs = [
-  ...DflowNode.out(["string"]),
-  ...DflowNode.out(["number"], { name: "milliseconds" }),
+  output("string"),
+  output("number", { name: "milliseconds" }),
 ];
 
 class DflowDateNew extends DflowNode {
   static kind = "newDate";
-  static inputs = DflowNode.in(["string", "number"], { optional: true });
+  static inputs = [input(["string", "number"], { optional: true })];
   static outputs = dateOutputs;
   run() {
     const input = this.input(0).data;
