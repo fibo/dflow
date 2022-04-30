@@ -87,7 +87,7 @@ __export(stdin_exports, {
   DflowOutput: () => DflowOutput,
   DflowPin: () => DflowPin
 });
-var _multi, _optional, _source, _sources, _data, _inputs, _outputs, _inputPosition, _outputPosition, _nodeIdsInsideFunctions, nodeIdsInsideFunctions_fn, _graph, _generateInputIds, generateInputIds_fn, _generateOutputIds, generateOutputIds_fn;
+var _multi, _optional, _source, _sources, _data, _host, _inputs, _outputs, _inputPosition, _outputPosition, _graph, _generateInputIds, generateInputIds_fn, _generateOutputIds, generateOutputIds_fn;
 class DflowErrorItemNotFound extends Error {
   constructor(kind, id) {
     super(`${kind} not found id=${id}`);
@@ -311,22 +311,25 @@ class DflowOutput extends DflowPin {
 }
 _data = new WeakMap();
 class DflowNode extends DflowItem {
-  constructor(_g, host, { isAsync = false, isConstant = false } = {}) {
-    var _h = _g, { kind, inputs = [], outputs = [] } = _h, item = __objRest(_h, ["kind", "inputs", "outputs"]);
+  constructor(_g) {
+    var _h = _g, { node: _i } = _h, _j = _i, { kind, inputs = [], outputs = [] } = _j, item = __objRest(_j, ["kind", "inputs", "outputs"]), { host, meta } = _h;
     super(item);
+    __privateAdd(this, _host, void 0);
     __privateAdd(this, _inputs, /* @__PURE__ */ new Map());
     __privateAdd(this, _outputs, /* @__PURE__ */ new Map());
     __privateAdd(this, _inputPosition, []);
     __privateAdd(this, _outputPosition, []);
     __publicField(this, "kind");
-    __publicField(this, "meta");
-    __publicField(this, "host");
-    this.host = host;
+    __publicField(this, "isAsync");
+    __publicField(this, "isConstant");
+    __privateSet(this, _host, host);
     this.kind = kind;
-    this.meta = {
-      isAsync,
-      isConstant
-    };
+    if ((meta == null ? void 0 : meta.isConstant) === true) {
+      this.isConstant = meta.isConstant;
+    }
+    if ((meta == null ? void 0 : meta.isAsync) === true) {
+      this.isAsync = meta.isAsync;
+    }
     for (const pin of inputs) {
       this.newInput(pin);
     }
@@ -398,7 +401,7 @@ class DflowNode extends DflowItem {
     return this.getOutputById(pinId);
   }
   deleteInput(pinId) {
-    this.host.deleteEdgesConnectedToPin([
+    __privateGet(this, _host).deleteEdgesConnectedToPin([
       this.id,
       pinId
     ]);
@@ -406,7 +409,7 @@ class DflowNode extends DflowItem {
     __privateGet(this, _inputPosition).splice(__privateGet(this, _inputPosition).indexOf(pinId), 1);
   }
   deleteOutput(pinId) {
-    this.host.deleteEdgesConnectedToPin([
+    __privateGet(this, _host).deleteEdgesConnectedToPin([
       this.id,
       pinId
     ]);
@@ -464,6 +467,7 @@ class DflowNode extends DflowItem {
     return obj;
   }
 }
+_host = new WeakMap();
 _inputs = new WeakMap();
 _outputs = new WeakMap();
 _inputPosition = new WeakMap();
@@ -474,8 +478,8 @@ __publicField(DflowNode, "isConstant");
 __publicField(DflowNode, "inputs");
 __publicField(DflowNode, "outputs");
 class DflowEdge extends DflowItem {
-  constructor(_i) {
-    var _j = _i, { source, target } = _j, item = __objRest(_j, ["source", "target"]);
+  constructor(_k) {
+    var _l = _k, { source, target } = _l, item = __objRest(_l, ["source", "target"]);
     super(item);
     __publicField(this, "source");
     __publicField(this, "target");
@@ -489,9 +493,8 @@ class DflowEdge extends DflowItem {
     });
   }
 }
-const _DflowGraph = class {
+class DflowGraph {
   constructor() {
-    __privateAdd(this, _nodeIdsInsideFunctions);
     __publicField(this, "nodes", /* @__PURE__ */ new Map());
     __publicField(this, "edges", /* @__PURE__ */ new Map());
     __publicField(this, "runOptions", {
@@ -507,24 +510,24 @@ const _DflowGraph = class {
     return nodeConnections.filter(({ targetId }) => nodeId === targetId).map(({ sourceId }) => sourceId);
   }
   static levelOfNodeId(nodeId, nodeConnections) {
-    const parentsNodeIds = _DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
+    const parentsNodeIds = DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
     if (parentsNodeIds.length === 0) {
       return 0;
     }
     let maxLevel = 0;
     for (const parentNodeId of parentsNodeIds) {
-      const level = _DflowGraph.levelOfNodeId(parentNodeId, nodeConnections);
+      const level = DflowGraph.levelOfNodeId(parentNodeId, nodeConnections);
       maxLevel = Math.max(level, maxLevel);
     }
     return maxLevel + 1;
   }
   static ancestorsOfNodeId(nodeId, nodeConnections) {
-    const parentsNodeIds = _DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
+    const parentsNodeIds = DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
     if (parentsNodeIds.length === 0) {
       return [];
     } else {
       return parentsNodeIds.reduce((accumulator, parentNodeId, index, array) => {
-        const ancestors = _DflowGraph.ancestorsOfNodeId(parentNodeId, nodeConnections);
+        const ancestors = DflowGraph.ancestorsOfNodeId(parentNodeId, nodeConnections);
         const result = accumulator.concat(ancestors);
         return index === array.length - 1 ? Array.from(new Set(array.concat(result))) : result;
       }, []);
@@ -533,7 +536,7 @@ const _DflowGraph = class {
   static sortNodesByLevel(nodeIds, nodeConnections) {
     const levelOf = {};
     for (const nodeId of nodeIds) {
-      levelOf[nodeId] = _DflowGraph.levelOfNodeId(nodeId, nodeConnections);
+      levelOf[nodeId] = DflowGraph.levelOfNodeId(nodeId, nodeConnections);
     }
     return nodeIds.slice().sort((a, b) => levelOf[a] <= levelOf[b] ? -1 : 1);
   }
@@ -544,6 +547,17 @@ const _DflowGraph = class {
       sourceId: edge.source[0],
       targetId: edge.target[0]
     }));
+  }
+  get nodeIdsInsideFunctions() {
+    const ancestorsOfReturnNodes = [];
+    for (const node of [
+      ...this.nodes.values()
+    ]) {
+      if (node.kind === "return") {
+        ancestorsOfReturnNodes.push(DflowGraph.ancestorsOfNodeId(node.id, this.nodeConnections));
+      }
+    }
+    return Array.from(new Set(ancestorsOfReturnNodes.flat()));
   }
   async run() {
     var _a, _b;
@@ -556,15 +570,15 @@ const _DflowGraph = class {
     if (verbose) {
       this.executionReport.steps = [];
     }
-    const nodeIdsExcluded = __privateMethod(this, _nodeIdsInsideFunctions, nodeIdsInsideFunctions_fn).call(this);
-    const nodeIds = _DflowGraph.sortNodesByLevel([
+    const nodeIdsExcluded = this.nodeIdsInsideFunctions;
+    const nodeIds = DflowGraph.sortNodesByLevel([
       ...this.nodes.keys()
     ].filter((nodeId) => !nodeIdsExcluded.includes(nodeId)), this.nodeConnections);
     NODES_LOOP:
       for (const nodeId1 of nodeIds) {
         const node = this.nodes.get(nodeId1);
         try {
-          if (!node.meta.isConstant) {
+          if (!node.isConstant) {
             let someInputIsNotValid = false;
             INPUTS_LOOP:
               for (const { id, data, types, isOptional } of node.inputs) {
@@ -585,7 +599,7 @@ const _DflowGraph = class {
               }
               continue NODES_LOOP;
             }
-            if (node.meta.isAsync) {
+            if (node.isAsync) {
               await node.run();
             } else {
               node.run();
@@ -618,20 +632,7 @@ const _DflowGraph = class {
     }
     return obj;
   }
-};
-let DflowGraph = _DflowGraph;
-_nodeIdsInsideFunctions = new WeakSet();
-nodeIdsInsideFunctions_fn = function() {
-  const ancestorsOfReturnNodes = [];
-  for (const node of [
-    ...this.nodes.values()
-  ]) {
-    if (node.kind === "return") {
-      ancestorsOfReturnNodes.push(_DflowGraph.ancestorsOfNodeId(node.id, this.nodeConnections));
-    }
-  }
-  return Array.from(new Set(ancestorsOfReturnNodes.flat()));
-};
+}
 const _DflowHost = class {
   constructor(nodesCatalog = {}) {
     __privateAdd(this, _graph, void 0);
@@ -758,7 +759,7 @@ const _DflowHost = class {
             return node.input(1).data;
           }
           default: {
-            if (!node.meta.isConstant && !node.meta.isAsync) {
+            if (!node.isConstant && !node.isAsync) {
               node.run();
             }
             if (verbose) {
@@ -800,11 +801,15 @@ const _DflowHost = class {
     };
     const inputs = Array.isArray(obj.inputs) ? __privateMethod(_b = _DflowHost, _generateInputIds, generateInputIds_fn).call(_b, obj.inputs) : __privateMethod(_d = _DflowHost, _generateInputIds, generateInputIds_fn).call(_d, (_c = NodeClass.inputs) != null ? _c : []);
     const outputs = Array.isArray(obj.outputs) ? __privateMethod(_e = _DflowHost, _generateOutputIds, generateOutputIds_fn).call(_e, obj.outputs) : __privateMethod(_g = _DflowHost, _generateOutputIds, generateOutputIds_fn).call(_g, (_f = NodeClass.outputs) != null ? _f : []);
-    const node = new NodeClass(__spreadProps(__spreadValues({}, obj), {
-      id: id4,
-      inputs,
-      outputs
-    }), this, meta);
+    const node = new NodeClass({
+      node: __spreadProps(__spreadValues({}, obj), {
+        id: id4,
+        inputs,
+        outputs
+      }),
+      host: this,
+      meta
+    });
     __privateGet(this, _graph).nodes.set(node.id, node);
     return node;
   }
@@ -915,8 +920,8 @@ __publicField(DflowNodeData, "outputs", [
   output()
 ]);
 class DflowNodeFunction extends DflowNode {
-  constructor(...args) {
-    super(...args);
+  constructor(arg) {
+    super(arg);
     this.output(0).data = this.id;
   }
 }

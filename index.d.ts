@@ -3,8 +3,8 @@ export declare type DflowNewItem<Item> = Omit<Item, "id"> & {
     id?: DflowId;
 };
 export declare type DflowNodeMetadata = {
-    isAsync?: boolean;
-    isConstant?: boolean;
+    isAsync: boolean;
+    isConstant: boolean;
 };
 export declare type DflowPinKind = "input" | "output";
 export declare type DflowPinType = "string" | "number" | "boolean" | "object" | "array" | "DflowId";
@@ -62,6 +62,11 @@ export declare type DflowNodeConnection = {
     sourceId: DflowId;
     targetId: DflowId;
 };
+export declare type DflowNodeConstructorArg = {
+    node: DflowSerializableNode;
+    host: DflowHost;
+    meta: Partial<DflowNodeMetadata>;
+};
 declare type DflowRunOptions = {
     verbose: boolean;
 };
@@ -112,16 +117,16 @@ export declare class DflowOutput extends DflowPin {
 export declare class DflowNode extends DflowItem {
     #private;
     readonly kind: string;
-    readonly meta: DflowNodeMetadata;
-    readonly host: DflowHost;
+    readonly isAsync?: DflowNodeMetadata["isAsync"];
+    readonly isConstant?: DflowNodeMetadata["isConstant"];
     static kind: string;
     static isAsync?: DflowNodeMetadata["isAsync"];
     static isConstant?: DflowNodeMetadata["isConstant"];
     static inputs?: DflowNewInput[];
     static outputs?: DflowNewOutput[];
+    constructor({ node: { kind, inputs, outputs, ...item }, host, meta, }: DflowNodeConstructorArg);
     static input(typing?: DflowPinType | DflowPinType[], rest?: Omit<DflowNewInput, "types">): DflowNewInput;
     static output(typing?: DflowPinType | DflowPinType[], rest?: Omit<DflowNewOutput, "types">): DflowNewOutput;
-    constructor({ kind, inputs, outputs, ...item }: DflowSerializableNode, host: DflowHost, { isAsync, isConstant }?: DflowNodeMetadata);
     get inputs(): IterableIterator<DflowInput>;
     get outputs(): IterableIterator<DflowOutput>;
     clearOutputs(): void;
@@ -143,7 +148,6 @@ export declare class DflowEdge extends DflowItem {
     toObject(): DflowSerializableEdge;
 }
 export declare class DflowGraph {
-    #private;
     readonly nodes: Map<DflowId, DflowNode>;
     readonly edges: Map<DflowId, DflowEdge>;
     runOptions: DflowRunOptions;
@@ -161,6 +165,7 @@ export declare class DflowGraph {
     static ancestorsOfNodeId(nodeId: DflowId, nodeConnections: DflowNodeConnection[]): DflowId[];
     static sortNodesByLevel(nodeIds: DflowId[], nodeConnections: DflowNodeConnection[]): DflowId[];
     get nodeConnections(): DflowNodeConnection[];
+    get nodeIdsInsideFunctions(): DflowId[];
     run(): Promise<void>;
     toObject(): DflowSerializableGraph;
 }
