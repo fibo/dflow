@@ -91,6 +91,12 @@ export type DflowNewNode =
 
 export type DflowNodeConnection = { sourceId: DflowId; targetId: DflowId };
 
+export type DflowNodeConstructorArg = {
+  node: DflowSerializableNode;
+  host: DflowHost;
+  meta: Partial<DflowNodeMetadata>;
+};
+
 type DflowRunOptions = { verbose: boolean };
 
 type DflowItemKind = DflowPinKind | "node" | "edge";
@@ -370,6 +376,7 @@ export class DflowOutput extends DflowPin {
 }
 
 export class DflowNode extends DflowItem {
+  readonly #host: DflowHost;
   readonly #inputs: Map<DflowId, DflowInput> = new Map();
   readonly #outputs: Map<DflowId, DflowOutput> = new Map();
   readonly #inputPosition: DflowId[] = [];
@@ -377,13 +384,43 @@ export class DflowNode extends DflowItem {
   readonly kind: string;
   readonly isAsync?: DflowNodeMetadata["isAsync"];
   readonly isConstant?: DflowNodeMetadata["isConstant"];
-  readonly host: DflowHost;
 
   static kind: string;
   static isAsync?: DflowNodeMetadata["isAsync"];
   static isConstant?: DflowNodeMetadata["isConstant"];
   static inputs?: DflowNewInput[];
   static outputs?: DflowNewOutput[];
+
+  constructor(
+    {
+      node: { kind, inputs = [], outputs = [], ...item },
+      host,
+      meta,
+    }: DflowNodeConstructorArg,
+  ) {
+    super(item);
+
+    this.#host = host;
+    this.kind = kind;
+
+    // Metadata.
+    if (meta?.isConstant === true) {
+      this.isConstant = meta.isConstant;
+    }
+    if (meta?.isAsync === true) {
+      this.isAsync = meta.isAsync;
+    }
+
+    // Inputs.
+    for (const pin of inputs) {
+      this.newInput(pin);
+    }
+
+    // Outputs.
+    for (const pin of outputs) {
+      this.newOutput(pin);
+    }
+  }
 
   static input(
     typing: DflowPinType | DflowPinType[] = [],
@@ -403,35 +440,6 @@ export class DflowNode extends DflowItem {
       return { types: [typing], ...rest };
     }
     return { types: typing, ...rest };
-  }
-
-  constructor(
-    { kind, inputs = [], outputs = [], ...item }: DflowSerializableNode,
-    host: DflowHost,
-    meta: Partial<DflowNodeMetadata> = {},
-  ) {
-    super(item);
-
-    this.host = host;
-    this.kind = kind;
-
-    // Metadata.
-    if (meta?.isConstant) {
-      this.isConstant = meta?.isConstant;
-    }
-    if (meta?.isAsync) {
-      this.isAsync = meta?.isAsync;
-    }
-
-    // Inputs.
-    for (const pin of inputs) {
-      this.newInput(pin);
-    }
-
-    // Outputs.
-    for (const pin of outputs) {
-      this.newOutput(pin);
-    }
   }
 
   get inputs() {
@@ -485,13 +493,13 @@ export class DflowNode extends DflowItem {
   }
 
   deleteInput(pinId: DflowId) {
-    this.host.deleteEdgesConnectedToPin([this.id, pinId]);
+    this.#host.deleteEdgesConnectedToPin([this.id, pinId]);
     this.#inputs.delete(pinId);
     this.#inputPosition.splice(this.#inputPosition.indexOf(pinId), 1);
   }
 
   deleteOutput(pinId: DflowId) {
-    this.host.deleteEdgesConnectedToPin([this.id, pinId]);
+    this.#host.deleteEdgesConnectedToPin([this.id, pinId]);
     this.#outputs.delete(pinId);
     this.#outputPosition.splice(this.#outputPosition.indexOf(pinId), 1);
   }
@@ -666,7 +674,7 @@ export class DflowGraph {
     }));
   }
 
-  #nodeIdsInsideFunctions() {
+  get nodeIdsInsideFunctions(): DflowId[] {
     const ancestorsOfReturnNodes = [];
 
     // Find all "return" nodes and get their ancestors.
@@ -700,7 +708,7 @@ export class DflowGraph {
     // Get nodeIds
     // 1. filtered by nodes inside functions
     // 2. sorted by graph hierarchy
-    const nodeIdsExcluded = this.#nodeIdsInsideFunctions();
+    const nodeIdsExcluded = this.nodeIdsInsideFunctions;
     const nodeIds = DflowGraph.sortNodesByLevel(
       [...this.nodes.keys()].filter((nodeId) =>
         !nodeIdsExcluded.includes(nodeId)
@@ -1048,7 +1056,11 @@ export class DflowHost {
       ? DflowHost.#generateOutputIds(obj.outputs)
       : DflowHost.#generateOutputIds(NodeClass.outputs ?? []);
 
-    const node = new NodeClass({ ...obj, id, inputs, outputs }, this, meta);
+    const node = new NodeClass({
+      node: { ...obj, id, inputs, outputs },
+      host: this,
+      meta,
+    });
 
     this.#graph.nodes.set(node.id, node);
 
@@ -1152,8 +1164,8 @@ class DflowNodeFunction extends DflowNode {
   static kind = "function";
   static isConstant = true;
   static outputs = [output("DflowId", { name: "id" })];
-  constructor(...args: ConstructorParameters<typeof DflowNode>) {
-    super(...args);
+  constructor(arg: DflowNodeConstructorArg) {
+    super(arg);
     this.output(0).data = this.id;
   }
 }
