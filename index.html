@@ -38,7 +38,7 @@
       container: document.querySelector('.container')
     });
 
-    const dflow = new DflowHost(nodesCatalog);
+    const dflow = new DflowHost({nodesCatalog});
     const catalog = dflow.nodesCatalog;
     dflow.verbose = true;
 
@@ -170,12 +170,7 @@
             to: [targetNodeId, targetPinId],
           } = data
 
-console.log({
-            id,
-            source: [sourceNodeId, sourcePinId],
-            target: [targetNodeId, targetPinId],
-})
-console.log(dflow.nodes)
+console.log(dflow.toObject())
         /*
           dflow.newEdge({
             id,

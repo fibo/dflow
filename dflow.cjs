@@ -71,10 +71,6 @@ var __privateSet = (obj, member, value, setter) => {
   setter ? setter.call(obj, value) : member.set(obj, value);
   return value;
 };
-var __privateMethod = (obj, member, method) => {
-  __accessCheck(obj, member, "access private method");
-  return method;
-};
 var stdin_exports = {};
 __export(stdin_exports, {
   DflowData: () => DflowData,
@@ -87,7 +83,7 @@ __export(stdin_exports, {
   DflowOutput: () => DflowOutput,
   DflowPin: () => DflowPin
 });
-var _multi, _optional, _source, _sources, _data, _host, _inputs, _outputs, _inputPosition, _outputPosition, _graph, _generateInputIds, generateInputIds_fn, _generateOutputIds, generateOutputIds_fn;
+var _multi, _optional, _source, _sources, _data, _host, _inputs, _outputs, _inputPosition, _outputPosition, _graph;
 class DflowErrorItemNotFound extends Error {
   constructor(kind, id) {
     super(`${kind} not found id=${id}`);
@@ -312,7 +308,7 @@ class DflowOutput extends DflowPin {
 _data = new WeakMap();
 class DflowNode extends DflowItem {
   constructor(_g) {
-    var _h = _g, { node: _i } = _h, _j = _i, { kind, inputs = [], outputs = [] } = _j, item = __objRest(_j, ["kind", "inputs", "outputs"]), { host, meta } = _h;
+    var _h = _g, { node: _i } = _h, _j = _i, { kind, inputs = [], outputs = [] } = _j, item = __objRest(_j, ["kind", "inputs", "outputs"]), { host } = _h;
     super(item);
     __privateAdd(this, _host, void 0);
     __privateAdd(this, _inputs, /* @__PURE__ */ new Map());
@@ -320,16 +316,8 @@ class DflowNode extends DflowItem {
     __privateAdd(this, _inputPosition, []);
     __privateAdd(this, _outputPosition, []);
     __publicField(this, "kind");
-    __publicField(this, "isAsync");
-    __publicField(this, "isConstant");
     __privateSet(this, _host, host);
     this.kind = kind;
-    if ((meta == null ? void 0 : meta.isConstant) === true) {
-      this.isConstant = meta.isConstant;
-    }
-    if ((meta == null ? void 0 : meta.isAsync) === true) {
-      this.isAsync = meta.isAsync;
-    }
     for (const pin of inputs) {
       this.newInput(pin);
     }
@@ -494,7 +482,8 @@ class DflowEdge extends DflowItem {
   }
 }
 class DflowGraph {
-  constructor() {
+  constructor({ nodesCatalog = {} } = {}) {
+    __publicField(this, "nodesCatalog");
     __publicField(this, "nodes", /* @__PURE__ */ new Map());
     __publicField(this, "edges", /* @__PURE__ */ new Map());
     __publicField(this, "runOptions", {
@@ -502,6 +491,7 @@ class DflowGraph {
     });
     __publicField(this, "runStatus", null);
     __publicField(this, "executionReport", null);
+    this.nodesCatalog = __spreadValues(__spreadValues({}, nodesCatalog), coreNodesCatalog);
   }
   static childrenOfNodeId(nodeId, nodeConnections) {
     return nodeConnections.filter(({ sourceId }) => nodeId === sourceId).map(({ targetId }) => targetId);
@@ -560,7 +550,7 @@ class DflowGraph {
     return Array.from(new Set(ancestorsOfReturnNodes.flat()));
   }
   async run() {
-    var _a, _b;
+    var _a, _b, _c;
     const { verbose } = this.runOptions;
     this.runStatus = "waiting";
     this.executionReport = {
@@ -577,8 +567,10 @@ class DflowGraph {
     NODES_LOOP:
       for (const nodeId1 of nodeIds) {
         const node = this.nodes.get(nodeId1);
+        const NodeClass = (_a = this.nodesCatalog[node.kind]) != null ? _a : DflowNodeUnknown;
+        const { isAsync, isConstant } = NodeClass;
         try {
-          if (!node.isConstant) {
+          if (!isConstant) {
             let someInputIsNotValid = false;
             INPUTS_LOOP:
               for (const { id, data, types, isOptional } of node.inputs) {
@@ -588,7 +580,7 @@ class DflowGraph {
                 if (!DflowData.validate(data, types)) {
                   someInputIsNotValid = true;
                   if (verbose) {
-                    (_a = this.executionReport.steps) == null ? void 0 : _a.push(_executionNodeInfo(node.toObject(), `invalid input data nodeId=${nodeId1} inputId=${id} data=${data}`));
+                    (_b = this.executionReport.steps) == null ? void 0 : _b.push(_executionNodeInfo(node.toObject(), `invalid input data nodeId=${nodeId1} inputId=${id} data=${data}`));
                   }
                   break INPUTS_LOOP;
                 }
@@ -599,14 +591,14 @@ class DflowGraph {
               }
               continue NODES_LOOP;
             }
-            if (node.isAsync) {
+            if (isAsync) {
               await node.run();
             } else {
               node.run();
             }
           }
           if (verbose) {
-            (_b = this.executionReport.steps) == null ? void 0 : _b.push(_executionNodeInfo(node.toObject()));
+            (_c = this.executionReport.steps) == null ? void 0 : _c.push(_executionNodeInfo(node.toObject()));
           }
         } catch (error) {
           console.error(error);
@@ -633,13 +625,11 @@ class DflowGraph {
     return obj;
   }
 }
-const _DflowHost = class {
-  constructor(nodesCatalog = {}) {
+class DflowHost {
+  constructor(arg) {
     __privateAdd(this, _graph, void 0);
-    __publicField(this, "nodesCatalog");
     __publicField(this, "context");
-    this.nodesCatalog = __spreadValues(__spreadValues({}, nodesCatalog), coreNodesCatalog);
-    __privateSet(this, _graph, new DflowGraph());
+    __privateSet(this, _graph, new DflowGraph(arg));
     this.context = {};
   }
   get executionReport() {
@@ -650,6 +640,9 @@ const _DflowHost = class {
   }
   get nodes() {
     return Array.from(__privateGet(this, _graph).nodes.values());
+  }
+  get nodesCatalog() {
+    return __privateGet(this, _graph).nodesCatalog;
   }
   get runStatusIsSuccess() {
     return __privateGet(this, _graph).runStatus === "success";
@@ -725,7 +718,7 @@ const _DflowHost = class {
     }
   }
   executeFunction(functionId, args) {
-    var _a, _b;
+    var _a, _b, _c;
     const { verbose } = __privateGet(this, _graph).runOptions;
     const nodeConnections = __privateGet(this, _graph).nodeConnections;
     const childrenNodeIds = DflowGraph.childrenOfNodeId(functionId, nodeConnections);
@@ -747,6 +740,8 @@ const _DflowHost = class {
     ], nodeConnections);
     for (const nodeId of nodeIds) {
       const node = this.getNodeById(nodeId);
+      const NodeClass = (_a = this.nodesCatalog[node.kind]) != null ? _a : DflowNodeUnknown;
+      const { isAsync, isConstant } = NodeClass;
       try {
         switch (node.kind) {
           case DflowNodeArgument.kind: {
@@ -759,11 +754,11 @@ const _DflowHost = class {
             return node.input(1).data;
           }
           default: {
-            if (!node.isConstant && !node.isAsync) {
+            if (!isConstant && !isAsync) {
               node.run();
             }
             if (verbose) {
-              (_b = (_a = this.executionReport) == null ? void 0 : _a.steps) == null ? void 0 : _b.push(_executionNodeInfo(node.toObject()));
+              (_c = (_b = this.executionReport) == null ? void 0 : _b.steps) == null ? void 0 : _c.push(_executionNodeInfo(node.toObject()));
             }
           }
         }
@@ -787,7 +782,7 @@ const _DflowHost = class {
     return item;
   }
   newNode(obj) {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e;
     const numNodes = __privateGet(this, _graph).nodes.size;
     const generateNodeId = (i = numNodes) => {
       const id = `n${i}`;
@@ -795,20 +790,29 @@ const _DflowHost = class {
     };
     const NodeClass = (_a = this.nodesCatalog[obj.kind]) != null ? _a : DflowNodeUnknown;
     const id4 = DflowData.isDflowId(obj.id) ? obj.id : generateNodeId();
-    const meta = {
-      isAsync: NodeClass.isAsync,
-      isConstant: NodeClass.isConstant
-    };
-    const inputs = Array.isArray(obj.inputs) ? __privateMethod(_b = _DflowHost, _generateInputIds, generateInputIds_fn).call(_b, obj.inputs) : __privateMethod(_d = _DflowHost, _generateInputIds, generateInputIds_fn).call(_d, (_c = NodeClass.inputs) != null ? _c : []);
-    const outputs = Array.isArray(obj.outputs) ? __privateMethod(_e = _DflowHost, _generateOutputIds, generateOutputIds_fn).call(_e, obj.outputs) : __privateMethod(_g = _DflowHost, _generateOutputIds, generateOutputIds_fn).call(_g, (_f = NodeClass.outputs) != null ? _f : []);
+    const inputs = (_c = (_b = NodeClass.inputs) == null ? void 0 : _b.map((pin, i) => {
+      var _a2, _b2;
+      const objPin = (_b2 = (_a2 = obj.inputs) == null ? void 0 : _a2[i]) != null ? _b2 : {};
+      const id = DflowData.isDflowId(objPin == null ? void 0 : objPin.id) ? objPin.id : `i${i}`;
+      return __spreadValues(__spreadValues({
+        id
+      }, objPin), pin);
+    })) != null ? _c : [];
+    const outputs = (_e = (_d = NodeClass.outputs) == null ? void 0 : _d.map((pin, i) => {
+      var _a2, _b2;
+      const objPin = (_b2 = (_a2 = obj.outputs) == null ? void 0 : _a2[i]) != null ? _b2 : {};
+      const id = DflowData.isDflowId(objPin == null ? void 0 : objPin.id) ? objPin.id : `o${i}`;
+      return __spreadValues(__spreadValues({
+        id
+      }, objPin), pin);
+    })) != null ? _e : [];
     const node = new NodeClass({
       node: __spreadProps(__spreadValues({}, obj), {
         id: id4,
         inputs,
         outputs
       }),
-      host: this,
-      meta
+      host: this
     });
     __privateGet(this, _graph).nodes.set(node.id, node);
     return node;
@@ -847,23 +851,8 @@ const _DflowHost = class {
   async run() {
     await __privateGet(this, _graph).run();
   }
-};
-let DflowHost = _DflowHost;
+}
 _graph = new WeakMap();
-_generateInputIds = new WeakSet();
-generateInputIds_fn = function(pins = []) {
-  return pins.map((pin, i) => __spreadProps(__spreadValues({}, pin), {
-    id: DflowData.isDflowId(pin.id) ? pin.id : `i${i}`
-  }));
-};
-_generateOutputIds = new WeakSet();
-generateOutputIds_fn = function(pins1 = []) {
-  return pins1.map((pin, i) => __spreadProps(__spreadValues({}, pin), {
-    id: DflowData.isDflowId(pin.id) ? pin.id : `o${i}`
-  }));
-};
-__privateAdd(DflowHost, _generateInputIds);
-__privateAdd(DflowHost, _generateOutputIds);
 const { input, output } = DflowNode;
 class DflowNodeArgument extends DflowNode {
 }
@@ -912,8 +901,46 @@ __publicField(DflowNodeBoolean, "inputs", [
 __publicField(DflowNodeBoolean, "outputs", [
   output("boolean")
 ]);
-class DflowNodeData extends DflowNode {
-}
+const _DflowNodeData = class extends DflowNode {
+  constructor(_m) {
+    var _n = _m, { node: _o } = _n, _p = _o, { outputs } = _p, node = __objRest(_p, ["outputs"]), { host } = _n;
+    super({
+      node: __spreadProps(__spreadValues({}, node), {
+        outputs: outputs == null ? void 0 : outputs.map((output5) => __spreadProps(__spreadValues({}, output5), {
+          types: _DflowNodeData.inferDflowPinTypes(output5.data)
+        }))
+      }),
+      host
+    });
+  }
+  static inferDflowPinTypes(data) {
+    switch (true) {
+      case DflowData.isArray(data):
+        return [
+          "array"
+        ];
+      case DflowData.isBoolean(data):
+        return [
+          "boolean"
+        ];
+      case DflowData.isNumber(data):
+        return [
+          "number"
+        ];
+      case DflowData.isString(data):
+        return [
+          "string"
+        ];
+      case DflowData.isObject(data):
+        return [
+          "object"
+        ];
+      default:
+        return [];
+    }
+  }
+};
+let DflowNodeData = _DflowNodeData;
 __publicField(DflowNodeData, "kind", "data");
 __publicField(DflowNodeData, "isConstant", true);
 __publicField(DflowNodeData, "outputs", [

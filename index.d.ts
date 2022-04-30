@@ -65,8 +65,11 @@ export declare type DflowNodeConnection = {
 export declare type DflowNodeConstructorArg = {
     node: DflowSerializableNode;
     host: DflowHost;
-    meta: Partial<DflowNodeMetadata>;
 };
+export declare type DflowGraphConstructorArg = {
+    nodesCatalog?: DflowNodesCatalog;
+};
+export declare type DflowHostConstructorArg = DflowGraphConstructorArg;
 declare type DflowRunOptions = {
     verbose: boolean;
 };
@@ -117,14 +120,12 @@ export declare class DflowOutput extends DflowPin {
 export declare class DflowNode extends DflowItem {
     #private;
     readonly kind: string;
-    readonly isAsync?: DflowNodeMetadata["isAsync"];
-    readonly isConstant?: DflowNodeMetadata["isConstant"];
     static kind: string;
     static isAsync?: DflowNodeMetadata["isAsync"];
     static isConstant?: DflowNodeMetadata["isConstant"];
     static inputs?: DflowNewInput[];
     static outputs?: DflowNewOutput[];
-    constructor({ node: { kind, inputs, outputs, ...item }, host, meta, }: DflowNodeConstructorArg);
+    constructor({ node: { kind, inputs, outputs, ...item }, host, }: DflowNodeConstructorArg);
     static input(typing?: DflowPinType | DflowPinType[], rest?: Omit<DflowNewInput, "types">): DflowNewInput;
     static output(typing?: DflowPinType | DflowPinType[], rest?: Omit<DflowNewOutput, "types">): DflowNewOutput;
     get inputs(): IterableIterator<DflowInput>;
@@ -148,11 +149,13 @@ export declare class DflowEdge extends DflowItem {
     toObject(): DflowSerializableEdge;
 }
 export declare class DflowGraph {
+    readonly nodesCatalog: DflowNodesCatalog;
     readonly nodes: Map<DflowId, DflowNode>;
     readonly edges: Map<DflowId, DflowEdge>;
     runOptions: DflowRunOptions;
     runStatus: DflowRunStatus | null;
     executionReport: DflowExecutionReport | null;
+    constructor({ nodesCatalog }?: DflowGraphConstructorArg);
     static childrenOfNodeId(nodeId: DflowId, nodeConnections: {
         sourceId: DflowId;
         targetId: DflowId;
@@ -171,12 +174,12 @@ export declare class DflowGraph {
 }
 export declare class DflowHost {
     #private;
-    readonly nodesCatalog: DflowNodesCatalog;
     readonly context: Record<string, unknown>;
-    constructor(nodesCatalog?: DflowNodesCatalog);
+    constructor(arg?: DflowHostConstructorArg);
     get executionReport(): DflowExecutionReport | null;
     get edges(): DflowEdge[];
     get nodes(): DflowNode[];
+    get nodesCatalog(): DflowNodesCatalog;
     get runStatusIsSuccess(): boolean;
     get runStatusIsWaiting(): boolean;
     get runStatusIsFailure(): boolean;

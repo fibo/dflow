@@ -94,8 +94,13 @@ export type DflowNodeConnection = { sourceId: DflowId; targetId: DflowId };
 export type DflowNodeConstructorArg = {
   node: DflowSerializableNode;
   host: DflowHost;
-  meta: Partial<DflowNodeMetadata>;
 };
+
+export type DflowGraphConstructorArg = {
+  nodesCatalog?: DflowNodesCatalog;
+};
+
+export type DflowHostConstructorArg = DflowGraphConstructorArg;
 
 type DflowRunOptions = { verbose: boolean };
 
@@ -382,8 +387,6 @@ export class DflowNode extends DflowItem {
   readonly #inputPosition: DflowId[] = [];
   readonly #outputPosition: DflowId[] = [];
   readonly kind: string;
-  readonly isAsync?: DflowNodeMetadata["isAsync"];
-  readonly isConstant?: DflowNodeMetadata["isConstant"];
 
   static kind: string;
   static isAsync?: DflowNodeMetadata["isAsync"];
@@ -395,21 +398,12 @@ export class DflowNode extends DflowItem {
     {
       node: { kind, inputs = [], outputs = [], ...item },
       host,
-      meta,
     }: DflowNodeConstructorArg,
   ) {
     super(item);
 
     this.#host = host;
     this.kind = kind;
-
-    // Metadata.
-    if (meta?.isConstant === true) {
-      this.isConstant = meta.isConstant;
-    }
-    if (meta?.isAsync === true) {
-      this.isAsync = meta.isAsync;
-    }
 
     // Inputs.
     for (const pin of inputs) {
@@ -584,11 +578,16 @@ export class DflowEdge extends DflowItem {
 }
 
 export class DflowGraph {
+  readonly nodesCatalog: DflowNodesCatalog;
   readonly nodes: Map<DflowId, DflowNode> = new Map();
   readonly edges: Map<DflowId, DflowEdge> = new Map();
   runOptions: DflowRunOptions = { verbose: false };
   runStatus: DflowRunStatus | null = null;
   executionReport: DflowExecutionReport | null = null;
+
+  constructor({ nodesCatalog = {} }: DflowGraphConstructorArg = {}) {
+    this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
+  }
 
   static childrenOfNodeId(
     nodeId: DflowId,
@@ -728,8 +727,11 @@ export class DflowGraph {
     for (const nodeId of nodeIds) {
       const node = this.nodes.get(nodeId) as DflowNode;
 
+      const NodeClass = this.nodesCatalog[node.kind] ?? DflowNodeUnknown;
+      const { isAsync, isConstant } = NodeClass;
+
       try {
-        if (!node.isConstant) {
+        if (!isConstant) {
           let someInputIsNotValid = false;
 
           // 2. INPUTS_LOOP
@@ -763,7 +765,7 @@ export class DflowGraph {
             continue NODES_LOOP;
           }
 
-          if (node.isAsync) {
+          if (isAsync) {
             await node.run();
           } else {
             node.run();
@@ -807,26 +809,10 @@ export class DflowGraph {
 
 export class DflowHost {
   readonly #graph: DflowGraph;
-  readonly nodesCatalog: DflowNodesCatalog;
   readonly context: Record<string, unknown>;
 
-  static #generateInputIds(pins: DflowNewInput[] = []) {
-    return pins.map((pin, i) => ({
-      ...pin,
-      id: DflowData.isDflowId(pin.id) ? pin.id : `i${i}`,
-    }));
-  }
-
-  static #generateOutputIds(pins: DflowNewOutput[] = []) {
-    return pins.map((pin, i) => ({
-      ...pin,
-      id: DflowData.isDflowId(pin.id) ? pin.id : `o${i}`,
-    }));
-  }
-
-  constructor(nodesCatalog: DflowNodesCatalog = {}) {
-    this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
-    this.#graph = new DflowGraph();
+  constructor(arg?: DflowHostConstructorArg) {
+    this.#graph = new DflowGraph(arg);
     this.context = {};
   }
 
@@ -840,6 +826,10 @@ export class DflowHost {
 
   get nodes() {
     return Array.from(this.#graph.nodes.values());
+  }
+
+  get nodesCatalog(): DflowNodesCatalog {
+    return this.#graph.nodesCatalog;
   }
 
   get runStatusIsSuccess() {
@@ -977,7 +967,11 @@ export class DflowHost {
       nodeConnections,
     );
     for (const nodeId of nodeIds) {
-      const node = this.getNodeById(nodeId);
+      const node = this.getNodeById(nodeId) as DflowNode;
+
+      const NodeClass = this.nodesCatalog[node.kind] ?? DflowNodeUnknown;
+      const { isAsync, isConstant } = NodeClass;
+
       try {
         switch (node.kind) {
           case DflowNodeArgument.kind: {
@@ -997,7 +991,7 @@ export class DflowHost {
           }
           default: {
             // Notice that executeFunction cannot execute async functions.
-            if (!node.isConstant && !node.isAsync) {
+            if (!isConstant && !isAsync) {
               node.run();
             }
 
@@ -1044,22 +1038,29 @@ export class DflowHost {
       ? (obj.id as DflowId)
       : generateNodeId();
 
-    const meta = {
-      isAsync: NodeClass.isAsync,
-      isConstant: NodeClass.isConstant,
-    };
+    const inputs = NodeClass.inputs?.map((pin, i) => {
+      const objPin = obj.inputs?.[i] ?? {} as Partial<DflowNewInput>;
+      const id = DflowData.isDflowId(objPin?.id) ? objPin.id : `i${i}`;
+      return {
+        id,
+        ...objPin,
+        ...pin,
+      };
+    }) ?? [];
 
-    const inputs = Array.isArray(obj.inputs)
-      ? DflowHost.#generateInputIds(obj.inputs)
-      : DflowHost.#generateInputIds(NodeClass.inputs ?? []);
-    const outputs = Array.isArray(obj.outputs)
-      ? DflowHost.#generateOutputIds(obj.outputs)
-      : DflowHost.#generateOutputIds(NodeClass.outputs ?? []);
+    const outputs = NodeClass.outputs?.map((pin, i) => {
+      const objPin = obj.outputs?.[i] ?? {} as Partial<DflowNewOutput>;
+      const id = DflowData.isDflowId(objPin?.id) ? objPin.id : `o${i}`;
+      return {
+        id,
+        ...objPin,
+        ...pin,
+      };
+    }) ?? [];
 
     const node = new NodeClass({
       node: { ...obj, id, inputs, outputs },
       host: this,
-      meta,
     });
 
     this.#graph.nodes.set(node.id, node);
@@ -1158,6 +1159,34 @@ class DflowNodeData extends DflowNode {
   static kind = "data";
   static isConstant = true;
   static outputs = [output()];
+  constructor({ node: { outputs, ...node }, host }: DflowNodeConstructorArg) {
+    super({
+      node: {
+        ...node,
+        outputs: outputs?.map((output) => ({
+          ...output,
+          types: DflowNodeData.inferDflowPinTypes(output.data),
+        })),
+      },
+      host,
+    });
+  }
+  static inferDflowPinTypes(data: DflowValue): DflowPinType[] {
+    switch (true) {
+      case DflowData.isArray(data):
+        return ["array"];
+      case DflowData.isBoolean(data):
+        return ["boolean"];
+      case DflowData.isNumber(data):
+        return ["number"];
+      case DflowData.isString(data):
+        return ["string"];
+      case DflowData.isObject(data):
+        return ["object"];
+      default:
+        return [];
+    }
+  }
 }
 
 class DflowNodeFunction extends DflowNode {
