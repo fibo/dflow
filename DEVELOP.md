@@ -7,7 +7,7 @@ Install [Deno](https://deno.land/).
 With [npm](https://www.npmjs.com/) install the following packages globally
 
 ```bash
-npm install esbuild serve typescript -g
+npm install esbuild typescript -g
 ```
 
 ## scripts

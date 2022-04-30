@@ -2,8 +2,8 @@ export type DflowId = string;
 export type DflowNewItem<Item> = Omit<Item, "id"> & { id?: DflowId };
 
 export type DflowNodeMetadata = {
-  isAsync?: boolean;
-  isConstant?: boolean;
+  isAsync: boolean;
+  isConstant: boolean;
 };
 
 export type DflowPinKind = "input" | "output";
@@ -40,8 +40,7 @@ export type DflowValue =
   | boolean
   | undefined
   | DflowArray
-  | DflowObject
-  | DflowSerializableGraph;
+  | DflowObject;
 
 export type DflowNodesCatalog = Record<DflowNode["kind"], typeof DflowNode>;
 
@@ -78,21 +77,17 @@ export type DflowSerializableEdge = DflowSerializableItem & {
   target: DflowSerializablePinPath;
 };
 
-export type DflowSerializableGraph = DflowSerializableItem & {
+export type DflowSerializableGraph = {
   nodes: DflowSerializableNode[];
   edges: DflowSerializableEdge[];
 };
 
-export type DflowNewGraph = DflowNewItem<DflowSerializableGraph>;
 export type DflowNewEdge = DflowNewItem<DflowSerializableEdge>;
 export type DflowNewInput = DflowNewItem<DflowSerializableInput>;
 export type DflowNewOutput = DflowNewItem<DflowSerializableOutput>;
 export type DflowNewNode =
   & Omit<DflowNewItem<DflowSerializableNode>, "inputs" | "outputs">
-  & {
-    inputs?: DflowNewInput[];
-    outputs?: DflowNewOutput[];
-  };
+  & { inputs?: DflowNewInput[]; outputs?: DflowNewOutput[] };
 
 export type DflowNodeConnection = { sourceId: DflowId; targetId: DflowId };
 
@@ -380,7 +375,8 @@ export class DflowNode extends DflowItem {
   readonly #inputPosition: DflowId[] = [];
   readonly #outputPosition: DflowId[] = [];
   readonly kind: string;
-  readonly meta: DflowNodeMetadata;
+  readonly isAsync?: DflowNodeMetadata["isAsync"];
+  readonly isConstant?: DflowNodeMetadata["isConstant"];
   readonly host: DflowHost;
 
   static kind: string;
@@ -412,7 +408,7 @@ export class DflowNode extends DflowItem {
   constructor(
     { kind, inputs = [], outputs = [], ...item }: DflowSerializableNode,
     host: DflowHost,
-    { isAsync = false, isConstant = false }: DflowNodeMetadata = {},
+    meta: Partial<DflowNodeMetadata> = {},
   ) {
     super(item);
 
@@ -420,7 +416,12 @@ export class DflowNode extends DflowItem {
     this.kind = kind;
 
     // Metadata.
-    this.meta = { isAsync, isConstant };
+    if (meta?.isConstant) {
+      this.isConstant = meta?.isConstant;
+    }
+    if (meta?.isAsync) {
+      this.isAsync = meta?.isAsync;
+    }
 
     // Inputs.
     for (const pin of inputs) {
@@ -574,7 +575,7 @@ export class DflowEdge extends DflowItem {
   }
 }
 
-export class DflowGraph extends DflowItem {
+export class DflowGraph {
   readonly nodes: Map<DflowId, DflowNode> = new Map();
   readonly edges: Map<DflowId, DflowEdge> = new Map();
   runOptions: DflowRunOptions = { verbose: false };
@@ -645,10 +646,7 @@ export class DflowGraph extends DflowItem {
     }
   }
 
-  /**
-   * Sort nodes by their level.
-   */
-  static sort(
+  static sortNodesByLevel(
     nodeIds: DflowId[],
     nodeConnections: DflowNodeConnection[],
   ): DflowId[] {
@@ -703,7 +701,7 @@ export class DflowGraph extends DflowItem {
     // 1. filtered by nodes inside functions
     // 2. sorted by graph hierarchy
     const nodeIdsExcluded = this.#nodeIdsInsideFunctions();
-    const nodeIds = DflowGraph.sort(
+    const nodeIds = DflowGraph.sortNodesByLevel(
       [...this.nodes.keys()].filter((nodeId) =>
         !nodeIdsExcluded.includes(nodeId)
       ),
@@ -723,7 +721,7 @@ export class DflowGraph extends DflowItem {
       const node = this.nodes.get(nodeId) as DflowNode;
 
       try {
-        if (!node.meta.isConstant) {
+        if (!node.isConstant) {
           let someInputIsNotValid = false;
 
           // 2. INPUTS_LOOP
@@ -757,7 +755,7 @@ export class DflowGraph extends DflowItem {
             continue NODES_LOOP;
           }
 
-          if (node.meta.isAsync) {
+          if (node.isAsync) {
             await node.run();
           } else {
             node.run();
@@ -784,7 +782,6 @@ export class DflowGraph extends DflowItem {
 
   toObject(): DflowSerializableGraph {
     const obj = {
-      ...super.toObject(),
       nodes: [],
       edges: [],
     } as DflowSerializableGraph;
@@ -821,7 +818,7 @@ export class DflowHost {
 
   constructor(nodesCatalog: DflowNodesCatalog = {}) {
     this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
-    this.#graph = new DflowGraph({ id: "g1" });
+    this.#graph = new DflowGraph();
     this.context = {};
   }
 
@@ -834,7 +831,7 @@ export class DflowHost {
   }
 
   get nodes() {
-    return this.#graph.nodes;
+    return Array.from(this.#graph.nodes.values());
   }
 
   get runStatusIsSuccess() {
@@ -967,7 +964,7 @@ export class DflowHost {
     // 2. if it is an argument node, inject input data
     // 3. if if is a return node, output data
     // 4. otherwise run node
-    const nodeIds = DflowGraph.sort(
+    const nodeIds = DflowGraph.sortNodesByLevel(
       [...returnNodeIds, ...nodeIdsInsideFunction],
       nodeConnections,
     );
@@ -992,7 +989,7 @@ export class DflowHost {
           }
           default: {
             // Notice that executeFunction cannot execute async functions.
-            if (!node.meta.isConstant && !node.meta.isAsync) {
+            if (!node.isConstant && !node.isAsync) {
               node.run();
             }
 

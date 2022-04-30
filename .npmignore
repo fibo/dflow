@@ -6,3 +6,4 @@ tsconfig.declarations.json
 import_map.json
 *_test.ts
 nodes/*_test.ts
+nodes/_test-utils.ts
