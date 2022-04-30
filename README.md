@@ -6,10 +6,13 @@
 
 - Implemented in TypeScript, available both on Node and Deno.
 - Expressive API.
-- Core nodes catalog with basic JavaScript features (to be completed).
-- Supports custom nodes, just extending `DflowNode` class.
+- Easily create nodes, just extending `DflowNode` class.
+- Example nodes catalog with basic JavaScript features. **NOTA BENE**: it is supposed that
+you implement your own nodes, for example node `addition` could be implemented using bigint or some floating point library, according to your needs.
+- Minimal internal type system. It is possible to connect an output of type `T`
+only to an input of type `U`, if and only if `U` includes `T`.
 - Graphic interface implemented with WebComponents.
-  ([demo here](https://fibo.github.io/dflow)).
+  ([demo here](https://fibo.github.io/dflow)) (to be completed).
 
 ## Installation
 

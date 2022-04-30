@@ -15,35 +15,31 @@ import {
   DflowPinType,
 } from "./dflow.ts";
 
+const { input, output } = DflowNode;
+
 const num = 1;
 const bool = true;
 const str = "string";
 const arr = [num, bool, str];
 const obj = { foo: num, bar: str };
 
-class EmptyNode extends DflowNode {
-  static kind = "Empty";
-}
-
-class NumNode extends EmptyNode {
-  static kind = "Num";
+class IdentityNode extends DflowNode {
+  static kind = "Identity";
+  static inputs = [input("number")];
+  static outputs = [output("number")];
+  run() {
+    this.output(0).data = this.input(0).data;
+  }
 }
 
 class SumNode extends DflowNode {
   static kind = "Sum";
-
+  static inputs = [input("number"), input("number")];
+  static outputs = [output("number")];
   run() {
-    let sum = 0;
-
-    for (const input of this.inputs) {
-      const inputData = input.data;
-      if (typeof inputData === "number") {
-        sum += inputData;
-      }
-    }
-
-    const output = this.output(0);
-    output.data = sum;
+    const data0 = this.input(0).data as number;
+    const data1 = this.input(1).data as number;
+    this.output(0).data = data0 + data1;
   }
 }
 
@@ -67,11 +63,10 @@ class SleepNode extends DflowNode {
 }
 
 const nodesCatalog1 = {
-  [EmptyNode.kind]: EmptyNode,
+  [IdentityNode.kind]: IdentityNode,
 };
 
 const nodesCatalog2 = {
-  [NumNode.kind]: NumNode,
   [SumNode.kind]: SumNode,
   [SleepNode.kind]: SleepNode,
 };
@@ -82,17 +77,16 @@ function sample01() {
   const pinId1 = "p1";
   const pinId2 = "p2";
   const edgeId1 = "e2";
-  const dflow = new DflowHost(nodesCatalog1);
+  const dflow = new DflowHost({ nodesCatalog: nodesCatalog1 });
   const catalog = dflow.nodesCatalog;
   dflow.newNode({
     id: nodeId1,
-    name: "Hello world",
-    kind: catalog.Empty.kind,
+    kind: catalog.Identity.kind,
     outputs: [{ id: pinId1 }],
   });
   dflow.newNode({
     id: nodeId2,
-    kind: catalog.Empty.kind,
+    kind: catalog.Identity.kind,
     inputs: [{ id: pinId2 }],
   });
   dflow.newEdge({
@@ -279,14 +273,13 @@ Deno.test("DflowHost clearGraph()", () => {
 Deno.test("DflowHost runStatusIsSuccess", () => {
   const dflow = new DflowHost();
 
-  dflow.newNode({ id: "n1", kind: "EmptyNode" });
   dflow.run();
 
   assertEquals(dflow.runStatusIsSuccess, true);
 });
 
 Deno.test("DflowHost run()", async () => {
-  const dflow = new DflowHost(nodesCatalog2);
+  const dflow = new DflowHost({ nodesCatalog: nodesCatalog2 });
   const catalog = dflow.nodesCatalog;
 
   // Num#out=2 -> Sum#in1 |
@@ -294,7 +287,7 @@ Deno.test("DflowHost run()", async () => {
   // Num#out=2 -> Sum#in2 |
   dflow.newNode({
     id: "num",
-    kind: catalog.Num.kind,
+    kind: catalog.data.kind,
     outputs: [{ id: "out", data: 2 }],
   });
   const sumNode = dflow.newNode({
@@ -325,12 +318,13 @@ Deno.test("DflowHost run()", async () => {
 
 Deno.test("DflowHost newNode()", () => {
   const nodeId1 = "n1";
-  const dflow = new DflowHost(nodesCatalog1);
-  dflow.newNode({ id: nodeId1, kind: EmptyNode.kind });
+  const dflow = new DflowHost({ nodesCatalog: nodesCatalog1 });
+  const catalog = dflow.nodesCatalog;
+  dflow.newNode({ id: nodeId1, kind: catalog.Identity.kind });
 
   const node1 = dflow.getNodeById(nodeId1);
   assertEquals(nodeId1, node1.id);
-  assertEquals(EmptyNode.kind, node1.kind);
+  assertEquals(catalog.Identity.kind, node1.kind);
 });
 
 Deno.test("DflowHost newEdge()", () => {
@@ -357,24 +351,6 @@ Deno.test("DflowHost deleteEdge()", () => {
   assertThrows(() => {
     dflow.getEdgeById(edgeId1);
   });
-});
-
-Deno.test("DflowHost newInput()", () => {
-  const nodeId1 = "n1";
-  const inputId1 = "i1";
-  const dflow = new DflowHost();
-  dflow.newNode({ id: nodeId1, kind: "EmptyNode" });
-  const input1 = dflow.newInput(nodeId1, { id: inputId1 });
-  assertEquals(inputId1, input1.id);
-});
-
-Deno.test("DflowHost newOutput()", () => {
-  const nodeId1 = "n1";
-  const outputId1 = "i1";
-  const dflow = new DflowHost();
-  dflow.newNode({ id: nodeId1, kind: "EmptyNode" });
-  const output1 = dflow.newOutput(nodeId1, { id: outputId1 });
-  assertEquals(outputId1, output1.id);
 });
 
 // DflowOutput

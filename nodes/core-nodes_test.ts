@@ -39,7 +39,7 @@ Deno.test("DflowNodeBoolean", () => {
 
 Deno.test("DflowNodeFunction", () => {
   const nodesCatalog = { ...mathCatalog, ...operatorCatalog };
-  const dflow = new DflowHost(nodesCatalog);
+  const dflow = new DflowHost({ nodesCatalog });
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.function.kind;
 

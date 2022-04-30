@@ -1,5 +1,14 @@
 import { assertEquals } from "std/testing/asserts.ts";
-import { DflowArray, DflowHost, DflowObject, DflowValue } from "../dflow.ts";
+import {
+  DflowArray,
+  DflowData,
+  DflowHost,
+  DflowObject,
+  DflowValue,
+} from "../dflow.ts";
+import { nodesCatalog } from "./index.ts";
+
+export const newDflowHost = () => new DflowHost({ nodesCatalog });
 
 export function testOneInOneOut<T>(
   dflow: DflowHost,
@@ -10,7 +19,7 @@ export function testOneInOneOut<T>(
   const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ types: [], data: input }],
+    outputs: [{ data: input }],
   });
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
@@ -180,17 +189,25 @@ export function testOneArrAndOneStrInOneStrOut(
   output?: string,
 ) {
   const catalog = dflow.nodesCatalog;
-  const dataNode1 = dflow.newNode({
-    kind: catalog.data.kind,
-    outputs: [{ types: ["array"], data: input1 }],
-  });
-  const dataNode2 = dflow.newNode({
-    kind: catalog.data.kind,
-    outputs: [{ types: ["string"], data: input2 }],
-  });
+  const dataNode1 = DflowData.isArray(input1)
+    ? dflow.newNode({
+      kind: catalog.data.kind,
+      outputs: [{ data: input1 }],
+    })
+    : undefined;
+  const dataNode2 = DflowData.isString(input2)
+    ? dflow.newNode({
+      kind: catalog.data.kind,
+      outputs: [{ data: input2 }],
+    })
+    : undefined;
   const testNode = dflow.newNode({ kind: nodeKind });
-  dflow.connect(dataNode1).to(testNode, 0);
-  dflow.connect(dataNode2).to(testNode, 1);
+  if (dataNode1) {
+    dflow.connect(dataNode1).to(testNode, 0);
+  }
+  if (dataNode2) {
+    dflow.connect(dataNode2).to(testNode, 1);
+  }
   dflow.run();
   assertEquals(testNode.output(0).data, output);
 }
@@ -223,22 +240,34 @@ export function testOneArrAndTwoNumInOneArrOut(
   output1?: DflowArray,
 ) {
   const catalog = dflow.nodesCatalog;
-  const dataNode1 = dflow.newNode({
-    kind: catalog.data.kind,
-    outputs: [{ types: ["array"], data: input1 }],
-  });
-  const dataNode2 = dflow.newNode({
-    kind: catalog.data.kind,
-    outputs: [{ types: ["number"], data: input2 }],
-  });
-  const dataNode3 = dflow.newNode({
-    kind: catalog.data.kind,
-    outputs: [{ types: ["number"], data: input3 }],
-  });
+  const dataNode1 = DflowData.isArray(input1)
+    ? dflow.newNode({
+      kind: catalog.data.kind,
+      outputs: [{ data: input1 }],
+    })
+    : undefined;
+  const dataNode2 = DflowData.isNumber(input2)
+    ? dflow.newNode({
+      kind: catalog.data.kind,
+      outputs: [{ data: input2 }],
+    })
+    : undefined;
+  const dataNode3 = DflowData.isNumber(input3)
+    ? dflow.newNode({
+      kind: catalog.data.kind,
+      outputs: [{ data: input3 }],
+    })
+    : undefined;
   const testNode = dflow.newNode({ kind: nodeKind });
-  dflow.connect(dataNode1).to(testNode, 0);
-  dflow.connect(dataNode2).to(testNode, 1);
-  dflow.connect(dataNode3).to(testNode, 2);
+  if (dataNode1) {
+    dflow.connect(dataNode1).to(testNode, 0);
+  }
+  if (dataNode2) {
+    dflow.connect(dataNode2).to(testNode, 1);
+  }
+  if (dataNode3) {
+    dflow.connect(dataNode3).to(testNode, 2);
+  }
   dflow.run();
   assertEquals(testNode.output(0).data, output1);
 }
@@ -396,22 +425,34 @@ export function testOneStrAndTwoNumInOneStrOut(
   output?: string,
 ) {
   const catalog = dflow.nodesCatalog;
-  const dataNode1 = dflow.newNode({
-    kind: catalog.data.kind,
-    outputs: [{ types: ["string"], data: input1 }],
-  });
-  const dataNode2 = dflow.newNode({
-    kind: catalog.data.kind,
-    outputs: [{ types: ["number"], data: input2 }],
-  });
-  const dataNode3 = dflow.newNode({
-    kind: catalog.data.kind,
-    outputs: [{ id: "out", types: ["number"], data: input3 }],
-  });
+  const dataNode1 = DflowData.isString(input1)
+    ? dflow.newNode({
+      kind: catalog.data.kind,
+      outputs: [{ data: input1 }],
+    })
+    : undefined;
+  const dataNode2 = DflowData.isNumber(input2)
+    ? dflow.newNode({
+      kind: catalog.data.kind,
+      outputs: [{ data: input2 }],
+    })
+    : undefined;
+  const dataNode3 = DflowData.isNumber(input3)
+    ? dflow.newNode({
+      kind: catalog.data.kind,
+      outputs: [{ data: input3 }],
+    })
+    : undefined;
   const testNode = dflow.newNode({ kind: nodeKind });
-  dflow.connect(dataNode1).to(testNode, 0);
-  dflow.connect(dataNode2).to(testNode, 1);
-  dflow.connect(dataNode3).to(testNode, 2);
+  if (dataNode1) {
+    dflow.connect(dataNode1).to(testNode, 0);
+  }
+  if (dataNode2) {
+    dflow.connect(dataNode2).to(testNode, 1);
+  }
+  if (dataNode3) {
+    dflow.connect(dataNode3).to(testNode, 2);
+  }
   dflow.run();
   assertEquals(testNode.output(0).data, output);
 }
