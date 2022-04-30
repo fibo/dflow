@@ -163,7 +163,6 @@
           break;
         }
 
-        /*
         case 'CREATE_EDGE': {
           const {
             id,
@@ -171,14 +170,21 @@
             to: [targetNodeId, targetPinId],
           } = data
 
+console.log({
+            id,
+            source: [sourceNodeId, sourcePinId],
+            target: [targetNodeId, targetPinId],
+})
+console.log(dflow.nodes)
+        /*
           dflow.newEdge({
             id,
             source: [sourceNodeId, sourcePinId],
             target: [targetNodeId, targetPinId],
           });
+          */
           break;
         }
-          */
 
         default: {
           console.log(action, data);

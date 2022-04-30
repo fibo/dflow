@@ -3,6 +3,8 @@ Create a host with an API context.
 */
 import { DflowHost, DflowNode } from "../dflow.ts";
 
+const { output } = DflowNode;
+
 class ApiClient {
   apiKey: string;
 
@@ -22,7 +24,7 @@ class ApiClient {
 class CustomNode extends DflowNode {
   static kind = "Custom";
   static isAsync = true;
-  static outputs = [...DflowNode.out(["string"])];
+  static outputs = [output("string")];
 
   async run() {
     const apiClient = this.host.context.apiClient;
