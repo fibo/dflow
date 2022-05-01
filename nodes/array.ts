@@ -1,10 +1,4 @@
-import {
-  DflowArray,
-  DflowHost,
-  DflowId,
-  DflowNode,
-  DflowNodeConstructorArg,
-} from "../dflow.ts";
+import { DflowArray, DflowId, DflowNode } from "../dflow.ts";
 
 const { input, output } = DflowNode;
 
@@ -23,61 +17,46 @@ class DflowArrayAt extends DflowNode {
 }
 
 class DflowArrayFilter extends DflowNode {
-  readonly #host: DflowHost;
   static kind = "arrayFilter";
   static inputs = [
     input("array"),
     input("DflowId", { name: "functionId" }),
   ];
   static outputs = [output("array")];
-  constructor(arg: DflowNodeConstructorArg) {
-    super(arg);
-    this.#host = arg.host;
-  }
   run() {
     this.output(0).data = (this.input(0).data as DflowArray).filter(
       (...args) =>
-        this.#host.executeFunction(this.input(1).data as DflowId, args),
+        this.host.executeFunction(this.input(1).data as DflowId, args),
     );
   }
 }
 
 class DflowArrayFindLastIndex extends DflowNode {
-  readonly #host: DflowHost;
   static kind = "arrayFindLastIndex";
   static inputs = [
     input("array"),
     input("DflowId", { name: "functionId" }),
   ];
   static outputs = [output("number")];
-  constructor(arg: DflowNodeConstructorArg) {
-    super(arg);
-    this.#host = arg.host;
-  }
   run() {
     this.output(0).data = (this.input(0).data as DflowArray).findLastIndex(
       (...args) =>
-        this.#host.executeFunction(this.input(1).data as DflowId, args),
+        this.host.executeFunction(this.input(1).data as DflowId, args),
     );
   }
 }
 
 class DflowArrayFindIndex extends DflowNode {
-  readonly #host: DflowHost;
   static kind = "arrayFindIndex";
   static inputs = [
     input("array"),
     input("DflowId", { name: "functionId" }),
   ];
   static outputs = [output("number")];
-  constructor(arg: DflowNodeConstructorArg) {
-    super(arg);
-    this.#host = arg.host;
-  }
   run() {
     this.output(0).data = (this.input(0).data as DflowArray).findIndex(
       (...args) =>
-        this.#host.executeFunction(this.input(1).data as DflowId, args),
+        this.host.executeFunction(this.input(1).data as DflowId, args),
     );
   }
 }
@@ -128,21 +107,16 @@ class DflowArrayLength extends DflowNode {
 }
 
 class DflowArrayMap extends DflowNode {
-  readonly #host: DflowHost;
   static kind = "arrayMap";
   static inputs = [
     input("array"),
     input("DflowId", { name: "functionId" }),
   ];
   static outputs = [output("array")];
-  constructor(arg: DflowNodeConstructorArg) {
-    super(arg);
-    this.#host = arg.host;
-  }
   run() {
     this.output(0).data = (this.input(0).data as DflowArray).map(
       (...args) =>
-        this.#host.executeFunction(this.input(1).data as DflowId, args),
+        this.host.executeFunction(this.input(1).data as DflowId, args),
     );
   }
 }

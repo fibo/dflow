@@ -381,12 +381,12 @@ export class DflowOutput extends DflowPin {
 }
 
 export class DflowNode extends DflowItem {
-  readonly #host: DflowHost;
   readonly #inputs: Map<DflowId, DflowInput> = new Map();
   readonly #outputs: Map<DflowId, DflowOutput> = new Map();
   readonly #inputPosition: DflowId[] = [];
   readonly #outputPosition: DflowId[] = [];
   readonly kind: string;
+  readonly host: DflowHost;
 
   static kind: string;
   static isAsync?: DflowNodeMetadata["isAsync"];
@@ -402,17 +402,41 @@ export class DflowNode extends DflowItem {
   ) {
     super(item);
 
-    this.#host = host;
     this.kind = kind;
+    this.host = host;
 
     // Inputs.
-    for (const pin of inputs) {
-      this.newInput(pin);
+
+    const generateInputId = (i: number): DflowId => {
+      const id = `i${i}`;
+      return this.#inputs.has(id) ? generateInputId(i + 1) : id;
+    };
+
+    for (const obj of inputs) {
+      const numInputs = this.#inputs.size;
+      const id = DflowData.isDflowId(obj.id)
+        ? obj.id
+        : generateInputId(numInputs);
+      const pin = new DflowInput({ ...obj, id });
+      this.#inputs.set(id, pin);
+      this.#inputPosition.push(id);
     }
 
     // Outputs.
-    for (const pin of outputs) {
-      this.newOutput(pin);
+
+    const generateOutputId = (i: number): DflowId => {
+      const id = `o${i}`;
+      return this.#outputs.has(id) ? generateOutputId(i + 1) : id;
+    };
+
+    for (const obj of outputs) {
+      const numOutputs = this.#outputs.size;
+      const id = DflowData.isDflowId(obj.id)
+        ? obj.id
+        : generateOutputId(numOutputs);
+      const pin = new DflowOutput({ ...obj, id });
+      this.#outputs.set(id, pin);
+      this.#outputPosition.push(id);
     }
   }
 
@@ -484,48 +508,6 @@ export class DflowNode extends DflowItem {
     }
 
     return this.getOutputById(pinId);
-  }
-
-  deleteInput(pinId: DflowId) {
-    this.#host.deleteEdgesConnectedToPin([this.id, pinId]);
-    this.#inputs.delete(pinId);
-    this.#inputPosition.splice(this.#inputPosition.indexOf(pinId), 1);
-  }
-
-  deleteOutput(pinId: DflowId) {
-    this.#host.deleteEdgesConnectedToPin([this.id, pinId]);
-    this.#outputs.delete(pinId);
-    this.#outputPosition.splice(this.#outputPosition.indexOf(pinId), 1);
-  }
-
-  newInput(obj: DflowNewInput): DflowInput {
-    const numInputs = this.#inputs.size;
-
-    const generateInputId = (i = numInputs): DflowId => {
-      const id = `i${i}`;
-      return this.#inputs.has(id) ? generateInputId(i + 1) : id;
-    };
-
-    const id = DflowData.isDflowId(obj.id) ? obj.id : generateInputId();
-    const pin = new DflowInput({ ...obj, id });
-    this.#inputs.set(id, pin);
-    this.#inputPosition.push(id);
-    return pin;
-  }
-
-  newOutput(obj: DflowNewOutput): DflowOutput {
-    const numOutputs = this.#outputs.size;
-
-    const generateOutputId = (i = numOutputs): DflowId => {
-      const id = `o${i}`;
-      return this.#outputs.has(id) ? generateOutputId(i + 1) : id;
-    };
-
-    const id = DflowData.isDflowId(obj.id) ? obj.id : generateOutputId();
-    const pin = new DflowOutput({ ...obj, id });
-    this.#outputs.set(id, pin);
-    this.#outputPosition.push(id);
-    return pin;
   }
 
   run(): void {}
@@ -821,11 +803,15 @@ export class DflowHost {
   }
 
   get edges() {
-    return Array.from(this.#graph.edges.values());
+    return Array.from(this.#graph.edges.values()).map((item) =>
+      item.toObject()
+    );
   }
 
   get nodes() {
-    return Array.from(this.#graph.nodes.values());
+    return Array.from(this.#graph.nodes.values()).map((item) =>
+      item.toObject()
+    );
   }
 
   get nodesCatalog(): DflowNodesCatalog {
@@ -1095,16 +1081,6 @@ export class DflowHost {
     targetPin.connectTo(sourcePin);
 
     return edge;
-  }
-
-  newInput(nodeId: DflowId, obj: DflowNewInput): DflowInput {
-    const node = this.getNodeById(nodeId);
-    return node.newInput(obj);
-  }
-
-  newOutput(nodeId: DflowId, obj: DflowNewOutput): DflowOutput {
-    const node = this.getNodeById(nodeId);
-    return node.newOutput(obj);
   }
 
   toObject() {
