@@ -13,15 +13,15 @@ function testConditionalIf(
 
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ id: "out1", types: [], data: input1 }],
+    outputs: [{ data: input1 }],
   });
   const dataNode2 = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ id: "out2", types: [], data: input2 }],
+    outputs: [{ data: input2 }],
   });
   const dataNode3 = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ id: "out3", types: [], data: input3 }],
+    outputs: [{ data: input3 }],
   });
   const testNode = dflow.newNode({ kind: catalog.if.kind });
 

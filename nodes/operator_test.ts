@@ -1,9 +1,8 @@
+import { DflowValue } from "../dflow.ts";
 import {
   newDflowHost,
   // TODO testOneNumAndOneMultiNumInOneNumOut,
-  testTwoAnyInOneBoolOut,
-  testTwoNumInOneBoolOut,
-  testTwoNumInOneNumOut,
+  testTwoInOneOut,
 } from "./_test-utils.ts";
 
 Deno.test("addition", () => {
@@ -15,7 +14,13 @@ Deno.test("addition", () => {
     { inputs: [2, 2], output: 4 },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoNumInOneNumOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<number, number, number>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 
@@ -50,7 +55,13 @@ Deno.test("division", () => {
     { inputs: [1, 0], output: undefined },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoNumInOneNumOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<number, number, number>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });
@@ -83,7 +94,13 @@ Deno.test("equality", () => {
     },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoAnyInOneBoolOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<DflowValue, DflowValue, boolean>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });
@@ -95,7 +112,13 @@ Deno.test("greaterThan", () => {
 
   [{ inputs: [1, 2], output: false }].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoNumInOneBoolOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<number, number, boolean>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });
@@ -107,7 +130,13 @@ Deno.test("greaterThanOrEqual", () => {
 
   [{ inputs: [1, 2], output: false }].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoNumInOneBoolOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<number, number, boolean>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });
@@ -119,7 +148,13 @@ Deno.test("lessThan", () => {
 
   [{ inputs: [1, 2], output: true }].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoNumInOneBoolOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<number, number, boolean>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });
@@ -131,7 +166,13 @@ Deno.test("lessThanOrEqual", () => {
 
   [{ inputs: [1, 2], output: true }].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoNumInOneBoolOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<number, number, boolean>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });
@@ -164,7 +205,13 @@ Deno.test("inequality", () => {
     },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoAnyInOneBoolOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<DflowValue, DflowValue, boolean>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });
@@ -176,7 +223,13 @@ Deno.test("multiplication", () => {
 
   [{ inputs: [2, 2], output: 4 }].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoNumInOneNumOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<number, number, number>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });
@@ -188,7 +241,13 @@ Deno.test("subtraction", () => {
 
   [{ inputs: [2, 2], output: 0 }].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoNumInOneNumOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<number, number, number>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });

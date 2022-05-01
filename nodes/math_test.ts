@@ -1,9 +1,5 @@
-import {
-  newDflowHost,
-  testOneArrInOneNumOut,
-  testOneNumInOneNumOut,
-  testOneNumOut,
-} from "./_test-utils.ts";
+import { DflowArray } from "../dflow.ts";
+import { newDflowHost, testOneInOneOut, testOneOut } from "./_test-utils.ts";
 
 Deno.test("mathAbs", () => {
   const dflow = newDflowHost();
@@ -13,7 +9,7 @@ Deno.test("mathAbs", () => {
   [
     { input: -1, output: 1 },
   ].forEach(({ input, output }) => {
-    testOneNumInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -25,7 +21,7 @@ Deno.test("mathCos", () => {
   [
     { input: 1, output: Math.cos(1) },
   ].forEach(({ input, output }) => {
-    testOneNumInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -37,7 +33,7 @@ Deno.test("mathCosh", () => {
   [
     { input: 1, output: Math.cosh(1) },
   ].forEach(({ input, output }) => {
-    testOneNumInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -49,7 +45,7 @@ Deno.test("mathFloor", () => {
   [
     { input: 1.2, output: Math.floor(1.2) },
   ].forEach(({ input, output }) => {
-    testOneNumInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -64,7 +60,7 @@ Deno.test("mathMax", () => {
     { input: [1, 2, 3], output: 3 },
     { input: [1, 2, "3"], output: 3 },
   ].forEach(({ input, output }) => {
-    testOneArrInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<DflowArray, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -79,7 +75,7 @@ Deno.test("mathMin", () => {
     { input: [1, 2, 3], output: 1 },
     { input: ["1", 2, 3], output: 1 },
   ].forEach(({ input, output }) => {
-    testOneArrInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<DflowArray, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -88,7 +84,7 @@ Deno.test("mathPI", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathPI.kind;
 
-  testOneNumOut(dflow, nodeKind, Math.PI);
+  testOneOut<number>(dflow, nodeKind, Math.PI);
 });
 
 Deno.test("mathRound", () => {
@@ -99,7 +95,7 @@ Deno.test("mathRound", () => {
   [
     { input: 1.2, output: Math.floor(1.2) },
   ].forEach(({ input, output }) => {
-    testOneNumInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -111,7 +107,7 @@ Deno.test("mathSin", () => {
   [
     { input: 1, output: Math.sin(1) },
   ].forEach(({ input, output }) => {
-    testOneNumInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -123,6 +119,6 @@ Deno.test("mathSinh", () => {
   [
     { input: 1, output: Math.sinh(1) },
   ].forEach(({ input, output }) => {
-    testOneNumInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });

@@ -1,9 +1,5 @@
-import {
-  newDflowHost,
-  testOneInOneOut,
-  testOneNumInOneBoolOut,
-  testOneStrInOneNumOut,
-} from "./_test-utils.ts";
+import { DflowValue } from "../dflow.ts";
+import { newDflowHost, testOneInOneOut } from "./_test-utils.ts";
 
 Deno.test("isFinite", () => {
   const dflow = newDflowHost();
@@ -15,7 +11,7 @@ Deno.test("isFinite", () => {
     { input: Infinity, output: false },
   ].forEach(
     ({ input, output }) => {
-      testOneNumInOneBoolOut(dflow, nodeKind, input, output);
+      testOneInOneOut<number, boolean>(dflow, nodeKind, input, output);
     },
   );
 });
@@ -33,7 +29,12 @@ Deno.test("isInteger", () => {
     { input: "x", output: false },
     { input: NaN, output: false },
   ].forEach((input) => {
-    testOneInOneOut<boolean>(dflow, nodeKind, input, Number.isInteger(input));
+    testOneInOneOut<DflowValue, boolean>(
+      dflow,
+      nodeKind,
+      input,
+      Number.isInteger(input),
+    );
   });
 });
 
@@ -49,7 +50,7 @@ Deno.test("isNaN", () => {
     { input: "x", output: false },
     { input: NaN, output: true },
   ].forEach(({ input, output }) => {
-    testOneInOneOut<boolean>(dflow, nodeKind, input, output);
+    testOneInOneOut<unknown, boolean>(dflow, nodeKind, input, output);
   });
 });
 
@@ -61,7 +62,7 @@ Deno.test("parseFloat", () => {
   [
     { input: "1.5", output: 1.5 },
   ].forEach(({ input, output }) => {
-    testOneStrInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<unknown, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -74,6 +75,6 @@ Deno.test("parseInt", () => {
     { input: "1.2", output: 1 },
     { input: "1", output: 1 },
   ].forEach(({ input, output }) => {
-    testOneStrInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<string, number>(dflow, nodeKind, input, output);
   });
 });

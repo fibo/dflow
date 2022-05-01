@@ -1,15 +1,11 @@
 import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
-import { DflowArray } from "../dflow.ts";
+import { DflowArray, DflowValue } from "../dflow.ts";
 import {
   newDflowHost,
-  testOneArrAndOneAnyInOneArrOut,
-  testOneArrAndOneNumInOneAnyOut,
-  testOneArrAndOneStrInOneBoolOut,
-  testOneArrAndOneStrInOneStrOut,
-  testOneArrAndTwoNumInOneArrOut,
-  testOneArrInOneAnyAndOneArrOut,
-  testOneArrInOneArrOut,
-  testOneArrInOneNumOut,
+  testOneInOneOut,
+  testOneInTwoOut,
+  testThreeInOneOut,
+  testTwoInOneOut,
 } from "./_test-utils.ts";
 
 Deno.test("arrayAt", () => {
@@ -23,7 +19,13 @@ Deno.test("arrayAt", () => {
     { input1: ["a", true], input2: 1, output: true },
     { input1: ["a", true, 42], input2: -1, output: 42 },
   ].forEach(({ input1, input2, output }) => {
-    testOneArrAndOneNumInOneAnyOut(dflow, nodeKind, input1, input2, output);
+    testTwoInOneOut<DflowArray, number, DflowValue>(
+      dflow,
+      nodeKind,
+      input1,
+      input2,
+      output,
+    );
   });
 });
 
@@ -35,7 +37,7 @@ Deno.test("arrayFindIndex", () => {
   const testNode = dflow.newNode({ kind: nodeKind });
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4, 5, 6, 7] }],
+    outputs: [{ data: [1, 2, 3, 4, 5, 6, 7] }],
   });
   const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
   const numberNode = dflow.newNode({ kind: catalog.number.kind });
@@ -68,7 +70,7 @@ Deno.test("arrayFindLastIndex", () => {
   const testNode = dflow.newNode({ kind: nodeKind });
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4, 5, 6, 0] }],
+    outputs: [{ data: [1, 2, 3, 4, 5, 6, 0] }],
   });
   const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
   const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
@@ -101,7 +103,7 @@ Deno.test("arrayFilter", () => {
   const testNode = dflow.newNode({ kind: nodeKind });
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4, 5, 6, 7] }],
+    outputs: [{ data: [1, 2, 3, 4, 5, 6, 7] }],
   });
   const numNode = dflow.newNode({ kind: catalog.mathPI.kind });
   const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
@@ -137,7 +139,13 @@ Deno.test("arrayIncludes", () => {
     { inputs: { array: ["a", "b"], element: "a" }, output: true },
   ].forEach(
     ({ inputs: { array, element }, output }) => {
-      testOneArrAndOneStrInOneBoolOut(dflow, nodeKind, array, element, output);
+      testTwoInOneOut<DflowArray, string, boolean>(
+        dflow,
+        nodeKind,
+        array,
+        element,
+        output,
+      );
     },
   );
 });
@@ -153,7 +161,13 @@ Deno.test("arrayJoin", () => {
     { inputs: { array: ["a", "b"], separator: undefined }, output: "a,b" },
   ].forEach(
     ({ inputs: { array, separator }, output }) => {
-      testOneArrAndOneStrInOneStrOut(dflow, nodeKind, array, separator, output);
+      testTwoInOneOut<DflowArray, string, string>(
+        dflow,
+        nodeKind,
+        array,
+        separator,
+        output,
+      );
     },
   );
 });
@@ -166,7 +180,7 @@ Deno.test("arrayLength", () => {
   [
     { input: ["a"], output: 1 },
   ].forEach(({ input, output }) => {
-    testOneArrInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<DflowArray, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -178,11 +192,11 @@ Deno.test("arrayMap", () => {
   const testNode = dflow.newNode({ kind: nodeKind });
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ id: "out", types: ["array"], data: [1, 2, 3, 4] }],
+    outputs: [{ data: [1, 2, 3, 4] }],
   });
   const numNode = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ id: "out", types: ["number"], data: 1 }],
+    outputs: [{ data: 1 }],
   });
   const argumentNode = dflow.newNode({ kind: catalog.argument.kind });
   const numberNode = dflow.newNode({ kind: catalog.number.kind });
@@ -218,7 +232,13 @@ Deno.test("arrayPop", () => {
   [
     { input: [1, 2, 3], output1: 3, output2: [1, 2] },
   ].forEach(({ input, output1, output2 }) => {
-    testOneArrInOneAnyAndOneArrOut(dflow, nodeKind, input, output1, output2);
+    testOneInTwoOut<DflowArray, DflowValue, DflowArray>(
+      dflow,
+      nodeKind,
+      input,
+      output1,
+      output2,
+    );
   });
 });
 
@@ -233,7 +253,13 @@ Deno.test("arrayPush", () => {
     { input1: [1, 2], input2: 3, output: [1, 2, 3] },
     { input1: [1, "a"], input2: true, output: [1, "a", true] },
   ].forEach(({ input1, input2, output }) => {
-    testOneArrAndOneAnyInOneArrOut(dflow, nodeKind, input1, input2, output);
+    testTwoInOneOut<DflowArray, DflowValue, DflowArray>(
+      dflow,
+      nodeKind,
+      input1,
+      input2,
+      output,
+    );
   });
 });
 
@@ -245,7 +271,7 @@ Deno.test("arrayReverse", () => {
   [
     { input: [1, 2, 3], output: [3, 2, 1] },
   ].forEach(({ input, output }) => {
-    testOneArrInOneArrOut(dflow, nodeKind, input, output);
+    testOneInOneOut<DflowArray, DflowArray>(dflow, nodeKind, input, output);
   });
 });
 
@@ -257,7 +283,13 @@ Deno.test("arrayShift", () => {
   [
     { input: [1, 2, 3], output1: 1, output2: [2, 3] },
   ].forEach(({ input, output1, output2 }) => {
-    testOneArrInOneAnyAndOneArrOut(dflow, nodeKind, input, output1, output2);
+    testOneInTwoOut<DflowArray, DflowValue, DflowArray>(
+      dflow,
+      nodeKind,
+      input,
+      output1,
+      output2,
+    );
   });
 });
 
@@ -292,7 +324,7 @@ Deno.test("arraySlice", () => {
       output: ["camel", "duck"],
     },
   ].forEach(({ input1, input2, input3, output }) => {
-    testOneArrAndTwoNumInOneArrOut(
+    testThreeInOneOut<DflowArray, number, number, DflowArray>(
       dflow,
       nodeKind,
       input1,
