@@ -317,14 +317,35 @@ Deno.test("DflowHost run()", async () => {
 });
 
 Deno.test("DflowHost newNode()", () => {
-  const nodeId1 = "n1";
   const dflow = new DflowHost({ nodesCatalog: nodesCatalog1 });
   const catalog = dflow.nodesCatalog;
-  dflow.newNode({ id: nodeId1, kind: catalog.Identity.kind });
 
-  const node1 = dflow.getNodeById(nodeId1);
-  assertEquals(nodeId1, node1.id);
-  assertEquals(catalog.Identity.kind, node1.kind);
+  // newNode with id
+  const nodeId1 = "node1";
+  const node1 = dflow.newNode({
+    kind: catalog.Identity.kind,
+    id: nodeId1,
+  });
+  assertEquals(node1.id, nodeId1);
+  assertEquals(node1.kind, catalog.Identity.kind);
+
+  // newNode with inputs
+  const inputId1 = "input1";
+  const node2 = dflow.newNode({
+    kind: catalog.Identity.kind,
+    inputs: [{ id: inputId1 }],
+  });
+  const node2Obj = node2.toObject();
+  assertEquals(node2Obj.inputs?.[0]?.id, inputId1);
+
+  // newNode with outputs
+  const outputId1 = "output1";
+  const node3 = dflow.newNode({
+    kind: catalog.Identity.kind,
+    outputs: [{ id: outputId1 }],
+  });
+  const node3Obj = node3.toObject();
+  assertEquals(node3Obj.outputs?.[0]?.id, outputId1);
 });
 
 Deno.test("DflowHost newEdge()", () => {
