@@ -44,7 +44,7 @@ Then you can import for example the following.
 import { DflowHost } from "dflow/dflow.ts";
 import { nodesCatalog } from "dflow/nodes.ts";
 
-const dflow = new DflowHost(nodesCatalog);
+const dflow = new DflowHost({ nodesCatalog });
 ```
 
 With [deno](https://deno.land/) you can then launch your script like this
@@ -99,14 +99,14 @@ import { nodesCatalog } from "dflow/nodes";
 
 function rungraph() {
   // use builtin nodes
-  const dflow = new DflowHost(nodesCatalog);
+  const dflow = new DflowHost({ nodesCatalog });
   const catalog = dflow.nodesCatalog;
 
   // create nodes
   const numNode = dflow.newNode({
     kind: catalog.data.kind,
     // set numNode output to π / 2
-    outputs: [{ id: "out", types: ["number"], data: Math.PI / 2 }],
+    outputs: [{ data: Math.PI / 2 }],
   });
   const sinNode = dflow.newNode({
     kind: catalog.mathSin.kind,
