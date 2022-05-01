@@ -1,5 +1,5 @@
 import { assertEquals } from "std/testing/asserts.ts";
-import { DflowArray, DflowHost, DflowId } from "../dflow.ts";
+import { DflowArray, DflowHost, DflowId, DflowValue } from "../dflow.ts";
 import { testOneInOneOut } from "./_test-utils.ts";
 import { catalog as mathCatalog } from "./math.ts";
 import { catalog as operatorCatalog } from "./operator.ts";
@@ -16,7 +16,7 @@ Deno.test("DflowNodeArray", () => {
     { input: [], output: [] },
     { input: [1, 2, 3], output: [1, 2, 3] },
   ].forEach(({ input, output }) => {
-    testOneInOneOut<DflowArray>(dflow, nodeKind, input, output);
+    testOneInOneOut<DflowValue, DflowArray>(dflow, nodeKind, input, output);
   });
 });
 
@@ -33,7 +33,7 @@ Deno.test("DflowNodeBoolean", () => {
     { input: [1, 2, 3], output: undefined },
     { input: { foo: "bar" }, output: undefined },
   ].forEach(({ input, output }) => {
-    testOneInOneOut<boolean>(dflow, nodeKind, input, output);
+    testOneInOneOut<DflowValue, boolean>(dflow, nodeKind, input, output);
   });
 });
 
@@ -70,7 +70,7 @@ Deno.test("DflowNodeIsUndefined", () => {
     { input: [1, 2, 3], output: false },
     { input: { foo: "bar" }, output: false },
   ].forEach(({ input, output }) => {
-    testOneInOneOut<boolean>(dflow, nodeKind, input, output);
+    testOneInOneOut<DflowValue, boolean>(dflow, nodeKind, input, output);
   });
 });
 
@@ -88,7 +88,7 @@ Deno.test("DflowNodeNumber", () => {
     { input: "foo", output: undefined },
     { input: 1, output: 1 },
   ].forEach(({ input, output }) => {
-    testOneInOneOut<number>(dflow, nodeKind, input, output);
+    testOneInOneOut<DflowValue, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -106,6 +106,6 @@ Deno.test("DflowNodeString", () => {
     { input: 1, output: undefined },
     { input: "foo", output: "foo" },
   ].forEach(({ input, output }) => {
-    testOneInOneOut<string>(dflow, nodeKind, input, output);
+    testOneInOneOut<DflowValue, string>(dflow, nodeKind, input, output);
   });
 });

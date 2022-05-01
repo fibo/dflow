@@ -1,8 +1,8 @@
+import { DflowValue } from "../dflow.ts";
 import {
   newDflowHost,
-  testOneBoolInOneBoolOut,
-  testTwoAnyInOneAnyOut,
-  testTwoBoolInOneBoolOut,
+  testOneInOneOut,
+  testTwoInOneOut,
 } from "./_test-utils.ts";
 
 Deno.test("DflowNodeAnd", () => {
@@ -17,7 +17,13 @@ Deno.test("DflowNodeAnd", () => {
     { inputs: [false, true], output: false && true },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoBoolInOneBoolOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<boolean, boolean, boolean>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });
@@ -31,7 +37,7 @@ Deno.test("DflowNodeNot", () => {
     { input: true, output: false },
     { input: false, output: true },
   ].forEach(({ input, output }) => {
-    testOneBoolInOneBoolOut(dflow, nodeKind, input, output);
+    testOneInOneOut<boolean, boolean>(dflow, nodeKind, input, output);
   });
 });
 
@@ -48,7 +54,13 @@ Deno.test("DflowNodeNullishCoaleshing", () => {
     { inputs: [undefined, 42], output: 42 },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoAnyInOneAnyOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<DflowValue, DflowValue, DflowValue>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });
@@ -65,7 +77,13 @@ Deno.test("DflowNodeOr", () => {
     { inputs: [false, true], output: false || true },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoBoolInOneBoolOut(dflow, nodeKind, input1, input2, output);
+      testTwoInOneOut<boolean, boolean, boolean>(
+        dflow,
+        nodeKind,
+        input1,
+        input2,
+        output,
+      );
     },
   );
 });

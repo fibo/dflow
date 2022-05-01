@@ -1,7 +1,7 @@
 import {
   newDflowHost,
-  testOneStrAndTwoNumInOneStrOut,
-  testOneStrInOneNumOut,
+  testOneInOneOut,
+  testThreeInOneOut,
 } from "./_test-utils.ts";
 
 Deno.test("stringLength", () => {
@@ -12,7 +12,7 @@ Deno.test("stringLength", () => {
   [
     { input: "foo", output: "foo".length },
   ].forEach(({ input, output }) => {
-    testOneStrInOneNumOut(dflow, nodeKind, input, output);
+    testOneInOneOut<string, number>(dflow, nodeKind, input, output);
   });
 });
 
@@ -35,7 +35,7 @@ Deno.test("substring", () => {
       output: "ll",
     },
   ].forEach(({ input1, input2, input3, output }) => {
-    testOneStrAndTwoNumInOneStrOut(
+    testThreeInOneOut<string, number, number, string>(
       dflow,
       nodeKind,
       input1,

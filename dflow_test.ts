@@ -385,7 +385,6 @@ Deno.test("DflowOutput.clear()", () => {
 Deno.test("DflowOutput set data", () => {
   const pin = new DflowOutput({ id: "test" });
   assertEquals(pin.id, "test");
-  assertEquals(pin.kind, "output");
   assertEquals(typeof pin.data, "undefined");
 
   testOutputSetData(str);
