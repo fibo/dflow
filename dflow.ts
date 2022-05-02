@@ -132,20 +132,28 @@ type DflowRunOptions = { verbose: boolean };
 
 type DflowItemKind = DflowPinKind | "node" | "edge";
 
+type DflowErrorItemNotFoundConstructorArg = {
+  kind: DflowItemKind;
+  id?: DflowId;
+  nodeId?: DflowId;
+  position?: number;
+};
+
 class DflowErrorItemNotFound extends Error {
-  constructor(kind: DflowItemKind, id: DflowId) {
-    super(`${kind} not found id=${id}`);
+  constructor(
+    { kind, id, nodeId, position }: DflowErrorItemNotFoundConstructorArg,
+  ) {
+    super(
+      [
+        `${kind} not found`,
+        typeof id !== "undefined" ? ` id=${id}` : "",
+        (typeof nodeId !== "undefined" && typeof position !== "undefined")
+          ? ` nodeId=${nodeId} position=${position}`
+          : "",
+      ].join(""),
+    );
   }
 }
-
-const _missingString = (stringName: string) => `${stringName} must be a string`;
-const _missingPin = (nodeId: DflowId, kind: DflowPinKind) =>
-  `${kind} pin not found nodeId=${nodeId}`;
-const _missingPinAtPosition = (
-  nodeId: DflowId,
-  kind: DflowPinKind,
-  position: number,
-) => `${_missingPin(nodeId, kind)} position=${position}`;
 
 const _executionNodeInfo = (
   { id, kind, outputs }: DflowSerializableNode,
@@ -495,7 +503,7 @@ export class DflowNode extends DflowItem {
   getInputById(id: DflowId): DflowInput {
     const item = this.#inputs.get(id);
     if (!item) {
-      throw new DflowErrorItemNotFound("input", id);
+      throw new DflowErrorItemNotFound({ kind: "input", id });
     }
     return item;
   }
@@ -504,7 +512,11 @@ export class DflowNode extends DflowItem {
     const pinId = this.#inputPosition[position];
 
     if (!pinId) {
-      throw new Error(_missingPinAtPosition(this.id, "input", position));
+      throw new DflowErrorItemNotFound({
+        kind: "input",
+        nodeId: this.id,
+        position,
+      });
     }
 
     return this.getInputById(pinId);
@@ -513,7 +525,7 @@ export class DflowNode extends DflowItem {
   getOutputById(id: DflowId): DflowOutput {
     const item = this.#outputs.get(id);
     if (!item) {
-      throw new DflowErrorItemNotFound("output", id);
+      throw new DflowErrorItemNotFound({ kind: "output", id });
     }
     return item;
   }
@@ -522,7 +534,11 @@ export class DflowNode extends DflowItem {
     const pinId = this.#outputPosition[position];
 
     if (!pinId) {
-      throw new Error(_missingPinAtPosition(this.id, "output", position));
+      throw new DflowErrorItemNotFound({
+        kind: "output",
+        nodeId: this.id,
+        position,
+      });
     }
 
     return this.getOutputById(pinId);
@@ -872,10 +888,6 @@ export class DflowHost {
   }
 
   deleteEdge(edgeId: DflowId) {
-    if (typeof edgeId !== "string") {
-      throw new TypeError(_missingString("edgeId"));
-    }
-
     const edge = this.getEdgeById(edgeId);
     if (!edge) return;
 
@@ -890,10 +902,6 @@ export class DflowHost {
   }
 
   deleteNode(nodeId: DflowId) {
-    if (typeof nodeId !== "string") {
-      throw new TypeError(_missingString("nodeId"));
-    }
-
     const node = this.getNodeById(nodeId);
 
     if (node) {
@@ -1015,7 +1023,7 @@ export class DflowHost {
   getEdgeById(id: DflowId): DflowEdge | undefined {
     const item = this.#graph.edges.get(id);
     if (!item) {
-      throw new DflowErrorItemNotFound("edge", id);
+      throw new DflowErrorItemNotFound({ kind: "edge", id });
     }
     return item;
   }
@@ -1023,7 +1031,7 @@ export class DflowHost {
   getNodeById(id: DflowId): DflowNode {
     const item = this.#graph.nodes.get(id);
     if (!item) {
-      throw new DflowErrorItemNotFound("node", id);
+      throw new DflowErrorItemNotFound({ kind: "node", id });
     }
     return item;
   }
