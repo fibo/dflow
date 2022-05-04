@@ -5,10 +5,12 @@
   "homepage": "http://g14n.info/dflow",
   "type": "module",
   "main": "./dflow.cjs",
+  "types": "dflow.d.ts",
   "exports": {
     ".": {
       "import": "./dflow.js",
-      "require": "./dflow.cjs"
+      "require": "./dflow.cjs",
+      "types": "./dflow.d.ts"
     },
     "./nodes": {
       "import": "./nodes.js"
@@ -33,9 +35,8 @@
     "example:context": "deno run examples/context.ts",
     "example:execution-report": "deno run examples/execution-report.ts",
     "example:usage": "deno run examples/usage.js",
-    "fmt": "deno fmt --ignore=./dflow.js,./dflow.cjs,./nodes.js,./index.d.ts",
+    "fmt": "deno fmt --ignore=./dflow.js,./dflow.cjs,./nodes.js,./dflow.d.ts",
     "emit_typescript_declarations": "tsc --project ./tsconfig.declarations.json",
-    "postemit_typescript_declarations": "mv dflow.d.ts index.d.ts",
     "lint": "deno lint --ignore=./dflow.js,./dflow.cjs,./nodes.js,./view.js",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
     "test": "deno test --unstable --importmap=import_map.json"

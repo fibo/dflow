@@ -42,7 +42,7 @@ Then you can import for example the following.
 
 ```typescript
 import { DflowHost } from "dflow/dflow.ts";
-import { nodesCatalog } from "dflow/nodes.ts";
+import { nodesCatalog } from "dflow/nodes/index.ts";
 
 const dflow = new DflowHost({ nodesCatalog });
 ```
@@ -54,13 +54,13 @@ deno run --importmap=import_map.json path/to/my/script.ts
 ```
 
 It is recommended to point to a specific version, for instance to point to
-version `0.26` or whatever, then change your import map accordingly
+version `0.36` or whatever, then change your import map accordingly
 
 ```diff
 {
   "imports": {
 -    "dflow/": "https://unpkg.com/dflow/"
-+    "dflow/": "https://unpkg.com/dflow@0.26/"
++    "dflow/": "https://unpkg.com/dflow@0.36/"
   }
 }
 ```
