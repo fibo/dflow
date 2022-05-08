@@ -31,7 +31,7 @@
 
   <script type="module">
     import { FlowView } from 'https://unpkg.com/flow-view';
-    import { DflowHost } from './dflow.js';
+    import { DflowHost, DflowData } from './dflow.js';
     import { nodesCatalog } from './nodes.js';
     import { onChangeView } from './view.js'
 
@@ -75,7 +75,7 @@
       ]
     };
 
-    flowView.onChange(onChangeView({ dflow, flowView }))
+    flowView.onChange(onChangeView({ DflowData, dflow, flowView }))
 
     flowView.loadGraph(initialGraph);
 

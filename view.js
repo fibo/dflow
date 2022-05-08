@@ -1,4 +1,4 @@
-export const onChangeView = ({ dflow, flowView }) => {
+export const onChangeView = ({ DflowData, dflow, flowView }) => {
   const catalog = dflow.nodesCatalog;
   const nodeLabels = Object.keys(catalog);
 
@@ -61,10 +61,8 @@ export const onChangeView = ({ dflow, flowView }) => {
               view.newOutput({});
             }
 
-            const typeofMaybeJson = typeof maybeJson;
-
-            if (["boolean", "number", "string"].includes(typeofMaybeJson)) {
-              const node = dflow.newNode({
+            if (DflowData.isDflowData(maybeJson)) {
+              dflow.newNode({
                 id: nodeId,
                 kind: catalog.data.kind,
                 outputs: [
@@ -74,26 +72,10 @@ export const onChangeView = ({ dflow, flowView }) => {
                   },
                 ],
               });
-
-              view.outputs[0].text = typeofMaybeJson;
             }
-
-            if (typeofMaybeJson === "object") {
-              const dataType = Array.isArray(maybeJson) ? "array" : "object";
-              dflow.newNode({
-                id: nodeId,
-                kind: "data",
-                outputs: [
-                  {
-                    data: maybeJson,
-                    id: data.outputs?.[0]?.id,
-                  },
-                ],
-              });
-
-              view.outputs[0].text = dataType;
-            }
-          } catch (ignore) {}
+          } catch (error) {
+            console.error(error);
+          }
         }
 
         break;
