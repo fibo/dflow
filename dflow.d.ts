@@ -74,6 +74,30 @@ export declare type DflowHostConstructorArg = DflowGraphConstructorArg;
 declare type DflowRunOptions = {
     verbose: boolean;
 };
+declare type DflowItemKind = DflowPinKind | "node" | "edge";
+export declare type DflowSerializableErrorCannotConnectPins = {
+    source: DflowSerializableOutput;
+    target: DflowSerializableInput;
+};
+export declare type DflowSerializableErrorItemNotFound = {
+    kind: DflowItemKind;
+    id?: DflowId;
+    nodeId?: DflowId;
+    position?: number;
+};
+/**
+ * DflowError is an abstract class extending Error.
+ * Its message is a JSON string.
+ */
+export declare class DflowError extends Error {
+    constructor(arg: DflowObject, errorClassName: string);
+}
+export declare class DflowErrorCannotConnectPins extends DflowError {
+    constructor(arg: DflowSerializableErrorCannotConnectPins);
+}
+export declare class DflowErrorItemNotFound extends DflowError {
+    constructor(arg: DflowSerializableErrorItemNotFound);
+}
 export declare class DflowData {
     static isArray(data: unknown): data is DflowArray;
     static isBoolean(data: unknown): data is boolean;
@@ -81,7 +105,6 @@ export declare class DflowData {
     static isObject(data: unknown): data is DflowObject;
     static isNumber(data: unknown): data is number;
     static isString(data: unknown): data is string;
-    static isStringNotEmpty(data: unknown): boolean;
     static isDflowData(data: unknown): boolean;
     static validate(data: unknown, types: DflowPinType[]): boolean;
 }
@@ -94,6 +117,7 @@ export declare class DflowPin extends DflowItem {
     readonly name?: string;
     readonly types: DflowPinType[];
     static types: string[];
+    static canConnect(sourceTypes?: DflowPinType[], targetTypes?: DflowPinType[]): boolean;
     constructor({ id, name, types }: DflowPinConstructorArg);
     get hasTypeAny(): boolean;
     hasType(type: DflowPinType): boolean;
@@ -132,9 +156,21 @@ export declare class DflowNode extends DflowItem {
     get inputs(): IterableIterator<DflowInput>;
     get outputs(): IterableIterator<DflowOutput>;
     clearOutputs(): void;
+    /**
+     * @throws DflowErrorItemNotFound
+     */
     getInputById(id: DflowId): DflowInput;
+    /**
+     * @throws DflowErrorItemNotFound
+     */
     input(position: number): DflowInput;
+    /**
+     * @throws DflowErrorItemNotFound
+     */
     getOutputById(id: DflowId): DflowOutput;
+    /**
+     * @throws DflowErrorItemNotFound
+     */
     output(position: number): DflowOutput;
     run(): void | Promise<void>;
     toObject(): DflowSerializableNode;
@@ -185,13 +221,27 @@ export declare class DflowHost {
     connect(sourceNode: DflowNode, sourcePosition?: number): {
         to: (targetNode: DflowNode, targetPosition?: number) => void;
     };
+    /**
+     * @throws DflowErrorItemNotFound
+     */
     deleteEdge(edgeId: DflowId): void;
+    /**
+     * @throws DflowErrorItemNotFound
+     */
     deleteNode(nodeId: DflowId): void;
-    deleteEdgesConnectedToPin([nodeId, pinId]: DflowSerializablePinPath): void;
     executeFunction(functionId: DflowId, args: DflowArray): DflowValue;
+    /**
+     * @throws DflowErrorItemNotFound
+     */
     getEdgeById(id: DflowId): DflowEdge | undefined;
+    /**
+     * @throws DflowErrorItemNotFound
+     */
     getNodeById(id: DflowId): DflowNode;
     newNode(obj: DflowNewNode): DflowNode;
+    /**
+     * @throws DflowErrorItemNotFound
+     */
     newEdge(obj: DflowNewEdge): DflowEdge;
     toObject(): DflowSerializableGraph;
     run(): Promise<void>;

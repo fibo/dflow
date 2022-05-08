@@ -75,6 +75,9 @@ var stdin_exports = {};
 __export(stdin_exports, {
   DflowData: () => DflowData,
   DflowEdge: () => DflowEdge,
+  DflowError: () => DflowError,
+  DflowErrorCannotConnectPins: () => DflowErrorCannotConnectPins,
+  DflowErrorItemNotFound: () => DflowErrorItemNotFound,
   DflowGraph: () => DflowGraph,
   DflowHost: () => DflowHost,
   DflowInput: () => DflowInput,
@@ -84,13 +87,21 @@ __export(stdin_exports, {
   DflowPin: () => DflowPin
 });
 var _source, _sources, _data, _inputs, _outputs, _inputPosition, _outputPosition, _graph;
-class DflowErrorItemNotFound extends Error {
-  constructor({ kind, id, nodeId, position }) {
-    super([
-      `${kind} not found`,
-      typeof id !== "undefined" ? ` id=${id}` : "",
-      typeof nodeId !== "undefined" && typeof position !== "undefined" ? ` nodeId=${nodeId} position=${position}` : ""
-    ].join(""));
+class DflowError extends Error {
+  constructor(arg, errorClassName) {
+    super(JSON.stringify(__spreadValues({
+      error: errorClassName
+    }, arg)));
+  }
+}
+class DflowErrorCannotConnectPins extends DflowError {
+  constructor(arg) {
+    super(arg, "DflowErrorCannotConnectPins");
+  }
+}
+class DflowErrorItemNotFound extends DflowError {
+  constructor(arg) {
+    super(arg, "DflowErrorItemNotFound");
   }
 }
 const _executionNodeInfo = ({ id: id1, kind, outputs }, error) => {
@@ -118,7 +129,7 @@ class DflowData {
     return typeof data === "boolean";
   }
   static isDflowId(data) {
-    return DflowData.isStringNotEmpty(data);
+    return typeof data === "string" && data !== "";
   }
   static isObject(data) {
     if (typeof data !== "object" || !data || Array.isArray(data))
@@ -130,9 +141,6 @@ class DflowData {
   }
   static isString(data) {
     return typeof data === "string";
-  }
-  static isStringNotEmpty(data) {
-    return DflowData.isString(data) && data !== "";
   }
   static isDflowData(data) {
     if (typeof data === "undefined")
@@ -186,6 +194,12 @@ class DflowPin extends DflowItem {
     }
     this.types = types;
   }
+  static canConnect(sourceTypes = [], targetTypes = []) {
+    const targetHasTypeAny = targetTypes.length === 0;
+    if (targetHasTypeAny)
+      return true;
+    return targetTypes.some((pinType) => sourceTypes.includes(pinType));
+  }
   get hasTypeAny() {
     return this.types.length === 0;
   }
@@ -230,20 +244,22 @@ class DflowInput extends DflowPin {
     return this.multi ? Array.from((_a = __privateGet(this, _sources)) != null ? _a : []).length > 0 : typeof __privateGet(this, _source) === "undefined";
   }
   connectTo(pin) {
-    const { hasTypeAny: targetHasTypeAny, types: targetTypes } = this;
+    const { types: targetTypes } = this;
     const { types: sourceTypes } = pin;
-    const canConnect = targetHasTypeAny || targetTypes.some((pinType) => sourceTypes.includes(pinType));
-    if (canConnect) {
-      if (this.multi) {
-        if (!__privateGet(this, _sources)) {
-          __privateSet(this, _sources, /* @__PURE__ */ new Set());
-        }
-        __privateGet(this, _sources).add(pin);
-      } else {
-        __privateSet(this, _source, pin);
+    const canConnect = DflowPin.canConnect(sourceTypes, targetTypes);
+    if (!canConnect) {
+      throw new DflowErrorCannotConnectPins({
+        source: pin.toObject(),
+        target: this.toObject()
+      });
+    }
+    if (this.multi) {
+      if (!__privateGet(this, _sources)) {
+        __privateSet(this, _sources, /* @__PURE__ */ new Set());
       }
+      __privateGet(this, _sources).add(pin);
     } else {
-      throw new Error(`mismatching pinTypes, source has types [${sourceTypes.join()}] and target has types [${targetTypes.join()}]`);
+      __privateSet(this, _source, pin);
     }
   }
   disconnect() {
@@ -285,7 +301,8 @@ class DflowOutput extends DflowPin {
         break;
       }
       default: {
-        throw new Error(`could not set data pinTypes=${JSON.stringify(this.types)} typeof data is ${typeof data}`);
+        this.clear();
+        break;
       }
     }
   }
@@ -671,26 +688,13 @@ class DflowHost {
   }
   deleteNode(nodeId) {
     const node = this.getNodeById(nodeId);
-    if (node) {
-      for (const edge of this.edges) {
-        const { source: [sourceNodeId], target: [targetNodeId] } = edge;
-        if (sourceNodeId === node.id || targetNodeId === node.id) {
-          this.deleteEdge(edge.id);
-        }
-      }
-      __privateGet(this, _graph).nodes.delete(nodeId);
-    } else {
-      throw new Error(`DflowNode not found, id=${nodeId}`);
-    }
-  }
-  deleteEdgesConnectedToPin([nodeId, pinId]) {
     for (const edge of this.edges) {
-      const [sourceNodeId, sourcePinId] = edge.source;
-      const [targetNodeId, targetPinId] = edge.target;
-      if (sourceNodeId === nodeId && sourcePinId === pinId || targetNodeId === nodeId && targetPinId === pinId) {
+      const { source: [sourceNodeId], target: [targetNodeId] } = edge;
+      if (sourceNodeId === node.id || targetNodeId === node.id) {
         this.deleteEdge(edge.id);
       }
     }
+    __privateGet(this, _graph).nodes.delete(nodeId);
   }
   executeFunction(functionId, args) {
     var _a, _b, _c;
