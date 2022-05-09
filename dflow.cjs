@@ -83,6 +83,7 @@ __export(stdin_exports, {
   DflowInput: () => DflowInput,
   DflowItem: () => DflowItem,
   DflowNode: () => DflowNode,
+  DflowNodeUnknown: () => DflowNodeUnknown,
   DflowOutput: () => DflowOutput,
   DflowPin: () => DflowPin
 });
@@ -119,7 +120,7 @@ const _executionNodeInfo = ({ id: id1, kind, outputs }, error) => {
   }
   return obj;
 };
-class DflowData {
+const _DflowData = class {
   static isArray(data) {
     if (!Array.isArray(data))
       return false;
@@ -145,32 +146,41 @@ class DflowData {
   static isDflowData(data) {
     if (typeof data === "undefined")
       return false;
-    return DflowData.isString(data) || DflowData.isBoolean(data) || DflowData.isNumber(data) || DflowData.isObject(data) || DflowData.isArray(data) || DflowData.isDflowId(data);
+    return _DflowData.isString(data) || _DflowData.isBoolean(data) || _DflowData.isNumber(data) || _DflowData.isObject(data) || _DflowData.isArray(data) || _DflowData.isDflowId(data);
   }
-  static validate(data, types) {
+  static isValidDataType(types, data) {
     if (types.length === 0) {
       return true;
     }
     return types.some((pinType) => {
       switch (pinType) {
         case "array":
-          return DflowData.isArray(data);
+          return _DflowData.isArray(data);
         case "boolean":
-          return DflowData.isBoolean(data);
+          return _DflowData.isBoolean(data);
         case "number":
-          return DflowData.isNumber(data);
+          return _DflowData.isNumber(data);
         case "object":
-          return DflowData.isObject(data);
+          return _DflowData.isObject(data);
         case "string":
-          return DflowData.isString(data);
+          return _DflowData.isString(data);
         case "DflowId":
-          return DflowData.isDflowId(data);
+          return _DflowData.isDflowId(data);
         default:
           return false;
       }
     }, true);
   }
-}
+};
+let DflowData = _DflowData;
+__publicField(DflowData, "types", [
+  "string",
+  "number",
+  "boolean",
+  "object",
+  "array",
+  "DflowId"
+]);
 class DflowItem {
   constructor({ id }) {
     __publicField(this, "id");
@@ -194,7 +204,10 @@ class DflowPin extends DflowItem {
     }
     this.types = types;
   }
-  static canConnect(sourceTypes = [], targetTypes = []) {
+  static canConnect(sourceTypes, targetTypes) {
+    const sourceHasTypeAny = sourceTypes.length === 0;
+    if (sourceHasTypeAny)
+      return true;
     const targetHasTypeAny = targetTypes.length === 0;
     if (targetHasTypeAny)
       return true;
@@ -207,14 +220,6 @@ class DflowPin extends DflowItem {
     return this.hasTypeAny || this.types.includes(type);
   }
 }
-__publicField(DflowPin, "types", [
-  "string",
-  "number",
-  "boolean",
-  "object",
-  "array",
-  "DflowId"
-]);
 class DflowInput extends DflowPin {
   constructor(_a) {
     var _b = _a, { multi, optional } = _b, pin = __objRest(_b, ["multi", "optional"]);
@@ -355,27 +360,17 @@ class DflowNode extends DflowItem {
     }
   }
   static input(typing = [], rest) {
-    if (typeof typing === "string") {
-      return __spreadValues({
-        types: [
-          typing
-        ]
-      }, rest);
-    }
     return __spreadValues({
-      types: typing
+      types: typeof typing === "string" ? [
+        typing
+      ] : typing
     }, rest);
   }
   static output(typing = [], rest) {
-    if (typeof typing === "string") {
-      return __spreadValues({
-        types: [
-          typing
-        ]
-      }, rest);
-    }
     return __spreadValues({
-      types: typing
+      types: typeof typing === "string" ? [
+        typing
+      ] : typing
     }, rest);
   }
   get inputs() {
@@ -569,26 +564,20 @@ class DflowGraph {
         const { isAsync, isConstant } = NodeClass;
         try {
           if (!isConstant) {
-            let someInputIsNotValid = false;
             INPUTS_LOOP:
               for (const { id, data, types, optional } of node.inputs) {
                 if (optional && typeof data === "undefined") {
                   continue INPUTS_LOOP;
                 }
-                if (!DflowData.validate(data, types)) {
-                  someInputIsNotValid = true;
-                  if (verbose) {
-                    (_b = this.executionReport.steps) == null ? void 0 : _b.push(_executionNodeInfo(node.toObject(), `invalid input data nodeId=${nodeId1} inputId=${id} data=${data}`));
-                  }
-                  break INPUTS_LOOP;
+                if (DflowData.isValidDataType(types, data)) {
+                  continue INPUTS_LOOP;
                 }
+                if (verbose) {
+                  (_b = this.executionReport.steps) == null ? void 0 : _b.push(_executionNodeInfo(node.toObject(), `invalid input data nodeId=${nodeId1} inputId=${id} data=${data}`));
+                }
+                node.clearOutputs();
+                continue NODES_LOOP;
               }
-            if (someInputIsNotValid) {
-              for (const output4 of node.outputs) {
-                output4.clear();
-              }
-              continue NODES_LOOP;
-            }
             if (isAsync) {
               await node.run();
             } else {
@@ -844,47 +833,13 @@ __publicField(DflowNodeArgument, "inputs", [
 __publicField(DflowNodeArgument, "outputs", [
   output()
 ]);
-class DflowNodeArray extends DflowNode {
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isArray(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-__publicField(DflowNodeArray, "kind", "array");
-__publicField(DflowNodeArray, "inputs", [
-  input()
-]);
-__publicField(DflowNodeArray, "outputs", [
-  output("array")
-]);
-class DflowNodeBoolean extends DflowNode {
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isBoolean(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-__publicField(DflowNodeBoolean, "kind", "boolean");
-__publicField(DflowNodeBoolean, "inputs", [
-  input()
-]);
-__publicField(DflowNodeBoolean, "outputs", [
-  output("boolean")
-]);
 class DflowNodeData extends DflowNode {
   constructor(_k) {
     var _l = _k, { node: _m } = _l, _n = _m, { outputs } = _n, node = __objRest(_n, ["outputs"]), { host } = _l;
     super({
       node: __spreadProps(__spreadValues({}, node), {
-        outputs: outputs == null ? void 0 : outputs.map((output5) => __spreadProps(__spreadValues({}, output5), {
-          types: function inferDflowPinTypes(data) {
+        outputs: outputs == null ? void 0 : outputs.map((output4) => __spreadProps(__spreadValues({}, output4), {
+          types: function inferDflowDataType(data) {
             switch (true) {
               case DflowData.isBoolean(data):
                 return [
@@ -909,7 +864,7 @@ class DflowNodeData extends DflowNode {
               default:
                 return [];
             }
-          }(output5.data)
+          }(output4.data)
         }))
       }),
       host
@@ -946,40 +901,6 @@ __publicField(DflowNodeIsUndefined, "inputs", [
 __publicField(DflowNodeIsUndefined, "outputs", [
   output("boolean")
 ]);
-class DflowNodeNumber extends DflowNode {
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isNumber(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-__publicField(DflowNodeNumber, "kind", "number");
-__publicField(DflowNodeNumber, "inputs", [
-  input()
-]);
-__publicField(DflowNodeNumber, "outputs", [
-  output("number")
-]);
-class DflowNodeObject extends DflowNode {
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isObject(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-__publicField(DflowNodeObject, "kind", "object");
-__publicField(DflowNodeObject, "inputs", [
-  input()
-]);
-__publicField(DflowNodeObject, "outputs", [
-  output("object")
-]);
 class DflowNodeReturn extends DflowNode {
 }
 __publicField(DflowNodeReturn, "kind", "return");
@@ -992,35 +913,13 @@ __publicField(DflowNodeReturn, "inputs", [
     name: "value"
   })
 ]);
-class DflowNodeString extends DflowNode {
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isString(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-__publicField(DflowNodeString, "kind", "string");
-__publicField(DflowNodeString, "inputs", [
-  input()
-]);
-__publicField(DflowNodeString, "outputs", [
-  output("string")
-]);
 class DflowNodeUnknown extends DflowNode {
 }
 const coreNodesCatalog = {
   [DflowNodeArgument.kind]: DflowNodeArgument,
-  [DflowNodeArray.kind]: DflowNodeArray,
-  [DflowNodeBoolean.kind]: DflowNodeBoolean,
   [DflowNodeData.kind]: DflowNodeData,
   [DflowNodeIsUndefined.kind]: DflowNodeIsUndefined,
-  [DflowNodeNumber.kind]: DflowNodeNumber,
-  [DflowNodeObject.kind]: DflowNodeObject,
   [DflowNodeFunction.kind]: DflowNodeFunction,
-  [DflowNodeString.kind]: DflowNodeString,
   [DflowNodeReturn.kind]: DflowNodeReturn
 };
 module.exports = __toCommonJS(stdin_exports);
