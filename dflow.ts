@@ -222,7 +222,7 @@ export class DflowData {
     );
   }
 
-  static validate(data: unknown, types: DflowPinType[]) {
+  static isValidDataType(types: DflowPinType[], data: unknown) {
     if (types.length === 0) {
       return true;
     }
@@ -277,9 +277,16 @@ export class DflowPin extends DflowItem {
     sourceTypes: DflowPinType[],
     targetTypes: DflowPinType[],
   ) {
+    // Source can have any type,
+    // DflowHost.run() will validate data.
+    const sourceHasTypeAny = sourceTypes.length === 0;
+    if (sourceHasTypeAny) return true;
+    // Target can have any type,
+    // DflowNode.run() will validate data.
     const targetHasTypeAny = targetTypes.length === 0;
     if (targetHasTypeAny) return true;
-    // Target pin handles some of the type source can have.
+    // Target pin handles some of the type source can have,
+    // DflowNode.run() will validate date.
     return targetTypes.some((pinType) => sourceTypes.includes(pinType));
   }
 
@@ -482,20 +489,14 @@ export class DflowNode extends DflowItem {
     typing: DflowPinType | DflowPinType[] = [],
     rest?: Omit<DflowInputDefinition, "types">,
   ): DflowInputDefinition {
-    if (typeof typing === "string") {
-      return { types: [typing], ...rest };
-    }
-    return { types: typing, ...rest };
+    return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
 
   static output(
     typing: DflowPinType | DflowPinType[] = [],
     rest?: Omit<DflowOutputDefinition, "types">,
   ): DflowOutputDefinition {
-    if (typeof typing === "string") {
-      return { types: [typing], ...rest };
-    }
-    return { types: typing, ...rest };
+    return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
 
   get inputs() {
@@ -772,36 +773,34 @@ export class DflowGraph {
 
       try {
         if (!isConstant) {
-          let someInputIsNotValid = false;
-
           // 2. INPUTS_LOOP
           // //////////////
           INPUTS_LOOP:
           for (const { id, data, types, optional } of node.inputs) {
-            // Ignore optional inputs.
+            // Ignore optional inputs with no data.
             if (optional && typeof data === "undefined") {
               continue INPUTS_LOOP;
             }
 
             // Validate input data.
-            if (!DflowData.validate(data, types)) {
-              someInputIsNotValid = true;
-              if (verbose) {
-                this.executionReport.steps?.push(
-                  _executionNodeInfo(
-                    node.toObject(),
-                    `invalid input data nodeId=${nodeId} inputId=${id} data=${data}`,
-                  ),
-                );
-              }
-              break INPUTS_LOOP;
+            if (DflowData.isValidDataType(types, data)) {
+              continue INPUTS_LOOP;
             }
-          }
 
-          if (someInputIsNotValid) {
-            for (const output of node.outputs) {
-              output.clear();
+            // Some input is not valid.
+
+            // Notify into execution report.
+            if (verbose) {
+              this.executionReport.steps?.push(
+                _executionNodeInfo(
+                  node.toObject(),
+                  `invalid input data nodeId=${nodeId} inputId=${id} data=${data}`,
+                ),
+              );
             }
+
+            // Cleanup outputs and go to next node.
+            node.clearOutputs();
             continue NODES_LOOP;
           }
 
@@ -1150,34 +1149,6 @@ class DflowNodeArgument extends DflowNode {
   static outputs = [output()];
 }
 
-class DflowNodeArray extends DflowNode {
-  static kind = "array";
-  static inputs = [input()];
-  static outputs = [output("array")];
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isArray(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-
-class DflowNodeBoolean extends DflowNode {
-  static kind = "boolean";
-  static inputs = [input()];
-  static outputs = [output("boolean")];
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isBoolean(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-
 class DflowNodeData extends DflowNode {
   static kind = "data";
   static isConstant = true;
@@ -1231,34 +1202,6 @@ class DflowNodeIsUndefined extends DflowNode {
   }
 }
 
-class DflowNodeNumber extends DflowNode {
-  static kind = "number";
-  static inputs = [input()];
-  static outputs = [output("number")];
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isNumber(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-
-class DflowNodeObject extends DflowNode {
-  static kind = "object";
-  static inputs = [input()];
-  static outputs = [output("object")];
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isObject(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-
 class DflowNodeReturn extends DflowNode {
   static kind = "return";
   static isConstant = true;
@@ -1268,32 +1211,13 @@ class DflowNodeReturn extends DflowNode {
   ];
 }
 
-class DflowNodeString extends DflowNode {
-  static kind = "string";
-  static inputs = [input()];
-  static outputs = [output("string")];
-  run() {
-    const data = this.input(0).data;
-    if (DflowData.isString(data)) {
-      this.output(0).data = data;
-    } else {
-      this.output(0).clear();
-    }
-  }
-}
-
-// The "Unknown" node is not inclued in core nodes catalog.
-class DflowNodeUnknown extends DflowNode {}
+// The "unknown" node is not inclued in core nodes catalog.
+export class DflowNodeUnknown extends DflowNode {}
 
 const coreNodesCatalog: DflowNodesCatalog = {
   [DflowNodeArgument.kind]: DflowNodeArgument,
-  [DflowNodeArray.kind]: DflowNodeArray,
-  [DflowNodeBoolean.kind]: DflowNodeBoolean,
   [DflowNodeData.kind]: DflowNodeData,
   [DflowNodeIsUndefined.kind]: DflowNodeIsUndefined,
-  [DflowNodeNumber.kind]: DflowNodeNumber,
-  [DflowNodeObject.kind]: DflowNodeObject,
   [DflowNodeFunction.kind]: DflowNodeFunction,
-  [DflowNodeString.kind]: DflowNodeString,
   [DflowNodeReturn.kind]: DflowNodeReturn,
 };
