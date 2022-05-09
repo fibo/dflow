@@ -8,12 +8,13 @@ import {
 
 import {
   DflowData,
+  DflowDataType,
   DflowErrorItemNotFound,
   DflowGraph,
   DflowHost,
   DflowNode,
   DflowOutput,
-  DflowPinType,
+  DflowPin,
 } from "./dflow.ts";
 
 const { input, output } = DflowNode;
@@ -390,13 +391,13 @@ Deno.test("DflowHost deleteEdge()", () => {
 // DflowOutput
 // ////////////////////////////////////////////////////////////////////////////
 
-function testOutputSetData(data: unknown, types?: DflowPinType[]) {
+function testOutputSetData(data: unknown, types?: DflowDataType[]) {
   const output = new DflowOutput({ id: "test", types });
   output.data = data;
   assertStrictEquals(data, output.data);
 }
 
-function testOutputSetDataInvalid(data: unknown, types: DflowPinType[]) {
+function testOutputSetDataInvalid(data: unknown, types: DflowDataType[]) {
   const output = new DflowOutput({ id: "test", types });
   output.data = data;
   assertEquals(typeof output.data, "undefined");
@@ -527,4 +528,65 @@ Deno.test("DflowOutput set data", () => {
   testOutputSetDataInvalid(null, ["object", "array"]);
   testOutputSetData(obj, ["object", "array"]);
   testOutputSetData(arr, ["object", "array"]);
+});
+
+// DflowPin
+// ////////////////////////////////////////////////////////////////////////////
+
+Deno.test("DflowPin.canConnect()", () => {
+  const testCases: {
+    sourceTypes: DflowDataType[];
+    targetTypes: DflowDataType[];
+    expected: boolean;
+  }[] = [
+    // Every source can connect to a target with same type.
+    ...DflowData.types.map((dataType) => ({
+      sourceTypes: [dataType],
+      targetTypes: [dataType],
+      expected: true,
+    })),
+    // Every source can connect to a target with type "any".
+    ...DflowData.types.map((dataType) => ({
+      sourceTypes: [dataType],
+      targetTypes: [],
+      expected: true,
+    })),
+    // Every source with type "any" can connect to a target with type "any".
+    { sourceTypes: [], targetTypes: [], expected: true },
+    // A source with defined type cannot connect to a target with different type.
+    { sourceTypes: ["array"], targetTypes: ["boolean"], expected: false },
+    { sourceTypes: ["array"], targetTypes: ["number"], expected: false },
+    { sourceTypes: ["array"], targetTypes: ["object"], expected: false },
+    { sourceTypes: ["array"], targetTypes: ["string"], expected: false },
+    { sourceTypes: ["array"], targetTypes: ["DflowId"], expected: false },
+    { sourceTypes: ["boolean"], targetTypes: ["array"], expected: false },
+    { sourceTypes: ["boolean"], targetTypes: ["number"], expected: false },
+    { sourceTypes: ["boolean"], targetTypes: ["object"], expected: false },
+    { sourceTypes: ["boolean"], targetTypes: ["string"], expected: false },
+    { sourceTypes: ["boolean"], targetTypes: ["DflowId"], expected: false },
+    { sourceTypes: ["number"], targetTypes: ["array"], expected: false },
+    { sourceTypes: ["number"], targetTypes: ["boolean"], expected: false },
+    { sourceTypes: ["number"], targetTypes: ["object"], expected: false },
+    { sourceTypes: ["number"], targetTypes: ["string"], expected: false },
+    { sourceTypes: ["number"], targetTypes: ["DflowId"], expected: false },
+    { sourceTypes: ["object"], targetTypes: ["array"], expected: false },
+    { sourceTypes: ["object"], targetTypes: ["boolean"], expected: false },
+    { sourceTypes: ["object"], targetTypes: ["number"], expected: false },
+    { sourceTypes: ["object"], targetTypes: ["string"], expected: false },
+    { sourceTypes: ["object"], targetTypes: ["DflowId"], expected: false },
+    { sourceTypes: ["string"], targetTypes: ["array"], expected: false },
+    { sourceTypes: ["string"], targetTypes: ["boolean"], expected: false },
+    { sourceTypes: ["string"], targetTypes: ["number"], expected: false },
+    { sourceTypes: ["string"], targetTypes: ["object"], expected: false },
+    { sourceTypes: ["string"], targetTypes: ["DflowId"], expected: false },
+    { sourceTypes: ["DflowId"], targetTypes: ["array"], expected: false },
+    { sourceTypes: ["DflowId"], targetTypes: ["boolean"], expected: false },
+    { sourceTypes: ["DflowId"], targetTypes: ["number"], expected: false },
+    { sourceTypes: ["DflowId"], targetTypes: ["object"], expected: false },
+    { sourceTypes: ["DflowId"], targetTypes: ["string"], expected: false },
+  ];
+
+  testCases.forEach(({ sourceTypes, targetTypes, expected }) => {
+    assertEquals(DflowPin.canConnect(sourceTypes, targetTypes), expected);
+  });
 });

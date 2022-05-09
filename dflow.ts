@@ -5,14 +5,15 @@ export type DflowNodeMetadata = {
   isConstant: boolean;
 };
 
-export type DflowPinKind = "input" | "output";
-export type DflowPinType =
-  | "string"
-  | "number"
-  | "boolean"
-  | "object"
+export type DflowDataType =
   | "array"
+  | "boolean"
+  | "number"
+  | "object"
+  | "string"
   | "DflowId";
+
+export type DflowPinKind = "input" | "output";
 
 export type DflowRunStatus = "waiting" | "success" | "failure";
 
@@ -184,6 +185,15 @@ const _executionNodeInfo = (
 };
 
 export class DflowData {
+  static types: DflowDataType[] = [
+    "string",
+    "number",
+    "boolean",
+    "object",
+    "array",
+    "DflowId",
+  ];
+
   static isArray(data: unknown): data is DflowArray {
     if (!Array.isArray(data)) return false;
     return true;
@@ -222,7 +232,7 @@ export class DflowData {
     );
   }
 
-  static isValidDataType(types: DflowPinType[], data: unknown) {
+  static isValidDataType(types: DflowDataType[], data: unknown) {
     if (types.length === 0) {
       return true;
     }
@@ -262,20 +272,11 @@ export class DflowItem {
 
 export class DflowPin extends DflowItem {
   readonly name?: string;
-  readonly types: DflowPinType[];
-
-  static types = [
-    "string",
-    "number",
-    "boolean",
-    "object",
-    "array",
-    "DflowId",
-  ];
+  readonly types: DflowDataType[];
 
   static canConnect(
-    sourceTypes: DflowPinType[],
-    targetTypes: DflowPinType[],
+    sourceTypes: DflowDataType[],
+    targetTypes: DflowDataType[],
   ) {
     // Source can have any type,
     // DflowHost.run() will validate data.
@@ -306,7 +307,7 @@ export class DflowPin extends DflowItem {
     return this.types.length === 0;
   }
 
-  hasType(type: DflowPinType) {
+  hasType(type: DflowDataType) {
     return this.hasTypeAny || this.types.includes(type);
   }
 }
@@ -486,14 +487,14 @@ export class DflowNode extends DflowItem {
   }
 
   static input(
-    typing: DflowPinType | DflowPinType[] = [],
+    typing: DflowDataType | DflowDataType[] = [],
     rest?: Omit<DflowInputDefinition, "types">,
   ): DflowInputDefinition {
     return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
 
   static output(
-    typing: DflowPinType | DflowPinType[] = [],
+    typing: DflowDataType | DflowDataType[] = [],
     rest?: Omit<DflowOutputDefinition, "types">,
   ): DflowOutputDefinition {
     return { types: typeof typing === "string" ? [typing] : typing, ...rest };
@@ -1160,7 +1161,7 @@ class DflowNodeData extends DflowNode {
         outputs: outputs?.map((output) => ({
           ...output,
           types:
-            (function inferDflowPinTypes(data: DflowValue): DflowPinType[] {
+            (function inferDflowDataType(data: DflowValue): DflowDataType[] {
               switch (true) {
                 case DflowData.isBoolean(data):
                   return ["boolean"];
