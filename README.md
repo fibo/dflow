@@ -70,19 +70,19 @@ version `0.36` or whatever, then change your import map accordingly
 This is a trivial sample graph that will run `sin(π / 2) = 1` computation.
 
 ```
-  --------------
-  number = π / 2
-  --------------
-  |
-  |
-  -------
-  mathSin
-  -------
-  |
-  |
- ------------
-| consoleLog |
- ------------
+   ----------------
+  | number = π / 2 |
+   ----------------
+   |
+   |
+   ---------
+  | mathSin |
+   ---------
+    \
+     \
+     ------------
+    | consoleLog |
+     ------------
 ```
 
 You can run the following code with any of the following:
@@ -128,6 +128,6 @@ rungraph();
 
 ## License
 
-[MIT](http://g14n.info/mit-license)
+[MIT](https://fibo.github.io/mit-license)
 
 [dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"

@@ -1,0 +1,7 @@
+{
+  "tasks": {
+    "fmt": "deno fmt --ignore=./dflow.js,./dflow.cjs,./nodes.js,./dflow.d.ts",
+    "lint": "deno lint --ignore=./dflow.js,./dflow.cjs,./nodes.js,./view.js",
+    "test": "deno test --unstable --importmap=import_map.json"
+  }
+}
