@@ -3,9 +3,7 @@
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "deno.import_intellisense_origins": {
-    "https://deno.land": true
-  },
+  "deno.importMap": "./import_map.json",
   "deno.lint": true,
   "deno.unstable": true
 }
