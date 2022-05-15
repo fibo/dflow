@@ -1,8 +1,16 @@
 # dflow development
 
-## Requirements
+This project has a *GitHub Codespace* avaialable.
 
-Install [Deno](https://deno.land/).
+Otherwise to develop locally, install [Deno](https://deno.land/).
+
+## Deno tasks
+
+- Run tests: `deno task test`
+- Format code: `deno task fmt`
+- Lint code: `deno task lint`
+
+## Build
 
 With [npm](https://www.npmjs.com/) install the following packages globally
 
@@ -10,11 +18,4 @@ With [npm](https://www.npmjs.com/) install the following packages globally
 npm install esbuild typescript -g
 ```
 
-## scripts
-
-- Run tests: `npm run test` ...ehm or, you know, just `npm t`
-- Format code: `npm run fmt`
-- Lint code: `npm run lint`
-- Build package: `npm run build`. It will
-  1. Create bundle: `npm run bundle`
-  2. Generate types: `npm run generate_types`
+Build package with: `npm run build`.
