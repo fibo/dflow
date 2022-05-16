@@ -1,7 +1,22 @@
 {
+  "fmt": {
+    "files": {
+      "exclude": [
+        "README.md",
+        "DEVELOP.md",
+        "dflow.cjs",
+        "dflow.js",
+        "nodes.js",
+        "view.js"
+      ]
+    }
+  },
+  "lint": {
+    "files": {
+      "exclude": ["dflow.cjs", "dflow.js", "nodes.js", "view.js"]
+    }
+  },
   "tasks": {
-    "fmt": "deno fmt --ignore=./dflow.js,./dflow.cjs,./nodes.js,./dflow.d.ts",
-    "lint": "deno lint --ignore=./dflow.js,./dflow.cjs,./nodes.js,./view.js",
     "test": "deno test --unstable --importmap=import_map.json"
   }
 }

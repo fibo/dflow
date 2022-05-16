@@ -6,9 +6,9 @@ Otherwise to develop locally, install [Deno](https://deno.land/).
 
 ## Deno tasks
 
-- Run tests: `deno task test`
-- Format code: `deno task fmt`
-- Lint code: `deno task lint`
+Format files as usual: `deno fmt`.
+Lint files as usual: `deno lint`.
+Run tests with: `deno task test`.
 
 ## Build
 
