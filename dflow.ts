@@ -18,16 +18,9 @@ type DflowSerializableItem = {
 
 type DflowItemConstructorArg = DflowSerializableItem;
 
-class DflowItem {
+interface DflowItem<Serializable> {
   readonly id: DflowId;
-
-  constructor({ id }: DflowItemConstructorArg) {
-    this.id = id;
-  }
-
-  toObject(): DflowSerializableItem {
-    return { id: this.id };
-  }
+  toObject(): Serializable;
 }
 
 // DflowData
@@ -133,18 +126,14 @@ type DflowSerializablePin =
 
 type DflowPinDefinition =
   & Pick<DflowPin, "types">
-  & Partial<Pick<DflowPin, "id" | "name">>;
+  & Partial<Pick<DflowPin, "name">>;
 
-type DflowPinConstructorArg =
-  & DflowItemConstructorArg
-  & Partial<Pick<DflowPin, "name" | "types">>;
+type DflowPinConstructorArg = Partial<Pick<DflowPin, "name" | "types">>;
 
-export class DflowPin extends DflowItem {
+export class DflowPin {
   constructor(
-    { id, name, types = [] }: DflowPinConstructorArg,
+    { name, types = [] }: DflowPinConstructorArg,
   ) {
-    super({ id });
-
     if (name) {
       this.name = name;
     }
@@ -190,22 +179,15 @@ type DflowInputDefinition =
   & Partial<Pick<DflowInput, "optional" | "multi">>;
 
 type DflowInputConstructorArg =
+  & DflowItemConstructorArg
   & DflowPinConstructorArg
   & Pick<DflowInputDefinition, "optional" | "multi">;
 
 export type DflowSerializableInput = DflowSerializablePin;
 
-export class DflowInput extends DflowPin {
-  constructor({ multi, optional, ...pin }: DflowInputConstructorArg) {
-    super(pin);
-
-    if (multi) {
-      this.multi = multi;
-    }
-    if (optional) {
-      this.optional = optional;
-    }
-  }
+export class DflowInput extends DflowPin
+  implements DflowItem<DflowSerializableInput> {
+  readonly id: DflowId;
 
   #source?: DflowOutput;
 
@@ -214,6 +196,19 @@ export class DflowInput extends DflowPin {
   multi?: boolean;
 
   optional?: boolean;
+
+  constructor({ id, multi, optional, ...pin }: DflowInputConstructorArg) {
+    super(pin);
+
+    this.id = id;
+
+    if (multi) {
+      this.multi = multi;
+    }
+    if (optional) {
+      this.optional = optional;
+    }
+  }
 
   get data(): DflowValue {
     if (this.multi) {
@@ -258,7 +253,7 @@ export class DflowInput extends DflowPin {
   }
 
   toObject(): DflowSerializableInput {
-    return super.toObject() as DflowSerializableInput;
+    return { id: this.id };
   }
 }
 
@@ -273,18 +268,24 @@ export type DflowSerializableOutput =
   & DflowSerializablePin
   & Partial<Pick<DflowOutput, "data">>;
 
-type DflowOutputConstructorArg = DflowPinConstructorArg & {
-  data?: DflowValue;
-};
+type DflowOutputConstructorArg =
+  & DflowItemConstructorArg
+  & DflowPinConstructorArg
+  & {
+    data?: DflowValue;
+  };
 
-export class DflowOutput extends DflowPin {
-  constructor({ data, ...pin }: DflowOutputConstructorArg) {
-    super(pin);
-
-    this.#data = data;
-  }
+export class DflowOutput extends DflowPin
+  implements DflowItem<DflowSerializableOutput> {
+  readonly id: DflowId;
 
   #data: DflowValue;
+
+  constructor({ id, data, ...pin }: DflowOutputConstructorArg) {
+    super(pin);
+    this.id = id;
+    this.#data = data;
+  }
 
   get data(): DflowValue {
     return this.#data;
@@ -317,7 +318,7 @@ export class DflowOutput extends DflowPin {
   }
 
   toObject(): DflowSerializableOutput {
-    const obj = super.toObject() as DflowSerializableOutput;
+    const obj = { id: this.id } as DflowSerializableOutput;
 
     if (typeof this.#data !== "undefined") {
       obj.data = this.#data;
@@ -347,18 +348,30 @@ export type DflowNodeConstructorArg = {
   host: DflowHost;
 };
 
-export class DflowNode extends DflowItem {
+export class DflowNode implements DflowItem<DflowSerializableNode> {
+  readonly id: DflowId;
+
+  readonly #inputs: Map<DflowId, DflowInput> = new Map();
+
+  readonly #outputs: Map<DflowId, DflowOutput> = new Map();
+
+  readonly #inputPosition: DflowId[] = [];
+
+  readonly #outputPosition: DflowId[] = [];
+
+  readonly kind: string;
+
+  readonly host: DflowHost;
+
   constructor(
     {
-      node: { kind, inputs = [], outputs = [], ...item },
+      node: { id, kind, inputs = [], outputs = [] },
       host,
     }: DflowNodeConstructorArg,
   ) {
-    super(item);
-
-    this.kind = kind;
-
+    this.id = id;
     this.host = host;
+    this.kind = kind;
 
     // Inputs.
 
@@ -414,18 +427,6 @@ export class DflowNode extends DflowItem {
   ): DflowOutputDefinition {
     return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
-
-  readonly #inputs: Map<DflowId, DflowInput> = new Map();
-
-  readonly #outputs: Map<DflowId, DflowOutput> = new Map();
-
-  readonly #inputPosition: DflowId[] = [];
-
-  readonly #outputPosition: DflowId[] = [];
-
-  readonly kind: string;
-
-  readonly host: DflowHost;
 
   get inputs() {
     return this.#inputs.values();
@@ -501,7 +502,7 @@ export class DflowNode extends DflowItem {
 
   toObject(): DflowSerializableNode {
     const obj = {
-      ...super.toObject(),
+      id: this.id,
       kind: this.kind,
     } as DflowSerializableNode;
 
@@ -536,20 +537,24 @@ export type DflowSerializableEdge = DflowSerializableItem & {
   target: DflowSerializablePinPath;
 };
 
-export class DflowEdge extends DflowItem {
+type DflowEdgeConstructorArg = DflowSerializableEdge;
+
+export class DflowEdge implements DflowItem<DflowSerializableEdge> {
+  readonly id: DflowId;
+
   readonly source: DflowSerializablePinPath;
+
   readonly target: DflowSerializablePinPath;
 
-  constructor({ source, target, ...item }: DflowSerializableEdge) {
-    super(item);
-
+  constructor({ source, target, id }: DflowEdgeConstructorArg) {
+    this.id = id;
     this.source = source;
     this.target = target;
   }
 
   toObject(): DflowSerializableEdge {
     return {
-      ...super.toObject(),
+      id: this.id,
       source: this.source,
       target: this.target,
     };
@@ -571,8 +576,6 @@ class DflowNodeImplementation extends DflowNode {
   static inputs?: DflowInputDefinition[];
 
   static outputs?: DflowOutputDefinition[];
-
-  run(): void | Promise<void> {}
 }
 
 export type DflowNodesCatalog = Record<
@@ -613,10 +616,6 @@ type DflowGraphConstructorArg = {
 };
 
 export class DflowGraph {
-  constructor({ nodesCatalog = {} }: DflowGraphConstructorArg = {}) {
-    this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
-  }
-
   readonly nodesCatalog: DflowNodesCatalog;
 
   readonly nodes: Map<DflowId, DflowNode> = new Map();
@@ -628,6 +627,10 @@ export class DflowGraph {
   runStatus: DflowGraphRunStatus | null = null;
 
   executionReport: DflowGraphExecutionReport | null = null;
+
+  constructor({ nodesCatalog = {} }: DflowGraphConstructorArg = {}) {
+    this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
+  }
 
   static executionNodeInfo = (
     { id, kind, outputs }: DflowSerializableNode,
@@ -885,14 +888,14 @@ type DflowNewEdge =
 export type DflowHostConstructorArg = DflowGraphConstructorArg;
 
 export class DflowHost {
+  readonly #graph: DflowGraph;
+
+  readonly context: Record<string, unknown>;
+
   constructor(arg?: DflowHostConstructorArg) {
     this.#graph = new DflowGraph(arg);
     this.context = {};
   }
-
-  readonly #graph: DflowGraph;
-
-  readonly context: Record<string, unknown>;
 
   get executionReport() {
     return this.#graph.executionReport;
@@ -914,16 +917,8 @@ export class DflowHost {
     return this.#graph.nodesCatalog;
   }
 
-  get runStatusIsSuccess() {
-    return this.#graph.runStatus === "success";
-  }
-
-  get runStatusIsWaiting() {
-    return this.#graph.runStatus === "waiting";
-  }
-
-  get runStatusIsFailure() {
-    return this.#graph.runStatus === "failure";
+  get runStatus() {
+    return this.#graph.runStatus;
   }
 
   set verbose(option: DflowGraphRunOptions["verbose"]) {
@@ -1073,7 +1068,7 @@ export class DflowHost {
   /**
    * @throws DflowErrorItemNotFound
    */
-  getEdgeById(id: DflowId): DflowEdge | undefined {
+  getEdgeById(id: DflowId): DflowEdge {
     const item = this.#graph.edges.get(id);
     if (!item) {
       throw new DflowErrorItemNotFound({ kind: "edge", id });
