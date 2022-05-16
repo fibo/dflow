@@ -185,8 +185,7 @@ type DflowInputConstructorArg =
 
 export type DflowSerializableInput = DflowSerializablePin;
 
-export class DflowInput extends DflowPin
-  implements DflowItem<DflowSerializableInput> {
+class DflowInput extends DflowPin implements DflowItem<DflowSerializableInput> {
   readonly id: DflowId;
 
   #source?: DflowOutput;
@@ -275,7 +274,7 @@ type DflowOutputConstructorArg =
     data?: DflowValue;
   };
 
-export class DflowOutput extends DflowPin
+class DflowOutput extends DflowPin
   implements DflowItem<DflowSerializableOutput> {
   readonly id: DflowId;
 
@@ -539,7 +538,7 @@ export type DflowSerializableEdge = DflowSerializableItem & {
 
 type DflowEdgeConstructorArg = DflowSerializableEdge;
 
-export class DflowEdge implements DflowItem<DflowSerializableEdge> {
+class DflowEdge implements DflowItem<DflowSerializableEdge> {
   readonly id: DflowId;
 
   readonly source: DflowSerializablePinPath;
@@ -615,7 +614,7 @@ type DflowGraphConstructorArg = {
   nodesCatalog?: DflowNodesCatalog;
 };
 
-export class DflowGraph {
+class DflowGraph {
   readonly nodesCatalog: DflowNodesCatalog;
 
   readonly nodes: Map<DflowId, DflowNode> = new Map();
