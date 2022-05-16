@@ -1,6 +1,11 @@
 // DflowItem
 // ////////////////////////////////////////////////////////////////////
 
+/**
+ * Every DflowItem has an identifier unique in its scope.
+ * A node or edge id is unique in its graph.
+ * An input or output id is unique in its node.
+ */
 export type DflowId = string;
 
 type DflowPinKind = "input" | "output";
@@ -13,7 +18,7 @@ type DflowSerializableItem = {
 
 type DflowItemConstructorArg = DflowSerializableItem;
 
-export class DflowItem {
+class DflowItem {
   readonly id: DflowId;
 
   constructor({ id }: DflowItemConstructorArg) {
@@ -28,10 +33,6 @@ export class DflowItem {
 // DflowData
 // ////////////////////////////////////////////////////////////////////
 
-export type DflowObject = { [Key in string]?: DflowValue };
-
-export type DflowArray = Array<DflowValue>;
-
 export type DflowValue =
   | string
   | number
@@ -39,6 +40,10 @@ export type DflowValue =
   | undefined
   | DflowArray
   | DflowObject;
+
+export type DflowObject = { [Key in string]?: DflowValue };
+
+export type DflowArray = Array<DflowValue>;
 
 const dflowDataTypes = [
   "string",
@@ -352,6 +357,7 @@ export class DflowNode extends DflowItem {
     super(item);
 
     this.kind = kind;
+
     this.host = host;
 
     // Inputs.
@@ -389,14 +395,9 @@ export class DflowNode extends DflowItem {
     }
   }
 
-  static kind: string;
-
-  static isAsync?: DflowNodeMetadata["isAsync"];
-
-  static inputs?: DflowInputDefinition[];
-
-  static outputs?: DflowOutputDefinition[];
-
+  /**
+   * DflowInputDefinition helper.
+   */
   static input(
     typing: DflowDataType | DflowDataType[] = [],
     rest?: Omit<DflowInputDefinition, "types">,
@@ -404,6 +405,9 @@ export class DflowNode extends DflowItem {
     return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
 
+  /**
+   * DflowOutputDefinition helper.
+   */
   static output(
     typing: DflowDataType | DflowDataType[] = [],
     rest?: Omit<DflowOutputDefinition, "types">,
@@ -552,6 +556,30 @@ export class DflowEdge extends DflowItem {
   }
 }
 
+// DflowNodesCatalog
+// ////////////////////////////////////////////////////////////////////
+
+class DflowNodeImplementation extends DflowNode {
+  constructor(arg: DflowNodeConstructorArg) {
+    super(arg);
+  }
+
+  static kind: DflowNode["kind"];
+
+  static isAsync?: DflowNodeMetadata["isAsync"];
+
+  static inputs?: DflowInputDefinition[];
+
+  static outputs?: DflowOutputDefinition[];
+
+  run(): void | Promise<void> {}
+}
+
+export type DflowNodesCatalog = Record<
+  DflowNode["kind"],
+  typeof DflowNodeImplementation
+>;
+
 // DflowGraph
 // ////////////////////////////////////////////////////////////////////
 
@@ -579,8 +607,6 @@ export type DflowSerializableGraph = {
 type DflowNodeConnection = { sourceId: DflowId; targetId: DflowId };
 
 type DflowGraphRunOptions = { verbose: boolean };
-
-export type DflowNodesCatalog = Record<DflowNode["kind"], typeof DflowNode>;
 
 type DflowGraphConstructorArg = {
   nodesCatalog?: DflowNodesCatalog;
