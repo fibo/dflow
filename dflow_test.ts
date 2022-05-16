@@ -278,12 +278,12 @@ Deno.test("DflowHost clearGraph()", () => {
   assertEquals(graph.edges.length, 0);
 });
 
-Deno.test("DflowHost runStatusIsSuccess", () => {
+Deno.test("DflowHost with empty graph executes with runStatus success", () => {
   const dflow = new DflowHost();
 
   dflow.run();
 
-  assertEquals(dflow.runStatusIsSuccess, true);
+  assertEquals(dflow.runStatus, "success");
 });
 
 Deno.test("DflowHost run()", async () => {
