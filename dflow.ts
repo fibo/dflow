@@ -2,7 +2,6 @@ export type DflowId = string;
 
 export type DflowNodeMetadata = {
   isAsync: boolean;
-  isConstant: boolean;
 };
 
 export type DflowDataType =
@@ -436,7 +435,6 @@ export class DflowNode extends DflowItem {
 
   static kind: string;
   static isAsync?: DflowNodeMetadata["isAsync"];
-  static isConstant?: DflowNodeMetadata["isConstant"];
   static inputs?: DflowInputDefinition[];
   static outputs?: DflowOutputDefinition[];
 
@@ -770,46 +768,44 @@ export class DflowGraph {
       const node = this.nodes.get(nodeId) as DflowNode;
 
       const NodeClass = this.nodesCatalog[node.kind] ?? DflowNodeUnknown;
-      const { isAsync, isConstant } = NodeClass;
+      const { isAsync } = NodeClass;
 
       try {
-        if (!isConstant) {
-          // 2. INPUTS_LOOP
-          // //////////////
-          INPUTS_LOOP:
-          for (const { id, data, types, optional } of node.inputs) {
-            // Ignore optional inputs with no data.
-            if (optional && typeof data === "undefined") {
-              continue INPUTS_LOOP;
-            }
-
-            // Validate input data.
-            if (DflowData.isValidDataType(types, data)) {
-              continue INPUTS_LOOP;
-            }
-
-            // Some input is not valid.
-
-            // Notify into execution report.
-            if (verbose) {
-              this.executionReport.steps?.push(
-                _executionNodeInfo(
-                  node.toObject(),
-                  `invalid input data nodeId=${nodeId} inputId=${id} data=${data}`,
-                ),
-              );
-            }
-
-            // Cleanup outputs and go to next node.
-            node.clearOutputs();
-            continue NODES_LOOP;
+        // 2. INPUTS_LOOP
+        // //////////////
+        INPUTS_LOOP:
+        for (const { id, data, types, optional } of node.inputs) {
+          // Ignore optional inputs with no data.
+          if (optional && typeof data === "undefined") {
+            continue INPUTS_LOOP;
           }
 
-          if (isAsync) {
-            await node.run();
-          } else {
-            node.run();
+          // Validate input data.
+          if (DflowData.isValidDataType(types, data)) {
+            continue INPUTS_LOOP;
           }
+
+          // Some input is not valid.
+
+          // Notify into execution report.
+          if (verbose) {
+            this.executionReport.steps?.push(
+              _executionNodeInfo(
+                node.toObject(),
+                `invalid input data nodeId=${nodeId} inputId=${id} data=${data}`,
+              ),
+            );
+          }
+
+          // Cleanup outputs and go to next node.
+          node.clearOutputs();
+          continue NODES_LOOP;
+        }
+
+        if (isAsync) {
+          await node.run();
+        } else {
+          node.run();
         }
 
         if (verbose) {
@@ -994,7 +990,7 @@ export class DflowHost {
       const node = this.getNodeById(nodeId) as DflowNode;
 
       const NodeClass = this.nodesCatalog[node.kind] ?? DflowNodeUnknown;
-      const { isAsync, isConstant } = NodeClass;
+      const { isAsync } = NodeClass;
 
       try {
         switch (node.kind) {
@@ -1015,7 +1011,7 @@ export class DflowHost {
           }
           default: {
             // Notice that executeFunction cannot execute async functions.
-            if (!isConstant && !isAsync) {
+            if (!isAsync) {
               node.run();
             }
 
@@ -1145,14 +1141,12 @@ const { input, output } = DflowNode;
 
 class DflowNodeArgument extends DflowNode {
   static kind = "argument";
-  static isConstant = true;
   static inputs = [input("number", { name: "position", optional: true })];
   static outputs = [output()];
 }
 
 class DflowNodeData extends DflowNode {
   static kind = "data";
-  static isConstant = true;
   static outputs = [output()];
   constructor({ node: { outputs, ...node }, host }: DflowNodeConstructorArg) {
     super({
@@ -1186,7 +1180,6 @@ class DflowNodeData extends DflowNode {
 
 class DflowNodeFunction extends DflowNode {
   static kind = "function";
-  static isConstant = true;
   static outputs = [output("DflowId", { name: "id" })];
   constructor(arg: DflowNodeConstructorArg) {
     super(arg);
@@ -1205,7 +1198,6 @@ class DflowNodeIsUndefined extends DflowNode {
 
 class DflowNodeReturn extends DflowNode {
   static kind = "return";
-  static isConstant = true;
   static inputs = [
     input("DflowId", { name: "functionId" }),
     input([], { name: "value" }),

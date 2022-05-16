@@ -74,7 +74,6 @@ class DflowMathMin extends DflowNode {
 
 class DflowMathPI extends DflowNode {
   static kind = "mathPI";
-  static isConstant = true;
   static outputs = [output("number", { name: "π", data: Math.PI })];
 }
 

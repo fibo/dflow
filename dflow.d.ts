@@ -1,7 +1,6 @@
 export declare type DflowId = string;
 export declare type DflowNodeMetadata = {
   isAsync: boolean;
-  isConstant: boolean;
 };
 export declare type DflowDataType =
   | "array"
@@ -192,7 +191,6 @@ export declare class DflowNode extends DflowItem {
   readonly host: DflowHost;
   static kind: string;
   static isAsync?: DflowNodeMetadata["isAsync"];
-  static isConstant?: DflowNodeMetadata["isConstant"];
   static inputs?: DflowInputDefinition[];
   static outputs?: DflowOutputDefinition[];
   constructor(
