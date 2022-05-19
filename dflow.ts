@@ -185,7 +185,8 @@ type DflowInputConstructorArg =
 
 export type DflowSerializableInput = DflowSerializablePin;
 
-class DflowInput extends DflowPin implements DflowItem<DflowSerializableInput> {
+export class DflowInput extends DflowPin
+  implements DflowItem<DflowSerializableInput> {
   readonly id: DflowId;
 
   #source?: DflowOutput;
@@ -274,7 +275,7 @@ type DflowOutputConstructorArg =
     data?: DflowValue;
   };
 
-class DflowOutput extends DflowPin
+export class DflowOutput extends DflowPin
   implements DflowItem<DflowSerializableOutput> {
   readonly id: DflowId;
 
@@ -538,7 +539,7 @@ export type DflowSerializableEdge = DflowSerializableItem & {
 
 type DflowEdgeConstructorArg = DflowSerializableEdge;
 
-class DflowEdge implements DflowItem<DflowSerializableEdge> {
+export class DflowEdge implements DflowItem<DflowSerializableEdge> {
   readonly id: DflowId;
 
   readonly source: DflowSerializablePinPath;
@@ -563,23 +564,17 @@ class DflowEdge implements DflowItem<DflowSerializableEdge> {
 // DflowNodesCatalog
 // ////////////////////////////////////////////////////////////////////
 
-class DflowNodeImplementation extends DflowNode {
-  constructor(arg: DflowNodeConstructorArg) {
-    super(arg);
-  }
-
-  static kind: DflowNode["kind"];
-
-  static isAsync?: DflowNodeMetadata["isAsync"];
-
-  static inputs?: DflowInputDefinition[];
-
-  static outputs?: DflowOutputDefinition[];
+interface DflowNodeImplementation {
+  new (arg: DflowNodeConstructorArg): DflowNode;
+  kind: DflowNode["kind"];
+  isAsync?: DflowNodeMetadata["isAsync"];
+  inputs?: DflowInputDefinition[];
+  outputs?: DflowOutputDefinition[];
 }
 
 export type DflowNodesCatalog = Record<
   DflowNode["kind"],
-  typeof DflowNodeImplementation
+  DflowNodeImplementation
 >;
 
 // DflowGraph
@@ -614,7 +609,7 @@ type DflowGraphConstructorArg = {
   nodesCatalog?: DflowNodesCatalog;
 };
 
-class DflowGraph {
+export class DflowGraph {
   readonly nodesCatalog: DflowNodesCatalog;
 
   readonly nodes: Map<DflowId, DflowNode> = new Map();
