@@ -53,8 +53,7 @@ export class DflowData {
   static types = dflowDataTypes;
 
   static isArray(data: unknown): data is DflowArray {
-    if (!Array.isArray(data)) return false;
-    return true;
+    return Array.isArray(data);
   }
 
   static isBoolean(data: unknown): data is boolean {
@@ -66,8 +65,7 @@ export class DflowData {
   }
 
   static isObject(data: unknown): data is DflowObject {
-    if (typeof data !== "object" || !data || Array.isArray(data)) return false;
-    return true;
+    return typeof data === "object" && data !== null && !Array.isArray(data);
   }
 
   static isNumber(data: unknown): data is number {
@@ -92,9 +90,7 @@ export class DflowData {
 
   static isValidDataType(types: DflowDataType[], data: unknown) {
     const isAnyType = types.length === 0;
-    if (isAnyType) {
-      return true;
-    }
+    if (isAnyType) return true;
 
     return types.some((pinType) => {
       switch (pinType) {
@@ -134,9 +130,7 @@ export class DflowPin {
   constructor(
     { name, types = [] }: DflowPinConstructorArg,
   ) {
-    if (name) {
-      this.name = name;
-    }
+    if (name) this.name = name;
 
     this.types = types;
   }
@@ -202,12 +196,8 @@ export class DflowInput extends DflowPin
 
     this.id = id;
 
-    if (multi) {
-      this.multi = multi;
-    }
-    if (optional) {
-      this.optional = optional;
-    }
+    if (multi) this.multi = multi;
+    if (optional) this.optional = optional;
   }
 
   get data(): DflowValue {
@@ -319,11 +309,7 @@ export class DflowOutput extends DflowPin
 
   toObject(): DflowSerializableOutput {
     const obj = { id: this.id } as DflowSerializableOutput;
-
-    if (typeof this.#data !== "undefined") {
-      obj.data = this.#data;
-    }
-
+    if (typeof this.#data !== "undefined") obj.data = this.#data;
     return obj;
   }
 }
@@ -447,9 +433,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
    */
   getInputById(id: DflowId): DflowInput {
     const item = this.#inputs.get(id);
-    if (!item) {
-      throw new DflowErrorItemNotFound({ kind: "input", id });
-    }
+    if (!item) throw new DflowErrorItemNotFound({ kind: "input", id });
     return item;
   }
 
@@ -475,9 +459,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
    */
   getOutputById(id: DflowId): DflowOutput {
     const item = this.#outputs.get(id);
-    if (!item) {
-      throw new DflowErrorItemNotFound({ kind: "output", id });
-    }
+    if (!item) throw new DflowErrorItemNotFound({ kind: "output", id });
     return item;
   }
 
@@ -512,16 +494,12 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
     for (const input of this.inputs) {
       inputs.push(input.toObject());
     }
-    if (inputs.length > 0) {
-      obj.inputs = inputs;
-    }
+    if (inputs.length > 0) obj.inputs = inputs;
 
     for (const output of this.outputs) {
       outputs.push(output.toObject());
     }
-    if (outputs.length > 0) {
-      obj.outputs = outputs;
-    }
+    if (outputs.length > 0) obj.outputs = outputs;
 
     return obj;
   }
@@ -636,9 +614,7 @@ export class DflowGraph {
       outputs: outputs?.map(({ id, data, name }) => ({ id, data, name })),
     } as DflowExecutionNodeInfo;
 
-    if (error) {
-      obj.error = error;
-    }
+    if (error) obj.error = error;
 
     return obj;
   };
@@ -667,9 +643,7 @@ export class DflowGraph {
   ) {
     const parentsNodeIds = DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
     // 1. A node with no parent as level zero.
-    if (parentsNodeIds.length === 0) {
-      return 0;
-    }
+    if (parentsNodeIds.length === 0) return 0;
 
     // 2. Otherwise its level is the max level of its parents plus one.
     let maxLevel = 0;
@@ -685,26 +659,23 @@ export class DflowGraph {
     nodeConnections: DflowNodeConnection[],
   ): DflowId[] {
     const parentsNodeIds = DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
-    if (parentsNodeIds.length === 0) {
-      return [];
-    } else {
-      return parentsNodeIds.reduce<DflowId[]>(
-        (accumulator, parentNodeId, index, array) => {
-          const ancestors = DflowGraph.ancestorsOfNodeId(
-            parentNodeId,
-            nodeConnections,
-          );
+    if (parentsNodeIds.length === 0) return [];
+    return parentsNodeIds.reduce<DflowId[]>(
+      (accumulator, parentNodeId, index, array) => {
+        const ancestors = DflowGraph.ancestorsOfNodeId(
+          parentNodeId,
+          nodeConnections,
+        );
 
-          const result = accumulator.concat(ancestors);
+        const result = accumulator.concat(ancestors);
 
-          // On last iteration, remove duplicates
-          return index === array.length - 1
-            ? Array.from(new Set(array.concat(result)))
-            : result;
-        },
-        [],
-      );
-    }
+        // On last iteration, remove duplicates
+        return index === array.length - 1
+          ? Array.from(new Set(array.concat(result)))
+          : result;
+      },
+      [],
+    );
   }
 
   static sortNodesByLevel(
@@ -754,9 +725,7 @@ export class DflowGraph {
       start: new Date(),
     };
 
-    if (verbose) {
-      this.executionReport.steps = [];
-    }
+    if (verbose) this.executionReport.steps = [];
 
     // Get nodeIds
     // 1. filtered by nodes inside functions
@@ -790,14 +759,10 @@ export class DflowGraph {
         INPUTS_LOOP:
         for (const { id, data, types, optional } of node.inputs) {
           // Ignore optional inputs with no data.
-          if (optional && typeof data === "undefined") {
-            continue INPUTS_LOOP;
-          }
+          if (optional && typeof data === "undefined") continue INPUTS_LOOP;
 
           // Validate input data.
-          if (DflowData.isValidDataType(types, data)) {
-            continue INPUTS_LOOP;
-          }
+          if (DflowData.isValidDataType(types, data)) continue INPUTS_LOOP;
 
           // Some input is not valid.
 
@@ -834,9 +799,7 @@ export class DflowGraph {
     }
 
     // Set runStatus to success if there was no error.
-    if (this.runStatus === "waiting") {
-      this.runStatus = "success";
-    }
+    if (this.runStatus === "waiting") this.runStatus = "success";
 
     this.executionReport.status = this.runStatus;
     this.executionReport.end = new Date();
@@ -1042,9 +1005,7 @@ export class DflowHost {
           }
           default: {
             // Notice that executeFunction cannot execute async functions.
-            if (!isAsync) {
-              node.run();
-            }
+            if (!isAsync) node.run();
 
             if (verbose) {
               this.executionReport?.steps?.push(
@@ -1064,9 +1025,7 @@ export class DflowHost {
    */
   getEdgeById(id: DflowId): DflowEdge {
     const item = this.#graph.edges.get(id);
-    if (!item) {
-      throw new DflowErrorItemNotFound({ kind: "edge", id });
-    }
+    if (!item) throw new DflowErrorItemNotFound({ kind: "edge", id });
     return item;
   }
 
@@ -1075,9 +1034,7 @@ export class DflowHost {
    */
   getNodeById(id: DflowId): DflowNode {
     const item = this.#graph.nodes.get(id);
-    if (!item) {
-      throw new DflowErrorItemNotFound({ kind: "node", id });
-    }
+    if (!item) throw new DflowErrorItemNotFound({ kind: "node", id });
     return item;
   }
 
