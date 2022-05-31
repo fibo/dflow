@@ -569,8 +569,8 @@ type DflowExecutionNodeInfo =
 
 export type DflowGraphExecutionReport = {
   status: DflowGraphRunStatus;
-  start: Date;
-  end?: Date;
+  start: string;
+  end?: string;
   steps?: DflowExecutionNodeInfo[];
 };
 
@@ -722,7 +722,7 @@ export class DflowGraph {
 
     this.executionReport = {
       status: this.runStatus,
-      start: new Date(),
+      start: new Date().toJSON(),
     };
 
     if (verbose) this.executionReport.steps = [];
@@ -802,7 +802,7 @@ export class DflowGraph {
     if (this.runStatus === "waiting") this.runStatus = "success";
 
     this.executionReport.status = this.runStatus;
-    this.executionReport.end = new Date();
+    this.executionReport.end = new Date().toJSON();
   }
 
   toObject(): DflowSerializableGraph {
