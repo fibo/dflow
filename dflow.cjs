@@ -97,9 +97,7 @@ const dflowDataTypes = [
 ];
 const _DflowData = class {
   static isArray(data) {
-    if (!Array.isArray(data))
-      return false;
-    return true;
+    return Array.isArray(data);
   }
   static isBoolean(data) {
     return typeof data === "boolean";
@@ -108,9 +106,7 @@ const _DflowData = class {
     return typeof data === "string" && data !== "";
   }
   static isObject(data) {
-    if (typeof data !== "object" || !data || Array.isArray(data))
-      return false;
-    return true;
+    return typeof data === "object" && data !== null && !Array.isArray(data);
   }
   static isNumber(data) {
     return typeof data === "number" && !isNaN(data);
@@ -125,9 +121,8 @@ const _DflowData = class {
   }
   static isValidDataType(types, data) {
     const isAnyType = types.length === 0;
-    if (isAnyType) {
+    if (isAnyType)
       return true;
-    }
     return types.some((pinType) => {
       switch (pinType) {
         case "array":
@@ -154,9 +149,8 @@ class DflowPin {
   constructor({ name, types = [] }) {
     __publicField(this, "name");
     __publicField(this, "types");
-    if (name) {
+    if (name)
       this.name = name;
-    }
     this.types = types;
   }
   static canConnect(sourceTypes, targetTypes) {
@@ -185,12 +179,10 @@ class DflowInput extends DflowPin {
     __publicField(this, "multi");
     __publicField(this, "optional");
     this.id = id;
-    if (multi) {
+    if (multi)
       this.multi = multi;
-    }
-    if (optional) {
+    if (optional)
       this.optional = optional;
-    }
   }
   get data() {
     var _a, _b;
@@ -276,9 +268,8 @@ class DflowOutput extends DflowPin {
     const obj = {
       id: this.id
     };
-    if (typeof __privateGet(this, _data) !== "undefined") {
+    if (typeof __privateGet(this, _data) !== "undefined")
       obj.data = __privateGet(this, _data);
-    }
     return obj;
   }
 }
@@ -349,12 +340,11 @@ class DflowNode {
   }
   getInputById(id) {
     const item = __privateGet(this, _inputs).get(id);
-    if (!item) {
+    if (!item)
       throw new DflowErrorItemNotFound({
         kind: "input",
         id
       });
-    }
     return item;
   }
   input(position) {
@@ -370,12 +360,11 @@ class DflowNode {
   }
   getOutputById(id) {
     const item = __privateGet(this, _outputs).get(id);
-    if (!item) {
+    if (!item)
       throw new DflowErrorItemNotFound({
         kind: "output",
         id
       });
-    }
     return item;
   }
   output(position) {
@@ -401,15 +390,13 @@ class DflowNode {
     for (const input1 of this.inputs) {
       inputs.push(input1.toObject());
     }
-    if (inputs.length > 0) {
+    if (inputs.length > 0)
       obj.inputs = inputs;
-    }
     for (const output3 of this.outputs) {
       outputs.push(output3.toObject());
     }
-    if (outputs.length > 0) {
+    if (outputs.length > 0)
       obj.outputs = outputs;
-    }
     return obj;
   }
 }
@@ -454,9 +441,8 @@ const _DflowGraph = class {
   }
   static levelOfNodeId(nodeId, nodeConnections) {
     const parentsNodeIds = _DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
-    if (parentsNodeIds.length === 0) {
+    if (parentsNodeIds.length === 0)
       return 0;
-    }
     let maxLevel = 0;
     for (const parentNodeId of parentsNodeIds) {
       const level = _DflowGraph.levelOfNodeId(parentNodeId, nodeConnections);
@@ -466,15 +452,13 @@ const _DflowGraph = class {
   }
   static ancestorsOfNodeId(nodeId, nodeConnections) {
     const parentsNodeIds = _DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
-    if (parentsNodeIds.length === 0) {
+    if (parentsNodeIds.length === 0)
       return [];
-    } else {
-      return parentsNodeIds.reduce((accumulator, parentNodeId, index, array) => {
-        const ancestors = _DflowGraph.ancestorsOfNodeId(parentNodeId, nodeConnections);
-        const result = accumulator.concat(ancestors);
-        return index === array.length - 1 ? Array.from(new Set(array.concat(result))) : result;
-      }, []);
-    }
+    return parentsNodeIds.reduce((accumulator, parentNodeId, index, array) => {
+      const ancestors = _DflowGraph.ancestorsOfNodeId(parentNodeId, nodeConnections);
+      const result = accumulator.concat(ancestors);
+      return index === array.length - 1 ? Array.from(new Set(array.concat(result))) : result;
+    }, []);
   }
   static sortNodesByLevel(nodeIds, nodeConnections) {
     const levelOf = {};
@@ -508,11 +492,10 @@ const _DflowGraph = class {
     this.runStatus = "waiting";
     this.executionReport = {
       status: this.runStatus,
-      start: new Date()
+      start: new Date().toJSON()
     };
-    if (verbose) {
+    if (verbose)
       this.executionReport.steps = [];
-    }
     const nodeIdsExcluded = this.nodeIdsInsideFunctions;
     const nodeIds = _DflowGraph.sortNodesByLevel([
       ...this.nodes.keys()
@@ -525,12 +508,10 @@ const _DflowGraph = class {
         try {
           INPUTS_LOOP:
             for (const { id, data, types, optional } of node.inputs) {
-              if (optional && typeof data === "undefined") {
+              if (optional && typeof data === "undefined")
                 continue INPUTS_LOOP;
-              }
-              if (DflowData.isValidDataType(types, data)) {
+              if (DflowData.isValidDataType(types, data))
                 continue INPUTS_LOOP;
-              }
               if (verbose) {
                 (_b = this.executionReport.steps) == null ? void 0 : _b.push(_DflowGraph.executionNodeInfo(node.toObject(), `invalid input data nodeId=${nodeId1} inputId=${id} data=${data}`));
               }
@@ -550,11 +531,10 @@ const _DflowGraph = class {
           this.runStatus = "failure";
         }
       }
-    if (this.runStatus === "waiting") {
+    if (this.runStatus === "waiting")
       this.runStatus = "success";
-    }
     this.executionReport.status = this.runStatus;
-    this.executionReport.end = new Date();
+    this.executionReport.end = new Date().toJSON();
   }
   toObject() {
     const obj = {
@@ -581,9 +561,8 @@ __publicField(DflowGraph, "executionNodeInfo", ({ id: id2, kind, outputs }, erro
       name
     }))
   };
-  if (error) {
+  if (error)
     obj.error = error;
-  }
   return obj;
 });
 class DflowHost {
@@ -690,9 +669,8 @@ class DflowHost {
             return node.input(1).data;
           }
           default: {
-            if (!isAsync) {
+            if (!isAsync)
               node.run();
-            }
             if (verbose) {
               (_c = (_b = this.executionReport) == null ? void 0 : _b.steps) == null ? void 0 : _c.push(DflowGraph.executionNodeInfo(node.toObject()));
             }
@@ -705,22 +683,20 @@ class DflowHost {
   }
   getEdgeById(id) {
     const item = __privateGet(this, _graph).edges.get(id);
-    if (!item) {
+    if (!item)
       throw new DflowErrorItemNotFound({
         kind: "edge",
         id
       });
-    }
     return item;
   }
   getNodeById(id) {
     const item = __privateGet(this, _graph).nodes.get(id);
-    if (!item) {
+    if (!item)
       throw new DflowErrorItemNotFound({
         kind: "node",
         id
       });
-    }
     return item;
   }
   newNode(obj) {

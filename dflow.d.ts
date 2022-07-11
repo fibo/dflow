@@ -203,8 +203,8 @@ declare type DflowExecutionNodeInfo =
   };
 export declare type DflowGraphExecutionReport = {
   status: DflowGraphRunStatus;
-  start: Date;
-  end?: Date;
+  start: string;
+  end?: string;
   steps?: DflowExecutionNodeInfo[];
 };
 export declare type DflowSerializableGraph = {
@@ -231,7 +231,7 @@ export declare class DflowGraph {
   constructor({ nodesCatalog }?: DflowGraphConstructorArg);
   static executionNodeInfo: (
     { id, kind, outputs }: DflowSerializableNode,
-    error?: string | undefined,
+    error?: string,
   ) => DflowExecutionNodeInfo;
   static childrenOfNodeId(nodeId: DflowId, nodeConnections: {
     sourceId: DflowId;
