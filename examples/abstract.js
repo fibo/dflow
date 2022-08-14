@@ -36,8 +36,6 @@ function sleep(seconds = 1) {
 
 class SleepNode extends DflowNode {
   kind = "Sleep";
-  static isAsync = true;
-
   async run() {
     console.log("sleep node start");
     await sleep();

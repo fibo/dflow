@@ -23,7 +23,6 @@ class ApiClient {
 
 class CustomNode extends DflowNode {
   static kind = "Custom";
-  static isAsync = true;
   static outputs = [output("string")];
 
   async run() {
