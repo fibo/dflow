@@ -50,38 +50,6 @@ export function testOneInTwoOut<Input1, Output1, Output2>(
   assertEquals(testNode.output(1).data, output2);
 }
 
-// export function testOneNumAndOneMultiNumInOneNumOut(
-//   dflow: DflowHost,
-//   nodeKind: string,
-//   input1?: number,
-//   input2?: number[],
-//   output?: number,
-// ) {
-//   const catalog = dflow.nodesCatalog;
-
-//   const dataNode1 = dflow.newNode({
-//     kind: catalog.data.kind,
-//     outputs: [ data: input1 }],
-//   });
-//   const testNode = dflow.newNode({ kind: nodeKind });
-//   dflow.connect(dataNode1).to(testNode, 0);
-
-//   if (Array.isArray(input2)) {
-//     const dataNodes = input2.map((input) => (
-//       dflow.newNode({
-//         kind: catalog.data.kind,
-//         outputs: [{ types: ["number"], data: input }],
-//       })
-//     ));
-//     dataNodes.forEach((dataNode, i) => (
-//       dflow.connect(dataNode).to(testNode, i + 1)
-//     ));
-//   }
-
-//   dflow.run();
-//   assertEquals(testNode.output(0).data, output);
-// }
-
 export function testTwoInOneOut<Input1, Input2, Output1>(
   dflow: DflowHost,
   nodeKind: string,

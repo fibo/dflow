@@ -1,9 +1,5 @@
 import { DflowValue } from "../dflow.ts";
-import {
-  newDflowHost,
-  // TODO testOneNumAndOneMultiNumInOneNumOut,
-  testTwoInOneOut,
-} from "./_test-utils.ts";
+import { newDflowHost, testTwoInOneOut } from "./_test-utils.ts";
 
 Deno.test("addition", () => {
   const dflow = newDflowHost();
@@ -23,25 +19,6 @@ Deno.test("addition", () => {
       );
     },
   );
-
-  /*
-  [
-    { input1: undefined, input2: undefined, output: undefined },
-    { input1: 2, input2: [1], output: 3 },
-    { input1: 2, input2: [1, 2], output: 5 },
-    { input1: 2, input2: [1, 2, 3], output: 8 },
-  ].forEach(
-    ({ input1, input2, output }) => {
-      testOneNumAndOneMultiNumInOneNumOut(
-        dflow,
-        nodeKind,
-        input1,
-        input2,
-        output,
-      );
-    },
-  );
-  */
 });
 
 Deno.test("division", () => {
