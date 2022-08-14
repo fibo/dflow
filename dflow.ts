@@ -317,10 +317,6 @@ export class DflowOutput extends DflowPin
 // DflowNode
 // ////////////////////////////////////////////////////////////////////
 
-type DflowNodeMetadata = {
-  isAsync: boolean;
-};
-
 export type DflowSerializableNode =
   & DflowSerializableItem
   & Pick<DflowNode, "kind">
@@ -545,7 +541,6 @@ export class DflowEdge implements DflowItem<DflowSerializableEdge> {
 interface DflowNodeImplementation {
   new (arg: DflowNodeConstructorArg): DflowNode;
   kind: DflowNode["kind"];
-  isAsync?: DflowNodeMetadata["isAsync"];
   inputs?: DflowInputDefinition[];
   outputs?: DflowOutputDefinition[];
 }
@@ -750,9 +745,6 @@ export class DflowGraph {
     for (const nodeId of nodeIds) {
       const node = this.nodes.get(nodeId) as DflowNode;
 
-      const NodeClass = this.nodesCatalog[node.kind] ?? DflowNodeUnknown;
-      const { isAsync } = NodeClass;
-
       try {
         // 2. INPUTS_LOOP
         // //////////////
@@ -781,7 +773,9 @@ export class DflowGraph {
           continue NODES_LOOP;
         }
 
-        if (isAsync) {
+        if (
+          node.run.constructor.name === "AsyncFunction"
+        ) {
           await node.run();
         } else {
           node.run();
@@ -983,9 +977,6 @@ export class DflowHost {
     for (const nodeId of nodeIds) {
       const node = this.getNodeById(nodeId) as DflowNode;
 
-      const NodeClass = this.nodesCatalog[node.kind] ?? DflowNodeUnknown;
-      const { isAsync } = NodeClass;
-
       try {
         switch (node.kind) {
           case DflowNodeArgument.kind: {
@@ -1004,8 +995,13 @@ export class DflowHost {
             return node.input(1).data;
           }
           default: {
-            // Notice that executeFunction cannot execute async functions.
-            if (!isAsync) node.run();
+            if (node.run.constructor.name === "AsyncFunction") {
+              throw new Error(
+                "dflow executeFunction() cannot execute async functions",
+              );
+            } else {
+              node.run();
+            }
 
             if (verbose) {
               this.executionReport?.steps?.push(

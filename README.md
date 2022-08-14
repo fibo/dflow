@@ -120,7 +120,7 @@ function rungraph() {
   dflow.connect(sinNode).to(consoleLogNode);
 
   // run graph
-  dflow.run();
+  await dflow.run();
 }
 
 rungraph();
