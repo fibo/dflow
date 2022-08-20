@@ -263,7 +263,7 @@ Deno.test("DflowGraph ancestorsOfNodeId", () => {
 // ////////////////////////////////////////////////////////////////////////////
 
 Deno.test("new DflowHost has an empty graph", () => {
-  const dflow = new DflowHost();
+  const dflow = new DflowHost({ nodesCatalog: {} });
   assertObjectMatch(dflow.toObject(), { nodes: [], edges: [] });
 });
 
@@ -277,10 +277,8 @@ Deno.test("DflowHost clearGraph()", () => {
 });
 
 Deno.test("DflowHost with empty graph executes with runStatus success", () => {
-  const dflow = new DflowHost();
-
+  const dflow = new DflowHost({ nodesCatalog: {} });
   dflow.run();
-
   assertEquals(dflow.runStatus, "success");
 });
 

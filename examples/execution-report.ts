@@ -2,7 +2,7 @@ import { DflowHost } from "../dflow.ts";
 import { nodesCatalog } from "../nodes/index.ts";
 
 function rungraph() {
-  const dflow = new DflowHost(nodesCatalog);
+  const dflow = new DflowHost({ nodesCatalog });
   const catalog = dflow.nodesCatalog;
 
   const numNode = dflow.newNode({ kind: catalog.mathPI.kind });

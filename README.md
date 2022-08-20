@@ -22,7 +22,7 @@
 
 With [npm](https://npmjs.org/) do
 
-```bash
+```sh
 npm install dflow
 ```
 
@@ -49,7 +49,7 @@ const dflow = new DflowHost({ nodesCatalog });
 
 With [deno](https://deno.land/) you can then launch your script like this
 
-```bash
+```sh
 deno run --importmap=import_map.json path/to/my/script.ts
 ```
 

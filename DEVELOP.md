@@ -10,12 +10,25 @@ Format files as usual: `deno fmt`.
 Lint files as usual: `deno lint`.
 Run tests with: `deno task test`.
 
+## npm scripts
+
+`npm run fmt`, `npm run lint` and `npm test` are wrappers of their corresponding *deno tasks*.
+
+### examples
+
+* `npm run examples:abstract`
+* `npm run examples:context`
+* `npm run examples:execution-report`
+* `npm run examples:usage`
+
 ## Build
 
-With [npm](https://www.npmjs.com/) install the following packages globally
+With [npm] install the following packages globally
 
 ```bash
 npm install esbuild typescript -g
 ```
 
 Build package with: `npm run build`.
+
+[npm]: https://www.npmjs.com/ "npm"
