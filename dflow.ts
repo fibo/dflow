@@ -553,9 +553,9 @@ export type DflowNodesCatalog = Record<
 // DflowGraph
 // ////////////////////////////////////////////////////////////////////
 
-type DflowGraphRunStatus = "waiting" | "success" | "failure";
+export type DflowGraphRunStatus = "running" | "success" | "failure";
 
-type DflowExecutionNodeInfo =
+export type DflowExecutionNodeInfo =
   & Pick<
     DflowSerializableNode,
     "id" | "kind" | "outputs"
@@ -565,8 +565,8 @@ type DflowExecutionNodeInfo =
 export type DflowGraphExecutionReport = {
   status: DflowGraphRunStatus;
   start: string;
-  end?: string;
-  steps?: DflowExecutionNodeInfo[];
+  end: string;
+  steps: DflowExecutionNodeInfo[];
 };
 
 export type DflowSerializableGraph = {
@@ -712,15 +712,15 @@ export class DflowGraph {
   async run() {
     const { verbose } = this.runOptions;
 
-    // Set runStatus to waiting if there was some unhandled error in a previous run.
-    this.runStatus = "waiting";
+    // Set runStatus to running if there was some unhandled error in a previous run.
+    this.runStatus = "running";
 
-    this.executionReport = {
+    const executionReport: DflowGraphExecutionReport = {
       status: this.runStatus,
       start: new Date().toJSON(),
+      end: new Date().toJSON(),
+      steps: [],
     };
-
-    if (verbose) this.executionReport.steps = [];
 
     // Get nodeIds
     // 1. filtered by nodes inside functions
@@ -760,7 +760,7 @@ export class DflowGraph {
 
           // Notify into execution report.
           if (verbose) {
-            this.executionReport.steps?.push(
+            executionReport.steps.push(
               DflowGraph.executionNodeInfo(
                 node.toObject(),
                 `invalid input data nodeId=${nodeId} inputId=${id} data=${data}`,
@@ -782,7 +782,7 @@ export class DflowGraph {
         }
 
         if (verbose) {
-          this.executionReport.steps?.push(
+          executionReport.steps.push(
             DflowGraph.executionNodeInfo(node.toObject()),
           );
         }
@@ -793,10 +793,12 @@ export class DflowGraph {
     }
 
     // Set runStatus to success if there was no error.
-    if (this.runStatus === "waiting") this.runStatus = "success";
+    if (this.runStatus === "running") this.runStatus = "success";
 
-    this.executionReport.status = this.runStatus;
-    this.executionReport.end = new Date().toJSON();
+    executionReport.status = this.runStatus;
+    executionReport.end = new Date().toJSON();
+
+    this.executionReport = executionReport;
   }
 
   toObject(): DflowSerializableGraph {
