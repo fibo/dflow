@@ -1,4 +1,3 @@
-import { DflowArray } from "../dflow.ts";
 import { newDflowHost, testOneInOneOut, testOneOut } from "./_test-utils.ts";
 
 Deno.test("mathAbs", () => {
@@ -60,7 +59,7 @@ Deno.test("mathMax", () => {
     { input: [1, 2, 3], output: 3 },
     { input: [1, 2, "3"], output: 3 },
   ].forEach(({ input, output }) => {
-    testOneInOneOut<DflowArray, number>(dflow, nodeKind, input, output);
+    testOneInOneOut<unknown[], unknown>(dflow, nodeKind, input, output);
   });
 });
 
@@ -75,7 +74,7 @@ Deno.test("mathMin", () => {
     { input: [1, 2, 3], output: 1 },
     { input: ["1", 2, 3], output: 1 },
   ].forEach(({ input, output }) => {
-    testOneInOneOut<DflowArray, number>(dflow, nodeKind, input, output);
+    testOneInOneOut<unknown[], unknown>(dflow, nodeKind, input, output);
   });
 });
 

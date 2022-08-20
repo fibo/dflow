@@ -72,7 +72,7 @@ class DflowArrayIncludes extends DflowNode {
     const data = this.input(0).data;
     const element = this.input(1).data;
 
-    if (Array.isArray(data)) {
+    if (Array.isArray(data) && typeof element !== "undefined") {
       this.output(0).data = data.includes(element);
     }
   }
