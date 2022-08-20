@@ -36,7 +36,6 @@ export type DflowValue =
   | string
   | number
   | boolean
-  | undefined
   | DflowArray
   | DflowObject;
 
@@ -176,12 +175,12 @@ export class DflowPin {
 
 type DflowInputDefinition =
   & DflowPinDefinition
-  & Partial<Pick<DflowInput, "optional" | "multi">>;
+  & Partial<Pick<DflowInput, "optional">>;
 
 type DflowInputConstructorArg =
   & DflowItemConstructorArg
   & DflowPinConstructorArg
-  & Pick<DflowInputDefinition, "optional" | "multi">;
+  & Pick<DflowInputDefinition, "optional">;
 
 export type DflowSerializableInput = DflowSerializablePin;
 
@@ -191,34 +190,24 @@ export class DflowInput extends DflowPin
 
   #source?: DflowOutput;
 
-  #sources?: Set<DflowOutput>;
-
-  multi?: boolean;
-
+  /**
+   * By default an input is not optional; in this case if its data
+   * is not defined then its node will not be executed.
+   */
   optional?: boolean;
 
-  constructor({ id, multi, optional, ...pin }: DflowInputConstructorArg) {
+  constructor({ id, optional, ...pin }: DflowInputConstructorArg) {
     super(pin);
-
     this.id = id;
-
-    if (multi) this.multi = multi;
     if (optional) this.optional = optional;
   }
 
-  get data(): DflowValue {
-    if (this.multi) {
-      const sources = Array.from(this.#sources ?? []);
-      return sources.length ? sources.map((output) => output.data) : undefined;
-    } else {
-      return this.#source?.data;
-    }
+  get data(): DflowValue | undefined {
+    return this.#source?.data;
   }
 
   get isConnected() {
-    return this.multi
-      ? ((Array.from(this.#sources ?? [])).length > 0)
-      : typeof this.#source === "undefined";
+    return typeof this.#source === "undefined";
   }
 
   connectTo(pin: DflowOutput) {
@@ -234,18 +223,11 @@ export class DflowInput extends DflowPin
       });
     }
 
-    if (this.multi) {
-      if (!this.#sources) {
-        this.#sources = new Set();
-      }
-      this.#sources.add(pin);
-    } else {
-      this.#source = pin;
-    }
+    this.#source = pin;
   }
 
   disconnect() {
-    this.multi ? this.#sources?.clear() : this.#source = undefined;
+    this.#source = undefined;
   }
 
   toObject(): DflowSerializableInput {
@@ -275,7 +257,7 @@ export class DflowOutput extends DflowPin
   implements DflowItem<DflowSerializableOutput> {
   readonly id: DflowId;
 
-  #data: DflowValue;
+  #data: DflowValue | undefined;
 
   constructor({ id, data, ...pin }: DflowOutputConstructorArg) {
     super(pin);
@@ -283,7 +265,7 @@ export class DflowOutput extends DflowPin
     this.#data = data;
   }
 
-  get data(): DflowValue {
+  get data(): DflowValue | undefined {
     return this.#data;
   }
 
@@ -1148,7 +1130,7 @@ class DflowNodeData extends DflowNode {
         outputs: outputs?.map((output) => ({
           ...output,
           types:
-            (function inferDflowDataType(data: DflowValue): DflowDataType[] {
+            (function inferDflowDataType(data?: DflowValue): DflowDataType[] {
               switch (true) {
                 case DflowData.isBoolean(data):
                   return ["boolean"];
