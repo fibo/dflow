@@ -4,7 +4,13 @@
  * An input or output id is unique in its node.
  */
 export declare type DflowId = string;
+/**
+ * A pin can be of kind "input" or "output"
+ */
 declare type DflowPinKind = "input" | "output";
+/**
+ * An item can be a pin, node or edge
+ */
 declare type DflowItemKind = DflowPinKind | "node" | "edge";
 declare type DflowSerializableItem = {
   id: DflowId;
@@ -113,9 +119,6 @@ export declare class DflowOutput extends DflowPin
   clear(): void;
   toObject(): DflowSerializableOutput;
 }
-declare type DflowNodeMetadata = {
-  isAsync: boolean;
-};
 export declare type DflowSerializableNode =
   & DflowSerializableItem
   & Pick<DflowNode, "kind">
@@ -187,7 +190,6 @@ export declare class DflowEdge implements DflowItem<DflowSerializableEdge> {
 interface DflowNodeImplementation {
   new (arg: DflowNodeConstructorArg): DflowNode;
   kind: DflowNode["kind"];
-  isAsync?: DflowNodeMetadata["isAsync"];
   inputs?: DflowInputDefinition[];
   outputs?: DflowOutputDefinition[];
 }
@@ -195,8 +197,8 @@ export declare type DflowNodesCatalog = Record<
   DflowNode["kind"],
   DflowNodeImplementation
 >;
-declare type DflowGraphRunStatus = "waiting" | "success" | "failure";
-declare type DflowExecutionNodeInfo =
+export declare type DflowGraphRunStatus = "running" | "success" | "failure";
+export declare type DflowExecutionNodeInfo =
   & Pick<DflowSerializableNode, "id" | "kind" | "outputs">
   & {
     error?: string;
@@ -204,8 +206,8 @@ declare type DflowExecutionNodeInfo =
 export declare type DflowGraphExecutionReport = {
   status: DflowGraphRunStatus;
   start: string;
-  end?: string;
-  steps?: DflowExecutionNodeInfo[];
+  end: string;
+  steps: DflowExecutionNodeInfo[];
 };
 export declare type DflowSerializableGraph = {
   nodes: DflowSerializableNode[];
@@ -219,7 +221,7 @@ declare type DflowGraphRunOptions = {
   verbose: boolean;
 };
 declare type DflowGraphConstructorArg = {
-  nodesCatalog?: DflowNodesCatalog;
+  nodesCatalog: DflowNodesCatalog;
 };
 export declare class DflowGraph {
   readonly nodesCatalog: DflowNodesCatalog;
@@ -228,7 +230,7 @@ export declare class DflowGraph {
   runOptions: DflowGraphRunOptions;
   runStatus: DflowGraphRunStatus | null;
   executionReport: DflowGraphExecutionReport | null;
-  constructor({ nodesCatalog }?: DflowGraphConstructorArg);
+  constructor({ nodesCatalog }: DflowGraphConstructorArg);
   static executionNodeInfo: (
     { id, kind, outputs }: DflowSerializableNode,
     error?: string,
@@ -277,7 +279,7 @@ export declare type DflowHostConstructorArg = DflowGraphConstructorArg;
 export declare class DflowHost {
   #private;
   readonly context: Record<string, unknown>;
-  constructor(arg?: DflowHostConstructorArg);
+  constructor(arg: DflowHostConstructorArg);
   get executionReport(): DflowGraphExecutionReport | null;
   get edges(): DflowSerializableEdge[];
   get nodes(): DflowSerializableNode[];

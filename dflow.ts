@@ -8,8 +8,14 @@
  */
 export type DflowId = string;
 
+/**
+ * A pin can be of kind "input" or "output"
+ */
 type DflowPinKind = "input" | "output";
 
+/**
+ * An item can be a pin, node or edge
+ */
 type DflowItemKind = DflowPinKind | "node" | "edge";
 
 type DflowSerializableItem = {
@@ -579,7 +585,7 @@ type DflowNodeConnection = { sourceId: DflowId; targetId: DflowId };
 type DflowGraphRunOptions = { verbose: boolean };
 
 type DflowGraphConstructorArg = {
-  nodesCatalog?: DflowNodesCatalog;
+  nodesCatalog: DflowNodesCatalog;
 };
 
 export class DflowGraph {
@@ -595,7 +601,7 @@ export class DflowGraph {
 
   executionReport: DflowGraphExecutionReport | null = null;
 
-  constructor({ nodesCatalog = {} }: DflowGraphConstructorArg = {}) {
+  constructor({ nodesCatalog }: DflowGraphConstructorArg) {
     this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
   }
 
@@ -845,7 +851,7 @@ export class DflowHost {
 
   readonly context: Record<string, unknown>;
 
-  constructor(arg?: DflowHostConstructorArg) {
+  constructor(arg: DflowHostConstructorArg) {
     this.#graph = new DflowGraph(arg);
     this.context = {};
   }

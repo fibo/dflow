@@ -1,13 +1,18 @@
 import { DflowHost, DflowNode } from "../dflow.js";
 
+const { input, output } = DflowNode;
+
 class NumNode extends DflowNode {
   static kind = "Num";
+  static outputs = [output(["number"])];
 
   run() {}
 }
 
 class SumNode extends DflowNode {
   static kind = "Sum";
+  static inputs = [input(["number"]), input(["number"])];
+  static outputs = [output(["number"])];
 
   run() {
     let sum = 0;
@@ -37,8 +42,9 @@ function sleep(seconds = 1) {
 class SleepNode extends DflowNode {
   kind = "Sleep";
   async run() {
-    console.log("sleep node start");
-    await sleep();
+    const numSeconds = 2;
+    console.log("sleep node start", `(will sleep ${numSeconds} seconds) zZz`);
+    await sleep(numSeconds);
     console.log("sleep node end");
   }
 }
@@ -50,13 +56,14 @@ const nodesCatalog = {
 };
 
 async function runGraph() {
-  const dflow = new DflowHost(nodesCatalog);
+  const dflow = new DflowHost({ nodesCatalog });
 
-  dflow.newNode({
+  // Create two nodes, num and sum.
+  const numNode = dflow.newNode({
     id: "num",
     name: "Hello world",
     kind: NumNode.kind,
-    outputs: [{ id: "out", data: 2 }],
+    outputs: [{ id: "out", data: 21 }],
   });
   const sumNode = dflow.newNode({
     id: "sum",
@@ -64,11 +71,9 @@ async function runGraph() {
     inputs: [{ id: "in1" }, { id: "in2" }],
     outputs: [{ id: "out" }],
   });
-  dflow.newEdge({
-    id: "e1",
-    source: ["num", "out"],
-    target: ["sum", "in1"],
-  });
+
+  // Connect nodes, using both `dflow.connect()` and `dflow.newEdge()`.
+  dflow.connect(numNode).to(sumNode);
   dflow.newEdge({
     id: "e2",
     source: ["num", "out"],
@@ -81,7 +86,7 @@ async function runGraph() {
   await dflow.run();
 
   const sum = sumNode.output(0);
-  console.log(sum.data); // 4
+  console.log(sum.data); // 42
 }
 
 runGraph();
