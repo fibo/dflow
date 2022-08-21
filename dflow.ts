@@ -697,8 +697,8 @@ export class DflowGraph {
     return Array.from(new Set(ancestorsOfReturnNodes.flat()));
   }
 
-  async run() {
-    const { verbose } = this.runOptions;
+  async run(runOptions?: DflowGraphRunOptions) {
+    const { verbose } = runOptions ?? this.runOptions;
 
     // Set runStatus to running if there was some unhandled error in a previous run.
     this.runStatus = "running";
