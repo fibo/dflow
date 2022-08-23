@@ -296,7 +296,7 @@ export class DflowOutput extends DflowPin
   }
 
   toObject(): DflowSerializableOutput {
-    const obj = { id: this.id } as DflowSerializableOutput;
+    const obj: DflowSerializableOutput = { id: this.id };
     if (typeof this.#data !== "undefined") obj.data = this.#data;
     return obj;
   }
@@ -407,9 +407,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   }
 
   clearOutputs() {
-    for (const output of this.outputs) {
-      output.clear();
-    }
+    for (const output of this.outputs) output.clear();
   }
 
   /**
@@ -422,6 +420,8 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   }
 
   /**
+   * Get input by position.
+   *
    * @throws DflowErrorItemNotFound
    */
   input(position: number): DflowInput {
@@ -448,6 +448,8 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   }
 
   /**
+   * Get output by position.
+   *
    * @throws DflowErrorItemNotFound
    */
   output(position: number): DflowOutput {
@@ -467,22 +469,19 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   run(): void | Promise<void> {}
 
   toObject(): DflowSerializableNode {
-    const obj = {
+    const obj: DflowSerializableNode = {
       id: this.id,
       kind: this.kind,
-    } as DflowSerializableNode;
+    };
 
-    const inputs = [];
-    const outputs = [];
-
-    for (const input of this.inputs) {
-      inputs.push(input.toObject());
-    }
+    const inputs = Array.from(this.#inputs.values()).map((input) =>
+      input.toObject()
+    );
     if (inputs.length > 0) obj.inputs = inputs;
 
-    for (const output of this.outputs) {
-      outputs.push(output.toObject());
-    }
+    const outputs = Array.from(this.#outputs.values()).map((output) =>
+      output.toObject()
+    );
     if (outputs.length > 0) obj.outputs = outputs;
 
     return obj;
@@ -591,11 +590,11 @@ export class DflowGraph {
     { id, kind, outputs }: DflowSerializableNode,
     error?: string,
   ): DflowExecutionNodeInfo => {
-    const obj = {
+    const obj: DflowExecutionNodeInfo = {
       id,
       kind,
       outputs: outputs?.map(({ id, data, name }) => ({ id, data, name })),
-    } as DflowExecutionNodeInfo;
+    };
 
     if (error) obj.error = error;
 
@@ -790,19 +789,10 @@ export class DflowGraph {
   }
 
   toObject(): DflowSerializableGraph {
-    const obj = {
-      nodes: [],
-      edges: [],
-    } as DflowSerializableGraph;
-
-    for (const node of this.nodes.values()) {
-      obj.nodes.push(node.toObject());
-    }
-    for (const edge of this.edges.values()) {
-      obj.edges.push(edge.toObject());
-    }
-
-    return obj;
+    return {
+      nodes: Array.from(this.nodes.values()).map((item) => item.toObject()),
+      edges: Array.from(this.edges.values()).map((item) => item.toObject()),
+    };
   }
 }
 
