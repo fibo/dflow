@@ -1164,15 +1164,6 @@ class DflowNodeFunction extends DflowNode {
   }
 }
 
-class DflowNodeIsUndefined extends DflowNode {
-  static kind = "isUndefined";
-  static inputs = [input()];
-  static outputs = [output("boolean")];
-  run() {
-    this.output(0).data = typeof this.input(0).data === "undefined";
-  }
-}
-
 class DflowNodeReturn extends DflowNode {
   static kind = "return";
   static inputs = [
@@ -1187,7 +1178,6 @@ export class DflowNodeUnknown extends DflowNode {}
 const coreNodesCatalog: DflowNodesCatalog = {
   [DflowNodeArgument.kind]: DflowNodeArgument,
   [DflowNodeData.kind]: DflowNodeData,
-  [DflowNodeIsUndefined.kind]: DflowNodeIsUndefined,
   [DflowNodeFunction.kind]: DflowNodeFunction,
   [DflowNodeReturn.kind]: DflowNodeReturn,
 };
