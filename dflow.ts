@@ -24,8 +24,13 @@ type DflowSerializableItem = {
 
 type DflowItemConstructorArg = DflowSerializableItem;
 
-interface DflowItem<Serializable> {
+interface DflowItem<Serializable extends DflowValue> {
   readonly id: DflowId;
+
+  /**
+   * Return serializable item,
+   * i.e. an object that can be converted to JSON format.
+   */
   toObject(): Serializable;
 }
 
@@ -330,9 +335,9 @@ export type DflowNodeConstructorArg = {
 export class DflowNode implements DflowItem<DflowSerializableNode> {
   readonly id: DflowId;
 
-  readonly #inputs: Map<DflowId, DflowInput> = new Map();
+  readonly #inputsMap: Map<DflowId, DflowInput> = new Map();
 
-  readonly #outputs: Map<DflowId, DflowOutput> = new Map();
+  readonly #outputsMap: Map<DflowId, DflowOutput> = new Map();
 
   readonly #inputPosition: DflowId[] = [];
 
@@ -356,16 +361,16 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
 
     const generateInputId = (i: number): DflowId => {
       const id = `i${i}`;
-      return this.#inputs.has(id) ? generateInputId(i + 1) : id;
+      return this.#inputsMap.has(id) ? generateInputId(i + 1) : id;
     };
 
     for (const obj of inputs) {
-      const numInputs = this.#inputs.size;
+      const numInputs = this.#inputsMap.size;
       const id = DflowData.isDflowId(obj.id)
         ? obj.id
         : generateInputId(numInputs);
       const pin = new DflowInput({ ...obj, id });
-      this.#inputs.set(id, pin);
+      this.#inputsMap.set(id, pin);
       this.#inputPosition.push(id);
     }
 
@@ -373,16 +378,16 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
 
     const generateOutputId = (i: number): DflowId => {
       const id = `o${i}`;
-      return this.#outputs.has(id) ? generateOutputId(i + 1) : id;
+      return this.#outputsMap.has(id) ? generateOutputId(i + 1) : id;
     };
 
     for (const obj of outputs) {
-      const numOutputs = this.#outputs.size;
+      const numOutputs = this.#outputsMap.size;
       const id = DflowData.isDflowId(obj.id)
         ? obj.id
         : generateOutputId(numOutputs);
       const pin = new DflowOutput({ ...obj, id });
-      this.#outputs.set(id, pin);
+      this.#outputsMap.set(id, pin);
       this.#outputPosition.push(id);
     }
   }
@@ -407,23 +412,27 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
     return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
 
-  get inputs() {
-    return this.#inputs.values();
-  }
-
-  get outputs() {
-    return this.#outputs.values();
+  get inputsDataAreValid(): boolean {
+    for (const { data, types, optional } of this.#inputsMap.values()) {
+      // Ignore optional inputs with no data.
+      if (optional && typeof data === "undefined") continue;
+      // Validate input data.
+      if (DflowData.isValidDataType(types, data)) continue;
+      // Some input is not valid.
+      return false;
+    }
+    return true;
   }
 
   clearOutputs() {
-    for (const output of this.outputs) output.clear();
+    for (const output of this.#outputsMap.values()) output.clear();
   }
 
   /**
    * @throws DflowErrorItemNotFound
    */
   getInputById(id: DflowId): DflowInput {
-    const item = this.#inputs.get(id);
+    const item = this.#inputsMap.get(id);
     if (!item) throw new DflowErrorItemNotFound({ kind: "input", id });
     return item;
   }
@@ -451,7 +460,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
    * @throws DflowErrorItemNotFound
    */
   getOutputById(id: DflowId): DflowOutput {
-    const item = this.#outputs.get(id);
+    const item = this.#outputsMap.get(id);
     if (!item) throw new DflowErrorItemNotFound({ kind: "output", id });
     return item;
   }
@@ -483,15 +492,11 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
       kind: this.kind,
     };
 
-    const inputs = Array.from(this.#inputs.values()).map((input) =>
-      input.toObject()
-    );
-    if (inputs.length > 0) obj.inputs = inputs;
+    const ins = [...this.#inputsMap.values()].map((item) => item.toObject());
+    if (ins.length > 0) obj.inputs = ins;
 
-    const outputs = Array.from(this.#outputs.values()).map((output) =>
-      output.toObject()
-    );
-    if (outputs.length > 0) obj.outputs = outputs;
+    const outs = [...this.#outputsMap.values()].map((item) => item.toObject());
+    if (outs.length > 0) obj.outputs = outs;
 
     return obj;
   }
@@ -584,9 +589,9 @@ type DflowGraphConstructorArg = {
 export class DflowGraph {
   readonly nodesCatalog: DflowNodesCatalog;
 
-  readonly nodes: Map<DflowId, DflowNode> = new Map();
+  readonly nodesMap: Map<DflowId, DflowNode> = new Map();
 
-  readonly edges: Map<DflowId, DflowEdge> = new Map();
+  readonly edgesMap: Map<DflowId, DflowEdge> = new Map();
 
   runOptions: DflowGraphRunOptions = { verbose: false };
 
@@ -665,7 +670,7 @@ export class DflowGraph {
 
         // On last iteration, remove duplicates
         return index === array.length - 1
-          ? Array.from(new Set(array.concat(result)))
+          ? [...new Set(array.concat(result))]
           : result;
       },
       [],
@@ -686,7 +691,7 @@ export class DflowGraph {
   }
 
   get nodeConnections(): DflowNodeConnection[] {
-    return [...this.edges.values()].map((edge) => ({
+    return [...this.edgesMap.values()].map((edge) => ({
       sourceId: edge.source[0],
       targetId: edge.target[0],
     }));
@@ -696,7 +701,7 @@ export class DflowGraph {
     const ancestorsOfReturnNodes = [];
 
     // Find all "return" nodes and get their ancestors.
-    for (const node of [...this.nodes.values()]) {
+    for (const node of [...this.nodesMap.values()]) {
       if (node.kind === "return") {
         ancestorsOfReturnNodes.push(
           DflowGraph.ancestorsOfNodeId(node.id, this.nodeConnections),
@@ -705,7 +710,7 @@ export class DflowGraph {
     }
 
     // Flatten and deduplicate results.
-    return Array.from(new Set(ancestorsOfReturnNodes.flat()));
+    return [...new Set(ancestorsOfReturnNodes.flat())];
   }
 
   async run(runOptions?: DflowGraphRunOptions) {
@@ -726,50 +731,31 @@ export class DflowGraph {
     // 2. sorted by graph hierarchy
     const nodeIdsExcluded = this.nodeIdsInsideFunctions;
     const nodeIds = DflowGraph.sortNodesByLevel(
-      [...this.nodes.keys()].filter((nodeId) =>
+      [...this.nodesMap.keys()].filter((nodeId) =>
         !nodeIdsExcluded.includes(nodeId)
       ),
       this.nodeConnections,
     );
 
-    // Two nested loops:
-    //   1. NODES_LOOP
-    //   2. INPUTS_LOOP
-    //
-    // For every node loop over their inputs and validate data.
-
-    // 1. NODES_LOOP
-    // /////////////
-    NODES_LOOP:
     for (const nodeId of nodeIds) {
-      const node = this.nodes.get(nodeId) as DflowNode;
+      const node = this.nodesMap.get(nodeId) as DflowNode;
 
       try {
-        // 2. INPUTS_LOOP
-        // //////////////
-        INPUTS_LOOP:
-        for (const { id, data, types, optional } of node.inputs) {
-          // Ignore optional inputs with no data.
-          if (optional && typeof data === "undefined") continue INPUTS_LOOP;
-
-          // Validate input data.
-          if (DflowData.isValidDataType(types, data)) continue INPUTS_LOOP;
-
-          // Some input is not valid.
-
+        // If some input data is not valid.
+        if (!node.inputsDataAreValid) {
           // Notify into execution report.
           if (verbose) {
+            const error = new DflowErrorInvalidInputData({ nodeId });
             executionReport.steps.push(
               DflowGraph.executionNodeInfo(
                 node.toObject(),
-                `invalid input data nodeId=${nodeId} inputId=${id} data=${data}`,
+                error.message,
               ),
             );
           }
-
           // Cleanup outputs and go to next node.
           node.clearOutputs();
-          continue NODES_LOOP;
+          continue;
         }
 
         if (
@@ -802,8 +788,8 @@ export class DflowGraph {
 
   toObject(): DflowSerializableGraph {
     return {
-      nodes: Array.from(this.nodes.values()).map((item) => item.toObject()),
-      edges: Array.from(this.edges.values()).map((item) => item.toObject()),
+      nodes: [...this.nodesMap.values()].map((item) => item.toObject()),
+      edges: [...this.edgesMap.values()].map((item) => item.toObject()),
     };
   }
 }
@@ -845,15 +831,11 @@ export class DflowHost {
   }
 
   get edges() {
-    return Array.from(this.#graph.edges.values()).map((item) =>
-      item.toObject()
-    );
+    return [...this.#graph.edgesMap.values()].map((item) => item.toObject());
   }
 
   get nodes() {
-    return Array.from(this.#graph.nodes.values()).map((item) =>
-      item.toObject()
-    );
+    return [...this.#graph.nodesMap.values()].map((item) => item.toObject());
   }
 
   get nodesCatalog(): DflowNodesCatalog {
@@ -869,8 +851,8 @@ export class DflowHost {
   }
 
   clearGraph() {
-    this.#graph.nodes.clear();
-    this.#graph.edges.clear();
+    this.#graph.nodesMap.clear();
+    this.#graph.edgesMap.clear();
   }
 
   connect(sourceNode: DflowNode, sourcePosition = 0) {
@@ -901,7 +883,7 @@ export class DflowHost {
     targetPin.disconnect();
 
     // 2. Delete edge.
-    this.#graph.edges.delete(edgeId);
+    this.#graph.edgesMap.delete(edgeId);
   }
 
   /**
@@ -922,7 +904,7 @@ export class DflowHost {
     }
 
     // 2. Delete node.
-    this.#graph.nodes.delete(nodeId);
+    this.#graph.nodesMap.delete(nodeId);
   }
 
   executeFunction(functionId: DflowId, args: DflowArray) {
@@ -953,7 +935,7 @@ export class DflowHost {
         const result = accumulator.concat(ancestors);
 
         // On last iteration, remove duplicates
-        return index === array.length ? Array.from(new Set(result)) : result;
+        return index === array.length ? [...new Set(result)] : result;
       },
       [],
     );
@@ -1012,7 +994,7 @@ export class DflowHost {
    * @throws DflowErrorItemNotFound
    */
   getEdgeById(id: DflowId): DflowEdge {
-    const item = this.#graph.edges.get(id);
+    const item = this.#graph.edgesMap.get(id);
     if (!item) throw new DflowErrorItemNotFound({ kind: "edge", id });
     return item;
   }
@@ -1021,17 +1003,17 @@ export class DflowHost {
    * @throws DflowErrorItemNotFound
    */
   getNodeById(id: DflowId): DflowNode {
-    const item = this.#graph.nodes.get(id);
+    const item = this.#graph.nodesMap.get(id);
     if (!item) throw new DflowErrorItemNotFound({ kind: "node", id });
     return item;
   }
 
   newNode(obj: DflowNewNode): DflowNode {
-    const numNodes = this.#graph.nodes.size;
+    const numNodes = this.#graph.nodesMap.size;
 
     const generateNodeId = (i = numNodes): DflowId => {
       const id = `n${i}`;
-      return this.#graph.nodes.has(id) ? generateNodeId(i + 1) : id;
+      return this.#graph.nodesMap.has(id) ? generateNodeId(i + 1) : id;
     };
 
     const NodeClass = this.nodesCatalog[obj.kind] ?? DflowNodeUnknown;
@@ -1065,7 +1047,7 @@ export class DflowHost {
       host: this,
     });
 
-    this.#graph.nodes.set(node.id, node);
+    this.#graph.nodesMap.set(node.id, node);
 
     return node;
   }
@@ -1074,11 +1056,11 @@ export class DflowHost {
    * @throws DflowErrorItemNotFound
    */
   newEdge(obj: DflowNewEdge): DflowEdge {
-    const numEdges = this.#graph.edges.size;
+    const numEdges = this.#graph.edgesMap.size;
 
     const generateEdgeId = (i = numEdges): DflowId => {
       const id = `e${i}`;
-      return this.#graph.edges.has(id) ? generateEdgeId(i + 1) : id;
+      return this.#graph.edgesMap.has(id) ? generateEdgeId(i + 1) : id;
     };
 
     const id = DflowData.isDflowId(obj.id)
@@ -1087,7 +1069,7 @@ export class DflowHost {
 
     const edge = new DflowEdge({ ...obj, id });
 
-    this.#graph.edges.set(edge.id, edge);
+    this.#graph.edgesMap.set(edge.id, edge);
 
     const [sourceNodeId, sourcePinId] = edge.source;
     const [targetNodeId, targetPinId] = edge.target;
@@ -1185,13 +1167,20 @@ const coreNodesCatalog: DflowNodesCatalog = {
 // Dflow errors
 // ////////////////////////////////////////////////////////////////////
 
+const dflowErrors = [
+  "CannotConnectPins",
+  "InvalidInputData",
+  "ItemNotFound",
+] as const;
+type DflowErrorName = typeof dflowErrors[number];
+
 /**
  * DflowError is an abstract class extending Error.
  * Its message is a JSON string.
  */
 export class DflowError extends Error {
-  constructor(arg: DflowObject, errorClassName: string) {
-    super(JSON.stringify({ error: errorClassName, ...arg }));
+  constructor(arg: DflowObject, errorName: DflowErrorName) {
+    super(JSON.stringify({ error: errorName, ...arg }));
   }
 }
 
@@ -1204,7 +1193,19 @@ export type DflowSerializableErrorCannotConnectPins = {
 
 export class DflowErrorCannotConnectPins extends DflowError {
   constructor(arg: DflowSerializableErrorCannotConnectPins) {
-    super(arg, "DflowErrorCannotConnectPins");
+    super(arg, "CannotConnectPins");
+  }
+}
+
+// DflowErrorInvalidInputData
+
+export type DflowSerializableErrorInvalidInputData = {
+  nodeId: DflowSerializableNode["id"];
+};
+
+export class DflowErrorInvalidInputData extends DflowError {
+  constructor(arg: DflowSerializableErrorInvalidInputData) {
+    super(arg, "InvalidInputData");
   }
 }
 
@@ -1219,6 +1220,6 @@ export type DflowSerializableErrorItemNotFound = {
 
 export class DflowErrorItemNotFound extends DflowError {
   constructor(arg: DflowSerializableErrorItemNotFound) {
-    super(arg, "DflowErrorItemNotFound");
+    super(arg, "ItemNotFound");
   }
 }
