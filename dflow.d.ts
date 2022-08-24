@@ -24,7 +24,6 @@ export declare type DflowValue =
   | string
   | number
   | boolean
-  | undefined
   | DflowArray
   | DflowObject;
 export declare type DflowObject = {
@@ -78,20 +77,23 @@ export declare class DflowPin {
 }
 declare type DflowInputDefinition =
   & DflowPinDefinition
-  & Partial<Pick<DflowInput, "optional" | "multi">>;
+  & Partial<Pick<DflowInput, "optional">>;
 declare type DflowInputConstructorArg =
   & DflowItemConstructorArg
   & DflowPinConstructorArg
-  & Pick<DflowInputDefinition, "optional" | "multi">;
+  & Pick<DflowInputDefinition, "optional">;
 export declare type DflowSerializableInput = DflowSerializablePin;
 export declare class DflowInput extends DflowPin
   implements DflowItem<DflowSerializableInput> {
   #private;
   readonly id: DflowId;
-  multi?: boolean;
+  /**
+   * By default an input is not optional; in this case if its data
+   * is not defined then its node will not be executed.
+   */
   optional?: boolean;
-  constructor({ id, multi, optional, ...pin }: DflowInputConstructorArg);
-  get data(): DflowValue;
+  constructor({ id, optional, ...pin }: DflowInputConstructorArg);
+  get data(): DflowValue | undefined;
   get isConnected(): boolean;
   connectTo(pin: DflowOutput): void;
   disconnect(): void;
@@ -114,7 +116,7 @@ export declare class DflowOutput extends DflowPin
   #private;
   readonly id: DflowId;
   constructor({ id, data, ...pin }: DflowOutputConstructorArg);
-  get data(): DflowValue;
+  get data(): DflowValue | undefined;
   set data(data: unknown);
   clear(): void;
   toObject(): DflowSerializableOutput;
@@ -160,6 +162,8 @@ export declare class DflowNode implements DflowItem<DflowSerializableNode> {
    */
   getInputById(id: DflowId): DflowInput;
   /**
+   * Get input by position.
+   *
    * @throws DflowErrorItemNotFound
    */
   input(position: number): DflowInput;
@@ -168,6 +172,8 @@ export declare class DflowNode implements DflowItem<DflowSerializableNode> {
    */
   getOutputById(id: DflowId): DflowOutput;
   /**
+   * Get output by position.
+   *
    * @throws DflowErrorItemNotFound
    */
   output(position: number): DflowOutput;
@@ -257,7 +263,7 @@ export declare class DflowGraph {
   ): DflowId[];
   get nodeConnections(): DflowNodeConnection[];
   get nodeIdsInsideFunctions(): DflowId[];
-  run(): Promise<void>;
+  run(runOptions?: DflowGraphRunOptions): Promise<void>;
   toObject(): DflowSerializableGraph;
 }
 declare type DflowNewItem = Partial<Pick<DflowSerializableItem, "id">>;
@@ -298,7 +304,10 @@ export declare class DflowHost {
    * @throws DflowErrorItemNotFound
    */
   deleteNode(nodeId: DflowId): void;
-  executeFunction(functionId: DflowId, args: DflowArray): DflowValue;
+  executeFunction(
+    functionId: DflowId,
+    args: DflowArray,
+  ): DflowValue | undefined;
   /**
    * @throws DflowErrorItemNotFound
    */
