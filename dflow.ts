@@ -184,6 +184,9 @@ type DflowInputConstructorArg =
 
 export type DflowSerializableInput = DflowSerializablePin;
 
+/**
+ * @implements DflowItem<DflowSerializableInput>
+ */
 export class DflowInput extends DflowPin
   implements DflowItem<DflowSerializableInput> {
   readonly id: DflowId;
@@ -253,6 +256,9 @@ type DflowOutputConstructorArg =
     data?: DflowValue;
   };
 
+/**
+ * @implements DflowItem<DflowSerializableOutput>
+ */
 export class DflowOutput extends DflowPin
   implements DflowItem<DflowSerializableOutput> {
   readonly id: DflowId;
@@ -318,6 +324,9 @@ export type DflowNodeConstructorArg = {
   host: DflowHost;
 };
 
+/**
+ * @implements DflowItem<DflowSerializableNode>
+ */
 export class DflowNode implements DflowItem<DflowSerializableNode> {
   readonly id: DflowId;
 
@@ -500,6 +509,9 @@ export type DflowSerializableEdge = DflowSerializableItem & {
 
 type DflowEdgeConstructorArg = DflowSerializableEdge;
 
+/**
+ * @implements DflowItem<DflowSerializableEdge>
+ */
 export class DflowEdge implements DflowItem<DflowSerializableEdge> {
   readonly id: DflowId;
 
@@ -525,7 +537,7 @@ export class DflowEdge implements DflowItem<DflowSerializableEdge> {
 // DflowNodesCatalog
 // ////////////////////////////////////////////////////////////////////
 
-interface DflowNodeImplementation {
+export interface DflowNodeDefinition {
   new (arg: DflowNodeConstructorArg): DflowNode;
   kind: DflowNode["kind"];
   inputs?: DflowInputDefinition[];
@@ -534,7 +546,7 @@ interface DflowNodeImplementation {
 
 export type DflowNodesCatalog = Record<
   DflowNode["kind"],
-  DflowNodeImplementation
+  DflowNodeDefinition
 >;
 
 // DflowGraph
