@@ -3,8 +3,6 @@
   "description": "is a minimal Dataflow programming engine",
   "type": "module",
   "version": "0.37.0",
-  "homepage": "https://fibo.github.io/dflow",
-  "license": "MIT",
   "main": "./dflow.cjs",
   "types": "dflow.d.ts",
   "exports": {
@@ -17,7 +15,6 @@
       "import": "./nodes.js"
     }
   },
-  "funding": "https://github.com/sponsors/fibo",
   "engines": {
     "node": ">=14",
     "deno": ">=1.10"
@@ -26,6 +23,8 @@
     "name": "Gianluca Casati",
     "url": "https://fibo.github.io"
   },
+  "homepage": "https://fibo.github.io/dflow",
+  "license": "MIT",
   "scripts": {
     "build": "npm run bundle:dflow:commonjs && npm run bundle:dflow:esmodule && npm run bundle:nodes:esmodule && npm run emit_typescript_declarations",
     "bundle:dflow:commonjs": "deno bundle dflow.ts | esbuild --format=cjs --target=node10 > dflow.cjs",
@@ -49,8 +48,7 @@
     "url": "git://github.com/fibo/dflow.git"
   },
   "keywords": [
-    "dataflow",
-    "visual"
+    "dataflow"
   ],
   "dependencies": {}
 }
