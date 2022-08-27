@@ -54,7 +54,7 @@ async function runGraph() {
   });
   const sumNode = dflow.newNode({
     kind: SumNode.kind,
-    // Optional `id`.
+    // Optional `id`. If Dflow is edited in a view, it can handy to reuse ids.
     id: "sum",
     inputs: [{ id: "in1" }, { id: "in2" }],
     outputs: [{ id: "out" }],
@@ -63,7 +63,6 @@ async function runGraph() {
   // Connect nodes. Both `dflow.connect()` and `dflow.newEdge()` are used here.
   dflow.connect(numNode).to(sumNode);
   dflow.newEdge({
-    id: "e2",
     source: [numNode.id, "out"],
     target: ["sum", "in2"],
   });
