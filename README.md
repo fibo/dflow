@@ -42,6 +42,12 @@ npm install dflow
 
 Module is published here: https://deno.land/x/dflow
 
+Dflow engine is implemented in a single *dflow.ts* file, you can use an import like
+
+```ts
+import { DflowHost } from "https://deno.land/x/dflow@v0.38.0/dflow.ts";
+```
+
 #### Using an import map
 
 Create an _import_map.json_ file like this.
