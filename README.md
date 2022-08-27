@@ -23,7 +23,8 @@ It can contain nodes and edges. Nodes are executed, sorted by their connections.
 **NOTA BENE**: it is supposed that you implement your own nodes, for example node `addition` could be implemented using bigint or some floating point library, according to your needs.
 However an example nodes catalog with basic JavaScript features can be imported from `dflow/nodes`.
 
-Graphic interface can be implemented with WebComponents: ([demo here](https://fibo.github.io/dflow)) (to be completed, **not included** in this package).
+Graphic interface can be implemented with WebComponents (to be completed): ([demo here](https://fibo.github.io/dflow)).
+It is implemented with [flow-view](https://github.com/fibo/flow-view) and **not included** in this package.
 
 ## Installation
 
