@@ -14,12 +14,7 @@ Run tests with: `deno task test`.
 
 `npm run fmt`, `npm run lint` and `npm test` are wrappers of their corresponding *deno tasks*.
 
-### examples
-
-* `npm run examples:abstract`
-* `npm run examples:context`
-* `npm run examples:execution-report`
-* `npm run examples:usage`
+See also *example* scripts listed [here](https://github.com/fibo/dflow/blob/main/examples/README.md).
 
 ## Build
 

@@ -26,7 +26,7 @@ function rungraph() {
   dflow.connect(sinNode).to(consoleLogNode);
 
   // run graph
-  await dflow.run();
+  dflow.run();
 }
 
 rungraph();

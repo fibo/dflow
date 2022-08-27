@@ -98,7 +98,7 @@ You can run the following code with any of the following:
 
 - launching command
   `deno run https://raw.githubusercontent.com/fibo/dflow/main/examples/usage.js`
-- cloning this repo and launching `node examples/usage.js`.
+- cloning this repo and launching `npm run example:usage`.
 
 You should see a number `1` printed on output.
 
@@ -129,11 +129,15 @@ function rungraph() {
   dflow.connect(sinNode).to(consoleLogNode);
 
   // run graph
-  await dflow.run();
+  dflow.run();
 }
 
 rungraph();
 ```
+
+A graph can be executed asynchronously with `await dflow.run()`: see [custom nodes example](https://github.com/fibo/dflow/blob/main/examples/custom-nodes.js).
+
+Available examples are listed [here](https://github.com/fibo/dflow/blob/main/examples).
 
 ## License
 
