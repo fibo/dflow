@@ -320,8 +320,7 @@ export type DflowSerializableNode =
 /**
  * DflowNode constructor accepts a single argument.
  *
- * You can import this type as a helper, for example
- * if you need to create a DflowNode that does something in the constructor.
+ * You can import this type as a helper, for example if you need to create a DflowNode that does something in the constructor.
  * @example
  * ```ts
  * class DflowNodeFunction extends DflowNode {
@@ -340,6 +339,24 @@ export type DflowNodeConstructorArg = {
 };
 
 /**
+ * DflowNode represents a block of code: it can have inputs and outputs.
+ *
+ * Extend this class to create a node.
+ * @example
+ * ```ts
+ * const { input, output } = DflowNode;
+
+ * class Addition extends DflowNode {
+ *   static kind = "addition";
+ *   static inputs = [input("number"), input("number")];
+ *   static outputs = [output("number")];
+ *   run() {
+ *     this.output(0).data = (this.input(0).data as number) +
+ *       (this.input(1).data as number);
+ *   }
+ * }
+ * ```
+ *
  * @implements DflowItem<DflowSerializableNode>
  */
 export class DflowNode implements DflowItem<DflowSerializableNode> {
@@ -403,7 +420,20 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   }
 
   /**
-   * DflowInputDefinition helper.
+   * `DlowNode.input()` is a `DflowInputDefinition` helper.
+   *
+   * @example
+   * ```ts
+   * const { input } = DflowNode;
+   *
+   * export class Echo extends DflowNode {
+   *   static kind = "echo";
+   *   static inputs = [input("string")];
+   *   run () {
+   *     console.log(this.input(0).data as string);
+   *   }
+   * }
+   * ```
    */
   static input(
     typing: DflowDataType | DflowDataType[] = [],
@@ -413,7 +443,17 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   }
 
   /**
-   * DflowOutputDefinition helper.
+   * `DflowNode.output()` is a `DflowOutputDefinition` helper.
+   *
+   * @example
+   * ```ts
+   * const { output } = DflowNode;
+   *
+   * export class MathPI extends DflowNode {
+   *   static kind = "mathPI";
+   *   static outputs = [output("number", { name: "π", data: Math.PI })];
+   * }
+   * ```
    */
   static output(
     typing: DflowDataType | DflowDataType[] = [],
@@ -525,6 +565,8 @@ export type DflowSerializableEdge = DflowSerializableItem & {
 type DflowEdgeConstructorArg = DflowSerializableEdge;
 
 /**
+ * `DflowEdge` connects an input to an output.
+ *
  * @implements DflowItem<DflowSerializableEdge>
  */
 export class DflowEdge implements DflowItem<DflowSerializableEdge> {
@@ -596,6 +638,10 @@ type DflowGraphConstructorArg = {
   nodesCatalog: DflowNodesCatalog;
 };
 
+/**
+ * `DflowGraph` represents a program.
+ * I can have nodes and edges. It executes all nodes, sorted by their connections.
+ */
 export class DflowGraph {
   readonly nodesCatalog: DflowNodesCatalog;
 
@@ -1164,7 +1210,7 @@ class DflowNodeReturn extends DflowNode {
   ];
 }
 
-// The "unknown" node is not inclued in core nodes catalog.
+// The "unknown" node is not included in core nodes catalog.
 export class DflowNodeUnknown extends DflowNode {}
 
 const coreNodesCatalog: DflowNodesCatalog = {
