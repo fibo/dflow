@@ -48,7 +48,8 @@
     "url": "git://github.com/fibo/dflow.git"
   },
   "keywords": [
-    "dataflow"
+    "dataflow",
+    "dataflow-programming"
   ],
   "dependencies": {}
 }

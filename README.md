@@ -2,19 +2,28 @@
 
 > is a minimal [Dataflow programming][dataflow-wikipedia] engine
 
+## How it works
+
+A **node** represents a block of code: it can have **inputs** and **outputs**.
+
+An **edge** connects an input to an output.
+
+A **graph** represents a program.
+I can have nodes and edges. Nodes are executed, sorted by their connections.
+
 ## Features
 
 - Implemented in TypeScript, available both on Node and Deno.
-- Expressive API.
-- Easily create nodes, just extending `DflowNode` class.
-- Example nodes catalog with basic JavaScript features. **NOTA BENE**: it is
-  supposed that you implement your own nodes, for example node `addition` could
-  be implemented using bigint or some floating point library, according to your
-  needs.
-- Minimal internal type system. It is possible to connect an output of type `T`
-  only to an input of type `U`, if and only if `U` includes `T`.
-- Graphic interface implemented with WebComponents.
-  ([demo here](https://fibo.github.io/dflow)) (to be completed).
+- Expressive and simple API.
+- A graph can be saved as a JSON file. It can be then loaded and executed.
+- It is easy to create nodes: just extend `DflowNode` class, define its inputs and outputs and the `run()` function.
+- Minimal internal type system: it is possible to connect an output of type `T` to an input of type `U`, if and only if `U` includes `T`.
+- It is possible to define functions represented by nodes and edges.
+
+**NOTA BENE**: it is supposed that you implement your own nodes, for example node `addition` could be implemented using bigint or some floating point library, according to your needs.
+However an example nodes catalog with basic JavaScript features can be imported from `dflow/nodes`.
+
+Graphic interface can be implemented with WebComponents: ([demo here](https://fibo.github.io/dflow)) (to be completed, **not included** in this package).
 
 ## Installation
 
@@ -67,7 +76,7 @@ version `0.36` or whatever, then change your import map accordingly
 
 ## Usage
 
-This is a trivial sample graph that will run `sin(π / 2) = 1` computation.
+This is a trivial sample graph that will compute `sin(π / 2) = 1` and print the result.
 
 ```
    ----------------
