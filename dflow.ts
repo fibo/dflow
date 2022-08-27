@@ -137,17 +137,16 @@ type DflowPinDefinition =
 type DflowPinConstructorArg = Partial<Pick<DflowPin, "name" | "types">>;
 
 export class DflowPin {
+  readonly name?: string;
+
+  readonly types: DflowDataType[];
+
   constructor(
     { name, types = [] }: DflowPinConstructorArg,
   ) {
     if (name) this.name = name;
-
     this.types = types;
   }
-
-  readonly name?: string;
-
-  readonly types: DflowDataType[];
 
   static canConnect(
     sourceTypes: DflowDataType[],
@@ -219,19 +218,13 @@ export class DflowInput extends DflowPin
   }
 
   connectTo(pin: DflowOutput) {
-    const { types: targetTypes } = this;
-    const { types: sourceTypes } = pin;
-
-    const canConnect = DflowPin.canConnect(sourceTypes, targetTypes);
-
-    if (!canConnect) {
+    if (DflowPin.canConnect(pin.types, this.types)) this.#source = pin;
+    else {
       throw new DflowErrorCannotConnectPins({
         source: pin.toObject(),
         target: this.toObject(),
       });
     }
-
-    this.#source = pin;
   }
 
   disconnect() {
@@ -324,6 +317,23 @@ export type DflowSerializableNode =
     outputs?: DflowSerializableOutput[];
   };
 
+/**
+ * DflowNode constructor accepts a single argument.
+ *
+ * You can import this type as a helper, for example
+ * if you need to create a DflowNode that does something in the constructor.
+ * @example
+ * ```ts
+ * class DflowNodeFunction extends DflowNode {
+ *   static kind = "function";
+ *   static outputs = [output("DflowId", { name: "id" })];
+ *   constructor(arg: DflowNodeConstructorArg) {
+ *     super(arg);
+ *     this.output(0).data = this.id;
+ *   }
+ * }
+ * ```
+ */
 export type DflowNodeConstructorArg = {
   node: DflowSerializableNode;
   host: DflowHost;
