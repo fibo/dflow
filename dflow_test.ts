@@ -132,6 +132,7 @@ Deno.test("DflowData isNumber()", () => {
   assertEquals(DflowData.isNumber(obj), false);
   assertEquals(DflowData.isNumber(str), false);
   assertEquals(DflowData.isNumber(undefined), false);
+  assertEquals(DflowData.isNumber(Infinity), false);
 });
 
 Deno.test("DflowData isObject()", () => {

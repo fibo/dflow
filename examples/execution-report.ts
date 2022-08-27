@@ -16,7 +16,7 @@ function rungraph() {
   dflow.connect(numNode).to(additionNode, 1);
 
   dflow.verbose = true;
-  await dflow.run();
+  dflow.run();
 
   console.log(JSON.stringify(dflow.executionReport, null, 2));
 }

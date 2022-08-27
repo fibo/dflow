@@ -4,7 +4,7 @@ const { input, output } = DflowNode;
 
 class DflowIsFinite extends DflowNode {
   static kind = "isFinite";
-  static inputs = [input("number")];
+  static inputs = [input()];
   static outputs = [output("boolean")];
   run() {
     this.output(0).data = Number.isFinite(this.input(0).data);

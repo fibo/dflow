@@ -5,7 +5,6 @@ const { input, output } = DflowNode;
 class NumNode extends DflowNode {
   static kind = "Num";
   static outputs = [output(["number"])];
-
   run() {}
 }
 
@@ -13,21 +12,10 @@ class SumNode extends DflowNode {
   static kind = "Sum";
   static inputs = [input(["number"]), input(["number"])];
   static outputs = [output(["number"])];
-
   run() {
-    let sum = 0;
-
-    for (const input of this.inputs) {
-      const inputData = input.data;
-      if (typeof inputData === "number") {
-        sum += inputData;
-      }
-    }
-
-    const output = this.output(0);
-    if (output !== null) {
-      output.data = sum;
-    }
+    const a = this.input(0).data;
+    const b = this.input(1).data;
+    this.output(0).data = a + b;
   }
 }
 
@@ -59,30 +47,31 @@ async function runGraph() {
   const dflow = new DflowHost({ nodesCatalog });
 
   // Create two nodes, num and sum.
+
   const numNode = dflow.newNode({
-    id: "num",
-    name: "Hello world",
     kind: NumNode.kind,
     outputs: [{ id: "out", data: 21 }],
   });
   const sumNode = dflow.newNode({
-    id: "sum",
     kind: SumNode.kind,
+    // Optional `id`.
+    id: "sum",
     inputs: [{ id: "in1" }, { id: "in2" }],
     outputs: [{ id: "out" }],
   });
 
-  // Connect nodes, using both `dflow.connect()` and `dflow.newEdge()`.
+  // Connect nodes. Both `dflow.connect()` and `dflow.newEdge()` are used here.
   dflow.connect(numNode).to(sumNode);
   dflow.newEdge({
     id: "e2",
-    source: ["num", "out"],
+    source: [numNode.id, "out"],
     target: ["sum", "in2"],
   });
 
   // Add also an async node.
   dflow.newNode({ id: "sleep", kind: SleepNode.kind });
 
+  // Run graph asynchronously.
   await dflow.run();
 
   const sum = sumNode.output(0);

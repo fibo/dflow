@@ -79,7 +79,7 @@ export class DflowData {
   }
 
   static isNumber(data: unknown): data is number {
-    return typeof data === "number" && !isNaN(data);
+    return typeof data === "number" && !isNaN(data) && Number.isFinite(data);
   }
 
   static isString(data: unknown): data is string {
