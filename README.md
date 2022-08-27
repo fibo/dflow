@@ -37,12 +37,18 @@ npm install dflow
 
 ### Deno
 
+> Dflow lives in Deno land!
+
+Module is published here: https://deno.land/x/dflow
+
+#### Using an import map
+
 Create an _import_map.json_ file like this.
 
 ```json
 {
   "imports": {
-    "dflow/": "https://unpkg.com/dflow/"
+    "dflow/": "https://deno.land/x/dflow/"
   }
 }
 ```
@@ -54,6 +60,10 @@ import { DflowHost } from "dflow/dflow.ts";
 import { nodesCatalog } from "dflow/nodes/index.ts";
 
 const dflow = new DflowHost({ nodesCatalog });
+
+// ... load or create a graph
+
+await dflow.run()
 ```
 
 With [deno](https://deno.land/) you can then launch your script like this
@@ -62,14 +72,14 @@ With [deno](https://deno.land/) you can then launch your script like this
 deno run --importmap=import_map.json path/to/my/script.ts
 ```
 
-It is recommended to point to a specific version, for instance to point to
-version `0.36` or whatever, then change your import map accordingly
+You may want to point to a specific version, for instance version `0.38` or whatever.
+Then change your import map accordingly
 
 ```diff
 {
   "imports": {
--    "dflow/": "https://unpkg.com/dflow/"
-+    "dflow/": "https://unpkg.com/dflow@0.36/"
+-    "dflow/": "https://deno.land/x/dflow/"
++    "dflow/": "https://deno.land/x/dflow@0.38/"
   }
 }
 ```
