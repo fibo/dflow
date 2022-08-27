@@ -911,12 +911,29 @@ export class DflowHost {
     this.#graph.edgesMap.clear();
   }
 
+  /**
+   * Connect node A to node B.
+   *
+   * @example
+   * ```ts
+   * dflow.connect(nodeA).to(nodeB);
+   * ```
+   *
+   * Both `connect()` and `to()` accept an optional second parameter which defaults to 0.
+   * It is the pin position.
+   *
+   * @example
+   * ```ts
+   * dflow.connect(nodeA, outputPosition).to(nodeB, inputPosition);
+   * ```
+   *
+   * @throws DflowErrorItemNotFound
+   */
   connect(sourceNode: DflowNode, sourcePosition = 0) {
     return {
       to: (targetNode: DflowNode, targetPosition = 0) => {
         const sourcePin = sourceNode.output(sourcePosition);
         const targetPin = targetNode.input(targetPosition);
-
         this.newEdge({
           source: [sourceNode.id, sourcePin.id],
           target: [targetNode.id, targetPin.id],
