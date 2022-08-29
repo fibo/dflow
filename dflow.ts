@@ -37,6 +37,9 @@ interface DflowItem<Serializable extends DflowValue> {
 // DflowData
 // ////////////////////////////////////////////////////////////////////
 
+/**
+ * A `DflowValue` represents input or output data and can be serialized into JSON.
+ */
 export type DflowValue =
   | string
   | number
@@ -44,8 +47,10 @@ export type DflowValue =
   | DflowArray
   | DflowObject;
 
+/** @ignore */
 export type DflowObject = { [Key in string]?: DflowValue };
 
+/** @ignore */
 export type DflowArray = Array<DflowValue>;
 
 const dflowDataTypes = [
@@ -59,6 +64,9 @@ const dflowDataTypes = [
 
 export type DflowDataType = typeof dflowDataTypes[number];
 
+/**
+ * `DflowData` is a static class with methods to handle Dflow data.
+ */
 export class DflowData {
   static types = dflowDataTypes;
 
@@ -490,6 +498,20 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
    *   static outputs = [output("number", { name: "π", data: Math.PI })];
    * }
    * ```
+   *
+   * Named output with `number` type.
+   * @example
+   * ```ts
+   * input("number", { name: "answer" })
+   * ```
+   *
+   * @see {@link DflowNode.input} for other similar examples.
+   *
+   * `DflowOutputDefinition` has also an optional `data` attribute.
+   * @example
+   * ```ts
+   * input("number", { data: 42, name: "answer" })
+   * ```
    */
   static output(
     typing: DflowDataType | DflowDataType[] = [],
@@ -630,6 +652,10 @@ export class DflowEdge implements DflowItem<DflowSerializableEdge> {
 // DflowNodesCatalog
 // ////////////////////////////////////////////////////////////////////
 
+/**
+ * A class extending `DflowNode` must implement `DflowNodeDefinition` interface,
+ * to be used as a value in a `DflowNodesCatalog`.
+ */
 export interface DflowNodeDefinition {
   new (arg: DflowNodeConstructorArg): DflowNode;
   kind: DflowNode["kind"];
@@ -695,6 +721,16 @@ export class DflowGraph {
     this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
   }
 
+  /** @ignore */
+  static childrenOfNodeId(
+    nodeId: DflowId,
+    nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
+  ) {
+    return nodeConnections
+      .filter(({ sourceId }) => nodeId === sourceId)
+      .map(({ targetId }) => targetId);
+  }
+
   static executionNodeInfo = (
     { id, kind, outputs }: DflowSerializableNode,
     error?: string,
@@ -710,15 +746,7 @@ export class DflowGraph {
     return obj;
   };
 
-  static childrenOfNodeId(
-    nodeId: DflowId,
-    nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
-  ) {
-    return nodeConnections
-      .filter(({ sourceId }) => nodeId === sourceId)
-      .map(({ targetId }) => targetId);
-  }
-
+  /** @ignore */
   static parentsOfNodeId(
     nodeId: DflowId,
     nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
@@ -728,23 +756,7 @@ export class DflowGraph {
       .map(({ sourceId }) => sourceId);
   }
 
-  static levelOfNodeId(
-    nodeId: DflowId,
-    nodeConnections: DflowNodeConnection[],
-  ) {
-    const parentsNodeIds = DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
-    // 1. A node with no parent as level zero.
-    if (parentsNodeIds.length === 0) return 0;
-
-    // 2. Otherwise its level is the max level of its parents plus one.
-    let maxLevel = 0;
-    for (const parentNodeId of parentsNodeIds) {
-      const level = DflowGraph.levelOfNodeId(parentNodeId, nodeConnections);
-      maxLevel = Math.max(level, maxLevel);
-    }
-    return maxLevel + 1;
-  }
-
+  /** @ignore */
   static ancestorsOfNodeId(
     nodeId: DflowId,
     nodeConnections: DflowNodeConnection[],
@@ -757,9 +769,7 @@ export class DflowGraph {
           parentNodeId,
           nodeConnections,
         );
-
         const result = accumulator.concat(ancestors);
-
         // On last iteration, remove duplicates
         return index === array.length - 1
           ? [...new Set(array.concat(result))]
@@ -769,19 +779,24 @@ export class DflowGraph {
     );
   }
 
-  static sortNodesByLevel(
-    nodeIds: DflowId[],
+  /** @ignore */
+  static levelOfNodeId(
+    nodeId: DflowId,
     nodeConnections: DflowNodeConnection[],
-  ): DflowId[] {
-    const levelOf: Record<DflowId, number> = {};
-
-    for (const nodeId of nodeIds) {
-      levelOf[nodeId] = DflowGraph.levelOfNodeId(nodeId, nodeConnections);
+  ) {
+    const parentsNodeIds = DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
+    // 1. A node with no parent as level zero.
+    if (parentsNodeIds.length === 0) return 0;
+    // 2. Otherwise its level is the max level of its parents plus one.
+    let maxLevel = 0;
+    for (const parentNodeId of parentsNodeIds) {
+      const level = DflowGraph.levelOfNodeId(parentNodeId, nodeConnections);
+      maxLevel = Math.max(level, maxLevel);
     }
-
-    return nodeIds.slice().sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
+    return maxLevel + 1;
   }
 
+  /** @ignore */
   get nodeConnections(): DflowNodeConnection[] {
     return [...this.edgesMap.values()].map((edge) => ({
       sourceId: edge.source[0],
@@ -789,9 +804,9 @@ export class DflowGraph {
     }));
   }
 
+  /** @ignore */
   get nodeIdsInsideFunctions(): DflowId[] {
     const ancestorsOfReturnNodes = [];
-
     // Find all "return" nodes and get their ancestors.
     for (const node of [...this.nodesMap.values()]) {
       if (node.kind === "return") {
@@ -800,11 +815,25 @@ export class DflowGraph {
         );
       }
     }
-
     // Flatten and deduplicate results.
     return [...new Set(ancestorsOfReturnNodes.flat())];
   }
 
+  /** @ignore */
+  static sortNodesByLevel(
+    nodeIds: DflowId[],
+    nodeConnections: DflowNodeConnection[],
+  ): DflowId[] {
+    const levelOf: Record<DflowId, number> = {};
+    for (const nodeId of nodeIds) {
+      levelOf[nodeId] = DflowGraph.levelOfNodeId(nodeId, nodeConnections);
+    }
+    return nodeIds.slice().sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
+  }
+
+  /**
+   * Execute all nodes, sorted by their connections.
+   */
   async run(runOptions?: DflowGraphRunOptions) {
     const { verbose } = runOptions ?? this.runOptions;
 
