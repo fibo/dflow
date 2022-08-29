@@ -515,7 +515,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   }
 
   /**
-   * @throws DflowErrorItemNotFound
+   * @throws {DflowErrorItemNotFound}
    */
   getInputById(id: DflowId): DflowInput {
     const item = this.#inputsMap.get(id);
@@ -526,7 +526,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   /**
    * Get input by position.
    *
-   * @throws DflowErrorItemNotFound
+   * @throws {DflowErrorItemNotFound}
    */
   input(position: number): DflowInput {
     const pinId = this.#inputPosition[position];
@@ -543,7 +543,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   }
 
   /**
-   * @throws DflowErrorItemNotFound
+   * @throws {DflowErrorItemNotFound}
    */
   getOutputById(id: DflowId): DflowOutput {
     const item = this.#outputsMap.get(id);
@@ -554,7 +554,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   /**
    * Get output by position.
    *
-   * @throws DflowErrorItemNotFound
+   * @throws {DflowErrorItemNotFound}
    */
   output(position: number): DflowOutput {
     const pinId = this.#outputPosition[position];
@@ -963,7 +963,7 @@ export class DflowHost {
    * dflow.connect(nodeA, outputPosition).to(nodeB, inputPosition);
    * ```
    *
-   * @throws DflowErrorItemNotFound
+   * @throws {DflowErrorItemNotFound}
    */
   connect(sourceNode: DflowNode, sourcePosition = 0) {
     return {
@@ -979,7 +979,7 @@ export class DflowHost {
   }
 
   /**
-   * @throws DflowErrorItemNotFound
+   * @throws {DflowErrorItemNotFound}
    */
   deleteEdge(edgeId: DflowId) {
     const edge = this.getEdgeById(edgeId);
@@ -996,7 +996,7 @@ export class DflowHost {
   }
 
   /**
-   * @throws DflowErrorItemNotFound
+   * @throws {DflowErrorItemNotFound}
    */
   deleteNode(nodeId: DflowId) {
     const node = this.getNodeById(nodeId);
@@ -1100,7 +1100,7 @@ export class DflowHost {
   }
 
   /**
-   * @throws DflowErrorItemNotFound
+   * @throws {DflowErrorItemNotFound}
    */
   getEdgeById(id: DflowId): DflowEdge {
     const item = this.#graph.edgesMap.get(id);
@@ -1109,7 +1109,7 @@ export class DflowHost {
   }
 
   /**
-   * @throws DflowErrorItemNotFound
+   * @throws {DflowErrorItemNotFound}
    */
   getNodeById(id: DflowId): DflowNode {
     const item = this.#graph.nodesMap.get(id);
@@ -1162,7 +1162,7 @@ export class DflowHost {
   }
 
   /**
-   * @throws DflowErrorItemNotFound
+   * @throws {DflowErrorItemNotFound}
    */
   newEdge(obj: DflowNewEdge): DflowEdge {
     const numEdges = this.#graph.edgesMap.size;
