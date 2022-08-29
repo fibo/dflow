@@ -339,9 +339,9 @@ export type DflowNodeConstructorArg = {
 };
 
 /**
- * DflowNode represents a block of code: it can have inputs and outputs.
+ * `DflowNode` represents a block of code: it can have inputs and outputs.
  *
- * Extend this class to create a node.
+ * Extend it to create a node.
  * @example
  * ```ts
  * const { input, output } = DflowNode;
@@ -433,6 +433,42 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
    *     console.log(this.input(0).data as string);
    *   }
    * }
+   * ```
+   *
+   * Input with `number` type.
+   * @example
+   * ```ts
+   * input("number")
+   * ```
+   *
+   * Optional `number` input.
+   * @example
+   * ```ts
+   * input("number", { optional: true })
+   * ```
+   *
+   * Input that accepts both `number` and `string` type.
+   * @example
+   * ```ts
+   * input(["number", "string"])
+   * ```
+   *
+   * Input with any type.
+   * @example
+   * ```ts
+   * input()
+   * ```
+   *
+   * Input with type `array` and name.
+   * @example
+   * ```ts
+   * input("array", { name: "list" })
+   * ```
+   *
+   * Input with any type and named "foo".
+   * @example
+   * ```ts
+   * input([], { name: "foo" })
    * ```
    */
   static input(
