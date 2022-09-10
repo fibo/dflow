@@ -93,7 +93,7 @@ Then change your import map accordingly
 
 ## Usage
 
-This is a trivial sample graph that will compute `sin(π / 2) = 1` and print the result.
+This is a graph that will compute `sin(π / 2) = 1` and print the result.
 
 ```
    ----------------
