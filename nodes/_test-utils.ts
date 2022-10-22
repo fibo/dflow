@@ -1,5 +1,5 @@
 import { assertEquals } from "std/testing/asserts.ts";
-import { DflowData, DflowHost } from "../dflow.ts";
+import { Dflow, DflowHost } from "../dflow.ts";
 import { nodesCatalog } from "./index.ts";
 
 export const newDflowHost = () => new DflowHost({ nodesCatalog });
@@ -58,13 +58,13 @@ export function testTwoInOneOut<Input1, Input2, Output1>(
   output?: Output1,
 ) {
   const catalog = dflow.nodesCatalog;
-  const dataNode1 = DflowData.isDflowData(input1)
+  const dataNode1 = Dflow.isDflowData(input1)
     ? dflow.newNode({
       kind: catalog.data.kind,
       outputs: [{ data: input1 }],
     })
     : undefined;
-  const dataNode2 = DflowData.isDflowData(input2)
+  const dataNode2 = Dflow.isDflowData(input2)
     ? dflow.newNode({
       kind: catalog.data.kind,
       outputs: [{ data: input2 }],
@@ -90,19 +90,19 @@ export function testThreeInOneOut<Input1, Input2, Input3, Output1>(
   output?: Output1,
 ) {
   const catalog = dflow.nodesCatalog;
-  const dataNode1 = DflowData.isDflowData(input1)
+  const dataNode1 = Dflow.isDflowData(input1)
     ? dflow.newNode({
       kind: catalog.data.kind,
       outputs: [{ data: input1 }],
     })
     : undefined;
-  const dataNode2 = DflowData.isDflowData(input2)
+  const dataNode2 = Dflow.isDflowData(input2)
     ? dflow.newNode({
       kind: catalog.data.kind,
       outputs: [{ data: input2 }],
     })
     : undefined;
-  const dataNode3 = DflowData.isDflowData(input3)
+  const dataNode3 = Dflow.isDflowData(input3)
     ? dflow.newNode({
       kind: catalog.data.kind,
       outputs: [{ data: input3 }],

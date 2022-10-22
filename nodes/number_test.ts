@@ -1,4 +1,4 @@
-import { DflowValue } from "../dflow.ts";
+import { DflowData } from "../dflow.ts";
 import { newDflowHost, testOneInOneOut } from "./_test-utils.ts";
 
 Deno.test("isFinite", () => {
@@ -29,7 +29,7 @@ Deno.test("isInteger", () => {
     { input: "x", output: false },
     { input: NaN, output: false },
   ].forEach((input) => {
-    testOneInOneOut<DflowValue, boolean>(
+    testOneInOneOut<DflowData, boolean>(
       dflow,
       nodeKind,
       input,

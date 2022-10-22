@@ -1,4 +1,4 @@
-import { DflowValue } from "../dflow.ts";
+import { DflowData } from "../dflow.ts";
 import {
   newDflowHost,
   testOneInOneOut,
@@ -54,7 +54,7 @@ Deno.test("DflowNodeNullishCoaleshing", () => {
     { inputs: [undefined, 42], output: 42 },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<DflowValue, DflowValue, DflowValue>(
+      testTwoInOneOut<DflowData, DflowData, DflowData>(
         dflow,
         nodeKind,
         input1,
