@@ -35,7 +35,7 @@
     "example:execution-report": "deno run examples/execution-report.ts",
     "example:usage": "deno run examples/usage.js",
     "emit_typescript_declarations": "tsc --project ./tsconfig.declarations.json",
-    "fmt": "deno task fmt",
+    "fmt": "deno fmt",
     "postemit_typescript_declarations": "deno fmt dflow.d.ts",
     "prebuild": "npm test",
     "lint": "deno lint",
