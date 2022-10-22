@@ -1,4 +1,4 @@
-import { DflowValue } from "../dflow.ts";
+import { DflowData } from "../dflow.ts";
 import { newDflowHost, testTwoInOneOut } from "./_test-utils.ts";
 
 Deno.test("addition", () => {
@@ -71,7 +71,7 @@ Deno.test("equality", () => {
     },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<DflowValue, DflowValue, boolean>(
+      testTwoInOneOut<DflowData, DflowData, boolean>(
         dflow,
         nodeKind,
         input1,
@@ -182,7 +182,7 @@ Deno.test("inequality", () => {
     },
   ].forEach(
     ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<DflowValue, DflowValue, boolean>(
+      testTwoInOneOut<DflowData, DflowData, boolean>(
         dflow,
         nodeKind,
         input1,

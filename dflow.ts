@@ -24,7 +24,7 @@ type DflowSerializableItem = {
 
 type DflowItemConstructorArg = DflowSerializableItem;
 
-interface DflowItem<Serializable extends DflowValue> {
+interface DflowItem<Serializable extends DflowData> {
   /** Item identifier */
   readonly id: DflowId;
   /**
@@ -52,35 +52,47 @@ const generateItemId = (
 // ////////////////////////////////////////////////////////////////////
 
 /**
- * A `DflowValue` represents input or output data and can be serialized into JSON.
+ * A `DflowData` represents input or output data and can be serialized into JSON.
  */
-export type DflowValue = string | number | boolean | DflowArray | DflowObject;
+export type DflowData =
+  | string
+  | number
+  | boolean
+  | DflowArray
+  | DflowObject;
 
 /** @ignore */
-export type DflowObject = { [Key in string]?: DflowValue };
+export type DflowObject = { [Key in string]?: DflowData };
 
 /** @ignore */
-export type DflowArray = Array<DflowValue>;
+export type DflowArray = DflowData[];
 
-const dflowDataTypes = [
-  "string",
-  "number",
-  "boolean",
-  "object",
-  "array",
-  "DflowId",
-] as const;
-
-export type DflowDataType = typeof dflowDataTypes[number];
+export type DflowDataType = typeof Dflow.dataTypes[number];
 
 /**
- * `DflowData` is a static class with methods to handle Dflow data.
+ * `Dflow` is a static class with methods to handle Dflow data.
  */
-export class DflowData {
-  static types = dflowDataTypes;
+export class Dflow {
+  static dataTypes = [
+    "string",
+    "number",
+    "boolean",
+    "object",
+    "array",
+    "DflowId",
+  ];
+
+  static inferDataType(data: unknown): DflowDataType[] {
+    if (Dflow.isBoolean(data)) return ["boolean"];
+    if (Dflow.isNumber(data)) return ["number"];
+    if (Dflow.isString(data)) return ["string"];
+    if (Dflow.isArray(data)) return ["array"];
+    if (Dflow.isObject(data)) return ["object"];
+    return [];
+  }
 
   static isArray(arg: unknown): arg is DflowArray {
-    return Array.isArray(arg);
+    return Array.isArray(arg) && arg.every(Dflow.isDflowData);
   }
 
   static isBoolean(arg: unknown): arg is boolean {
@@ -92,7 +104,8 @@ export class DflowData {
   }
 
   static isObject(arg: unknown): arg is DflowObject {
-    return typeof arg === "object" && arg !== null && !Array.isArray(arg);
+    return typeof arg === "object" && arg !== null && !Array.isArray(arg) &&
+      Object.values(arg).every(Dflow.isDflowData);
   }
 
   static isNumber(arg: unknown): arg is number {
@@ -103,15 +116,15 @@ export class DflowData {
     return typeof arg === "string";
   }
 
-  static isDflowData(arg: unknown) {
+  static isDflowData(arg: unknown): arg is DflowData {
     if (typeof arg === "undefined") return false;
     return (
-      DflowData.isString(arg) ||
-      DflowData.isBoolean(arg) ||
-      DflowData.isNumber(arg) ||
-      DflowData.isObject(arg) ||
-      DflowData.isArray(arg) ||
-      DflowData.isDflowId(arg)
+      Dflow.isString(arg) ||
+      Dflow.isBoolean(arg) ||
+      Dflow.isNumber(arg) ||
+      Dflow.isObject(arg) ||
+      Dflow.isArray(arg) ||
+      Dflow.isDflowId(arg)
     );
   }
 
@@ -122,17 +135,17 @@ export class DflowData {
     return types.some((pinType) => {
       switch (pinType) {
         case "array":
-          return DflowData.isArray(data);
+          return Dflow.isArray(data);
         case "boolean":
-          return DflowData.isBoolean(data);
+          return Dflow.isBoolean(data);
         case "number":
-          return DflowData.isNumber(data);
+          return Dflow.isNumber(data);
         case "object":
-          return DflowData.isObject(data);
+          return Dflow.isObject(data);
         case "string":
-          return DflowData.isString(data);
+          return Dflow.isString(data);
         case "DflowId":
-          return DflowData.isDflowId(data);
+          return Dflow.isDflowId(data);
         default:
           return false;
       }
@@ -230,7 +243,7 @@ export class DflowInput extends DflowPin
   /**
    * An input data is a reference to its connected output data, if any.
    */
-  get data(): DflowValue | undefined {
+  get data(): DflowData | undefined {
     return this.source?.data;
   }
 
@@ -262,19 +275,20 @@ export class DflowInput extends DflowPin
 // ////////////////////////////////////////////////////////////////////
 
 type DflowOutputDefinition = DflowPinDefinition & {
-  data?: DflowValue;
+  data?: DflowData;
 };
 
+type DflowOutputData = {
+  data?: DflowData | undefined;
+};
 export type DflowSerializableOutput =
   & DflowSerializablePin
-  & Partial<Pick<DflowOutput, "data">>;
+  & DflowOutputData;
 
 type DflowOutputConstructorArg =
   & DflowItemConstructorArg
   & DflowPinConstructorArg
-  & {
-    data?: DflowValue;
-  };
+  & DflowOutputData;
 
 /**
  * A `DflowOutput` is a node output pin.
@@ -285,7 +299,7 @@ export class DflowOutput extends DflowPin
   implements DflowItem<DflowSerializableOutput> {
   readonly id: DflowId;
 
-  private value: DflowValue | undefined;
+  private value: DflowData | undefined;
 
   constructor({ id, data, ...pin }: DflowOutputConstructorArg) {
     super(pin);
@@ -293,29 +307,25 @@ export class DflowOutput extends DflowPin
     this.value = data;
   }
 
-  get data(): DflowValue | undefined {
+  get data(): DflowData | undefined {
     return this.value;
   }
 
-  set data(data: unknown) {
-    switch (true) {
-      case typeof data === "undefined":
-        this.clear();
-        break;
-      case this.hasTypeAny:
-      case this.hasType("string") && DflowData.isString(data):
-      case this.hasType("number") && DflowData.isNumber(data):
-      case this.hasType("boolean") && DflowData.isBoolean(data):
-      case this.hasType("object") && DflowData.isObject(data):
-      case this.hasType("array") && DflowData.isArray(data):
-      case this.hasType("DflowId") && DflowData.isDflowId(data): {
-        this.value = data as DflowValue;
-        break;
-      }
-      default: {
-        this.clear();
-        break;
-      }
+  set data(arg: unknown) {
+    if (typeof arg === "undefined") {
+      this.clear();
+    } else if (
+      (this.hasType("string") && Dflow.isString(arg)) ||
+      (this.hasType("number") && Dflow.isNumber(arg)) ||
+      (this.hasType("boolean") && Dflow.isBoolean(arg)) ||
+      (this.hasType("object") && Dflow.isObject(arg)) ||
+      (this.hasType("array") && Dflow.isArray(arg)) ||
+      (this.hasType("DflowId") && Dflow.isDflowId(arg)) ||
+      (this.hasTypeAny && Dflow.isDflowData(arg))
+    ) {
+      this.value = arg;
+    } else {
+      this.clear();
     }
   }
 
@@ -417,7 +427,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
     // Inputs.
 
     for (const obj of inputs) {
-      const id = DflowData.isDflowId(obj.id)
+      const id = Dflow.isDflowId(obj.id)
         ? obj.id
         : generateItemId(this.inputsMap, "i");
       const pin = new DflowInput({ ...obj, id });
@@ -428,7 +438,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
     // Outputs.
 
     for (const obj of outputs) {
-      const id = DflowData.isDflowId(obj.id)
+      const id = Dflow.isDflowId(obj.id)
         ? obj.id
         : generateItemId(this.outputsMap, "o");
       const pin = new DflowOutput({ ...obj, id });
@@ -545,7 +555,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
       // Ignore optional inputs with no data.
       if (optional && typeof data === "undefined") continue;
       // Validate input data.
-      if (DflowData.isValidDataType(types, data)) continue;
+      if (Dflow.isValidDataType(types, data)) continue;
       // Some input is not valid.
       return false;
     }
@@ -1184,13 +1194,13 @@ export class DflowHost {
   newNode(obj: DflowNewNode): DflowNode {
     const NodeClass = this.nodesCatalog[obj.kind] ?? DflowNodeUnknown;
 
-    const id = DflowData.isDflowId(obj.id)
+    const id = Dflow.isDflowId(obj.id)
       ? (obj.id as DflowId)
       : generateItemId(this.graph.nodesMap, "n");
 
     const inputs = NodeClass.inputs?.map((pin, i) => {
       const objPin = obj.inputs?.[i] ?? ({} as Partial<DflowNewInput>);
-      const id = DflowData.isDflowId(objPin?.id) ? objPin.id : `i${i}`;
+      const id = Dflow.isDflowId(objPin?.id) ? objPin.id : `i${i}`;
       return {
         id,
         ...objPin,
@@ -1200,7 +1210,7 @@ export class DflowHost {
 
     const outputs = NodeClass.outputs?.map((pin, i) => {
       const objPin = obj.outputs?.[i] ?? ({} as Partial<DflowNewOutput>);
-      const id = DflowData.isDflowId(objPin?.id) ? objPin.id : `o${i}`;
+      const id = Dflow.isDflowId(objPin?.id) ? objPin.id : `o${i}`;
       return {
         id,
         ...objPin,
@@ -1222,7 +1232,7 @@ export class DflowHost {
    * @throws {DflowErrorItemNotFound}
    */
   newEdge(obj: DflowNewEdge): DflowEdge {
-    const id = DflowData.isDflowId(obj.id)
+    const id = Dflow.isDflowId(obj.id)
       ? (obj.id as DflowId)
       : generateItemId(this.graph.edgesMap, "e");
 
@@ -1276,24 +1286,7 @@ class DflowNodeData extends DflowNode {
         ...node,
         outputs: outputs?.map((output) => ({
           ...output,
-          types: (function inferDflowDataType(
-            data?: DflowValue,
-          ): DflowDataType[] {
-            switch (true) {
-              case DflowData.isBoolean(data):
-                return ["boolean"];
-              case DflowData.isNumber(data):
-                return ["number"];
-              case DflowData.isString(data):
-                return ["string"];
-              case DflowData.isArray(data):
-                return ["array"];
-              case DflowData.isObject(data):
-                return ["object"];
-              default:
-                return [];
-            }
-          })(output.data),
+          types: Dflow.inferDataType(output.data),
         })),
       },
       host,

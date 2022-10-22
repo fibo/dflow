@@ -16,7 +16,7 @@ declare type DflowSerializableItem = {
   id: DflowId;
 };
 declare type DflowItemConstructorArg = DflowSerializableItem;
-interface DflowItem<Serializable extends DflowValue> {
+interface DflowItem<Serializable extends DflowData> {
   /** Item identifier */
   readonly id: DflowId;
   /**
@@ -26,9 +26,9 @@ interface DflowItem<Serializable extends DflowValue> {
   toObject(): Serializable;
 }
 /**
- * A `DflowValue` represents input or output data and can be serialized into JSON.
+ * A `DflowData` represents input or output data and can be serialized into JSON.
  */
-export declare type DflowValue =
+export declare type DflowData =
   | string
   | number
   | boolean
@@ -36,10 +36,10 @@ export declare type DflowValue =
   | DflowObject;
 /** @ignore */
 export declare type DflowObject = {
-  [Key in string]?: DflowValue;
+  [Key in string]?: DflowData;
 };
 /** @ignore */
-export declare type DflowArray = Array<DflowValue>;
+export declare type DflowArray = DflowData[];
 declare const dflowDataTypes: readonly [
   "string",
   "number",
@@ -50,10 +50,10 @@ declare const dflowDataTypes: readonly [
 ];
 export declare type DflowDataType = typeof dflowDataTypes[number];
 /**
- * `DflowData` is a static class with methods to handle Dflow data.
+ * `Dflow` is a static class with methods to handle Dflow data.
  */
-export declare class DflowData {
-  static types: readonly [
+export declare class Dflow {
+  static dataTypes: readonly [
     "string",
     "number",
     "boolean",
@@ -61,13 +61,14 @@ export declare class DflowData {
     "array",
     "DflowId",
   ];
+  static inferDataType(data: unknown): DflowDataType[];
   static isArray(arg: unknown): arg is DflowArray;
   static isBoolean(arg: unknown): arg is boolean;
   static isDflowId(arg: unknown): arg is DflowId;
   static isObject(arg: unknown): arg is DflowObject;
   static isNumber(arg: unknown): arg is number;
   static isString(arg: unknown): arg is string;
-  static isDflowData(arg: unknown): boolean;
+  static isDflowData(arg: unknown): arg is DflowData;
   static isValidDataType(types: DflowDataType[], data: unknown): boolean;
 }
 declare type DflowSerializablePin =
@@ -115,7 +116,7 @@ export declare class DflowInput extends DflowPin
   /**
    * An input data is a reference to its connected output data, if any.
    */
-  get data(): DflowValue | undefined;
+  get data(): DflowData | undefined;
   get isConnected(): boolean;
   connectTo(pin: DflowOutput): void;
   disconnect(): void;
@@ -123,17 +124,18 @@ export declare class DflowInput extends DflowPin
   toObject(): DflowSerializableInput;
 }
 declare type DflowOutputDefinition = DflowPinDefinition & {
-  data?: DflowValue;
+  data?: DflowData;
+};
+declare type DflowOutputData = {
+  data?: DflowData | undefined;
 };
 export declare type DflowSerializableOutput =
   & DflowSerializablePin
-  & Partial<Pick<DflowOutput, "data">>;
+  & DflowOutputData;
 declare type DflowOutputConstructorArg =
   & DflowItemConstructorArg
   & DflowPinConstructorArg
-  & {
-    data?: DflowValue;
-  };
+  & DflowOutputData;
 /**
  * A `DflowOutput` is a node output pin.
  *
@@ -144,8 +146,8 @@ export declare class DflowOutput extends DflowPin
   readonly id: DflowId;
   private value;
   constructor({ id, data, ...pin }: DflowOutputConstructorArg);
-  get data(): DflowValue | undefined;
-  set data(data: unknown);
+  get data(): DflowData | undefined;
+  set data(arg: unknown);
   clear(): void;
   /** Return serializable item. */
   toObject(): DflowSerializableOutput;
@@ -534,10 +536,7 @@ export declare class DflowHost {
    * @throws {DflowErrorItemNotFound}
    */
   deleteNode(nodeId: DflowId): void;
-  executeFunction(
-    functionId: DflowId,
-    args: DflowArray,
-  ): DflowValue | undefined;
+  executeFunction(functionId: DflowId, args: DflowArray): DflowData | undefined;
   /**
    * @throws {DflowErrorItemNotFound}
    */

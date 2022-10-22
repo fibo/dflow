@@ -1,5 +1,5 @@
 import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
-import { DflowArray, DflowValue } from "../dflow.ts";
+import { DflowArray, DflowData } from "../dflow.ts";
 import {
   newDflowHost,
   testOneInOneOut,
@@ -19,7 +19,7 @@ Deno.test("arrayAt", () => {
     { input1: ["a", true], input2: 1, output: true },
     { input1: ["a", true, 42], input2: -1, output: 42 },
   ].forEach(({ input1, input2, output }) => {
-    testTwoInOneOut<DflowArray, number, DflowValue>(
+    testTwoInOneOut<DflowArray, number, DflowData>(
       dflow,
       nodeKind,
       input1,
@@ -224,7 +224,7 @@ Deno.test("arrayPop", () => {
   [
     { input: [1, 2, 3], output1: 3, output2: [1, 2] },
   ].forEach(({ input, output1, output2 }) => {
-    testOneInTwoOut<DflowArray, DflowValue, DflowArray>(
+    testOneInTwoOut<DflowArray, DflowData, DflowArray>(
       dflow,
       nodeKind,
       input,
@@ -245,7 +245,7 @@ Deno.test("arrayPush", () => {
     { input1: [1, 2], input2: 3, output: [1, 2, 3] },
     { input1: [1, "a"], input2: true, output: [1, "a", true] },
   ].forEach(({ input1, input2, output }) => {
-    testTwoInOneOut<DflowArray, DflowValue, DflowArray>(
+    testTwoInOneOut<DflowArray, DflowData, DflowArray>(
       dflow,
       nodeKind,
       input1,
@@ -275,7 +275,7 @@ Deno.test("arrayShift", () => {
   [
     { input: [1, 2, 3], output1: 1, output2: [2, 3] },
   ].forEach(({ input, output1, output2 }) => {
-    testOneInTwoOut<DflowArray, DflowValue, DflowArray>(
+    testOneInTwoOut<DflowArray, DflowData, DflowArray>(
       dflow,
       nodeKind,
       input,

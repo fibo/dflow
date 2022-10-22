@@ -1,12 +1,12 @@
 import { assertEquals } from "std/testing/asserts.ts";
-import { DflowValue } from "../dflow.ts";
+import { DflowData } from "../dflow.ts";
 import { newDflowHost } from "./_test-utils.ts";
 
 function testConditionalIf(
-  input1?: DflowValue,
-  input2?: DflowValue,
-  input3?: DflowValue,
-  output?: DflowValue,
+  input1?: DflowData,
+  input2?: DflowData,
+  input3?: DflowData,
+  output?: DflowData,
 ) {
   const dflow = newDflowHost();
   const catalog = dflow.nodesCatalog;
