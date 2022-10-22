@@ -4,6 +4,7 @@
       "exclude": [
         "README.md",
         "DEVELOP.md",
+        "examples/README.md",
         "dflow.cjs",
         "dflow.js",
         "nodes.js",
