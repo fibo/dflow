@@ -1,4 +1,4 @@
-import { DflowArray, DflowObject } from "../dflow.ts";
+import { DflowArray, DflowObject } from "dflow";
 import { newDflowHost, testOneInOneOut } from "./_test-utils.ts";
 
 Deno.test("objectKeys", () => {

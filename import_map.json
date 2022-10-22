@@ -1,5 +1,6 @@
 {
   "imports": {
+    "dflow": "./dflow.ts",
     "std/": "https://deno.land/std/"
   }
 }

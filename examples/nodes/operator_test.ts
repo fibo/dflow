@@ -1,4 +1,4 @@
-import { DflowData } from "../dflow.ts";
+import { DflowData } from "dflow";
 import { newDflowHost, testTwoInOneOut } from "./_test-utils.ts";
 
 Deno.test("addition", () => {

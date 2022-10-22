@@ -1,4 +1,4 @@
-import { DflowData } from "../dflow.ts";
+import { DflowData, DflowNode } from "dflow";
 import { newDflowHost, testOneInOneOut } from "./_test-utils.ts";
 
 Deno.test("isFinite", () => {

@@ -64,7 +64,7 @@ Then you can import for example the following.
 
 ```typescript
 import { DflowHost } from "dflow/dflow.ts";
-import { nodesCatalog } from "dflow/nodes/index.ts";
+import { nodesCatalog } from "dflow/examples/nodes/index.ts";
 
 const dflow = new DflowHost({ nodesCatalog });
 

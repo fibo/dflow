@@ -1,5 +1,5 @@
 import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
-import { DflowArray, DflowData } from "../dflow.ts";
+import { DflowArray, DflowData } from "dflow";
 import {
   newDflowHost,
   testOneInOneOut,
