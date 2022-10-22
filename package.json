@@ -2,7 +2,7 @@
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
   "type": "module",
-  "version": "0.38.0",
+  "version": "0.39.0",
   "main": "./dflow.cjs",
   "types": "dflow.d.ts",
   "exports": {
