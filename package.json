@@ -29,7 +29,7 @@
     "bundle:dflow:esmodule": "deno bundle dflow.ts | esbuild --minify-whitespace --target=safari11 > dflow.js",
     "bundle:nodes:esmodule": "deno bundle examples/nodes/index.ts | esbuild --minify-whitespace --target=safari11 > nodes.js",
     "example:custom-nodes": "deno run examples/custom-nodes.js",
-    "example:context": "deno run examples/context.ts",
+    "example:context": "deno run --unstable --importmap=import_map.json examples/context.ts",
     "example:execution-report": "deno run examples/execution-report.ts",
     "example:usage": "deno run examples/usage.js",
     "emit_typescript_declarations": "tsc --project ./tsconfig.declarations.json",
