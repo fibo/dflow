@@ -8,7 +8,6 @@
   "exports": {
     ".": {
       "import": "./dflow.js",
-      "require": "./dflow.cjs",
       "types": "./dflow.d.ts"
     },
     "./nodes": {
@@ -26,8 +25,7 @@
   "homepage": "https://fibo.github.io/dflow",
   "license": "MIT",
   "scripts": {
-    "build": "npm run bundle:dflow:commonjs && npm run bundle:dflow:esmodule && npm run bundle:nodes:esmodule && npm run emit_typescript_declarations",
-    "bundle:dflow:commonjs": "deno bundle dflow.ts | esbuild --format=cjs --target=node10 > dflow.cjs",
+    "build": "npm run bundle:dflow:esmodule && npm run bundle:nodes:esmodule && npm run emit_typescript_declarations",
     "bundle:dflow:esmodule": "deno bundle dflow.ts | esbuild --minify-whitespace --target=safari11 > dflow.js",
     "bundle:nodes:esmodule": "deno bundle nodes/index.ts | esbuild --minify-whitespace --target=safari11 > nodes.js",
     "example:custom-nodes": "deno run examples/custom-nodes.js",
