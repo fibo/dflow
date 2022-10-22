@@ -1,5 +1,5 @@
 import { assertEquals } from "std/testing/asserts.ts";
-import { Dflow, DflowHost } from "../dflow.ts";
+import { Dflow, DflowHost } from "dflow";
 import { nodesCatalog } from "./index.ts";
 
 export const newDflowHost = () => new DflowHost({ nodesCatalog });

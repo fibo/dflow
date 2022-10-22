@@ -1,4 +1,4 @@
-import { DflowArray, DflowId, DflowNode } from "../dflow.ts";
+import { DflowArray, DflowId, DflowNode } from "dflow";
 
 const { input, output } = DflowNode;
 

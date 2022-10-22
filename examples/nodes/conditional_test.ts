@@ -1,5 +1,5 @@
 import { assertEquals } from "std/testing/asserts.ts";
-import { DflowData } from "../dflow.ts";
+import { DflowData } from "dflow";
 import { newDflowHost } from "./_test-utils.ts";
 
 function testConditionalIf(

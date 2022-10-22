@@ -1,4 +1,4 @@
-import type { DflowNodesCatalog } from "../dflow.ts";
+import type { DflowNodesCatalog } from "dflow";
 import { catalog as arrayCatalog } from "./array.ts";
 import { catalog as conditionalCatalog } from "./conditional.ts";
 import { catalog as consoleCatalog } from "./console.ts";
