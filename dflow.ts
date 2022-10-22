@@ -41,7 +41,7 @@ interface DflowItem<Serializable extends DflowValue> {
 const generateItemId = (
   itemMap: Map<DflowId, unknown>,
   idPrefix: string,
-  i?: number
+  i?: number,
 ): DflowId => {
   const n = i ?? itemMap.size;
   const id = `${idPrefix}${n}`;
@@ -143,11 +143,13 @@ export class DflowData {
 // DflowPin
 // ////////////////////////////////////////////////////////////////////
 
-type DflowSerializablePin = DflowSerializableItem &
-  Partial<Pick<DflowPin, "name">>;
+type DflowSerializablePin =
+  & DflowSerializableItem
+  & Partial<Pick<DflowPin, "name">>;
 
-type DflowPinDefinition = Pick<DflowPin, "types"> &
-  Partial<Pick<DflowPin, "name">>;
+type DflowPinDefinition =
+  & Pick<DflowPin, "types">
+  & Partial<Pick<DflowPin, "name">>;
 
 type DflowPinConstructorArg = Partial<Pick<DflowPin, "name" | "types">>;
 
@@ -163,7 +165,7 @@ export class DflowPin {
 
   static canConnect(
     sourceTypes: DflowDataType[],
-    targetTypes: DflowDataType[]
+    targetTypes: DflowDataType[],
   ) {
     // Source can have any type,
     // DflowHost.run() will validate data.
@@ -190,12 +192,14 @@ export class DflowPin {
 // DflowInput
 // ////////////////////////////////////////////////////////////////////
 
-type DflowInputDefinition = DflowPinDefinition &
-  Partial<Pick<DflowInput, "optional">>;
+type DflowInputDefinition =
+  & DflowPinDefinition
+  & Partial<Pick<DflowInput, "optional">>;
 
-type DflowInputConstructorArg = DflowItemConstructorArg &
-  DflowPinConstructorArg &
-  Pick<DflowInputDefinition, "optional">;
+type DflowInputConstructorArg =
+  & DflowItemConstructorArg
+  & DflowPinConstructorArg
+  & Pick<DflowInputDefinition, "optional">;
 
 export type DflowSerializableInput = DflowSerializablePin;
 
@@ -204,10 +208,8 @@ export type DflowSerializableInput = DflowSerializablePin;
  *
  * @implements DflowItem<DflowSerializableInput>
  */
-export class DflowInput
-  extends DflowPin
-  implements DflowItem<DflowSerializableInput>
-{
+export class DflowInput extends DflowPin
+  implements DflowItem<DflowSerializableInput> {
   readonly id: DflowId;
 
   private source?: DflowOutput;
@@ -263,11 +265,14 @@ type DflowOutputDefinition = DflowPinDefinition & {
   data?: DflowValue;
 };
 
-export type DflowSerializableOutput = DflowSerializablePin &
-  Partial<Pick<DflowOutput, "data">>;
+export type DflowSerializableOutput =
+  & DflowSerializablePin
+  & Partial<Pick<DflowOutput, "data">>;
 
-type DflowOutputConstructorArg = DflowItemConstructorArg &
-  DflowPinConstructorArg & {
+type DflowOutputConstructorArg =
+  & DflowItemConstructorArg
+  & DflowPinConstructorArg
+  & {
     data?: DflowValue;
   };
 
@@ -276,10 +281,8 @@ type DflowOutputConstructorArg = DflowItemConstructorArg &
  *
  * @implements DflowItem<DflowSerializableOutput>
  */
-export class DflowOutput
-  extends DflowPin
-  implements DflowItem<DflowSerializableOutput>
-{
+export class DflowOutput extends DflowPin
+  implements DflowItem<DflowSerializableOutput> {
   readonly id: DflowId;
 
   private value: DflowValue | undefined;
@@ -331,8 +334,10 @@ export class DflowOutput
 // DflowNode
 // ////////////////////////////////////////////////////////////////////
 
-export type DflowSerializableNode = DflowSerializableItem &
-  Pick<DflowNode, "kind"> & {
+export type DflowSerializableNode =
+  & DflowSerializableItem
+  & Pick<DflowNode, "kind">
+  & {
     inputs?: DflowSerializableInput[];
     outputs?: DflowSerializableOutput[];
   };
@@ -494,7 +499,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
    */
   static input(
     typing: DflowDataType | DflowDataType[] = [],
-    rest?: Omit<DflowInputDefinition, "types">
+    rest?: Omit<DflowInputDefinition, "types">,
   ): DflowInputDefinition {
     return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
@@ -530,7 +535,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
    */
   static output(
     typing: DflowDataType | DflowDataType[] = [],
-    rest?: Omit<DflowOutputDefinition, "types">
+    rest?: Omit<DflowOutputDefinition, "types">,
   ): DflowOutputDefinition {
     return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
@@ -696,10 +701,12 @@ export type DflowNodesCatalog = Record<DflowNode["kind"], DflowNodeDefinition>;
 
 export type DflowGraphRunStatus = "running" | "success" | "failure";
 
-export type DflowExecutionNodeInfo = Pick<
-  DflowSerializableNode,
-  "id" | "kind" | "outputs"
-> & { error?: string };
+export type DflowExecutionNodeInfo =
+  & Pick<
+    DflowSerializableNode,
+    "id" | "kind" | "outputs"
+  >
+  & { error?: string };
 
 export type DflowGraphExecutionReport = {
   status: DflowGraphRunStatus;
@@ -747,7 +754,7 @@ export class DflowGraph {
   /** @ignore */
   static childrenOfNodeId(
     nodeId: DflowId,
-    nodeConnections: { sourceId: DflowId; targetId: DflowId }[]
+    nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
   ) {
     return nodeConnections
       .filter(({ sourceId }) => nodeId === sourceId)
@@ -756,7 +763,7 @@ export class DflowGraph {
 
   static executionNodeInfo = (
     { id, kind, outputs }: DflowSerializableNode,
-    error?: string
+    error?: string,
   ): DflowExecutionNodeInfo => {
     const obj: DflowExecutionNodeInfo = {
       id,
@@ -772,7 +779,7 @@ export class DflowGraph {
   /** @ignore */
   static parentsOfNodeId(
     nodeId: DflowId,
-    nodeConnections: { sourceId: DflowId; targetId: DflowId }[]
+    nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
   ) {
     return nodeConnections
       .filter(({ targetId }) => nodeId === targetId)
@@ -782,7 +789,7 @@ export class DflowGraph {
   /** @ignore */
   static ancestorsOfNodeId(
     nodeId: DflowId,
-    nodeConnections: DflowNodeConnection[]
+    nodeConnections: DflowNodeConnection[],
   ): DflowId[] {
     const parentsNodeIds = DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
     if (parentsNodeIds.length === 0) return [];
@@ -790,7 +797,7 @@ export class DflowGraph {
       (accumulator, parentNodeId, index, array) => {
         const ancestors = DflowGraph.ancestorsOfNodeId(
           parentNodeId,
-          nodeConnections
+          nodeConnections,
         );
         const result = accumulator.concat(ancestors);
         // On last iteration, remove duplicates
@@ -798,14 +805,14 @@ export class DflowGraph {
           ? [...new Set(array.concat(result))]
           : result;
       },
-      []
+      [],
     );
   }
 
   /** @ignore */
   static levelOfNodeId(
     nodeId: DflowId,
-    nodeConnections: DflowNodeConnection[]
+    nodeConnections: DflowNodeConnection[],
   ) {
     const parentsNodeIds = DflowGraph.parentsOfNodeId(nodeId, nodeConnections);
     // 1. A node with no parent as level zero.
@@ -831,11 +838,13 @@ export class DflowGraph {
   get nodeIdsInsideFunctions(): DflowId[] {
     const ancestorsOfReturnNodes = [];
     // Find all "return" nodes and get their ancestors.
-    for (const node of [...this.nodesMap.values()])
-      if (node.kind === "return")
+    for (const node of [...this.nodesMap.values()]) {
+      if (node.kind === "return") {
         ancestorsOfReturnNodes.push(
-          DflowGraph.ancestorsOfNodeId(node.id, this.nodeConnections)
+          DflowGraph.ancestorsOfNodeId(node.id, this.nodeConnections),
         );
+      }
+    }
     // Flatten and deduplicate results.
     return [...new Set(ancestorsOfReturnNodes.flat())];
   }
@@ -843,7 +852,7 @@ export class DflowGraph {
   /** @ignore */
   static sortNodesByLevel(
     nodeIds: DflowId[],
-    nodeConnections: DflowNodeConnection[]
+    nodeConnections: DflowNodeConnection[],
   ): DflowId[] {
     const levelOf: Record<DflowId, number> = {};
     for (const nodeId of nodeIds) {
@@ -874,9 +883,9 @@ export class DflowGraph {
     const nodeIdsExcluded = this.nodeIdsInsideFunctions;
     const nodeIds = DflowGraph.sortNodesByLevel(
       [...this.nodesMap.keys()].filter(
-        (nodeId) => !nodeIdsExcluded.includes(nodeId)
+        (nodeId) => !nodeIdsExcluded.includes(nodeId),
       ),
-      this.nodeConnections
+      this.nodeConnections,
     );
 
     for (const nodeId of nodeIds) {
@@ -889,7 +898,7 @@ export class DflowGraph {
           if (verbose) {
             const error = new DflowErrorInvalidInputData({ nodeId });
             executionReport.steps.push(
-              DflowGraph.executionNodeInfo(node.toObject(), error.message)
+              DflowGraph.executionNodeInfo(node.toObject(), error.message),
             );
           }
           // Cleanup outputs and go to next node.
@@ -905,7 +914,7 @@ export class DflowGraph {
 
         if (verbose) {
           executionReport.steps.push(
-            DflowGraph.executionNodeInfo(node.toObject())
+            DflowGraph.executionNodeInfo(node.toObject()),
           );
         }
       } catch (error) {
@@ -939,17 +948,21 @@ type DflowNewItem = Partial<Pick<DflowSerializableItem, "id">>;
 
 type DflowNewInput = DflowNewItem;
 
-type DflowNewOutput = DflowNewItem &
-  Partial<Pick<DflowOutputConstructorArg, "data">>;
+type DflowNewOutput =
+  & DflowNewItem
+  & Partial<Pick<DflowOutputConstructorArg, "data">>;
 
-type DflowNewNode = DflowNewItem &
-  Pick<DflowSerializableNode, "kind"> & {
+type DflowNewNode =
+  & DflowNewItem
+  & Pick<DflowSerializableNode, "kind">
+  & {
     inputs?: DflowNewInput[];
     outputs?: DflowNewOutput[];
   };
 
-type DflowNewEdge = DflowNewItem &
-  Pick<DflowSerializableEdge, "source" | "target">;
+type DflowNewEdge =
+  & DflowNewItem
+  & Pick<DflowSerializableEdge, "source" | "target">;
 
 export type DflowHostConstructorArg = DflowGraphConstructorArg;
 
@@ -1077,7 +1090,7 @@ export class DflowHost {
     const nodeConnections = this.graph.nodeConnections;
     const childrenNodeIds = DflowGraph.childrenOfNodeId(
       functionId,
-      nodeConnections
+      nodeConnections,
     );
     const returnNodeIds = [];
     for (const childrenNodeId of childrenNodeIds) {
@@ -1092,7 +1105,7 @@ export class DflowHost {
       (accumulator, returnNodeId, index, array) => {
         const ancestors = DflowGraph.ancestorsOfNodeId(
           returnNodeId,
-          nodeConnections
+          nodeConnections,
         );
 
         const result = accumulator.concat(ancestors);
@@ -1100,7 +1113,7 @@ export class DflowHost {
         // On last iteration, remove duplicates
         return index === array.length ? [...new Set(result)] : result;
       },
-      []
+      [],
     );
 
     // 1. get nodeIds sorted by graph hierarchy
@@ -1109,7 +1122,7 @@ export class DflowHost {
     // 4. otherwise run node
     const nodeIds = DflowGraph.sortNodesByLevel(
       [...returnNodeIds, ...nodeIdsInsideFunction],
-      nodeConnections
+      nodeConnections,
     );
     for (const nodeId of nodeIds) {
       const node = this.getNodeById(nodeId) as DflowNode;
@@ -1119,10 +1132,9 @@ export class DflowHost {
           case DflowNodeArgument.kind: {
             const position = node.input(0).data;
             // Argument position default to 0, must be >= 0.
-            const index =
-              typeof position === "number" && !isNaN(position)
-                ? Math.max(position, 0)
-                : 0;
+            const index = typeof position === "number" && !isNaN(position)
+              ? Math.max(position, 0)
+              : 0;
             node.output(0).data = args[index];
             break;
           }
@@ -1132,7 +1144,7 @@ export class DflowHost {
           default: {
             if (node.run.constructor.name === "AsyncFunction") {
               throw new Error(
-                "dflow executeFunction() cannot execute async functions"
+                "dflow executeFunction() cannot execute async functions",
               );
             } else {
               node.run();
@@ -1140,7 +1152,7 @@ export class DflowHost {
 
             if (verbose) {
               this.executionReport?.steps?.push(
-                DflowGraph.executionNodeInfo(node.toObject())
+                DflowGraph.executionNodeInfo(node.toObject()),
               );
             }
           }
@@ -1176,27 +1188,25 @@ export class DflowHost {
       ? (obj.id as DflowId)
       : generateItemId(this.graph.nodesMap, "n");
 
-    const inputs =
-      NodeClass.inputs?.map((pin, i) => {
-        const objPin = obj.inputs?.[i] ?? ({} as Partial<DflowNewInput>);
-        const id = DflowData.isDflowId(objPin?.id) ? objPin.id : `i${i}`;
-        return {
-          id,
-          ...objPin,
-          ...pin,
-        };
-      }) ?? [];
+    const inputs = NodeClass.inputs?.map((pin, i) => {
+      const objPin = obj.inputs?.[i] ?? ({} as Partial<DflowNewInput>);
+      const id = DflowData.isDflowId(objPin?.id) ? objPin.id : `i${i}`;
+      return {
+        id,
+        ...objPin,
+        ...pin,
+      };
+    }) ?? [];
 
-    const outputs =
-      NodeClass.outputs?.map((pin, i) => {
-        const objPin = obj.outputs?.[i] ?? ({} as Partial<DflowNewOutput>);
-        const id = DflowData.isDflowId(objPin?.id) ? objPin.id : `o${i}`;
-        return {
-          id,
-          ...objPin,
-          ...pin,
-        };
-      }) ?? [];
+    const outputs = NodeClass.outputs?.map((pin, i) => {
+      const objPin = obj.outputs?.[i] ?? ({} as Partial<DflowNewOutput>);
+      const id = DflowData.isDflowId(objPin?.id) ? objPin.id : `o${i}`;
+      return {
+        id,
+        ...objPin,
+        ...pin,
+      };
+    }) ?? [];
 
     const node = new NodeClass({
       node: { ...obj, id, inputs, outputs },
@@ -1267,7 +1277,7 @@ class DflowNodeData extends DflowNode {
         outputs: outputs?.map((output) => ({
           ...output,
           types: (function inferDflowDataType(
-            data?: DflowValue
+            data?: DflowValue,
           ): DflowDataType[] {
             switch (true) {
               case DflowData.isBoolean(data):
