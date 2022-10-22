@@ -40,27 +40,12 @@ export declare type DflowObject = {
 };
 /** @ignore */
 export declare type DflowArray = DflowData[];
-declare const dflowDataTypes: readonly [
-  "string",
-  "number",
-  "boolean",
-  "object",
-  "array",
-  "DflowId",
-];
-export declare type DflowDataType = typeof dflowDataTypes[number];
+export declare type DflowDataType = typeof Dflow.dataTypes[number];
 /**
  * `Dflow` is a static class with methods to handle Dflow data.
  */
 export declare class Dflow {
-  static dataTypes: readonly [
-    "string",
-    "number",
-    "boolean",
-    "object",
-    "array",
-    "DflowId",
-  ];
+  static dataTypes: string[];
   static inferDataType(data: unknown): DflowDataType[];
   static isArray(arg: unknown): arg is DflowArray;
   static isBoolean(arg: unknown): arg is boolean;
