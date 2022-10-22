@@ -3,38 +3,37 @@
   "description": "is a minimal Dataflow programming engine",
   "type": "module",
   "version": "0.39.0",
-  "main": "./dflow.cjs",
-  "types": "dflow.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dflow.js",
-      "types": "./dflow.d.ts"
-    },
-    "./nodes": {
-      "import": "./nodes.js"
-    }
-  },
   "engines": {
     "node": ">=14",
     "deno": ">=1.10"
   },
+  "license": "MIT",
+  "homepage": "https://fibo.github.io/dflow",
   "author": {
     "name": "Gianluca Casati",
     "url": "https://fibo.github.io"
   },
-  "homepage": "https://fibo.github.io/dflow",
-  "license": "MIT",
+  "types": "dist/dflow.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/dflow.js",
+      "types": "./dist/dflow.d.ts"
+    },
+    "./nodes": {
+      "import": "./dist/nodes.js"
+    }
+  },
   "scripts": {
-    "build": "npm run bundle:dflow:esmodule && npm run bundle:nodes:esmodule && npm run emit_typescript_declarations",
-    "bundle:dflow:esmodule": "deno bundle dflow.ts | esbuild --minify-whitespace --target=safari11 > dflow.js",
-    "bundle:nodes:esmodule": "deno bundle examples/nodes/index.ts | esbuild --minify-whitespace --target=safari11 > nodes.js",
+    "build": "npm run bundle:dflow && npm run bundle:nodes && npm run emit_typescript_declarations",
+    "bundle:dflow": "deno bundle dflow.ts | esbuild --minify-whitespace --target=safari11 > dist/dflow.js",
+    "bundle:nodes": "deno bundle --importmap=import_map.json examples/nodes/index.ts | esbuild --minify-whitespace --target=safari11 > dist/nodes.js",
     "example:custom-nodes": "deno run examples/custom-nodes.js",
     "example:context": "deno run --unstable --importmap=import_map.json examples/context.ts",
     "example:execution-report": "deno run examples/execution-report.ts",
     "example:usage": "deno run examples/usage.js",
     "emit_typescript_declarations": "tsc --project ./tsconfig.declarations.json",
     "fmt": "deno fmt",
-    "postemit_typescript_declarations": "deno fmt dflow.d.ts",
+    "postemit_typescript_declarations": "deno fmt dist/dflow.d.ts",
     "prebuild": "npm test",
     "lint": "deno lint",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
