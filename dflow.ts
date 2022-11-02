@@ -732,8 +732,6 @@ export type DflowSerializableGraph = {
 
 type DflowNodeConnection = { sourceId: DflowId; targetId: DflowId };
 
-type DflowGraphRunOptions = { verbose: boolean };
-
 type DflowGraphConstructorArg = {
   nodesCatalog: DflowNodesCatalog;
 };
@@ -750,8 +748,6 @@ export class DflowGraph {
 
   /** @ignore */
   readonly edgesMap: Map<DflowId, DflowEdge> = new Map();
-
-  runOptions: DflowGraphRunOptions = { verbose: false };
 
   runStatus: DflowGraphRunStatus | null = null;
 
@@ -874,9 +870,7 @@ export class DflowGraph {
   /**
    * Execute all nodes, sorted by their connections.
    */
-  async run(runOptions?: DflowGraphRunOptions) {
-    const { verbose } = runOptions ?? this.runOptions;
-
+  async run() {
     // Set runStatus to running if there was some unhandled error in a previous run.
     this.runStatus = "running";
 
@@ -905,12 +899,10 @@ export class DflowGraph {
         // If some input data is not valid.
         if (!node.inputsDataAreValid) {
           // Notify into execution report.
-          if (verbose) {
-            const error = new DflowErrorInvalidInputData({ nodeId });
-            executionReport.steps.push(
-              DflowGraph.executionNodeInfo(node.toObject(), error.message),
-            );
-          }
+          const error = new DflowErrorInvalidInputData({ nodeId });
+          executionReport.steps.push(
+            DflowGraph.executionNodeInfo(node.toObject(), error.message),
+          );
           // Cleanup outputs and go to next node.
           node.clearOutputs();
           continue;
@@ -922,11 +914,9 @@ export class DflowGraph {
           node.run();
         }
 
-        if (verbose) {
-          executionReport.steps.push(
-            DflowGraph.executionNodeInfo(node.toObject()),
-          );
-        }
+        executionReport.steps.push(
+          DflowGraph.executionNodeInfo(node.toObject()),
+        );
       } catch (error) {
         console.error(error);
         this.runStatus = "failure";
@@ -1006,10 +996,6 @@ export class DflowHost {
 
   get runStatus() {
     return this.graph.runStatus;
-  }
-
-  set verbose(option: DflowGraphRunOptions["verbose"]) {
-    this.graph.runOptions.verbose = option;
   }
 
   /**
@@ -1094,8 +1080,6 @@ export class DflowHost {
   }
 
   executeFunction(functionId: DflowId, args: DflowArray) {
-    const { verbose } = this.graph.runOptions;
-
     // Get all return nodes connected to function node.
     const nodeConnections = this.graph.nodeConnections;
     const childrenNodeIds = DflowGraph.childrenOfNodeId(
@@ -1160,11 +1144,9 @@ export class DflowHost {
               node.run();
             }
 
-            if (verbose) {
-              this.executionReport?.steps?.push(
-                DflowGraph.executionNodeInfo(node.toObject()),
-              );
-            }
+            this.executionReport?.steps?.push(
+              DflowGraph.executionNodeInfo(node.toObject()),
+            );
           }
         }
       } catch (error) {
