@@ -392,9 +392,6 @@ declare type DflowNodeConnection = {
   sourceId: DflowId;
   targetId: DflowId;
 };
-declare type DflowGraphRunOptions = {
-  verbose: boolean;
-};
 declare type DflowGraphConstructorArg = {
   nodesCatalog: DflowNodesCatalog;
 };
@@ -408,7 +405,6 @@ export declare class DflowGraph {
   readonly nodesMap: Map<DflowId, DflowNode>;
   /** @ignore */
   readonly edgesMap: Map<DflowId, DflowEdge>;
-  runOptions: DflowGraphRunOptions;
   runStatus: DflowGraphRunStatus | null;
   executionReport: DflowGraphExecutionReport | null;
   constructor({ nodesCatalog }: DflowGraphConstructorArg);
@@ -448,7 +444,7 @@ export declare class DflowGraph {
   /**
    * Execute all nodes, sorted by their connections.
    */
-  run(runOptions?: DflowGraphRunOptions): Promise<void>;
+  run(): Promise<void>;
   /** Return serializable item. */
   toObject(): DflowSerializableGraph;
 }
@@ -479,7 +475,6 @@ export declare class DflowHost {
   get nodes(): DflowSerializableNode[];
   get nodesCatalog(): DflowNodesCatalog;
   get runStatus(): DflowGraphRunStatus | null;
-  set verbose(option: DflowGraphRunOptions["verbose"]);
   /**
    * Empty graph.
    *
