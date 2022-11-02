@@ -1,5 +1,5 @@
 import { DflowHost } from "../dflow.ts";
-import { nodesCatalog } from "../nodes/index.ts";
+import { nodesCatalog } from "./nodes/index.ts";
 
 function rungraph() {
   const dflow = new DflowHost({ nodesCatalog });
@@ -15,7 +15,6 @@ function rungraph() {
   dflow.connect(numNode).to(additionNode, 0);
   dflow.connect(numNode).to(additionNode, 1);
 
-  dflow.verbose = true;
   dflow.run();
 
   console.log(JSON.stringify(dflow.executionReport, null, 2));

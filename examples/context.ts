@@ -40,7 +40,6 @@ const nodesCatalog = {
 
 async function contextExample() {
   const dflow = new DflowHost(nodesCatalog);
-  dflow.verbose = true;
 
   const apiKey = "s3cret";
   const apiClient = new ApiClient(apiKey);
