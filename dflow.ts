@@ -117,7 +117,7 @@ export class Dflow {
   }
 
   static isDflowData(arg: unknown): arg is DflowData {
-    if (typeof arg === "undefined") return false;
+    if (arg === undefined) return false;
     return (
       Dflow.isString(arg) ||
       Dflow.isBoolean(arg) ||
@@ -248,7 +248,7 @@ export class DflowInput extends DflowPin
   }
 
   get isConnected() {
-    return typeof this.source === "undefined";
+    return this.source === undefined;
   }
 
   connectTo(pin: DflowOutput) {
@@ -312,7 +312,7 @@ export class DflowOutput extends DflowPin
   }
 
   set data(arg: unknown) {
-    if (typeof arg === "undefined") {
+    if (arg === undefined) {
       this.clear();
     } else if (
       (this.hasType("string") && Dflow.isString(arg)) ||
@@ -336,7 +336,7 @@ export class DflowOutput extends DflowPin
   /** Return serializable item. */
   toObject(): DflowSerializableOutput {
     const obj: DflowSerializableOutput = { id: this.id };
-    if (typeof this.value !== "undefined") obj.data = this.value;
+    if (this.value !== undefined) obj.data = this.value;
     return obj;
   }
 }
@@ -553,7 +553,7 @@ export class DflowNode implements DflowItem<DflowSerializableNode> {
   get inputsDataAreValid(): boolean {
     for (const { data, types, optional } of this.inputsMap.values()) {
       // Ignore optional inputs with no data.
-      if (optional && typeof data === "undefined") continue;
+      if (optional && data === undefined) continue;
       // Validate input data.
       if (Dflow.isValidDataType(types, data)) continue;
       // Some input is not valid.
