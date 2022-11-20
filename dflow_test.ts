@@ -15,7 +15,7 @@ import {
   DflowNode,
   DflowOutput,
   DflowPin,
-} from "./dflow.ts";
+} from "dflow";
 
 const { input, output } = DflowNode;
 
@@ -376,7 +376,7 @@ Deno.test("DflowHost newNode()", () => {
     inputs: [{ id: inputId1 }],
   });
   const node2Obj = node2.toObject();
-  assertEquals(node2Obj.inputs?.[0]?.id, inputId1);
+  assertEquals(node2Obj.i?.[0]?.id, inputId1);
 
   // newNode with outputs
   const outputId1 = "output1";
@@ -385,7 +385,7 @@ Deno.test("DflowHost newNode()", () => {
     outputs: [{ id: outputId1 }],
   });
   const node3Obj = node3.toObject();
-  assertEquals(node3Obj.outputs?.[0]?.id, outputId1);
+  assertEquals(node3Obj.o?.[0]?.id, outputId1);
 });
 
 Deno.test("DflowHost newEdge()", () => {
@@ -423,20 +423,20 @@ Deno.test("DflowHost deleteEdge()", () => {
 // DflowOutput
 // ////////////////////////////////////////////////////////////////////////////
 
-function testOutputSetData(data: unknown, types?: DflowDataType[]) {
-  const output = new DflowOutput({ id: "test", types });
+function testOutputSetData(data: unknown, types: DflowDataType[] = []) {
+  const output = new DflowOutput({ id: "test", nodeId: "node", types });
   output.data = data;
   assertStrictEquals(data, output.data);
 }
 
 function testOutputSetDataInvalid(data: unknown, types: DflowDataType[]) {
-  const output = new DflowOutput({ id: "test", types });
+  const output = new DflowOutput({ id: "test", nodeId: "node", types });
   output.data = data;
   assertEquals(typeof output.data, "undefined");
 }
 
 Deno.test("DflowOutput.clear()", () => {
-  const output = new DflowOutput({ id: "test" });
+  const output = new DflowOutput({ id: "test", nodeId: "node", types: [] });
   const data = 1;
   output.data = data;
   assertStrictEquals(data, output.data);
@@ -445,7 +445,7 @@ Deno.test("DflowOutput.clear()", () => {
 });
 
 Deno.test("DflowOutput set data", () => {
-  const pin = new DflowOutput({ id: "test" });
+  const pin = new DflowOutput({ id: "test", nodeId: "node", types: [] });
   assertEquals(pin.id, "test");
   assertEquals(typeof pin.data, "undefined");
 
