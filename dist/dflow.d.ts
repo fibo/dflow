@@ -5,19 +5,6 @@
  */
 export declare type DflowId = string;
 /**
- * Every dflow item, e.g. `DflowNode`, `DflowEdge`, etc. is
- * serializable into JSON and must implement `DflowItem` interface.
- */
-export interface DflowItem<Serializable extends DflowData> {
-  /** Item identifier. */
-  readonly id: DflowId;
-  /**
-   * Return serializable item,
-   * i.e. an object that can be converted to JSON format.
-   */
-  toObject(): Serializable;
-}
-/**
  * A `DflowData` represents any data that can be serialized into JSON.
  */
 export declare type DflowData =
@@ -33,6 +20,18 @@ export declare type DflowObject = {
 /** @ignore */
 export declare type DflowArray = DflowData[];
 export declare type DflowDataType = typeof Dflow.dataTypes[number];
+/**
+ * Every dflow item (`DflowNode`, `DflowEdge`, etc.) and
+ * every dflow error (`DflowErrorItemNotFound`, `DflowErrorInvalidInputData`, etc.)
+ * is serializable into JSON.
+ */
+export interface DflowSerializable<Data extends DflowData> {
+  /**
+   * Return serializable data,
+   * i.e. an object that can be converted to JSON format.
+   */
+  toObject(): Data;
+}
 /**
  * `Dflow` is a static class with methods to handle Dflow data.
  */
@@ -127,10 +126,10 @@ export declare type DflowSerializableInput = {
 /**
  * A `DflowInput` is a node input pin.
  *
- * @implements DflowItem<DflowSerializableInput>
+ * @implements DflowSerializable<DflowSerializableInput>
  */
 export declare class DflowInput extends DflowPin
-  implements DflowItem<DflowSerializableInput> {
+  implements DflowSerializable<DflowSerializableInput> {
   readonly id: DflowId;
   private source?;
   /**
@@ -184,10 +183,10 @@ export declare type DflowSerializableOutput = {
 /**
  * A `DflowOutput` is a node output pin.
  *
- * @implements DflowItem<DflowSerializableOutput>
+ * @implements DflowSerializable<DflowSerializableOutput>
  */
 export declare class DflowOutput extends DflowPin
-  implements DflowItem<DflowSerializableOutput> {
+  implements DflowSerializable<DflowSerializableOutput> {
   readonly id: DflowId;
   private value;
   constructor({ id, data, ...pin }: {
@@ -259,9 +258,10 @@ export declare type DflowNodeConstructorArg =
  * }
  * ```
  *
- * @implements DflowItem<DflowSerializableNode>
+ * @implements DflowSerializable<DflowSerializableNode>
  */
-export declare class DflowNode implements DflowItem<DflowSerializableNode> {
+export declare class DflowNode
+  implements DflowSerializable<DflowSerializableNode> {
   readonly id: DflowId;
   /** @ignore */
   private inputsMap;
@@ -416,9 +416,10 @@ export declare type DflowSerializableEdge = {
 /**
  * `DflowEdge` connects an `DflowOutput` to a `DflowInput`.
  *
- * @implements DflowItem<DflowSerializableEdge>
+ * @implements DflowSerializable<DflowSerializableEdge>
  */
-export declare class DflowEdge implements DflowItem<DflowSerializableEdge> {
+export declare class DflowEdge
+  implements DflowSerializable<DflowSerializableEdge> {
   readonly id: DflowId;
   /**
    * Path to output pin.
@@ -460,14 +461,18 @@ export declare type DflowNodesCatalog = Record<
   DflowNode["kind"],
   DflowNodeDefinition
 >;
-export declare type DflowGraphRunStatus = "running" | "success" | "failure";
+/**
+ * Contains info about node execution, that is:
+ * the serialized node except its inputs; an error, if any.
+ */
 export declare type DflowExecutionNodeInfo =
-  & Pick<DflowSerializableNode, "id" | "k" | "o">
+  & Omit<DflowSerializableNode, "i">
   & {
-    error?: string;
+    /** Error during execution */
+    err?: DflowSerializableError;
   };
 export declare type DflowGraphExecutionReport = {
-  status: DflowGraphRunStatus;
+  status: Exclude<DflowGraph["runStatus"], null>;
   start: string;
   end: string;
   steps: DflowExecutionNodeInfo[];
@@ -493,7 +498,7 @@ export declare class DflowGraph {
   readonly nodesMap: Map<DflowId, DflowNode>;
   /** @ignore */
   readonly edgesMap: Map<DflowId, DflowEdge>;
-  runStatus: DflowGraphRunStatus | null;
+  runStatus: "running" | "success" | "failure" | null;
   executionReport: DflowGraphExecutionReport | null;
   constructor({ nodesCatalog }: DflowGraphConstructorArg);
   /** @ignore */
@@ -503,8 +508,8 @@ export declare class DflowGraph {
   }[]): string[];
   /** @ignore */
   static executionNodeInfo: (
-    node: DflowSerializableNode,
-    error?: string,
+    node: DflowNode,
+    error?: DflowSerializableError,
   ) => DflowExecutionNodeInfo;
   /** @ignore */
   static parentsOfNodeId(nodeId: DflowId, nodeConnections: {
@@ -554,7 +559,7 @@ export declare class DflowHost {
    */
   get nodes(): DflowSerializableNode[];
   get nodesCatalog(): DflowNodesCatalog;
-  get runStatus(): DflowGraphRunStatus | null;
+  get runStatus(): "running" | "success" | "failure" | null;
   /**
    * Empty graph.
    *
@@ -639,20 +644,91 @@ export declare class DflowNodeUnknown extends DflowNode {
 }
 /** Builtin nodes, always included in `nodesCatalog`. */
 export declare const coreNodesCatalog: DflowNodesCatalog;
-export declare class DflowErrorCannotConnectPins extends Error {
-  constructor({ source, target }: Pick<DflowEdge, "source" | "target">);
-}
-export declare class DflowErrorInvalidInputData extends Error {
-  constructor(nodeId: DflowId);
-}
-export declare class DflowErrorItemNotFound extends Error {
+export declare type DflowSerializableErrorCode = {
+  /** error code */
+  _: string;
+};
+export declare type DflowSerializableError =
+  | DflowSerializableErrorItemNotFound
+  | DflowSerializableErrorInvalidInputData
+  | DflowSerializableErrorCannotConnectPins
+  | DflowSerializableErrorCannotExecuteAsyncFunction;
+export declare type DflowSerializableErrorCannotConnectPins =
+  & DflowSerializableErrorCode
+  & {
+    /** source */
+    s: DflowErrorCannotConnectPins["source"];
+    /** target */
+    t: DflowErrorCannotConnectPins["target"];
+  };
+export declare class DflowErrorCannotConnectPins extends Error
+  implements DflowSerializable<DflowSerializableErrorCannotConnectPins> {
+  readonly source: DflowEdge["source"];
+  readonly target: DflowEdge["target"];
+  static code: string;
+  static message(
+    { s, t }: Omit<DflowSerializableErrorCannotConnectPins, "_">,
+  ): string;
   constructor(
-    item: "node" | "edge" | "input" | "output",
-    { id, nodeId, position }: Partial<{
-      id: DflowId;
-      nodeId: DflowId;
-      position: number;
-    }>,
+    { source, target }: Pick<DflowErrorCannotConnectPins, "source" | "target">,
   );
+  toObject(): DflowSerializableErrorCannotConnectPins;
+}
+export declare type DflowSerializableErrorInvalidInputData =
+  & DflowSerializableErrorCode
+  & {
+    /** nodeId */
+    nId: DflowErrorInvalidInputData["nodeId"];
+  };
+export declare class DflowErrorInvalidInputData extends Error
+  implements DflowSerializable<DflowSerializableErrorInvalidInputData> {
+  static code: string;
+  readonly nodeId: DflowId;
+  static message(
+    { nId: nodeId }: Omit<DflowSerializableErrorInvalidInputData, "_">,
+  ): string;
+  constructor(nodeId: DflowErrorInvalidInputData["nodeId"]);
+  toObject(): DflowSerializableErrorInvalidInputData;
+}
+export declare type DflowSerializableErrorItemNotFound =
+  & DflowSerializableErrorCode
+  & {
+    item: DflowErrorItemNotFound["item"];
+    id?: DflowErrorItemNotFound["info"]["id"];
+    /** nodeId */
+    nId?: DflowErrorItemNotFound["info"]["nodeId"];
+    /** position */
+    p?: DflowErrorItemNotFound["info"]["position"];
+  };
+export declare class DflowErrorItemNotFound extends Error
+  implements DflowSerializable<DflowSerializableErrorItemNotFound> {
+  static code: string;
+  readonly item: "node" | "edge" | "input" | "output";
+  readonly info: Partial<{
+    id: DflowId;
+    nodeId: DflowId;
+    position: number;
+  }>;
+  static message(
+    { item, id, nId: nodeId, p: position }: Omit<
+      DflowSerializableErrorItemNotFound,
+      "_"
+    >,
+  ): string;
+  constructor(
+    item: DflowErrorItemNotFound["item"],
+    info?: DflowErrorItemNotFound["info"],
+  );
+  toObject(): DflowSerializableErrorItemNotFound;
+}
+export declare type DflowSerializableErrorCannotExecuteAsyncFunction =
+  DflowSerializableErrorCode;
+export declare class DflowErrorCannotExecuteAsyncFunction extends Error
+  implements
+    DflowSerializable<DflowSerializableErrorCannotExecuteAsyncFunction> {
+  static code: string;
+  static message(): string;
+  constructor();
+  toObject(): DflowSerializableErrorCode;
 }
 export {};
