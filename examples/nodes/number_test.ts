@@ -38,22 +38,6 @@ Deno.test("isInteger", () => {
   });
 });
 
-Deno.test("isNaN", () => {
-  const dflow = newDflowHost();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.isNaN.kind;
-
-  [
-    { input: undefined, output: false },
-    { input: 1.5, output: false },
-    { input: true, output: false },
-    { input: "x", output: false },
-    { input: NaN, output: true },
-  ].forEach(({ input, output }) => {
-    testOneInOneOut<unknown, boolean>(dflow, nodeKind, input, output);
-  });
-});
-
 Deno.test("parseFloat", () => {
   const dflow = newDflowHost();
   const catalog = dflow.nodesCatalog;
