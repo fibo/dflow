@@ -1,6 +1,5 @@
-export const onChangeView = ({ DflowData, dflow, flowView }) => {
+export const onChangeView = ({ Dflow, dflow, flowView, nodeDefinitions }) => {
   const catalog = dflow.nodesCatalog;
-  const nodeLabels = Object.keys(catalog);
 
   return ({ action, data }) => {
     switch (action) {
@@ -8,19 +7,13 @@ export const onChangeView = ({ DflowData, dflow, flowView }) => {
         const nodeId = data.id;
         const view = flowView.node(nodeId);
 
-        // Make it case insensitive.
-        const label = nodeLabels.find((nodeLabel) => {
-          return (nodeLabel.toLowerCase() === data.label.toLowerCase());
-        }) || data.label;
-        view.label = label;
-
         if (nodeLabels.includes(label)) {
           // Create node on dflow
           dflow.newNode({
             kind: label,
             id: nodeId,
-            inputs: data.inputs,
-            outputs: data.outputs,
+            inputs: data.ins,
+            outputs: data.outs,
           });
 
           // Complete node view with inputs and outputs.
@@ -61,7 +54,7 @@ export const onChangeView = ({ DflowData, dflow, flowView }) => {
               view.newOutput({});
             }
 
-            if (DflowData.isDflowData(maybeJson)) {
+            if (Dflow.isDflowData(maybeJson)) {
               dflow.newNode({
                 id: nodeId,
                 kind: catalog.data.kind,
