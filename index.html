@@ -30,42 +30,40 @@
   </main>
 
   <script type="module">
-    import { FlowView } from 'https://unpkg.com/flow-view';
-    import { DflowHost, DflowData } from './dflow.js';
-    import { nodesCatalog } from './nodes.js';
+    import { FlowView } from 'https://unpkg.com/flow-view@6.0.1';
+    import { DflowHost, Dflow } from './dist/dflow.js';
+    import { nodesCatalog } from './dist/nodes.js';
     import { onChangeView } from './view.js'
 
-    const flowView = new FlowView({
-      container: document.querySelector('.container')
-    });
+    const flowView = new FlowView(document.querySelector('.container'));
 
     const dflow = new DflowHost({nodesCatalog});
     const catalog = dflow.nodesCatalog;
 
-    const nodeLabels = Object.keys(catalog);
+    const nodeDefinitions = Object.keys(catalog).map(kind => ({ name: kind }));
 
-    flowView.addNodeLabels(nodeLabels);
+    flowView.addNodeDefinitions(nodeDefinitions);
 
     const initialGraph = {
       nodes: [
         {
           id: 'a',
-          label: '2',
+          text: '2',
           x: 60, y: 70,
-          outputs: [ { id: 'ao1', types: ['number'], data: 2 } ]
+          outs: [ { id: 'ao1', types: ['number'], data: 2 } ]
         },
         {
           id: 'b',
-          label: 'addition',
+          text: 'addition',
           x: 60, y: 240,
-          inputs: [ { id: 'bi1' }, { id: 'bi2' } ],
-          outputs: [ { id: 'bo1' } ]
+          ins: [ { id: 'bi1' }, { id: 'bi2' } ],
+          outs: [ { id: 'bo1' } ]
         },
         {
           id: 'PI',
-          label: 'mathPi',
+          text: 'mathPi',
           x: 170, y: 70,
-          outputs: [ { id: 'pi' } ]
+          outs: [ { id: 'pi' } ]
         }
       ],
       edges: [
@@ -74,7 +72,7 @@
       ]
     };
 
-    flowView.onChange(onChangeView({ DflowData, dflow, flowView }))
+    flowView.onChange(onChangeView({ Dflow, dflow, flowView, nodeDefinitions }))
 
     flowView.loadGraph(initialGraph);
 
