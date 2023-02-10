@@ -20,16 +20,6 @@ class DflowIsInteger extends DflowNode {
   }
 }
 
-class DflowIsNaN extends DflowNode {
-  static kind = "isNaN";
-  static inputs = [input()];
-  static outputs = [output("boolean")];
-
-  run() {
-    this.output(0).data = Number.isNaN(this.input(0).data);
-  }
-}
-
 class DflowParseFloat extends DflowNode {
   static kind = "parseFloat";
   static inputs = [input("string")];
@@ -51,7 +41,6 @@ class DflowParseInt extends DflowNode {
 export const catalog = {
   [DflowIsFinite.kind]: DflowIsFinite,
   [DflowIsInteger.kind]: DflowIsInteger,
-  [DflowIsNaN.kind]: DflowIsNaN,
   [DflowParseFloat.kind]: DflowParseFloat,
   [DflowParseInt.kind]: DflowParseInt,
 };
