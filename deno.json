@@ -16,6 +16,7 @@
       "exclude": ["dflow.js", "nodes.js", "view.js"]
     }
   },
+  "lock": false,
   "tasks": {
     "test": "deno test --unstable --importmap=import_map.json"
   }
