@@ -79,14 +79,13 @@ With [deno](https://deno.land/) you can then launch your script like this
 deno run --importmap=import_map.json path/to/my/script.ts
 ```
 
-You may want to point to a specific version, for instance version `0.38` or whatever.
-Then change your import map accordingly
+You may want to point to a specific version, for instance version `0.42`, change your import map accordingly
 
 ```diff
 {
   "imports": {
 -    "dflow/": "https://deno.land/x/dflow/"
-+    "dflow/": "https://deno.land/x/dflow@0.38/"
++    "dflow/": "https://deno.land/x/dflow@0.42/"
   }
 }
 ```
