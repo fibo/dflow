@@ -8,7 +8,6 @@
     "deno": ">=1.10"
   },
   "license": "MIT",
-  "homepage": "https://fibo.github.io/dflow",
   "author": {
     "name": "Gianluca Casati",
     "url": "https://fibo.github.io"
