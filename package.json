@@ -29,6 +29,7 @@
     "bundle:nodes": "deno bundle --importmap=import_map.json examples/nodes/index.ts | esbuild --minify-whitespace > dist/nodes.js",
     "example:custom-nodes": "deno run examples/custom-nodes.js",
     "example:context": "deno run --importmap=import_map.json examples/context.ts",
+    "example:deno": "deno run --importmap=./examples/deno/import_map.json ./examples/deno/example.ts",
     "example:execution-report": "deno run --importmap=import_map.json examples/execution-report.ts",
     "example:usage": "deno run examples/usage.js",
     "emit_typescript_declarations": "tsc --project ./tsconfig.declarations.json",
