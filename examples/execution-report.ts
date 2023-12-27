@@ -1,4 +1,4 @@
-import { DflowHost } from "../dflow.ts";
+import { DflowHost } from "dflow";
 import { nodesCatalog } from "./nodes/index.ts";
 
 function rungraph() {

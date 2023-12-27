@@ -1,6 +1,6 @@
 # dflow development
 
-This project has a *GitHub Codespace* avaialable.
+This project has a *GitHub Codespace* available.
 
 Otherwise to develop locally, install [Deno](https://deno.land/).
 

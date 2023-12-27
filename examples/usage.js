@@ -1,7 +1,7 @@
 // keep in sync with readme
 
-import { DflowHost } from "../dflow.js";
-import { nodesCatalog } from "../nodes.js";
+import { DflowHost } from "../dist/dflow.js";
+import { nodesCatalog } from "../dist/nodes.js";
 
 function rungraph() {
   // use builtin nodes
