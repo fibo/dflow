@@ -1,15 +1,13 @@
 {
   "fmt": {
-    "files": {
-      "exclude": [
-        "README.md",
-        "DEVELOP.md",
-        "examples/README.md",
-        "dflow.js",
-        "nodes.js",
-        "view.js"
-      ]
-    }
+    "exclude": [
+      "README.md",
+      "DEVELOP.md",
+      "dist/dflow.js",
+      "dist/nodes.js",
+      "examples/README.md",
+      "view.js"
+    ]
   },
   "lint": {
     "files": {

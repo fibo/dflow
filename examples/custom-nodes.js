@@ -1,4 +1,4 @@
-import { DflowHost, DflowNode } from "../dflow.js";
+import { DflowHost, DflowNode } from "../dist/dflow.js";
 
 const { input, output } = DflowNode;
 
