@@ -23,9 +23,6 @@ It can contain nodes and edges. Nodes are executed, sorted by their connections.
 **NOTA BENE**: it is supposed that you implement your own nodes, for example node `addition` could be implemented using bigint or some floating point library, according to your needs.
 However an example nodes catalog with basic JavaScript features can be imported from `dflow/nodes`.
 
-Graphic interface can be implemented with WebComponents (to be completed): ([demo here](https://fibo.github.io/dflow)).
-It is implemented with [flow-view](https://github.com/fibo/flow-view) and **not included** in this package.
-
 ## Installation
 
 ### Node
@@ -45,7 +42,7 @@ Module is published here: https://deno.land/x/dflow
 Dflow engine is implemented in a single *dflow.ts* file, you can use an import like
 
 ```ts
-import { DflowHost } from "https://deno.land/x/dflow@v0.38.0/dflow.ts";
+import { DflowHost } from "https://deno.land/x/dflow@v0.42.0/dflow.ts";
 ```
 
 #### Using an import map
@@ -84,8 +81,8 @@ You may want to point to a specific version, for instance version `0.42`, change
 ```diff
 {
   "imports": {
--    "dflow/": "https://deno.land/x/dflow/"
-+    "dflow/": "https://deno.land/x/dflow@0.42/"
+-    "dflow": "https://deno.land/x/dflow/dflow.ts"
++    "dflow": "https://deno.land/x/dflow@0.42/dflow.ts"
   }
 }
 ```
