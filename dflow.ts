@@ -28,12 +28,7 @@ const generateItemId = (
 /**
  * A `DflowData` represents any data that can be serialized into JSON.
  */
-export type DflowData =
-  | string
-  | number
-  | boolean
-  | DflowArray
-  | DflowObject;
+export type DflowData = string | number | boolean | DflowArray | DflowObject;
 
 /** @ignore */
 export type DflowObject = { [Key in string]?: DflowData };
@@ -41,7 +36,7 @@ export type DflowObject = { [Key in string]?: DflowData };
 /** @ignore */
 export type DflowArray = DflowData[];
 
-export type DflowDataType = typeof Dflow.dataTypes[number];
+export type DflowDataType = (typeof Dflow.dataTypes)[number];
 
 /**
  * Every dflow item (`DflowNode`, `DflowEdge`, etc.) and
@@ -52,8 +47,9 @@ export interface DflowSerializable<Data extends DflowData> {
   /**
    * Return serializable data,
    * i.e. an object that can be converted to JSON format.
+   * It will be called by `JSON.stringify`.
    */
-  toObject(): Data;
+  toJSON(): Data;
 }
 
 /**
@@ -108,8 +104,12 @@ export class Dflow {
    * It checks recursively that every value is some `DflowData`.
    */
   static isObject(arg: unknown): arg is DflowObject {
-    return typeof arg === "object" && arg !== null && !Array.isArray(arg) &&
-      Object.values(arg).every(Dflow.isDflowData);
+    return (
+      typeof arg === "object" &&
+      arg !== null &&
+      !Array.isArray(arg) &&
+      Object.values(arg).every(Dflow.isDflowData)
+    );
   }
 
   /**
@@ -182,13 +182,11 @@ export class DflowPin {
 
   readonly types: DflowDataType[];
 
-  constructor(
-    { nodeId, name, types = [] }:
-      & Pick<DflowPin, "nodeId" | "types">
-      & Partial<
-        Pick<DflowPin, "name">
-      >,
-  ) {
+  constructor({
+    nodeId,
+    name,
+    types = [],
+  }: Pick<DflowPin, "nodeId" | "types"> & Partial<Pick<DflowPin, "name">>) {
     if (name) this.name = name;
     this.types = types;
     this.nodeId = nodeId;
@@ -271,11 +269,11 @@ export class DflowInput extends DflowPin
    */
   optional?: boolean;
 
-  constructor(
-    { id, optional, ...pin }:
-      & { id: DflowId; nodeId: DflowId }
-      & DflowInputDefinition,
-  ) {
+  constructor({
+    id,
+    optional,
+    ...pin
+  }: { id: DflowId; nodeId: DflowId } & DflowInputDefinition) {
     super(pin);
     this.id = id;
     if (optional) this.optional = optional;
@@ -312,10 +310,8 @@ export class DflowInput extends DflowPin
     this.source = undefined;
   }
 
-  /**
-   * Return serializable item.
-   */
-  toObject(): DflowSerializableInput {
+  /** @ignore */
+  toJSON(): DflowSerializableInput {
     return { id: this.id };
   }
 }
@@ -356,11 +352,11 @@ export class DflowOutput extends DflowPin
 
   private value: DflowData | undefined;
 
-  constructor(
-    { id, data, ...pin }:
-      & { id: DflowId; nodeId: DflowId }
-      & DflowOutputDefinition,
-  ) {
+  constructor({
+    id,
+    data,
+    ...pin
+  }: { id: DflowId; nodeId: DflowId } & DflowOutputDefinition) {
     super(pin);
     this.id = id;
     this.value = data;
@@ -392,10 +388,8 @@ export class DflowOutput extends DflowPin
     this.value = undefined;
   }
 
-  /**
-   * Return serializable item.
-   */
-  toObject(): DflowSerializableOutput {
+  /** @ignore */
+  toJSON(): DflowSerializableOutput {
     const obj: DflowSerializableOutput = { id: this.id };
     if (this.value !== undefined) obj.d = this.value;
     return obj;
@@ -434,7 +428,10 @@ export type DflowSerializableNode = {
  * ```
  */
 export type DflowNodeConstructorArg =
-  & Pick<DflowNode, "id" | "kind" | "host">
+  & Pick<
+    DflowNode,
+    "id" | "kind" | "host"
+  >
   & {
     inputs?: ({ id?: DflowId } & DflowInputDefinition)[];
     outputs?: ({ id?: DflowId } & DflowOutputDefinition)[];
@@ -653,14 +650,11 @@ export class DflowNode implements DflowSerializable<DflowSerializableNode> {
   input(position: number): DflowInput {
     const pinId = this.inputPosition[position];
     if (!pinId) {
-      throw new DflowErrorItemNotFound(
-        "input",
-        {
-          id: this.id,
-          nodeId: this.id,
-          position,
-        },
-      );
+      throw new DflowErrorItemNotFound("input", {
+        id: this.id,
+        nodeId: this.id,
+        position,
+      });
     }
     return this.getInputById(pinId);
   }
@@ -684,13 +678,10 @@ export class DflowNode implements DflowSerializable<DflowSerializableNode> {
   output(position: number): DflowOutput {
     const pinId = this.outputPosition[position];
     if (!pinId) {
-      throw new DflowErrorItemNotFound(
-        "output",
-        {
-          nodeId: this.id,
-          position,
-        },
-      );
+      throw new DflowErrorItemNotFound("output", {
+        nodeId: this.id,
+        position,
+      });
     }
     return this.getOutputById(pinId);
   }
@@ -698,21 +689,17 @@ export class DflowNode implements DflowSerializable<DflowSerializableNode> {
   /** @ignore this method, it should be overridden. */
   run(): void | Promise<void> {}
 
-  /**
-   * Return serializable item.
-   */
-  toObject(): DflowSerializableNode {
+  /** @ignore */
+  toJSON(): DflowSerializableNode {
     const obj: DflowSerializableNode = {
       id: this.id,
       k: this.kind,
     };
 
-    const inputs = [...this.inputsMap.values()].map((item) => item.toObject());
+    const inputs = [...this.inputsMap.values()].map((item) => item.toJSON());
     if (inputs.length > 0) obj.i = inputs;
 
-    const outputs = [...this.outputsMap.values()].map((item) =>
-      item.toObject()
-    );
+    const outputs = [...this.outputsMap.values()].map((item) => item.toJSON());
     if (outputs.length > 0) obj.o = outputs;
 
     return obj;
@@ -746,18 +733,18 @@ export class DflowEdge implements DflowSerializable<DflowSerializableEdge> {
    */
   readonly target: [nodeId: DflowId, pinId: DflowId];
 
-  constructor(
-    { source, target, id }: Pick<DflowEdge, "id" | "source" | "target">,
-  ) {
+  constructor({
+    source,
+    target,
+    id,
+  }: Pick<DflowEdge, "id" | "source" | "target">) {
     this.id = id;
     this.source = source;
     this.target = target;
   }
 
-  /**
-   * Return serializable item.
-   */
-  toObject(): DflowSerializableEdge {
+  /** @ignore */
+  toJSON(): DflowSerializableEdge {
     return {
       id: this.id,
       s: this.source,
@@ -799,15 +786,10 @@ export type DflowNodesCatalog = Record<DflowNode["kind"], DflowNodeDefinition>;
  * Contains info about node execution, that is:
  * the serialized node except its inputs; an error, if any.
  */
-export type DflowExecutionNodeInfo =
-  & Omit<
-    DflowSerializableNode,
-    "i"
-  >
-  & {
-    /** Error during execution */
-    err?: DflowSerializableError;
-  };
+export type DflowExecutionNodeInfo = Omit<DflowSerializableNode, "i"> & {
+  /** Error during execution */
+  err?: DflowSerializableError;
+};
 
 export type DflowGraphExecutionReport = {
   status: Exclude<DflowGraph["runStatus"], null>;
@@ -863,7 +845,7 @@ export class DflowGraph {
     node: DflowNode,
     error?: DflowSerializableError,
   ): DflowExecutionNodeInfo => {
-    const { id, k, o } = node.toObject();
+    const { id, k, o } = node.toJSON();
     const info: DflowExecutionNodeInfo = { id, k };
     if (o) info.o = o;
     if (error) info.err = error;
@@ -989,7 +971,7 @@ export class DflowGraph {
           // Notify into execution report.
           const error = new DflowErrorInvalidInputData(nodeId);
           executionReport.steps.push(
-            DflowGraph.executionNodeInfo(node, error.toObject()),
+            DflowGraph.executionNodeInfo(node, error.toJSON()),
           );
           // Cleanup outputs and go to next node.
           node.clearOutputs();
@@ -1002,9 +984,7 @@ export class DflowGraph {
           node.run();
         }
 
-        executionReport.steps.push(
-          DflowGraph.executionNodeInfo(node),
-        );
+        executionReport.steps.push(DflowGraph.executionNodeInfo(node));
       } catch (error) {
         console.error(error);
         this.runStatus = "failure";
@@ -1020,13 +1000,11 @@ export class DflowGraph {
     this.executionReport = executionReport;
   }
 
-  /**
-   * Return serializable item.
-   */
-  toObject(): DflowSerializableGraph {
+  /** @ignore */
+  toJSON(): DflowSerializableGraph {
     return {
-      nodes: [...this.nodesMap.values()].map((item) => item.toObject()),
-      edges: [...this.edgesMap.values()].map((item) => item.toObject()),
+      nodes: [...this.nodesMap.values()].map((item) => item.toJSON()),
+      edges: [...this.edgesMap.values()].map((item) => item.toJSON()),
     };
   }
 }
@@ -1065,7 +1043,7 @@ export class DflowHost {
    * List node objects.
    */
   get nodes(): DflowSerializableNode[] {
-    return [...this.graph.nodesMap.values()].map((item) => item.toObject());
+    return [...this.graph.nodesMap.values()].map((item) => item.toJSON());
   }
 
   get nodesCatalog(): DflowNodesCatalog {
@@ -1315,11 +1293,9 @@ export class DflowHost {
     return edge;
   }
 
-  /**
-   * Return serializable item.
-   */
-  toObject(): DflowSerializableGraph {
-    return this.graph.toObject();
+  /** @ignore */
+  toJSON(): DflowSerializableGraph {
+    return this.graph.toJSON();
   }
 
   /** Execute graph. */
@@ -1417,16 +1393,18 @@ export class DflowErrorCannotConnectPins extends Error
   readonly target: DflowEdge["target"];
   static code = "01";
   static message({ s, t }: Omit<DflowSerializableErrorCannotConnectPins, "_">) {
-    return (`Cannot connect source ${s.join()} to target ${t.join()}`);
+    return `Cannot connect source ${s.join()} to target ${t.join()}`;
   }
-  constructor(
-    { source, target }: Pick<DflowErrorCannotConnectPins, "source" | "target">,
-  ) {
+  constructor({
+    source,
+    target,
+  }: Pick<DflowErrorCannotConnectPins, "source" | "target">) {
     super(DflowErrorCannotConnectPins.message({ s: source, t: target }));
     this.source = source;
     this.target = target;
   }
-  toObject(): DflowSerializableErrorCannotConnectPins {
+  /** @ignore */
+  toJSON(): DflowSerializableErrorCannotConnectPins {
     return {
       _: DflowErrorCannotConnectPins.code,
       s: this.source,
@@ -1446,16 +1424,17 @@ export class DflowErrorInvalidInputData extends Error
   implements DflowSerializable<DflowSerializableErrorInvalidInputData> {
   static code = "02";
   readonly nodeId: DflowId;
-  static message(
-    { nId: nodeId }: Omit<DflowSerializableErrorInvalidInputData, "_">,
-  ) {
-    return (`Invalid input data in node ${nodeId}`);
+  static message({
+    nId: nodeId,
+  }: Omit<DflowSerializableErrorInvalidInputData, "_">) {
+    return `Invalid input data in node ${nodeId}`;
   }
   constructor(nodeId: DflowErrorInvalidInputData["nodeId"]) {
     super(DflowErrorInvalidInputData.message({ nId: nodeId }));
     this.nodeId = nodeId;
   }
-  toObject(): DflowSerializableErrorInvalidInputData {
+  /** @ignore */
+  toJSON(): DflowSerializableErrorInvalidInputData {
     return {
       _: DflowErrorInvalidInputData.code,
       nId: this.nodeId,
@@ -1493,7 +1472,9 @@ export class DflowErrorItemNotFound extends Error
         id ? `id=${id}` : "",
         nodeId ? `nodeId=${nodeId}` : "",
         position ? `position=${position}` : "",
-      ].filter((str) => str !== "").join()
+      ]
+        .filter((str) => str !== "")
+        .join()
     }`;
   }
   constructor(
@@ -1511,8 +1492,12 @@ export class DflowErrorItemNotFound extends Error
     this.item = item;
     this.info = info;
   }
-  toObject(): DflowSerializableErrorItemNotFound {
-    const { item, info: { id, nodeId, position } } = this;
+  /** @ignore */
+  toJSON(): DflowSerializableErrorItemNotFound {
+    const {
+      item,
+      info: { id, nodeId, position },
+    } = this;
     const obj: DflowSerializableErrorItemNotFound = {
       item,
       _: DflowErrorItemNotFound.code,
@@ -1537,7 +1522,8 @@ export class DflowErrorCannotExecuteAsyncFunction extends Error
   constructor() {
     super(DflowErrorCannotExecuteAsyncFunction.message());
   }
-  toObject(): DflowSerializableErrorCode {
+  /** @ignore */
+  toJSON(): DflowSerializableErrorCode {
     return { _: DflowErrorCannotExecuteAsyncFunction.code };
   }
 }

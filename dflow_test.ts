@@ -300,14 +300,14 @@ Deno.test("DflowGraph ancestorsOfNodeId", () => {
 
 Deno.test("new DflowHost has an empty graph", () => {
   const dflow = new DflowHost({ nodesCatalog: {} });
-  assertObjectMatch(dflow.toObject(), { nodes: [], edges: [] });
+  assertObjectMatch(dflow.toJSON(), { nodes: [], edges: [] });
 });
 
 Deno.test("DflowHost clearGraph()", () => {
   const { dflow } = sample01();
   dflow.clearGraph();
 
-  const graph = dflow.toObject();
+  const graph = dflow.toJSON();
   assertEquals(graph.nodes.length, 0);
   assertEquals(graph.edges.length, 0);
 });
@@ -375,7 +375,7 @@ Deno.test("DflowHost newNode()", () => {
     kind: catalog.Identity.kind,
     inputs: [{ id: inputId1 }],
   });
-  const node2Obj = node2.toObject();
+  const node2Obj = node2.toJSON();
   assertEquals(node2Obj.i?.[0]?.id, inputId1);
 
   // newNode with outputs
@@ -384,7 +384,7 @@ Deno.test("DflowHost newNode()", () => {
     kind: catalog.Identity.kind,
     outputs: [{ id: outputId1 }],
   });
-  const node3Obj = node3.toObject();
+  const node3Obj = node3.toJSON();
   assertEquals(node3Obj.o?.[0]?.id, outputId1);
 });
 
