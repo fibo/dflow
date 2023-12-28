@@ -78,6 +78,112 @@ export class Dflow {
   }
 
   /**
+   * `Dlow.input()` is a `DflowInputDefinition` helper.
+   *
+   * @example
+   * ```ts
+   * const { input } = Dflow;
+   *
+   * export class Echo extends DflowNode {
+   *   static kind = "echo";
+   *   static inputs = [input("string")];
+   *   run () {
+   *     console.log(this.input(0).data as string);
+   *   }
+   * }
+   * ```
+   *
+   * Input with `number` type.
+   *
+   * @example
+   * ```ts
+   * Dflow.input("number")
+   * ```
+   *
+   * Optional `number` input.
+   *
+   * @example
+   *
+   * ```ts
+   * Dflow.input("number", { optional: true })
+   * ```
+   *
+   * Input that accepts both `number` and `string` type.
+   *
+   * @example
+   *
+   * ```ts
+   * Dflow.input(["number", "string"])
+   * ```
+   *
+   * Input with any type.
+   *
+   * @example
+   * ```ts
+   * Dflow.input()
+   * ```
+   *
+   * Input with type `array` and name.
+   *
+   * @example
+   * ```ts
+   * Dflow.input("array", { name: "list" })
+   * ```
+   *
+   * Input with any type and named "foo".
+   *
+   * @example
+   * ```ts
+   * Dflow.input([], { name: "foo" })
+   * ```
+   */
+  static input(
+    typing: DflowDataType | DflowDataType[] = [],
+    rest?: Omit<DflowInputDefinition, "types">,
+  ): DflowInputDefinition {
+    return {
+      types: typeof typing === "string" ? [typing] : typing,
+      ...rest,
+    };
+  }
+
+  /**
+   * `Dflow.output()` is a `DflowOutputDefinition` helper.
+   *
+   * @example
+   * ```ts
+   * const { output } = Dflow;
+   *
+   * export class MathPI extends DflowNode {
+   *   static kind = "mathPI";
+   *   static outputs = [output("number", { name: "π", data: Math.PI })];
+   * }
+   * ```
+   *
+   * Named output with `number` type.
+   *
+   * @example
+   * ```ts
+   * Dflow.output("number", { name: "answer" })
+   * ```
+   *
+   * @see {@link Dflow.input} for other similar examples.
+   *
+   * `DflowOutputDefinition` has also an optional `data` attribute.
+   *
+   * @example
+   * ```ts
+   * Dflow.output("number", { data: 42, name: "answer" })
+   * ```
+   */
+  static output(
+    typing: DflowDataType | DflowDataType[] = [],
+    rest?: Omit<DflowOutputDefinition, "types">,
+  ): DflowOutputDefinition {
+    return { types: typeof typing === "string" ? [typing] : typing, ...rest };
+  }
+
+  /**
    * Type guard for `DflowArray`.
    * It checks recursively that every element is some `DflowData`.
    */
@@ -512,109 +618,6 @@ export class DflowNode implements DflowSerializable<DflowSerializableNode> {
       this.outputsMap.set(id, output);
       this.outputPosition.push(id);
     }
-  }
-
-  /**
-   * `DlowNode.input()` is a `DflowInputDefinition` helper.
-   *
-   * @example
-   * ```ts
-   * const { input } = DflowNode;
-   *
-   * export class Echo extends DflowNode {
-   *   static kind = "echo";
-   *   static inputs = [input("string")];
-   *   run () {
-   *     console.log(this.input(0).data as string);
-   *   }
-   * }
-   * ```
-   *
-   * Input with `number` type.
-   *
-   * @example
-   * ```ts
-   * input("number")
-   * ```
-   *
-   * Optional `number` input.
-   *
-   * @example
-   *
-   * ```ts
-   * input("number", { optional: true })
-   * ```
-   *
-   * Input that accepts both `number` and `string` type.
-   *
-   * @example
-   *
-   * ```ts
-   * input(["number", "string"])
-   * ```
-   *
-   * Input with any type.
-   *
-   * @example
-   * ```ts
-   * input()
-   * ```
-   *
-   * Input with type `array` and name.
-   *
-   * @example
-   * ```ts
-   * input("array", { name: "list" })
-   * ```
-   *
-   * Input with any type and named "foo".
-   *
-   * @example
-   * ```ts
-   * input([], { name: "foo" })
-   * ```
-   */
-  static input(
-    typing: DflowDataType | DflowDataType[] = [],
-    rest?: Omit<DflowInputDefinition, "types">,
-  ): DflowInputDefinition {
-    return { types: typeof typing === "string" ? [typing] : typing, ...rest };
-  }
-
-  /**
-   * `DflowNode.output()` is a `DflowOutputDefinition` helper.
-   *
-   * @example
-   * ```ts
-   * const { output } = DflowNode;
-   *
-   * export class MathPI extends DflowNode {
-   *   static kind = "mathPI";
-   *   static outputs = [output("number", { name: "π", data: Math.PI })];
-   * }
-   * ```
-   *
-   * Named output with `number` type.
-   *
-   * @example
-   * ```ts
-   * input("number", { name: "answer" })
-   * ```
-   *
-   * @see {@link DflowNode.input} for other similar examples.
-   *
-   * `DflowOutputDefinition` has also an optional `data` attribute.
-   *
-   * @example
-   * ```ts
-   * input("number", { data: 42, name: "answer" })
-   * ```
-   */
-  static output(
-    typing: DflowDataType | DflowDataType[] = [],
-    rest?: Omit<DflowOutputDefinition, "types">,
-  ): DflowOutputDefinition {
-    return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
 
   get inputsDataAreValid(): boolean {
@@ -1307,7 +1310,7 @@ export class DflowHost {
 // Dflow core nodes
 // ////////////////////////////////////////////////////////////////////
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
 /** @ignore */
 class DflowNodeArgument extends DflowNode {

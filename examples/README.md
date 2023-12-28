@@ -1,6 +1,6 @@
 # dflow examples
 
-It is possible to run some examples via an npm script:
+It is possible to run examples via an npm script:
 
 <!-- This Markdown code syntax makes it easier to copy&paste commands. -->
 

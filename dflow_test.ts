@@ -17,7 +17,7 @@ import {
   DflowPin,
 } from "dflow";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
 const num = 1;
 const bool = true;
