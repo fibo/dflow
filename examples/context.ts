@@ -1,9 +1,9 @@
 /*
 Create a host with an API context.
 */
-import { DflowHost, DflowNode } from "dflow";
+import { Dflow, DflowHost, DflowNode } from "dflow";
 
-const { output } = DflowNode;
+const { output } = Dflow;
 
 class ApiClient {
   apiKey: string;
