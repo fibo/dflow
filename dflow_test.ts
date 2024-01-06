@@ -12,7 +12,6 @@ import {
   DflowErrorItemNotFound,
   DflowNode,
   DflowOutput,
-  DflowPin,
 } from "dflow";
 
 const { input, output } = Dflow;
@@ -553,10 +552,7 @@ Deno.test("DflowOutput set data", () => {
   testOutputSetData(arr, ["object", "array"]);
 });
 
-// DflowPin
-// ////////////////////////////////////////////////////////////////////////////
-
-Deno.test("DflowPin.canConnect()", () => {
+Deno.test("Dflow.canConnect()", () => {
   const testCases: {
     sourceTypes: DflowDataType[];
     targetTypes: DflowDataType[];
@@ -610,6 +606,6 @@ Deno.test("DflowPin.canConnect()", () => {
   ];
 
   testCases.forEach(({ sourceTypes, targetTypes, expected }) => {
-    assertEquals(DflowPin.canConnect(sourceTypes, targetTypes), expected);
+    assertEquals(Dflow.canConnect(sourceTypes, targetTypes), expected);
   });
 });
