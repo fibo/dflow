@@ -1,11 +1,11 @@
 import { assertEquals } from "std/testing/asserts.ts";
-import { DflowHost, DflowId } from "dflow";
+import { Dflow, DflowId } from "dflow";
 import { catalog as mathCatalog } from "./math.ts";
 import { catalog as operatorCatalog } from "./operator.ts";
 
 Deno.test("DflowNodeFunction", () => {
   const nodesCatalog = { ...mathCatalog, ...operatorCatalog };
-  const dflow = new DflowHost({ nodesCatalog });
+  const dflow = new Dflow({ nodesCatalog });
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.function.kind;
 

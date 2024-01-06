@@ -1,7 +1,7 @@
 import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
 import { DflowArray, DflowData } from "dflow";
 import {
-  newDflowHost,
+  newDflow,
   testOneInOneOut,
   testOneInTwoOut,
   testThreeInOneOut,
@@ -9,7 +9,7 @@ import {
 } from "./_test-utils.ts";
 
 Deno.test("arrayAt", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayAt.kind;
 
@@ -30,7 +30,7 @@ Deno.test("arrayAt", () => {
 });
 
 Deno.test("arrayFindIndex", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayFindIndex.kind;
 
@@ -61,7 +61,7 @@ Deno.test("arrayFindIndex", () => {
 });
 
 Deno.test("arrayFindLastIndex", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayFindLastIndex.kind;
 
@@ -92,7 +92,7 @@ Deno.test("arrayFindLastIndex", () => {
 });
 
 Deno.test("arrayFilter", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayFilter.kind;
 
@@ -124,7 +124,7 @@ Deno.test("arrayFilter", () => {
 });
 
 Deno.test("arrayIncludes", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayIncludes.kind;
 
@@ -145,7 +145,7 @@ Deno.test("arrayIncludes", () => {
 });
 
 Deno.test("arrayJoin", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayJoin.kind;
 
@@ -167,7 +167,7 @@ Deno.test("arrayJoin", () => {
 });
 
 Deno.test("arrayLength", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayLength.kind;
 
@@ -179,7 +179,7 @@ Deno.test("arrayLength", () => {
 });
 
 Deno.test("arrayMap", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayMap.kind;
 
@@ -217,7 +217,7 @@ Deno.test("arrayMap", () => {
 });
 
 Deno.test("arrayPop", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayPop.kind;
 
@@ -235,7 +235,7 @@ Deno.test("arrayPop", () => {
 });
 
 Deno.test("arrayPush", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayPush.kind;
 
@@ -256,7 +256,7 @@ Deno.test("arrayPush", () => {
 });
 
 Deno.test("arrayReverse", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayReverse.kind;
 
@@ -268,7 +268,7 @@ Deno.test("arrayReverse", () => {
 });
 
 Deno.test("arrayShift", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arrayShift.kind;
 
@@ -286,7 +286,7 @@ Deno.test("arrayShift", () => {
 });
 
 Deno.test("arraySlice", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.arraySlice.kind;
 

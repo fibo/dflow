@@ -10,8 +10,6 @@ import {
   Dflow,
   DflowDataType,
   DflowErrorItemNotFound,
-  DflowGraph,
-  DflowHost,
   DflowNode,
   DflowOutput,
   DflowPin,
@@ -77,7 +75,7 @@ function sample01() {
   const pinId1 = "p1";
   const pinId2 = "p2";
   const edgeId1 = "e2";
-  const dflow = new DflowHost({ nodesCatalog: nodesCatalog1 });
+  const dflow = new Dflow({ nodesCatalog: nodesCatalog1 });
   const catalog = dflow.nodesCatalog;
   dflow.newNode({
     id: nodeId1,
@@ -100,6 +98,23 @@ function sample01() {
 
 // Dflow
 // ////////////////////////////////////////////////////////////////////////////
+
+Deno.test("Dflow.ancestorsOfNodeId", () => {
+  assertArrayIncludes(
+    Dflow.ancestorsOfNodeId("n", [
+      { sourceId: "n1", targetId: "n" },
+    ]),
+    ["n1"],
+  );
+
+  assertArrayIncludes(
+    Dflow.ancestorsOfNodeId("n", [
+      { sourceId: "n1", targetId: "n2" },
+      { sourceId: "n2", targetId: "n" },
+    ]),
+    ["n1", "n2"],
+  );
+});
 
 Deno.test("Dflow.inferDataType()", () => {
   [
@@ -275,51 +290,28 @@ Deno.test("Dflow.isValidDataType()", () => {
   assertEquals(Dflow.isValidDataType(["number", "array"], str), false);
 });
 
-// DflowGraph
-// ////////////////////////////////////////////////////////////////////////////
-
-Deno.test("DflowGraph ancestorsOfNodeId", () => {
-  assertArrayIncludes(
-    DflowGraph.ancestorsOfNodeId("n", [
-      { sourceId: "n1", targetId: "n" },
-    ]),
-    ["n1"],
-  );
-
-  assertArrayIncludes(
-    DflowGraph.ancestorsOfNodeId("n", [
-      { sourceId: "n1", targetId: "n2" },
-      { sourceId: "n2", targetId: "n" },
-    ]),
-    ["n1", "n2"],
-  );
-});
-
-// DflowHost
-// ////////////////////////////////////////////////////////////////////////////
-
-Deno.test("new DflowHost has an empty graph", () => {
-  const dflow = new DflowHost({ nodesCatalog: {} });
+Deno.test("new Dflow has an empty graph", () => {
+  const dflow = new Dflow({ nodesCatalog: {} });
   assertObjectMatch(dflow.toJSON(), { nodes: [], edges: [] });
 });
 
-Deno.test("DflowHost clearGraph()", () => {
+Deno.test("dflow.clear()", () => {
   const { dflow } = sample01();
-  dflow.clearGraph();
+  dflow.clear();
 
   const graph = dflow.toJSON();
   assertEquals(graph.nodes.length, 0);
   assertEquals(graph.edges.length, 0);
 });
 
-Deno.test("DflowHost with empty graph executes with runStatus success", () => {
-  const dflow = new DflowHost({ nodesCatalog: {} });
+Deno.test("Dflow with empty graph executes with runStatus success", () => {
+  const dflow = new Dflow({ nodesCatalog: {} });
   dflow.run();
   assertEquals(dflow.runStatus, "success");
 });
 
-Deno.test("DflowHost run()", async () => {
-  const dflow = new DflowHost({ nodesCatalog: nodesCatalog2 });
+Deno.test("dflow.run()", async () => {
+  const dflow = new Dflow({ nodesCatalog: nodesCatalog2 });
   const catalog = dflow.nodesCatalog;
 
   // Num#out=2 -> Sum#in1 |
@@ -356,8 +348,8 @@ Deno.test("DflowHost run()", async () => {
   assertEquals(sum.data, 4);
 });
 
-Deno.test("DflowHost newNode()", () => {
-  const dflow = new DflowHost({ nodesCatalog: nodesCatalog1 });
+Deno.test("dflow.newNode()", () => {
+  const dflow = new Dflow({ nodesCatalog: nodesCatalog1 });
   const catalog = dflow.nodesCatalog;
 
   // newNode with id
@@ -388,14 +380,14 @@ Deno.test("DflowHost newNode()", () => {
   assertEquals(node3Obj.o?.[0]?.id, outputId1);
 });
 
-Deno.test("DflowHost newEdge()", () => {
+Deno.test("dflow.newEdge()", () => {
   const { dflow, edgeId1 } = sample01();
 
   const edge1 = dflow.getEdgeById(edgeId1);
   assertEquals(edgeId1, edge1?.id);
 });
 
-Deno.test("DflowHost deleteNode()", () => {
+Deno.test("dflow.deleteNode()", () => {
   const { dflow, nodeId1, edgeId1 } = sample01();
   dflow.deleteNode(nodeId1);
   assertThrows(() => {
@@ -409,7 +401,7 @@ Deno.test("DflowHost deleteNode()", () => {
   }, DflowErrorItemNotFound);
 });
 
-Deno.test("DflowHost deleteEdge()", () => {
+Deno.test("dflow.deleteEdge()", () => {
   const { dflow, edgeId1 } = sample01();
   dflow.deleteEdge(edgeId1);
   assertThrows(() => {

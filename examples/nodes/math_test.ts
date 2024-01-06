@@ -1,7 +1,7 @@
-import { newDflowHost, testOneInOneOut, testOneOut } from "./_test-utils.ts";
+import { newDflow, testOneInOneOut, testOneOut } from "./_test-utils.ts";
 
 Deno.test("mathAbs", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathAbs.kind;
 
@@ -13,7 +13,7 @@ Deno.test("mathAbs", () => {
 });
 
 Deno.test("mathCos", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathCos.kind;
 
@@ -25,7 +25,7 @@ Deno.test("mathCos", () => {
 });
 
 Deno.test("mathCosh", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathCosh.kind;
 
@@ -37,7 +37,7 @@ Deno.test("mathCosh", () => {
 });
 
 Deno.test("mathFloor", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathFloor.kind;
 
@@ -49,7 +49,7 @@ Deno.test("mathFloor", () => {
 });
 
 Deno.test("mathMax", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathMax.kind;
 
@@ -64,7 +64,7 @@ Deno.test("mathMax", () => {
 });
 
 Deno.test("mathMin", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathMin.kind;
 
@@ -79,7 +79,7 @@ Deno.test("mathMin", () => {
 });
 
 Deno.test("mathPI", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathPI.kind;
 
@@ -87,7 +87,7 @@ Deno.test("mathPI", () => {
 });
 
 Deno.test("mathRound", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathRound.kind;
 
@@ -99,7 +99,7 @@ Deno.test("mathRound", () => {
 });
 
 Deno.test("mathSin", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathSin.kind;
 
@@ -111,7 +111,7 @@ Deno.test("mathSin", () => {
 });
 
 Deno.test("mathSinh", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathSinh.kind;
 
