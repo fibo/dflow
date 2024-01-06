@@ -23,7 +23,7 @@
     }
   },
   "scripts": {
-    "build": "npm run bundle:dflow && npm run bundle:nodes && npm run emit_typescript_declarations",
+    "build": "mkdir -p dist && npm run bundle:dflow && npm run bundle:nodes && npm run emit_typescript_declarations",
     "bundle:dflow": "esbuild --minify-whitespace dflow.ts > dist/dflow.js",
     "bundle:nodes": "deno bundle --importmap=import_map.json examples/nodes/index.ts | esbuild --minify-whitespace > dist/nodes.js",
     "example:custom-nodes": "deno run examples/custom-nodes.js",
