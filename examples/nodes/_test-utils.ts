@@ -1,11 +1,11 @@
 import { deepEqual } from "std/node/assert.ts";
-import { Dflow, DflowHost } from "dflow";
+import { Dflow } from "dflow";
 import { nodesCatalog } from "./index.ts";
 
-export const newDflowHost = () => new DflowHost({ nodesCatalog });
+export const newDflow = () => new Dflow({ nodesCatalog });
 
 export function testOneOut<Output>(
-  dflow: DflowHost,
+  dflow: Dflow,
   nodeKind: string,
   output: Output,
 ) {
@@ -18,7 +18,7 @@ export function testOneInOneOut<
   Input,
   Output,
 >(
-  dflow: DflowHost,
+  dflow: Dflow,
   nodeKind: string,
   input?: Input,
   output?: Output,
@@ -39,7 +39,7 @@ export function testOneInTwoOut<
   Output1,
   Output2,
 >(
-  dflow: DflowHost,
+  dflow: Dflow,
   nodeKind: string,
   input?: Input,
   output1?: Output1,
@@ -62,7 +62,7 @@ export function testTwoInOneOut<
   Input2,
   Output,
 >(
-  dflow: DflowHost,
+  dflow: Dflow,
   nodeKind: string,
   input1?: Input1,
   input2?: Input2,
@@ -98,7 +98,7 @@ export function testThreeInOneOut<
   Input3,
   Output,
 >(
-  dflow: DflowHost,
+  dflow: Dflow,
   nodeKind: string,
   input1?: Input1,
   input2?: Input2,

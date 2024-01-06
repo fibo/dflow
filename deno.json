@@ -10,9 +10,7 @@
     ]
   },
   "lint": {
-    "files": {
-      "exclude": ["dflow.js", "nodes.js", "view.js"]
-    }
+    "exclude": ["dflow.js", "nodes.js", "view.js"]
   },
   "lock": false,
   "tasks": {

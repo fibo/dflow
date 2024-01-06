@@ -1,11 +1,11 @@
 import { assertEquals } from "std/testing/asserts.ts";
-import { newDflowHost } from "./_test-utils.ts";
+import { newDflow } from "./_test-utils.ts";
 import { nodesCatalog as catalog } from "./index.ts";
 
 Deno.test(catalog.newDate.kind, () => {
   const nodeKind = catalog.newDate.kind;
 
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const testNode = dflow.newNode({ kind: nodeKind });
 
   dflow.run();
@@ -20,7 +20,7 @@ Deno.test(catalog.newDate.kind, () => {
 Deno.test(catalog.now.kind, () => {
   const nodeKind = catalog.now.kind;
 
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const testNode = dflow.newNode({ kind: nodeKind });
 
   dflow.run();

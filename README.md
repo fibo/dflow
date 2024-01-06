@@ -42,7 +42,7 @@ Module is published here: https://deno.land/x/dflow
 Dflow engine is implemented in a single *dflow.ts* file, you can use an import like
 
 ```ts
-import { DflowHost } from "https://deno.land/x/dflow@v0.42.0/dflow.ts";
+import { Dflow } from "https://deno.land/x/dflow@v0.42.0/dflow.ts";
 ```
 
 #### Using an import map
@@ -60,10 +60,10 @@ Create an _import_map.json_ file like this.
 Then you can import for example the following.
 
 ```typescript
-import { DflowHost } from "dflow/dflow.ts";
+import { Dflow } from "dflow/dflow.ts";
 import { nodesCatalog } from "dflow/examples/nodes/index.ts";
 
-const dflow = new DflowHost({ nodesCatalog });
+const dflow = new Dflow({ nodesCatalog });
 
 // ... load or create a graph
 
@@ -116,12 +116,12 @@ You can run the following code with any of the following:
 You should see a number `1` printed on output.
 
 ```javascript
-import { DflowHost } from "dflow";
+import { Dflow } from "dflow";
 import { nodesCatalog } from "dflow/nodes";
 
 function rungraph() {
   // use builtin nodes
-  const dflow = new DflowHost({ nodesCatalog });
+  const dflow = new Dflow({ nodesCatalog });
   const catalog = dflow.nodesCatalog;
 
   // create nodes
