@@ -142,7 +142,8 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
     const [targetNodeId, targetPinId] = edge.target;
     const targetNode = this.getNodeById(targetNodeId);
     const targetPin = targetNode.getInputById(targetPinId);
-    targetPin.disconnect();
+    // Disconnect target
+    targetPin.source = undefined;
     // 2. Delete edge.
     this.edgesMap.delete(edgeId);
   }
@@ -460,6 +461,24 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
     );
   }
 
+  /**
+   * Check that types of source are compatible with types of target.
+   * @ignore
+   */
+  static canConnect(
+    sourceTypes: DflowDataType[],
+    targetTypes: DflowDataType[],
+  ) {
+    if (
+      // If source can have any type
+      sourceTypes.length === 0 ||
+      // or target can have any type, source and target are compatible.
+      targetTypes.length === 0
+    ) return true;
+    // Check if target accepts some of the type source can have.
+    return targetTypes.some((pinType) => sourceTypes.includes(pinType));
+  }
+
   /** @ignore */
   static childrenOfNodeId(
     nodeId: DflowId,
@@ -737,7 +756,7 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
 /**
  * `DflowPin` is a base class for `DflowInput` and `DflowOutput`.
  */
-export class DflowPin {
+class DflowPin {
   readonly name?: string;
 
   readonly nodeId: DflowId;
@@ -755,34 +774,12 @@ export class DflowPin {
   }
 
   /**
-   * Check that types of output source are compatible with types of input target.
-   */
-  static canConnect(
-    sourceTypes: DflowDataType[],
-    targetTypes: DflowDataType[],
-  ) {
-    if (
-      // If source can have any type
-      sourceTypes.length === 0 ||
-      // or target can have any type, source and target are compatible.
-      targetTypes.length === 0
-    ) return true;
-    // Check if target accepts some of the type source can have.
-    return targetTypes.some((pinType) => sourceTypes.includes(pinType));
-  }
-
-  /**
-   * If `types` is an empty list, it is equivalent to an `any` type.
-   */
-  get hasTypeAny() {
-    return this.types.length === 0;
-  }
-
-  /**
    * Check that given type is compatible with pin types.
    */
   hasType(type: DflowDataType) {
-    return this.hasTypeAny || this.types.includes(type);
+    // If `types` is an empty list, it is equivalent to have any type.
+    if (this.types.length === 0) return true;
+    return this.types.includes(type);
   }
 }
 
@@ -819,7 +816,7 @@ export class DflowInput extends DflowPin
   implements DflowSerializable<DflowSerializableInput> {
   readonly id: DflowId;
 
-  private source?: DflowOutput;
+  source?: DflowOutput;
 
   /**
    * By default an input is **not** `optional`.
@@ -853,20 +850,13 @@ export class DflowInput extends DflowPin
    * Connect input to given output.
    */
   connectTo(pin: DflowOutput) {
-    if (!DflowPin.canConnect(pin.types, this.types)) {
+    if (!Dflow.canConnect(pin.types, this.types)) {
       throw new DflowErrorCannotConnectPins({
         source: [pin.nodeId, pin.id],
         target: [this.nodeId, this.id],
       });
     }
     this.source = pin;
-  }
-
-  /**
-   * Disconnect from current output.
-   */
-  disconnect() {
-    this.source = undefined;
   }
 
   /** @ignore */
@@ -926,18 +916,19 @@ export class DflowOutput extends DflowPin
   }
 
   set data(arg: unknown) {
-    if (arg === undefined) {
-      this.clear();
-      return;
-    }
     if (
-      (this.hasType("string") && Dflow.isString(arg)) ||
-      (this.hasType("number") && Dflow.isNumber(arg)) ||
-      (this.hasType("boolean") && Dflow.isBoolean(arg)) ||
-      (this.hasType("object") && Dflow.isObject(arg)) ||
-      (this.hasType("array") && Dflow.isArray(arg)) ||
-      (this.hasType("DflowId") && Dflow.isDflowId(arg)) ||
-      (this.hasTypeAny && Dflow.isDflowData(arg))
+      arg !== undefined && (
+        (this.hasType("string") && Dflow.isString(arg)) ||
+        (this.hasType("number") && Dflow.isNumber(arg)) ||
+        (this.hasType("boolean") && Dflow.isBoolean(arg)) ||
+        (this.hasType("object") && Dflow.isObject(arg)) ||
+        (this.hasType("array") && Dflow.isArray(arg)) ||
+        (this.hasType("DflowId") && Dflow.isDflowId(arg)) ||
+        (
+          // Has any type and `arg` is some valid data.
+          this.types.length === 0 && Dflow.isDflowData(arg)
+        )
+      )
     ) {
       this.value = arg;
     } else this.clear();
