@@ -117,7 +117,7 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
    * ```
    *
    * Both `connect()` and `to()` accept an optional second parameter:
-   * the *pin position*, which defaults to 0.
+   * the *position*, which defaults to 0.
    *
    * @example
    * ```ts
@@ -129,11 +129,11 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   connect(sourceNode: DflowNode, sourcePosition = 0) {
     return {
       to: (targetNode: DflowNode, targetPosition = 0) => {
-        const sourcePin = sourceNode.output(sourcePosition);
-        const targetPin = targetNode.input(targetPosition);
+        const sourceOutput = sourceNode.output(sourcePosition);
+        const targetInput = targetNode.input(targetPosition);
         this.newEdge({
-          source: [sourceNode.id, sourcePin.id],
-          target: [targetNode.id, targetPin.id],
+          source: [sourceNode.id, sourceOutput.id],
+          target: [targetNode.id, targetInput.id],
         });
       },
     };
@@ -145,13 +145,13 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
    */
   deleteEdge(edgeId: DflowId) {
     const edge = this.getEdgeById(edgeId);
-    // 1. Cleanup target pin.
-    const [targetNodeId, targetPinId] = edge.target;
+    // Cleanup target input.
+    const [targetNodeId, targetInputId] = edge.target;
     const targetNode = this.getNodeById(targetNodeId);
-    const targetPin = targetNode.getInputById(targetPinId);
+    const targetInput = targetNode.getInputById(targetInputId);
     // Disconnect target
-    targetPin.source = undefined;
-    // 2. Delete edge.
+    targetInput.source = undefined;
+    // Delete edge.
     this.edgesMap.delete(edgeId);
   }
 
@@ -321,15 +321,22 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
 
     this.edgesMap.set(edge.id, edge);
 
-    const [sourceNodeId, sourcePinId] = edge.source;
-    const [targetNodeId, targetPinId] = edge.target;
+    const [sourceNodeId, sourceOutputId] = edge.source;
+    const [targetNodeId, targetInputId] = edge.target;
 
     const sourceNode = this.getNodeById(sourceNodeId);
     const targetNode = this.getNodeById(targetNodeId);
-    const sourcePin = sourceNode.getOutputById(sourcePinId);
-    const targetPin = targetNode.getInputById(targetPinId);
+    const sourceOutput = sourceNode.getOutputById(sourceOutputId);
+    const targetInput = targetNode.getInputById(targetInputId);
 
-    targetPin.connectTo(sourcePin);
+    if (!Dflow.canConnect(sourceOutput.types, targetInput.types)) {
+      throw new DflowErrorCannotConnectSourceToTarget({
+        source: [sourceNode.id, sourceOutput.id],
+        target: [targetNode.id, targetInput.id],
+      });
+    }
+
+    targetInput.source = sourceOutput;
 
     return edge;
   }
@@ -488,8 +495,8 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
       // or target can have any type, source and target are compatible.
       targetTypes.length === 0
     ) return true;
-    // Check if target accepts some of the type source can have.
-    return targetTypes.some((pinType) => sourceTypes.includes(pinType));
+    // Check if target accepts some of the `dataType` source can have.
+    return targetTypes.some((dataType) => sourceTypes.includes(dataType));
   }
 
   /** @ignore */
@@ -727,29 +734,27 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
    * Validate that data belongs to some of given types.
    */
   static isValidDataType(types: DflowDataType[], data: unknown) {
-    const isAnyType = types.length === 0;
-    if (isAnyType) return true;
-
-    return types.some((pinType) => {
-      switch (pinType) {
-        case "null":
-          return data === null;
-        case "boolean":
-          return typeof data === "boolean";
-        case "number":
-          return Dflow.isNumber(data);
-        case "string":
-          return typeof data === "string";
-        case "array":
-          return Dflow.isArray(data);
-        case "object":
-          return Dflow.isObject(data);
-        case "DflowId":
-          return Dflow.isDflowId(data);
-        default:
-          return false;
-      }
-    });
+    // TODO should return, otherwise graph would be not serializable.
+    // If has any data type, check that it is a valid `DflowData`.
+    // if (types.length === 0) return Dflow.isDflowData(data);
+    if (types.length === 0) return true;
+    return types.some((dataType) =>
+      (dataType === "null")
+        ? data === null
+        : dataType === "boolean"
+        ? typeof data === "boolean"
+        : (dataType === "string")
+        ? typeof data === "string"
+        : (dataType === "number")
+        ? Dflow.isNumber(data)
+        : (dataType === "object")
+        ? Dflow.isObject(data)
+        : (dataType === "array")
+        ? Dflow.isArray(data)
+        : (dataType === "DflowId")
+        ? Dflow.isDflowId(data)
+        : false
+    );
   }
 }
 
@@ -791,7 +796,7 @@ export type DflowSerializableInput = {
 };
 
 /**
- * A `DflowInput` is a node input pin.
+ * A `DflowInput` is a node input.
  *
  * @implements DflowSerializable<DflowSerializableInput>
  */
@@ -835,23 +840,6 @@ export class DflowInput
     return this.source?.data;
   }
 
-  get isConnected() {
-    return this.source !== undefined;
-  }
-
-  /**
-   * Connect input to given output.
-   */
-  connectTo(pin: DflowOutput) {
-    if (!Dflow.canConnect(pin.types, this.types)) {
-      throw new DflowErrorCannotConnectPins({
-        source: [pin.nodeId, pin.id],
-        target: [this.nodeId, this.id],
-      });
-    }
-    this.source = pin;
-  }
-
   /** @ignore */
   toJSON(): DflowSerializableInput {
     return { id: this.id };
@@ -884,7 +872,7 @@ export type DflowSerializableOutput = {
 };
 
 /**
- * A `DflowOutput` is a node output pin.
+ * A `DflowOutput` is a node output.
  *
  * @implements DflowSerializable<DflowSerializableOutput>
  */
@@ -1102,15 +1090,15 @@ export class DflowNode implements DflowSerializable<DflowSerializableNode> {
    * @throws {DflowErrorItemNotFound}
    */
   input(position: number): DflowInput {
-    const pinId = this.inputPosition[position];
-    if (!pinId) {
+    const id = this.inputPosition[position];
+    if (!id) {
       throw new DflowErrorItemNotFound("input", {
         id: this.id,
         nodeId: this.id,
         position,
       });
     }
-    return this.getInputById(pinId);
+    return this.getInputById(id);
   }
 
   /**
@@ -1130,14 +1118,14 @@ export class DflowNode implements DflowSerializable<DflowSerializableNode> {
    * @throws {DflowErrorItemNotFound}
    */
   output(position: number): DflowOutput {
-    const pinId = this.outputPosition[position];
-    if (!pinId) {
+    const id = this.outputPosition[position];
+    if (!id) {
       throw new DflowErrorItemNotFound("output", {
         nodeId: this.id,
         position,
       });
     }
-    return this.getOutputById(pinId);
+    return this.getOutputById(id);
   }
 
   /** @ignore this method, it should be overridden. */
@@ -1176,14 +1164,14 @@ export type DflowEdge = {
   readonly id: DflowId;
 
   /**
-   * Path to output pin.
+   * Path to output.
    */
-  readonly source: [nodeId: DflowId, pinId: DflowId];
+  readonly source: [nodeId: DflowId, outputId: DflowId];
 
   /**
-   * Path to input pin.
+   * Path to input.
    */
-  readonly target: [nodeId: DflowId, pinId: DflowId];
+  readonly target: [nodeId: DflowId, inputId: DflowId];
 };
 
 // DflowNodesCatalog
@@ -1306,38 +1294,43 @@ export type DflowSerializableErrorCode = {
 export type DflowSerializableError =
   | DflowSerializableErrorItemNotFound
   | DflowSerializableErrorInvalidInputData
-  | DflowSerializableErrorCannotConnectPins
+  | DflowSerializableErrorCannotConnectSourceToTarget
   | DflowSerializableErrorCannotExecuteAsyncFunction;
 
-export type DflowSerializableErrorCannotConnectPins =
+export type DflowSerializableErrorCannotConnectSourceToTarget =
   & DflowSerializableErrorCode
   & {
     /** source */
-    s: DflowErrorCannotConnectPins["source"];
+    s: DflowErrorCannotConnectSourceToTarget["source"];
     /** target */
-    t: DflowErrorCannotConnectPins["target"];
+    t: DflowErrorCannotConnectSourceToTarget["target"];
   };
 
-export class DflowErrorCannotConnectPins extends Error
-  implements DflowSerializable<DflowSerializableErrorCannotConnectPins> {
+export class DflowErrorCannotConnectSourceToTarget extends Error
+  implements
+    DflowSerializable<DflowSerializableErrorCannotConnectSourceToTarget> {
   readonly source: DflowEdge["source"];
   readonly target: DflowEdge["target"];
   static code = "01";
-  static message({ s, t }: Omit<DflowSerializableErrorCannotConnectPins, "_">) {
+  static message(
+    { s, t }: Omit<DflowSerializableErrorCannotConnectSourceToTarget, "_">,
+  ) {
     return `Cannot connect source ${s.join()} to target ${t.join()}`;
   }
   constructor({
     source,
     target,
-  }: Pick<DflowErrorCannotConnectPins, "source" | "target">) {
-    super(DflowErrorCannotConnectPins.message({ s: source, t: target }));
+  }: Pick<DflowErrorCannotConnectSourceToTarget, "source" | "target">) {
+    super(
+      DflowErrorCannotConnectSourceToTarget.message({ s: source, t: target }),
+    );
     this.source = source;
     this.target = target;
   }
   /** @ignore */
-  toJSON(): DflowSerializableErrorCannotConnectPins {
+  toJSON(): DflowSerializableErrorCannotConnectSourceToTarget {
     return {
-      _: DflowErrorCannotConnectPins.code,
+      _: DflowErrorCannotConnectSourceToTarget.code,
       s: this.source,
       t: this.target,
     };
