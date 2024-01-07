@@ -753,38 +753,18 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   }
 }
 
-// DflowPin
-// ////////////////////////////////////////////////////////////////////
-
 /**
- * `DflowPin` is a base class for `DflowInput` and `DflowOutput`.
+ * `DflowIO` is a base type for `DflowInput` and `DflowOutput`.
  */
-class DflowPin {
+type DflowIO = {
+  readonly id: DflowId;
+
   readonly name?: string;
 
   readonly nodeId: DflowId;
 
   readonly types: DflowDataType[];
-
-  constructor({
-    nodeId,
-    name,
-    types = [],
-  }: Pick<DflowPin, "nodeId" | "types"> & Partial<Pick<DflowPin, "name">>) {
-    if (name) this.name = name;
-    this.types = types;
-    this.nodeId = nodeId;
-  }
-
-  /**
-   * Check that given type is compatible with pin types.
-   */
-  hasType(type: DflowDataType) {
-    // If `types` is an empty list, it is equivalent to have any type.
-    if (this.types.length === 0) return true;
-    return this.types.includes(type);
-  }
-}
+};
 
 // DflowInput
 // ////////////////////////////////////////////////////////////////////
@@ -815,9 +795,15 @@ export type DflowSerializableInput = {
  *
  * @implements DflowSerializable<DflowSerializableInput>
  */
-export class DflowInput extends DflowPin
-  implements DflowSerializable<DflowSerializableInput> {
+export class DflowInput
+  implements DflowIO, DflowSerializable<DflowSerializableInput> {
   readonly id: DflowId;
+
+  readonly name?: string;
+
+  readonly nodeId: DflowId;
+
+  readonly types: DflowDataType[];
 
   source?: DflowOutput;
 
@@ -830,10 +816,14 @@ export class DflowInput extends DflowPin
 
   constructor({
     id,
+    name,
+    nodeId,
     optional,
-    ...pin
+    types,
   }: { id: DflowId; nodeId: DflowId } & DflowInputDefinition) {
-    super(pin);
+    if (name) this.name = name;
+    this.types = types;
+    this.nodeId = nodeId;
     this.id = id;
     if (optional) this.optional = optional;
   }
@@ -898,18 +888,28 @@ export type DflowSerializableOutput = {
  *
  * @implements DflowSerializable<DflowSerializableOutput>
  */
-export class DflowOutput extends DflowPin
-  implements DflowSerializable<DflowSerializableOutput> {
+export class DflowOutput
+  implements DflowIO, DflowSerializable<DflowSerializableOutput> {
   readonly id: DflowId;
+
+  readonly name?: string;
+
+  readonly nodeId: DflowId;
+
+  readonly types: DflowDataType[];
 
   private value: DflowData | undefined;
 
   constructor({
     id,
     data,
-    ...pin
+    name,
+    nodeId,
+    types,
   }: { id: DflowId; nodeId: DflowId } & DflowOutputDefinition) {
-    super(pin);
+    if (name) this.name = name;
+    this.types = types;
+    this.nodeId = nodeId;
     this.id = id;
     this.value = data;
   }
@@ -919,23 +919,26 @@ export class DflowOutput extends DflowPin
   }
 
   set data(arg: unknown) {
+    if (arg === undefined) {
+      this.value === undefined;
+      return;
+    }
+    const { types } = this;
     if (
-      arg !== undefined && (
-        (this.hasType("null") && arg === null) ||
-        (this.hasType("boolean") && typeof arg === "boolean") ||
-        (this.hasType("string") && typeof arg === "string") ||
-        (this.hasType("number") && Dflow.isNumber(arg)) ||
-        (this.hasType("object") && Dflow.isObject(arg)) ||
-        (this.hasType("array") && Dflow.isArray(arg)) ||
-        (this.hasType("DflowId") && Dflow.isDflowId(arg)) ||
-        (
-          // Has any type and `arg` is some valid data.
-          this.types.length === 0 && Dflow.isDflowData(arg)
-        )
-      )
+      (
+        // Has any type and `arg` is some valid data.
+        types.length === 0 && Dflow.isDflowData(arg)
+      ) ||
+      (types.includes("null") && arg === null) ||
+      (types.includes("boolean") && typeof arg === "boolean") ||
+      (types.includes("string") && typeof arg === "string") ||
+      (types.includes("number") && Dflow.isNumber(arg)) ||
+      (types.includes("object") && Dflow.isObject(arg)) ||
+      (types.includes("array") && Dflow.isArray(arg)) ||
+      (types.includes("DflowId") && Dflow.isDflowId(arg))
     ) {
       this.value = arg;
-    } else this.clear();
+    }
   }
 
   clear() {
