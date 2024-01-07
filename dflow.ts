@@ -6,7 +6,7 @@
  * A node or edge id is unique in its graph.
  * An input or output id is unique in its node.
  */
-export type DflowId = string;
+export type DflowId = number | string;
 
 /**
  * Helper to generate id unique in its scope.
@@ -28,7 +28,13 @@ const generateItemId = (
 /**
  * A `DflowData` represents any data that can be serialized into JSON.
  */
-export type DflowData = string | number | boolean | DflowArray | DflowObject;
+export type DflowData =
+  | null
+  | boolean
+  | number
+  | string
+  | DflowArray
+  | DflowObject;
 
 /** @ignore */
 export type DflowObject = { [Key in string]?: DflowData };
@@ -85,11 +91,12 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   }
 
   static dataTypes = [
-    "string",
-    "number",
+    "null",
     "boolean",
-    "object",
+    "number",
+    "string",
     "array",
+    "object",
     "DflowId",
   ];
 
@@ -505,9 +512,10 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
    * Infer `DflowDataType` of given argument.
    */
   static inferDataType(arg: unknown): DflowDataType[] {
-    if (Dflow.isBoolean(arg)) return ["boolean"];
+    if (arg === null) return ["null"];
+    if (typeof arg === "boolean") return ["boolean"];
+    if (typeof arg === "string") return ["string"];
     if (Dflow.isNumber(arg)) return ["number"];
-    if (Dflow.isString(arg)) return ["string"];
     if (Dflow.isArray(arg)) return ["array"];
     if (Dflow.isObject(arg)) return ["object"];
     return [];
@@ -667,17 +675,10 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   }
 
   /**
-   * Type guard for `boolean`.
-   */
-  static isBoolean(arg: unknown): arg is boolean {
-    return typeof arg === "boolean";
-  }
-
-  /**
    * Type guard for `DflowId`.
    */
   static isDflowId(arg: unknown): arg is DflowId {
-    return typeof arg === "string" && arg !== "";
+    return (typeof arg === "string" && arg !== "") || typeof arg === "number";
   }
 
   /**
@@ -694,17 +695,10 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   }
 
   /**
-   * Type guard for a valid dflow `number`, i.e. finite and not `NaN`.
+   * Type guard for a valid number, i.e. finite and not `NaN`.
    */
   static isNumber(arg: unknown): arg is number {
     return typeof arg === "number" && !isNaN(arg) && Number.isFinite(arg);
-  }
-
-  /**
-   * Type guard for `string`.
-   */
-  static isString(arg: unknown): arg is string {
-    return typeof arg === "string";
   }
 
   /**
@@ -713,8 +707,9 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   static isDflowData(arg: unknown): arg is DflowData {
     if (arg === undefined) return false;
     return (
-      Dflow.isString(arg) ||
-      Dflow.isBoolean(arg) ||
+      arg === null ||
+      typeof arg === "boolean" ||
+      typeof arg === "string" ||
       Dflow.isNumber(arg) ||
       Dflow.isObject(arg) ||
       Dflow.isArray(arg) ||
@@ -731,16 +726,18 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
 
     return types.some((pinType) => {
       switch (pinType) {
-        case "array":
-          return Dflow.isArray(data);
+        case "null":
+          return data === null;
         case "boolean":
-          return Dflow.isBoolean(data);
+          return typeof data === "boolean";
         case "number":
           return Dflow.isNumber(data);
+        case "string":
+          return typeof data === "string";
+        case "array":
+          return Dflow.isArray(data);
         case "object":
           return Dflow.isObject(data);
-        case "string":
-          return Dflow.isString(data);
         case "DflowId":
           return Dflow.isDflowId(data);
         default:
@@ -918,9 +915,10 @@ export class DflowOutput extends DflowPin
   set data(arg: unknown) {
     if (
       arg !== undefined && (
-        (this.hasType("string") && Dflow.isString(arg)) ||
+        (this.hasType("null") && arg === null) ||
+        (this.hasType("boolean") && typeof arg === "boolean") ||
+        (this.hasType("string") && typeof arg === "string") ||
         (this.hasType("number") && Dflow.isNumber(arg)) ||
-        (this.hasType("boolean") && Dflow.isBoolean(arg)) ||
         (this.hasType("object") && Dflow.isObject(arg)) ||
         (this.hasType("array") && Dflow.isArray(arg)) ||
         (this.hasType("DflowId") && Dflow.isDflowId(arg)) ||
