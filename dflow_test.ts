@@ -121,7 +121,7 @@ Deno.test("Dflow.inferDataType()", () => {
     { input: bool, output: ["boolean"] },
     { input: num, output: ["number"] },
     { input: NaN, output: [] },
-    { input: null, output: [] },
+    { input: null, output: ["null"] },
     { input: obj, output: ["object"] },
     { input: str, output: ["string"] },
     { input: undefined, output: [] },
@@ -149,17 +149,6 @@ Deno.test("Dflow.isArray()", () => {
     Dflow.isArray([1, [2, 3], [{ foo: 42 }], [true, () => {}]]),
     false,
   );
-});
-
-Deno.test("Dflow.isBoolean()", () => {
-  assertEquals(Dflow.isBoolean(arr), false);
-  assertEquals(Dflow.isBoolean(bool), true);
-  assertEquals(Dflow.isBoolean(num), false);
-  assertEquals(Dflow.isBoolean(NaN), false);
-  assertEquals(Dflow.isBoolean(null), false);
-  assertEquals(Dflow.isBoolean(obj), false);
-  assertEquals(Dflow.isBoolean(str), false);
-  assertEquals(Dflow.isBoolean(undefined), false);
 });
 
 Deno.test("Dflow.isNumber()", () => {
@@ -195,24 +184,8 @@ Deno.test("Dflow.isObject()", () => {
   assertEquals(Dflow.isObject({ foo: [1], bar: { quz: () => {} } }), false);
 });
 
-Deno.test("Dflow.isString()", () => {
-  assertEquals(Dflow.isString(arr), false);
-  assertEquals(Dflow.isString(bool), false);
-  assertEquals(Dflow.isString(num), false);
-  assertEquals(Dflow.isString(NaN), false);
-  assertEquals(Dflow.isString(null), false);
-  assertEquals(Dflow.isString(obj), false);
-  assertEquals(Dflow.isString(str), true);
-  assertEquals(Dflow.isString(undefined), false);
-});
-
 Deno.test("Dflow.isValidDataType()", () => {
-  assertEquals(Dflow.isValidDataType(["array"], arr), true);
-  assertEquals(Dflow.isValidDataType(["boolean"], bool), true);
-  assertEquals(Dflow.isValidDataType(["number"], num), true);
-  assertEquals(Dflow.isValidDataType(["number"], NaN), false);
-  assertEquals(Dflow.isValidDataType(["object"], obj), true);
-  assertEquals(Dflow.isValidDataType(["string"], str), true);
+  // Any type.
 
   assertEquals(Dflow.isValidDataType([], arr), true);
   assertEquals(Dflow.isValidDataType([], bool), true);
@@ -222,50 +195,88 @@ Deno.test("Dflow.isValidDataType()", () => {
   assertEquals(Dflow.isValidDataType([], obj), true);
   assertEquals(Dflow.isValidDataType([], str), true);
   assertEquals(Dflow.isValidDataType([], undefined), true);
+  assertEquals(Dflow.isValidDataType([], Infinity), true);
 
+  // The `array` type.
+
+  assertEquals(Dflow.isValidDataType(["array"], arr), true);
   assertEquals(Dflow.isValidDataType(["boolean"], arr), false);
+  assertEquals(Dflow.isValidDataType(["null"], arr), false);
   assertEquals(Dflow.isValidDataType(["number"], arr), false);
   assertEquals(Dflow.isValidDataType(["object"], arr), false);
   assertEquals(Dflow.isValidDataType(["string"], arr), false);
 
+  assertEquals(Dflow.isValidDataType(["array"], Infinity), false);
+  assertEquals(Dflow.isValidDataType(["array"], NaN), false);
+  assertEquals(Dflow.isValidDataType(["array"], undefined), false);
+
+  // The `boolean` type.
+
   assertEquals(Dflow.isValidDataType(["array"], bool), false);
+  assertEquals(Dflow.isValidDataType(["boolean"], bool), true);
+  assertEquals(Dflow.isValidDataType(["null"], bool), false);
   assertEquals(Dflow.isValidDataType(["number"], bool), false);
   assertEquals(Dflow.isValidDataType(["object"], bool), false);
   assertEquals(Dflow.isValidDataType(["string"], bool), false);
 
+  assertEquals(Dflow.isValidDataType(["boolean"], Infinity), false);
+  assertEquals(Dflow.isValidDataType(["boolean"], NaN), false);
+  assertEquals(Dflow.isValidDataType(["boolean"], undefined), false);
+
+  // The `null` type.
+
   assertEquals(Dflow.isValidDataType(["array"], null), false);
   assertEquals(Dflow.isValidDataType(["boolean"], null), false);
+  assertEquals(Dflow.isValidDataType(["null"], null), true);
   assertEquals(Dflow.isValidDataType(["number"], null), false);
   assertEquals(Dflow.isValidDataType(["object"], null), false);
   assertEquals(Dflow.isValidDataType(["string"], null), false);
 
+  assertEquals(Dflow.isValidDataType(["null"], Infinity), false);
+  assertEquals(Dflow.isValidDataType(["null"], NaN), false);
+  assertEquals(Dflow.isValidDataType(["null"], undefined), false);
+
+  // The `number` type.
+
   assertEquals(Dflow.isValidDataType(["array"], num), false);
   assertEquals(Dflow.isValidDataType(["boolean"], num), false);
+  assertEquals(Dflow.isValidDataType(["null"], num), false);
+  assertEquals(Dflow.isValidDataType(["number"], num), true);
   assertEquals(Dflow.isValidDataType(["object"], num), false);
   assertEquals(Dflow.isValidDataType(["string"], num), false);
 
-  assertEquals(Dflow.isValidDataType(["array"], NaN), false);
-  assertEquals(Dflow.isValidDataType(["boolean"], NaN), false);
-  assertEquals(Dflow.isValidDataType(["object"], NaN), false);
-  assertEquals(Dflow.isValidDataType(["string"], NaN), false);
+  assertEquals(Dflow.isValidDataType(["number"], Infinity), false);
+  assertEquals(Dflow.isValidDataType(["number"], NaN), false);
+  assertEquals(Dflow.isValidDataType(["number"], undefined), false);
+
+  // The `object` type.
 
   assertEquals(Dflow.isValidDataType(["array"], obj), false);
   assertEquals(Dflow.isValidDataType(["boolean"], obj), false);
+  assertEquals(Dflow.isValidDataType(["null"], obj), false);
   assertEquals(Dflow.isValidDataType(["number"], obj), false);
+  assertEquals(Dflow.isValidDataType(["object"], obj), true);
   assertEquals(Dflow.isValidDataType(["string"], obj), false);
+
+  assertEquals(Dflow.isValidDataType(["object"], Infinity), false);
+  assertEquals(Dflow.isValidDataType(["object"], NaN), false);
+  assertEquals(Dflow.isValidDataType(["object"], undefined), false);
+
+  // The `string` type.
 
   assertEquals(Dflow.isValidDataType(["array"], str), false);
   assertEquals(Dflow.isValidDataType(["boolean"], str), false);
+  assertEquals(Dflow.isValidDataType(["null"], str), false);
   assertEquals(Dflow.isValidDataType(["number"], str), false);
   assertEquals(Dflow.isValidDataType(["object"], str), false);
+  assertEquals(Dflow.isValidDataType(["string"], str), true);
 
-  assertEquals(Dflow.isValidDataType(["array"], undefined), false);
-  assertEquals(Dflow.isValidDataType(["boolean"], undefined), false);
-  assertEquals(Dflow.isValidDataType(["number"], undefined), false);
-  assertEquals(Dflow.isValidDataType(["object"], undefined), false);
+  assertEquals(Dflow.isValidDataType(["string"], Infinity), false);
+  assertEquals(Dflow.isValidDataType(["string"], NaN), false);
   assertEquals(Dflow.isValidDataType(["string"], undefined), false);
 
-  // No particular order here.
+  // Multiple types, no particular order here.
+
   assertEquals(Dflow.isValidDataType(["boolean", "array"], arr), true);
   assertEquals(
     Dflow.isValidDataType(["string", "number", "boolean"], bool),
