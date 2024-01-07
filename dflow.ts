@@ -317,7 +317,7 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   ): DflowEdge {
     const id = generateItemId(this.edgesMap, "e", arg.id);
 
-    const edge = new DflowEdge({ ...arg, id });
+    const edge = { ...arg, id };
 
     this.edgesMap.set(edge.id, edge);
 
@@ -441,7 +441,13 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   toJSON(): DflowSerializableGraph {
     return {
       nodes: [...this.nodesMap.values()].map((item) => item.toJSON()),
-      edges: [...this.edgesMap.values()].map((item) => item.toJSON()),
+      edges: [...this.edgesMap.values()].map((
+        { id, source: s, target: t },
+      ) => ({
+        id,
+        s,
+        t,
+      })),
     };
   }
 
@@ -1162,10 +1168,8 @@ export type DflowSerializableEdge = {
 
 /**
  * `DflowEdge` connects an `DflowOutput` to a `DflowInput`.
- *
- * @implements DflowSerializable<DflowSerializableEdge>
  */
-export class DflowEdge implements DflowSerializable<DflowSerializableEdge> {
+export type DflowEdge = {
   readonly id: DflowId;
 
   /**
@@ -1177,26 +1181,7 @@ export class DflowEdge implements DflowSerializable<DflowSerializableEdge> {
    * Path to input pin.
    */
   readonly target: [nodeId: DflowId, pinId: DflowId];
-
-  constructor({
-    source,
-    target,
-    id,
-  }: Pick<DflowEdge, "id" | "source" | "target">) {
-    this.id = id;
-    this.source = source;
-    this.target = target;
-  }
-
-  /** @ignore */
-  toJSON(): DflowSerializableEdge {
-    return {
-      id: this.id,
-      s: this.source,
-      t: this.target,
-    };
-  }
-}
+};
 
 // DflowNodesCatalog
 // ////////////////////////////////////////////////////////////////////
