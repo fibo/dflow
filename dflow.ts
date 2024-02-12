@@ -61,7 +61,7 @@ export interface DflowSerializable<Data extends DflowData> {
 // DflowData
 // ////////////////////////////////////////////////////////////////////
 
-type DflowConstructorArg = {
+export type DflowConstructorArg = {
   nodesCatalog: DflowNodesCatalog;
 };
 
