@@ -1,8 +1,8 @@
 import { DflowArray, DflowObject } from "dflow";
-import { newDflowHost, testOneInOneOut } from "./_test-utils.ts";
+import { newDflow, testOneInOneOut } from "./_test-utils.ts";
 
 Deno.test("objectKeys", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.objectKeys.kind;
 
@@ -17,7 +17,7 @@ Deno.test("objectKeys", () => {
 });
 
 Deno.test("objectValues", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.objectValues.kind;
 

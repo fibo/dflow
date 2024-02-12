@@ -1,6 +1,6 @@
-import { DflowHost, DflowNode } from "../dflow.js";
+import { Dflow, DflowNode } from "../dist/dflow.js";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
 class NumNode extends DflowNode {
   static kind = "Num";
@@ -44,7 +44,7 @@ const nodesCatalog = {
 };
 
 async function runGraph() {
-  const dflow = new DflowHost({ nodesCatalog });
+  const dflow = new Dflow({ nodesCatalog });
 
   // Create two nodes, num and sum.
 

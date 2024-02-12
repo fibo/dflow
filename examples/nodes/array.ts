@@ -1,6 +1,6 @@
-import { DflowArray, DflowId, DflowNode } from "dflow";
+import { Dflow, DflowArray, DflowId, DflowNode } from "dflow";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
 class DflowArrayAt extends DflowNode {
   static kind = "arrayAt";

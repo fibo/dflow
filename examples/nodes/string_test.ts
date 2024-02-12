@@ -1,11 +1,7 @@
-import {
-  newDflowHost,
-  testOneInOneOut,
-  testThreeInOneOut,
-} from "./_test-utils.ts";
+import { newDflow, testOneInOneOut, testThreeInOneOut } from "./_test-utils.ts";
 
 Deno.test("stringLength", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.stringLength.kind;
 
@@ -17,7 +13,7 @@ Deno.test("stringLength", () => {
 });
 
 Deno.test("substring", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.substring.kind;
 

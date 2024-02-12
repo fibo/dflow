@@ -1,9 +1,9 @@
 /*
 Create a host with an API context.
 */
-import { DflowHost, DflowNode } from "dflow";
+import { Dflow, DflowNode } from "dflow";
 
-const { output } = DflowNode;
+const { output } = Dflow;
 
 class ApiClient {
   apiKey: string;
@@ -39,7 +39,7 @@ const nodesCatalog = {
 };
 
 async function contextExample() {
-  const dflow = new DflowHost(nodesCatalog);
+  const dflow = new Dflow({ nodesCatalog });
 
   const apiKey = "s3cret";
   const apiClient = new ApiClient(apiKey);

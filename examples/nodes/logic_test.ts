@@ -1,12 +1,8 @@
 import { DflowData } from "dflow";
-import {
-  newDflowHost,
-  testOneInOneOut,
-  testTwoInOneOut,
-} from "./_test-utils.ts";
+import { newDflow, testOneInOneOut, testTwoInOneOut } from "./_test-utils.ts";
 
 Deno.test("DflowNodeAnd", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.and.kind;
 
@@ -29,7 +25,7 @@ Deno.test("DflowNodeAnd", () => {
 });
 
 Deno.test("DflowNodeNot", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.not.kind;
 
@@ -42,7 +38,7 @@ Deno.test("DflowNodeNot", () => {
 });
 
 Deno.test("DflowNodeNullishCoaleshing", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog["??"].kind;
 
@@ -66,7 +62,7 @@ Deno.test("DflowNodeNullishCoaleshing", () => {
 });
 
 Deno.test("DflowNodeOr", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.or.kind;
 
