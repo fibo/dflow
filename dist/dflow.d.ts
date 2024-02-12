@@ -34,7 +34,7 @@ export interface DflowSerializable<Data extends DflowData> {
    */
   toJSON(): Data;
 }
-type DflowConstructorArg = {
+export type DflowConstructorArg = {
   nodesCatalog: DflowNodesCatalog;
 };
 /**
