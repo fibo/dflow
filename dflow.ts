@@ -244,6 +244,7 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
         }
       } catch (error) {
         console.error(error);
+        throw error;
       }
     }
   }
