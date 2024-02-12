@@ -1,4 +1,8 @@
 {
+  "imports": {
+    "dflow": "./dflow.ts",
+    "std/": "https://deno.land/std@0.215.0/"
+  },
   "fmt": {
     "exclude": [
       "README.md",
@@ -12,8 +16,5 @@
   "lint": {
     "exclude": ["dflow.js", "nodes.js", "view.js"]
   },
-  "lock": false,
-  "tasks": {
-    "test": "deno test --unstable --importmap=import_map.json"
-  }
+  "lock": false
 }

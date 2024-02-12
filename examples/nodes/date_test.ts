@@ -1,4 +1,4 @@
-import { assertEquals } from "std/testing/asserts.ts";
+import { assertEquals } from "std/assert/mod.ts";
 import { newDflow } from "./_test-utils.ts";
 import { nodesCatalog as catalog } from "./index.ts";
 
