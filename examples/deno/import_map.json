@@ -1,5 +1,5 @@
 {
   "imports": {
-    "dflow/": "https://deno.land/x/dflow/"
+    "dflow": "https://deno.land/x/dflow/dflow.ts"
   }
 }

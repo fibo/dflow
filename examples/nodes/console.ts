@@ -1,6 +1,6 @@
-import { DflowNode } from "dflow";
+import { Dflow, DflowNode } from "dflow";
 
-const { input } = DflowNode;
+const { input } = Dflow;
 
 class DflowConsoleLog extends DflowNode {
   static kind = "consoleLog";

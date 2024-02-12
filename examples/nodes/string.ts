@@ -1,6 +1,6 @@
-import { DflowNode } from "dflow";
+import { Dflow, DflowNode } from "dflow";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
 export class DflowNodeStringLength extends DflowNode {
   static kind = "stringLength";

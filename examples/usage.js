@@ -1,11 +1,11 @@
-// keep in sync with readme
+// Keep in sync with README.md file.
 
-import { DflowHost } from "../dflow.js";
-import { nodesCatalog } from "../nodes.js";
+import { Dflow } from "../dist/dflow.js";
+import { nodesCatalog } from "../dist/nodes.js";
 
 function rungraph() {
   // use builtin nodes
-  const dflow = new DflowHost({ nodesCatalog });
+  const dflow = new Dflow({ nodesCatalog });
   const catalog = dflow.nodesCatalog;
 
   // create nodes

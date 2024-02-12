@@ -1,6 +1,6 @@
-import { DflowNode, DflowObject } from "dflow";
+import { Dflow, DflowNode, DflowObject } from "dflow";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
 class DflowObjectKeys extends DflowNode {
   static kind = "objectKeys";

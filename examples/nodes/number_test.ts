@@ -1,8 +1,8 @@
 import { DflowData } from "dflow";
-import { newDflowHost, testOneInOneOut } from "./_test-utils.ts";
+import { newDflow, testOneInOneOut } from "./_test-utils.ts";
 
 Deno.test("isFinite", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.isFinite.kind;
 
@@ -17,7 +17,7 @@ Deno.test("isFinite", () => {
 });
 
 Deno.test("isInteger", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.isInteger.kind;
 
@@ -39,7 +39,7 @@ Deno.test("isInteger", () => {
 });
 
 Deno.test("parseFloat", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.parseFloat.kind;
 
@@ -51,7 +51,7 @@ Deno.test("parseFloat", () => {
 });
 
 Deno.test("parseInt", () => {
-  const dflow = newDflowHost();
+  const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.parseInt.kind;
 

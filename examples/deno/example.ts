@@ -1,8 +1,3 @@
-import { DflowHost } from "dflow/dflow.ts";
-import { nodesCatalog } from "dflow/nodes/index.ts";
+import { Dflow } from "dflow";
 
-const dflow = new DflowHost({ nodesCatalog });
-
-// ... load a graph
-
-await dflow.run();
+console.log("42 is a number", Dflow.isNumber(42));
