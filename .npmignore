@@ -1,3 +1,6 @@
+.devcontainer/
+.vim/
+.vscode/
 DEVELOP.md
 deno.json
 dflow_test.ts
