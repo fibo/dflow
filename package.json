@@ -38,7 +38,7 @@
     "lint": "deno lint",
     "preversion": "npm run build",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
-    "test": "deno task test"
+    "test": "deno test"
   },
   "repository": {
     "type": "git",

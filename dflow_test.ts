@@ -4,7 +4,7 @@ import {
   assertObjectMatch,
   assertStrictEquals,
   assertThrows,
-} from "std/testing/asserts.ts";
+} from "std/assert/mod.ts";
 
 import {
   Dflow,

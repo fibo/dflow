@@ -1,4 +1,4 @@
-import { assertArrayIncludes, assertEquals } from "std/testing/asserts.ts";
+import { assertArrayIncludes, assertEquals } from "std/assert/mod.ts";
 import { DflowArray, DflowData } from "dflow";
 import {
   newDflow,

@@ -1,4 +1,4 @@
-import { deepEqual } from "std/node/assert.ts";
+import { equal } from "std/assert/mod.ts";
 import { Dflow } from "dflow";
 import { nodesCatalog } from "./index.ts";
 
@@ -11,7 +11,7 @@ export function testOneOut<Output>(
 ) {
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.run();
-  deepEqual(testNode.output(0).data, output);
+  equal(testNode.output(0).data, output);
 }
 
 export function testOneInOneOut<
@@ -31,7 +31,7 @@ export function testOneInOneOut<
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
   dflow.run();
-  deepEqual(testNode.output(0).data, output);
+  equal(testNode.output(0).data, output);
 }
 
 export function testOneInTwoOut<
@@ -53,8 +53,8 @@ export function testOneInTwoOut<
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
   dflow.run();
-  deepEqual(testNode.output(0).data, output1);
-  deepEqual(testNode.output(1).data, output2);
+  equal(testNode.output(0).data, output1);
+  equal(testNode.output(1).data, output2);
 }
 
 export function testTwoInOneOut<
@@ -89,7 +89,7 @@ export function testTwoInOneOut<
     dflow.connect(dataNode2).to(testNode, 1);
   }
   dflow.run();
-  deepEqual(testNode.output(0).data, output);
+  equal(testNode.output(0).data, output);
 }
 
 export function testThreeInOneOut<
@@ -135,5 +135,5 @@ export function testThreeInOneOut<
     dflow.connect(dataNode3).to(testNode, 2);
   }
   dflow.run();
-  deepEqual(testNode.output(0).data, output);
+  equal(testNode.output(0).data, output);
 }
