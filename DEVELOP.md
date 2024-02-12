@@ -8,11 +8,17 @@ Otherwise to develop locally, install [Deno](https://deno.land/).
 
 Format files as usual: `deno fmt`.
 Lint files as usual: `deno lint`.
-Run tests with: `deno task test`.
+Run tests with: `deno test`.
 
 ## npm scripts
 
-`npm run fmt`, `npm run lint` and `npm test` are wrappers of their corresponding *deno tasks*.
+If you want to push code to GitHub repo, please install the commit hook
+
+```sh
+npm run install_precommit_hook
+```
+
+Scripts `npm run fmt`, `npm run lint` and `npm test` are wrappers of their corresponding *deno tasks*.
 
 See also *example* scripts listed [here](https://github.com/fibo/dflow/blob/main/examples/README.md).
 

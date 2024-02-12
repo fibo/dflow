@@ -33,6 +33,7 @@
     "example:usage": "deno run examples/usage.js",
     "emit_typescript_declarations": "tsc --project ./tsconfig.declarations.json",
     "fmt": "deno fmt",
+    "install_precommit_hook": "echo '#!/bin/sh\ndeno test' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
     "postemit_typescript_declarations": "deno fmt dist/dflow.d.ts",
     "prebuild": "npm test",
     "lint": "deno lint",
