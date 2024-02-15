@@ -81,8 +81,6 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   /** @ignore */
   private edgesMap: Map<DflowId, DflowEdge> = new Map();
 
-  runStatus: "running" | "success" | "failure" | null = null;
-
   executionReport: DflowExecutionReport | null = null;
 
   constructor({ nodesCatalog }: DflowConstructorArg) {
@@ -218,33 +216,28 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
     for (const nodeId of nodeIds) {
       const node = this.getNodeById(nodeId);
 
-      try {
-        switch (node.kind) {
-          case DflowNodeArgument.kind: {
-            const position = node.input(0).data;
-            // Argument position default to 0, must be >= 0.
-            const index = typeof position === "number" && !isNaN(position)
-              ? Math.max(position, 0)
-              : 0;
-            node.output(0).data = args[index];
-            break;
-          }
-          case DflowNodeReturn.kind: {
-            return node.input(1).data;
-          }
-          default: {
-            if (node.run.constructor.name === "AsyncFunction") {
-              throw new DflowErrorCannotExecuteAsyncFunction();
-            }
-            node.run();
-            this.executionReport?.steps?.push(
-              Dflow.executionNodeInfo(node),
-            );
-          }
+      switch (node.kind) {
+        case DflowNodeArgument.kind: {
+          const position = node.input(0).data;
+          // Argument position default to 0, must be >= 0.
+          const index = typeof position === "number" && !isNaN(position)
+            ? Math.max(position, 0)
+            : 0;
+          node.output(0).data = args[index];
+          break;
         }
-      } catch (error) {
-        console.error(error);
-        throw error;
+        case DflowNodeReturn.kind: {
+          return node.input(1).data;
+        }
+        default: {
+          if (node.run.constructor.name === "AsyncFunction") {
+            throw new DflowErrorCannotExecuteAsyncFunction();
+          }
+          node.run();
+          this.executionReport?.steps?.push(
+            Dflow.executionNodeInfo(node),
+          );
+        }
       }
     }
   }
@@ -386,11 +379,7 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
    * Execute all nodes, sorted by their connections.
    */
   async run() {
-    // Set runStatus to running if there was some unhandled error in a previous run.
-    this.runStatus = "running";
-
     const executionReport: DflowExecutionReport = {
-      status: this.runStatus,
       start: Date.now(),
       end: Date.now(),
       steps: [],
@@ -410,36 +399,27 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
     for (const nodeId of nodeIds) {
       const node = this.nodesMap.get(nodeId) as DflowNode;
 
-      try {
-        // If some input data is not valid.
-        if (!node.inputsDataAreValid) {
-          // Notify into execution report.
-          const error = new DflowErrorInvalidInputData(nodeId);
-          executionReport.steps.push(
-            Dflow.executionNodeInfo(node, error.toJSON()),
-          );
-          // Cleanup outputs and go to next node.
-          node.clearOutputs();
-          continue;
-        }
-
-        if (node.run.constructor.name === "AsyncFunction") {
-          await node.run();
-        } else {
-          node.run();
-        }
-
-        executionReport.steps.push(Dflow.executionNodeInfo(node));
-      } catch (error) {
-        console.error(error);
-        this.runStatus = "failure";
+      // If some input data is not valid.
+      if (!node.inputsDataAreValid) {
+        // Notify into execution report.
+        const error = new DflowErrorInvalidInputData(nodeId);
+        executionReport.steps.push(
+          Dflow.executionNodeInfo(node, error.toJSON()),
+        );
+        // Cleanup outputs and go to next node.
+        node.clearOutputs();
+        continue;
       }
+
+      if (node.run.constructor.name === "AsyncFunction") {
+        await node.run();
+      } else {
+        node.run();
+      }
+
+      executionReport.steps.push(Dflow.executionNodeInfo(node));
     }
 
-    // Set runStatus to success if there was no error.
-    if (this.runStatus === "running") this.runStatus = "success";
-
-    executionReport.status = this.runStatus;
     executionReport.end = Date.now();
 
     this.executionReport = executionReport;
@@ -1211,7 +1191,6 @@ export type DflowExecutionNodeInfo = Omit<DflowSerializableNode, "i"> & {
 };
 
 export type DflowExecutionReport = {
-  status: Exclude<Dflow["runStatus"], null>;
   start: number;
   end: number;
   steps: DflowExecutionNodeInfo[];

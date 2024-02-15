@@ -2,7 +2,7 @@
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
   "type": "module",
-  "version": "0.43.0",
+  "version": "0.43.1",
   "engines": {
     "node": ">=14",
     "deno": ">=1.10"

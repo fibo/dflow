@@ -314,12 +314,6 @@ Deno.test("dflow.clear()", () => {
   assertEquals(graph.edges.length, 0);
 });
 
-Deno.test("Dflow with empty graph executes with runStatus success", () => {
-  const dflow = new Dflow({ nodesCatalog: {} });
-  dflow.run();
-  assertEquals(dflow.runStatus, "success");
-});
-
 Deno.test("dflow.run()", async () => {
   const dflow = new Dflow({ nodesCatalog: nodesCatalog2 });
   const catalog = dflow.nodesCatalog;

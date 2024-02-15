@@ -50,7 +50,6 @@ export declare class Dflow
   private nodesMap;
   /** @ignore */
   private edgesMap;
-  runStatus: "running" | "success" | "failure" | null;
   executionReport: DflowExecutionReport | null;
   constructor({ nodesCatalog }: DflowConstructorArg);
   static dataTypes: string[];
@@ -557,7 +556,6 @@ export type DflowExecutionNodeInfo = Omit<DflowSerializableNode, "i"> & {
   err?: DflowSerializableError;
 };
 export type DflowExecutionReport = {
-  status: Exclude<Dflow["runStatus"], null>;
   start: number;
   end: number;
   steps: DflowExecutionNodeInfo[];
