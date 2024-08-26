@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": ".",
+    // To build stripped JS, but emit declarations with JSDoc preserved:
+    // disable comments and declaration, then in package.json add script
+    //
+    //     "build": "tsc --removeComments --project tsconfig.build.json && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
+    //
+    "removeComments": false,
+    "declaration": false
+
+  },
+  "extends": "./tsconfig.json",
+  "exclude": ["./dflow_test.ts", "./examples"],
+  "include": ["./dflow.ts", "./test-utils.ts"]
+}

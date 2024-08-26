@@ -7,6 +7,5 @@ It is possible to run examples via an npm script:
     npm run example:context
     npm run example:custom-nodes
     npm run example:execution-report
-    npm run example:deno
     npm run example:usage
 

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    // TODO
+    // API should be improved and simplified in order enable
+    // "allowJs": true,
+    // "checkJs": true,
+    "lib": ["dom", "es2023"],
+    "module": "es6",
+		"moduleResolution": "node",
+    "noEmit": true,
+    "strict": true,
+    "target": "es2023"
+
+  },
+  "exclude": ["./node_modules"],
+  "include": ["./**/*.ts"]
+}

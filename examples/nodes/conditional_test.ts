@@ -1,6 +1,7 @@
-import { assertEquals } from "std/assert/mod.ts";
-import { DflowData } from "dflow";
-import { newDflow } from "./_test-utils.ts";
+import { strict as assert } from "node:assert"
+import { test } from "node:test"
+import { DflowData } from "../../dflow.js";
+import { newDflow } from "./_test-utils.js";
 
 function testConditionalIf(
   input1?: DflowData,
@@ -29,10 +30,10 @@ function testConditionalIf(
   dflow.connect(dataNode2).to(testNode, 1);
   dflow.connect(dataNode3).to(testNode, 2);
   dflow.run();
-  assertEquals(testNode.output(0).data, output);
+  assert.deepEqual(testNode.output(0).data, output);
 }
 
-Deno.test("DflowNodeIf", () => {
+test("DflowNodeIf", () => {
   [
     {
       input1: undefined,

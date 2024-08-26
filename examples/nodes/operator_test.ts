@@ -1,7 +1,8 @@
-import { DflowData } from "dflow";
-import { newDflow, testTwoInOneOut } from "./_test-utils.ts";
+import { test } from "node:test"
+import { DflowData } from "../../dflow.js";
+import { newDflow, testTwoInOneOut } from "./_test-utils.js";
 
-Deno.test("addition", () => {
+test("addition", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.addition.kind;
@@ -21,7 +22,7 @@ Deno.test("addition", () => {
   );
 });
 
-Deno.test("division", () => {
+test("division", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.division.kind;
@@ -43,7 +44,7 @@ Deno.test("division", () => {
   );
 });
 
-Deno.test("equality", () => {
+test("equality", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.equality.kind;
@@ -82,7 +83,7 @@ Deno.test("equality", () => {
   );
 });
 
-Deno.test("greaterThan", () => {
+test("greaterThan", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.greaterThan.kind;
@@ -100,7 +101,7 @@ Deno.test("greaterThan", () => {
   );
 });
 
-Deno.test("greaterThanOrEqual", () => {
+test("greaterThanOrEqual", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.greaterThanOrEqual.kind;
@@ -118,7 +119,7 @@ Deno.test("greaterThanOrEqual", () => {
   );
 });
 
-Deno.test("lessThan", () => {
+test("lessThan", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.lessThan.kind;
@@ -136,7 +137,7 @@ Deno.test("lessThan", () => {
   );
 });
 
-Deno.test("lessThanOrEqual", () => {
+test("lessThanOrEqual", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.lessThanOrEqual.kind;
@@ -154,7 +155,7 @@ Deno.test("lessThanOrEqual", () => {
   );
 });
 
-Deno.test("inequality", () => {
+test("inequality", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.inequality.kind;
@@ -193,7 +194,7 @@ Deno.test("inequality", () => {
   );
 });
 
-Deno.test("multiplication", () => {
+test("multiplication", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.multiplication.kind;
@@ -211,7 +212,7 @@ Deno.test("multiplication", () => {
   );
 });
 
-Deno.test("subtraction", () => {
+test("subtraction", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.subtraction.kind;

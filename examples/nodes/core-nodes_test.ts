@@ -1,9 +1,10 @@
-import { assertEquals } from "std/assert/mod.ts";
-import { Dflow, DflowId } from "dflow";
-import { catalog as mathCatalog } from "./math.ts";
-import { catalog as operatorCatalog } from "./operator.ts";
+import { strict as assert } from "node:assert"
+import { test } from "node:test"
+import { Dflow, DflowId } from "../../dflow.js";
+import { catalog as mathCatalog } from "./math.js";
+import { catalog as operatorCatalog } from "./operator.js";
 
-Deno.test("DflowNodeFunction", () => {
+test("DflowNodeFunction", () => {
   const nodesCatalog = { ...mathCatalog, ...operatorCatalog };
   const dflow = new Dflow({ nodesCatalog });
   const catalog = dflow.nodesCatalog;
@@ -21,5 +22,5 @@ Deno.test("DflowNodeFunction", () => {
 
   dflow.run();
 
-  assertEquals(testNode.output(0).data as DflowId, testNode.id);
+  assert.deepEqual(testNode.output(0).data as DflowId, testNode.id);
 });
