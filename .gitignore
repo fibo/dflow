@@ -1,6 +1,9 @@
 .DS_Store
 *~
 .*.swp
-dist/
 node_modules/
 npm-debug.log
+
+# generated files
+dflow.d.ts
+dflow.js

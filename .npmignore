@@ -1,9 +1,7 @@
-.devcontainer/
-.vim/
-.vscode/
-DEVELOP.md
-deno.json
+.ts-node.env
+.typescript.env
+dflow.ts
 dflow_test.ts
 examples/
-import_map.json
-tsconfig.declarations.json
+tsconfig.build.json
+tsconfig.json

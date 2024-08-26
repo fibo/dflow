@@ -1,8 +1,10 @@
-import { equal } from "std/assert/mod.ts";
-import { Dflow } from "dflow";
-import { nodesCatalog } from "./index.ts";
+import { strict as assert } from "node:assert"
+import { Dflow } from "../../dflow.js";
+import { nodesCatalog } from "./index.js";
 
-export const newDflow = () => new Dflow({ nodesCatalog });
+export function newDflow () {
+  return new Dflow({ nodesCatalog });
+}
 
 export function testOneOut<Output>(
   dflow: Dflow,
@@ -11,7 +13,7 @@ export function testOneOut<Output>(
 ) {
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.run();
-  equal(testNode.output(0).data, output);
+  assert.deepEqual(testNode.output(0).data, output);
 }
 
 export function testOneInOneOut<
@@ -31,7 +33,7 @@ export function testOneInOneOut<
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
   dflow.run();
-  equal(testNode.output(0).data, output);
+  assert.deepEqual(testNode.output(0).data, output);
 }
 
 export function testOneInTwoOut<
@@ -53,8 +55,8 @@ export function testOneInTwoOut<
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
   dflow.run();
-  equal(testNode.output(0).data, output1);
-  equal(testNode.output(1).data, output2);
+  assert.deepEqual(testNode.output(0).data, output1);
+  assert.deepEqual(testNode.output(1).data, output2);
 }
 
 export function testTwoInOneOut<
@@ -89,7 +91,7 @@ export function testTwoInOneOut<
     dflow.connect(dataNode2).to(testNode, 1);
   }
   dflow.run();
-  equal(testNode.output(0).data, output);
+  assert.deepEqual(testNode.output(0).data, output);
 }
 
 export function testThreeInOneOut<
@@ -135,5 +137,5 @@ export function testThreeInOneOut<
     dflow.connect(dataNode3).to(testNode, 2);
   }
   dflow.run();
-  equal(testNode.output(0).data, output);
+  assert.deepEqual(testNode.output(0).data, output);
 }
