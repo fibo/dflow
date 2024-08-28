@@ -2,6 +2,14 @@
 
 > is a minimal [Dataflow programming][dataflow-wikipedia] engine
 
+## Installation
+
+With [npm](https://npmjs.org/) do
+
+```sh
+npm install dflow
+```
+
 ## How it works
 
 A **node** represents a block of code: it can have **inputs** and **outputs**.
@@ -13,7 +21,7 @@ It can contain nodes and edges. Nodes are executed, sorted by their connections.
 
 ## Features
 
-- Implemented in TypeScript, available both on Node and Deno.
+- Implemented in TypeScript.
 - Expressive and simple API.
 - A graph can be saved as a JSON file. It can be then loaded and executed.
 - It is easy to create nodes: just extend `DflowNode` class, define its inputs and outputs and the `run()` function.
@@ -22,70 +30,6 @@ It can contain nodes and edges. Nodes are executed, sorted by their connections.
 
 **NOTA BENE**: it is supposed that you implement your own nodes, for example node `addition` could be implemented using bigint or some floating point library, according to your needs.
 However an example nodes catalog with basic JavaScript features can be imported from `dflow/nodes`.
-
-## Installation
-
-### Node
-
-With [npm](https://npmjs.org/) do
-
-```sh
-npm install dflow
-```
-
-### Deno
-
-> Dflow lives in Deno land!
-
-Module is published here: https://deno.land/x/dflow
-
-Dflow engine is implemented in a single *dflow.ts* file, you can use an import like
-
-```ts
-import { Dflow } from "https://deno.land/x/dflow@v0.42.0/dflow.ts";
-```
-
-#### Using an import map
-
-Create an _import_map.json_ file like this.
-
-```json
-{
-  "imports": {
-    "dflow/": "https://deno.land/x/dflow/"
-  }
-}
-```
-
-Then you can import for example the following.
-
-```typescript
-import { Dflow } from "dflow/dflow.ts";
-import { nodesCatalog } from "dflow/examples/nodes/index.ts";
-
-const dflow = new Dflow({ nodesCatalog });
-
-// ... load or create a graph
-
-await dflow.run()
-```
-
-With [deno](https://deno.land/) you can then launch your script like this
-
-```sh
-deno run --importmap=import_map.json path/to/my/script.ts
-```
-
-You may want to point to a specific version, for instance version `0.42`, change your import map accordingly
-
-```diff
-{
-  "imports": {
--    "dflow": "https://deno.land/x/dflow/dflow.ts"
-+    "dflow": "https://deno.land/x/dflow@0.42/dflow.ts"
-  }
-}
-```
 
 ## Usage
 
@@ -107,17 +51,37 @@ This is a graph that will compute `sin(π / 2) = 1` and print the result.
      ------------
 ```
 
-You can run the following code with any of the following:
-
-- launching command
-  `deno run https://raw.githubusercontent.com/fibo/dflow/main/examples/usage.js`
-- cloning this repo and launching `npm run example:usage`.
+You can run the following code with any of the following by cloning this repo and launching `npm run example:usage`.
 
 You should see a number `1` printed on output.
 
 ```javascript
-import { Dflow } from "dflow";
-import { nodesCatalog } from "dflow/nodes";
+import { Dflow, DflowNode } from "dflow";
+
+const { input, output } = Dflow;
+
+class DflowMathSin extends DflowNode {
+  static kind = "mathSin";
+  static inputs = [input("number")];
+  static outputs = [output("number")];
+  run() {
+    this.output(0).data = Math.sin(this.input(0).data);
+  }
+}
+
+class DflowConsoleLog extends DflowNode {
+  static kind = "consoleLog";
+  static inputs = [input()];
+  run() {
+    console.log(this.input(0).data);
+  }
+}
+
+const nodesCatalog = {
+  [DflowMathSin.kind]: DflowMathSin,
+  [DflowConsoleLog.kind]: DflowConsoleLog,
+  // DflowNodeData is a core node
+};
 
 function rungraph() {
   // use builtin nodes
@@ -130,12 +94,8 @@ function rungraph() {
     // set numNode output to π / 2
     outputs: [{ data: Math.PI / 2 }],
   });
-  const sinNode = dflow.newNode({
-    kind: catalog.mathSin.kind,
-  });
-  const consoleLogNode = dflow.newNode({
-    kind: catalog.consoleLog.kind,
-  });
+  const sinNode = dflow.newNode({ kind: catalog.mathSin.kind });
+  const consoleLogNode = dflow.newNode({ kind: catalog.consoleLog.kind });
 
   // connect numNode to sinNode and sinNode to consoleLog
   dflow.connect(numNode).to(sinNode);

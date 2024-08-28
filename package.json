@@ -2,44 +2,31 @@
   "name": "dflow",
   "description": "is a minimal Dataflow programming engine",
   "type": "module",
-  "version": "0.43.1",
-  "engines": {
-    "node": ">=14",
-    "deno": ">=1.10"
+  "version": "0.44.0",
+  "exports": {
+    "import": "dflow.js",
+    "types": "dflow.d.ts"
   },
   "license": "MIT",
   "author": {
     "name": "Gianluca Casati",
     "url": "https://fibo.github.io"
   },
-  "types": "dist/dflow.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/dflow.js",
-      "types": "./dist/dflow.d.ts"
-    },
-    "./nodes": {
-      "import": "./dist/nodes.js"
-    }
-  },
   "scripts": {
-    "build": "mkdir -p dist && npm run bundle:dflow && npm run bundle:nodes && npm run emit_typescript_declarations",
-    "bundle:dflow": "esbuild --minify-whitespace dflow.ts > dist/dflow.js",
-    "bundle:nodes": "deno bundle --importmap=import_map.json examples/nodes/index.ts | esbuild --minify-whitespace > dist/nodes.js",
-    "example:custom-nodes": "deno run examples/custom-nodes.js",
-    "example:context": "deno run --importmap=import_map.json examples/context.ts",
-    "example:deno": "deno run --importmap=./examples/deno/import_map.json ./examples/deno/example.ts",
-    "example:execution-report": "deno run --importmap=import_map.json examples/execution-report.ts",
-    "example:usage": "deno run examples/usage.js",
-    "emit_typescript_declarations": "tsc --project ./tsconfig.declarations.json",
-    "fmt": "deno fmt",
-    "install_precommit_hook": "echo '#!/bin/sh\ndeno test' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
-    "postemit_typescript_declarations": "deno fmt dist/dflow.d.ts",
-    "prebuild": "npm test",
-    "lint": "deno lint",
+    "build": "tsc --removeComments --project tsconfig.build.json && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
+    "check_types": "tsc",
+    "example:custom-nodes": "node examples/custom-nodes.js",
+    "example:context": "node --env-file .typescript.env examples/context.ts",
+    "example:execution-report": "node --env-file .typescript.env examples/execution-report.ts",
+    "example:usage": "node examples/usage.js",
+    "install_precommit_hook": "echo '#!/bin/sh\nnpm test' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
+    "prebuild": "npm run check_types",
+    "pretest": "npm run build",
     "preversion": "npm run build",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
-    "test": "deno test"
+    "test": "npm run test:dflow && npm run test:nodes",
+    "test:dflow": "node --test --env-file .typescript.env dflow_test.ts",
+    "test:nodes": "node --test --env-file .ts-node.env examples/nodes/*_test.ts"
   },
   "repository": {
     "type": "git",
@@ -49,5 +36,9 @@
     "dataflow",
     "dataflow-programming"
   ],
-  "dependencies": {}
+  "devDependencies": {
+    "@types/node": "^22.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
 }
