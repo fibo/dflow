@@ -6,7 +6,7 @@ import { catalog as operatorCatalog } from "./operator.js";
 
 test("DflowNodeFunction", () => {
   const nodesCatalog = { ...mathCatalog, ...operatorCatalog };
-  const dflow = new Dflow({ nodesCatalog });
+  const dflow = new Dflow(nodesCatalog);
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.function.kind;
 

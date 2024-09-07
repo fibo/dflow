@@ -39,7 +39,7 @@ const nodesCatalog = {
 };
 
 async function contextExample() {
-  const dflow = new Dflow({ nodesCatalog });
+  const dflow = new Dflow(nodesCatalog);
 
   const apiKey = "s3cret";
   const apiClient = new ApiClient(apiKey);

@@ -44,7 +44,7 @@ const nodesCatalog = {
 };
 
 async function runGraph() {
-  const dflow = new Dflow({ nodesCatalog });
+  const dflow = new Dflow(nodesCatalog);
 
   // Create two nodes, num and sum.
 

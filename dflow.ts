@@ -42,12 +42,8 @@ export interface DflowSerializable<Data extends DflowData> {
   toJSON(): Data;
 }
 
-// DflowData
+// Dflow
 // ////////////////////////////////////////////////////////////////////
-
-export type DflowConstructorArg = {
-  nodesCatalog: DflowNodesCatalog;
-};
 
 /**
  * `Dflow` represents a program as an executable graph.
@@ -65,7 +61,7 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
 
   executionReport: DflowExecutionReport | null = null;
 
-  constructor({ nodesCatalog }: DflowConstructorArg) {
+  constructor(nodesCatalog: DflowNodesCatalog) {
     this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
     this.context = {};
   }
@@ -458,10 +454,7 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   /**
    * Check that types of source are compatible with types of target.
    */
-  static canConnect(
-    sourceTypes: DflowDataType[],
-    targetTypes: DflowDataType[],
-  ) {
+  static canConnect(sourceTypes: DflowDataType[], targetTypes: DflowDataType[]) {
     if (
       // If source can have any type
       sourceTypes.length === 0 ||
@@ -472,19 +465,13 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
     return targetTypes.some((dataType) => sourceTypes.includes(dataType));
   }
 
-  static childrenOfNodeId(
-    nodeId: DflowId,
-    nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
-  ) {
+  static childrenOfNodeId(nodeId: DflowId, nodeConnections: { sourceId: DflowId; targetId: DflowId }[]) {
     return nodeConnections
       .filter(({ sourceId }) => nodeId === sourceId)
       .map(({ targetId }) => targetId);
   }
 
-  static executionNodeInfo(
-    node: DflowNode,
-    error?: DflowSerializableError,
-  ): DflowExecutionNodeInfo {
+  static executionNodeInfo(node: DflowNode, error?: DflowSerializableError): DflowExecutionNodeInfo {
     const { id, k, o } = node.toJSON();
     const info: DflowExecutionNodeInfo = { id, k };
     if (o) info.o = o;
@@ -505,10 +492,7 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
     return [];
   }
 
-  static levelOfNodeId(
-    nodeId: DflowId,
-    nodeConnections: DflowNodeConnection[],
-  ) {
+  static levelOfNodeId(nodeId: DflowId, nodeConnections: DflowNodeConnection[]) {
     const parentsNodeIds = Dflow.parentsOfNodeId(nodeId, nodeConnections);
     // 1. A node with no parent as level zero.
     if (parentsNodeIds.length === 0) return 0;
@@ -1128,7 +1112,9 @@ export class DflowNode implements DflowSerializable<DflowSerializableNode> {
 
 export type DflowSerializableEdge = {
   id: DflowId;
+  /** source */
   s: DflowEdge["source"];
+  /** target */
   t: DflowEdge["target"];
 };
 

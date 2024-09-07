@@ -3,7 +3,7 @@ import { Dflow } from "../../dflow.js";
 import { nodesCatalog } from "./index.js";
 
 export function newDflow () {
-  return new Dflow({ nodesCatalog });
+  return new Dflow(nodesCatalog);
 }
 
 export function testOneOut<Output>(

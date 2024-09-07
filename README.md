@@ -84,8 +84,7 @@ const nodesCatalog = {
 };
 
 function rungraph() {
-  // use builtin nodes
-  const dflow = new Dflow({ nodesCatalog });
+  const dflow = new Dflow(nodesCatalog);
   const catalog = dflow.nodesCatalog;
 
   // create nodes

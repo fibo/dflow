@@ -70,7 +70,7 @@ function sample01() {
   const pinId1 = "p1";
   const pinId2 = "p2";
   const edgeId1 = "e2";
-  const dflow = new Dflow({ nodesCatalog: nodesCatalog1 });
+  const dflow = new Dflow(nodesCatalog1);
   const catalog = dflow.nodesCatalog;
   dflow.newNode({
     id: nodeId1,
@@ -297,7 +297,7 @@ test("Dflow.isValidDataType()", () => {
 });
 
 test("new Dflow has an empty graph", () => {
-  const dflow = new Dflow({ nodesCatalog: {} });
+  const dflow = new Dflow({});
   assert.deepEqual(dflow.toJSON(), { nodes: [], edges: [] });
 });
 
@@ -311,7 +311,7 @@ test("dflow.clear()", () => {
 });
 
 test("dflow.run()", async () => {
-  const dflow = new Dflow({ nodesCatalog: nodesCatalog2 });
+  const dflow = new Dflow(nodesCatalog2);
   const catalog = dflow.nodesCatalog;
 
   // Num#out=2 -> Sum#in1 |
@@ -349,7 +349,7 @@ test("dflow.run()", async () => {
 });
 
 test("dflow.newNode()", () => {
-  const dflow = new Dflow({ nodesCatalog: nodesCatalog1 });
+  const dflow = new Dflow(nodesCatalog1);
   const catalog = dflow.nodesCatalog;
 
   // newNode with id

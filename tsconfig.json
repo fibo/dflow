@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     // TODO
-    // API should be improved and simplified in order enable
+    // API should be improved and simplified in order to enable
     // "allowJs": true,
     // "checkJs": true,
     "lib": ["dom", "es2023"],
