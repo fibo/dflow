@@ -194,12 +194,12 @@ test("Dflow.isValidDataType()", () => {
   assert.deepEqual(Dflow.isValidDataType([], arr), true);
   assert.deepEqual(Dflow.isValidDataType([], bool), true);
   assert.deepEqual(Dflow.isValidDataType([], num), true);
-  assert.deepEqual(Dflow.isValidDataType([], NaN), true);
   assert.deepEqual(Dflow.isValidDataType([], null), true);
   assert.deepEqual(Dflow.isValidDataType([], obj), true);
   assert.deepEqual(Dflow.isValidDataType([], str), true);
   assert.deepEqual(Dflow.isValidDataType([], undefined), true);
-  assert.deepEqual(Dflow.isValidDataType([], Infinity), true);
+  assert.deepEqual(Dflow.isValidDataType([], Infinity), false);
+  assert.deepEqual(Dflow.isValidDataType([], NaN), false);
 
   // The `array` type.
 
