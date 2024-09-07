@@ -16,51 +16,6 @@ class DflowArrayAt extends DflowNode {
   }
 }
 
-class DflowArrayFilter extends DflowNode {
-  static kind = "arrayFilter";
-  static inputs = [
-    input("array"),
-    input("DflowId", { name: "functionId" }),
-  ];
-  static outputs = [output("array")];
-  run() {
-    this.output(0).data = (this.input(0).data as DflowArray).filter(
-      (...args) =>
-        this.host.executeFunction(this.input(1).data as DflowId, args),
-    );
-  }
-}
-
-class DflowArrayFindLastIndex extends DflowNode {
-  static kind = "arrayFindLastIndex";
-  static inputs = [
-    input("array"),
-    input("DflowId", { name: "functionId" }),
-  ];
-  static outputs = [output("number")];
-  run() {
-    this.output(0).data = (this.input(0).data as DflowArray).findLastIndex(
-      (...args) =>
-        this.host.executeFunction(this.input(1).data as DflowId, args),
-    );
-  }
-}
-
-class DflowArrayFindIndex extends DflowNode {
-  static kind = "arrayFindIndex";
-  static inputs = [
-    input("array"),
-    input("DflowId", { name: "functionId" }),
-  ];
-  static outputs = [output("number")];
-  run() {
-    this.output(0).data = (this.input(0).data as DflowArray).findIndex(
-      (...args) =>
-        this.host.executeFunction(this.input(1).data as DflowId, args),
-    );
-  }
-}
-
 class DflowArrayIncludes extends DflowNode {
   static kind = "arrayIncludes";
   static inputs = [
@@ -103,21 +58,6 @@ class DflowArrayLength extends DflowNode {
     } else {
       this.output(0).clear;
     }
-  }
-}
-
-class DflowArrayMap extends DflowNode {
-  static kind = "arrayMap";
-  static inputs = [
-    input("array"),
-    input("DflowId", { name: "functionId" }),
-  ];
-  static outputs = [output("array")];
-  run() {
-    this.output(0).data = (this.input(0).data as DflowArray).map(
-      (...args) =>
-        this.host.executeFunction(this.input(1).data as DflowId, args),
-    );
   }
 }
 
@@ -201,13 +141,9 @@ class DflowArraySlice extends DflowNode {
 
 export const catalog = {
   [DflowArrayAt.kind]: DflowArrayAt,
-  [DflowArrayFilter.kind]: DflowArrayFilter,
-  [DflowArrayFindLastIndex.kind]: DflowArrayFindLastIndex,
-  [DflowArrayFindIndex.kind]: DflowArrayFindIndex,
   [DflowArrayIncludes.kind]: DflowArrayIncludes,
   [DflowArrayJoin.kind]: DflowArrayJoin,
   [DflowArrayLength.kind]: DflowArrayLength,
-  [DflowArrayMap.kind]: DflowArrayMap,
   [DflowArrayPop.kind]: DflowArrayPop,
   [DflowArrayPush.kind]: DflowArrayPush,
   [DflowArrayReverse.kind]: DflowArrayReverse,

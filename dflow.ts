@@ -26,7 +26,13 @@ export type DflowObject = { [Key in string]?: DflowData };
 
 export type DflowArray = DflowData[];
 
-export type DflowDataType = (typeof Dflow.dataTypes)[number];
+export type DflowDataType =
+  | "null"
+  | "boolean"
+  | "number"
+  | "string"
+  | "array"
+  | "object"
 
 /**
  * Every dflow item (`DflowNode`, `DflowEdge`, etc.) and
@@ -65,16 +71,6 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
     this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
     this.context = {};
   }
-
-  static dataTypes = [
-    "null",
-    "boolean",
-    "number",
-    "string",
-    "array",
-    "object",
-    "DflowId",
-  ];
 
   /**
    * Empty graph.
@@ -152,74 +148,6 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
     }
     // 3. Finally, delete node.
     this.nodesMap.delete(nodeId);
-  }
-
-  executeFunction(functionId: DflowId, args: DflowArray) {
-    // Get all return nodes connected to function node.
-    const nodeConnections = this.nodeConnections;
-    const childrenNodeIds = Dflow.childrenOfNodeId(
-      functionId,
-      nodeConnections,
-    );
-    const returnNodeIds = [];
-    for (const childrenNodeId of childrenNodeIds) {
-      const node = this.getNodeById(childrenNodeId);
-      if (node.kind === DflowNodeReturn.kind) {
-        returnNodeIds.push(node.id);
-      }
-    }
-
-    // Get all nodes inside function.
-    const nodeIdsInsideFunction = returnNodeIds.reduce<DflowId[]>(
-      (accumulator, returnNodeId, index, array) => {
-        const ancestors = Dflow.ancestorsOfNodeId(
-          returnNodeId,
-          nodeConnections,
-        );
-
-        const result = accumulator.concat(ancestors);
-
-        // On last iteration, remove duplicates
-        return index === array.length ? [...new Set(result)] : result;
-      },
-      [],
-    );
-
-    // 1. Get nodeIds sorted by graph hierarchy.
-    // 2. If it is an argument node, inject input data.
-    // 3. If if is a return node, output data.
-    // 4. Otherwise run node.
-    const nodeIds = Dflow.sortNodesByLevel(
-      [...returnNodeIds, ...nodeIdsInsideFunction],
-      nodeConnections,
-    );
-    for (const nodeId of nodeIds) {
-      const node = this.getNodeById(nodeId);
-
-      switch (node.kind) {
-        case DflowNodeArgument.kind: {
-          const position = node.input(0).data;
-          // Argument position default to 0, must be >= 0.
-          const index = typeof position === "number" && !isNaN(position)
-            ? Math.max(position, 0)
-            : 0;
-          node.output(0).data = args[index];
-          break;
-        }
-        case DflowNodeReturn.kind: {
-          return node.input(1).data;
-        }
-        default: {
-          if (node.run.constructor.name === "AsyncFunction") {
-            throw new DflowErrorCannotExecuteAsyncFunction();
-          }
-          node.run();
-          this.executionReport?.steps?.push(
-            Dflow.executionNodeInfo(node),
-          );
-        }
-      }
-    }
   }
 
   /**
@@ -517,7 +445,7 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
    *   static kind = "echo";
    *   static inputs = [input("string")];
    *   run () {
-   *     console.log(this.input(0).data as string);
+   *     console.log(this.input(0).data);
    *   }
    * }
    * ```
@@ -648,13 +576,6 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
   }
 
   /**
-   * Type guard for `DflowId`.
-   */
-  static isDflowId(arg: unknown): arg is DflowId {
-    return (typeof arg === "string" && arg !== "") || typeof arg === "number";
-  }
-
-  /**
    * Type guard for `DflowObject`.
    * It checks recursively that every value is some `DflowData`.
    */
@@ -685,8 +606,7 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
       typeof arg === "string" ||
       Dflow.isNumber(arg) ||
       Dflow.isObject(arg) ||
-      Dflow.isArray(arg) ||
-      Dflow.isDflowId(arg)
+      Dflow.isArray(arg)
     );
   }
 
@@ -711,8 +631,6 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
         ? Dflow.isObject(data)
         : (dataType === "array")
         ? Dflow.isArray(data)
-        : (dataType === "DflowId")
-        ? Dflow.isDflowId(data)
         : false
     );
   }
@@ -885,8 +803,7 @@ export class DflowOutput
       (types.includes("string") && typeof arg === "string") ||
       (types.includes("number") && Dflow.isNumber(arg)) ||
       (types.includes("object") && Dflow.isObject(arg)) ||
-      (types.includes("array") && Dflow.isArray(arg)) ||
-      (types.includes("DflowId") && Dflow.isDflowId(arg))
+      (types.includes("array") && Dflow.isArray(arg))
     ) {
       this.value = arg;
     }
@@ -1156,7 +1073,7 @@ export interface DflowNodeDefinition {
  *
  * ```ts
  * const nodesCatalog: DflowNodesCatalog = {
- *   myNode: MyNodeClass
+ *   [MyNodeClass.kind]: MyNodeClass
  * }
  * ```
  */
@@ -1187,17 +1104,9 @@ type DflowNodeConnection = { sourceId: DflowId; targetId: DflowId };
 // Dflow core nodes
 // ////////////////////////////////////////////////////////////////////
 
-const { input, output } = Dflow;
-
-class DflowNodeArgument extends DflowNode {
-  static kind = "argument";
-  static inputs = [input("number", { name: "position", optional: true })];
-  static outputs = [output()];
-}
-
 class DflowNodeData extends DflowNode {
   static kind = "data";
-  static outputs = [output()];
+  static outputs = [Dflow.output()];
   constructor({ outputs, ...rest }: DflowNodeConstructorArg) {
     super({
       outputs: outputs?.map((output) => ({
@@ -1209,23 +1118,6 @@ class DflowNodeData extends DflowNode {
   }
 }
 
-class DflowNodeFunction extends DflowNode {
-  static kind = "function";
-  static outputs = [output("DflowId", { name: "id" })];
-  constructor(arg: DflowNodeConstructorArg) {
-    super(arg);
-    this.output(0).data = this.id;
-  }
-}
-
-class DflowNodeReturn extends DflowNode {
-  static kind = "return";
-  static inputs = [
-    input("DflowId", { name: "functionId" }),
-    input([], { name: "value" }),
-  ];
-}
-
 /**
  * This class is used to instantiate a new node which `kind` was not found in `nodesCatalog`.
  * The "unknown" node class is not included in `coreNodesCatalog`.
@@ -1234,10 +1126,7 @@ export class DflowNodeUnknown extends DflowNode {}
 
 /** Builtin nodes, always included in `nodesCatalog`. */
 export const coreNodesCatalog: DflowNodesCatalog = {
-  [DflowNodeArgument.kind]: DflowNodeArgument,
   [DflowNodeData.kind]: DflowNodeData,
-  [DflowNodeFunction.kind]: DflowNodeFunction,
-  [DflowNodeReturn.kind]: DflowNodeReturn,
 };
 
 // Dflow errors
@@ -1252,7 +1141,6 @@ export type DflowSerializableError =
   | DflowSerializableErrorItemNotFound
   | DflowSerializableErrorInvalidInputData
   | DflowSerializableErrorCannotConnectSourceToTarget
-  | DflowSerializableErrorCannotExecuteAsyncFunction;
 
 export type DflowSerializableErrorCannotConnectSourceToTarget =
   & DflowSerializableErrorCode
@@ -1384,23 +1272,5 @@ export class DflowErrorItemNotFound extends Error
     if (nodeId) obj.nId = nodeId;
     if (position) obj.p = position;
     return obj;
-  }
-}
-
-export type DflowSerializableErrorCannotExecuteAsyncFunction =
-  DflowSerializableErrorCode;
-
-export class DflowErrorCannotExecuteAsyncFunction extends Error
-  implements
-    DflowSerializable<DflowSerializableErrorCannotExecuteAsyncFunction> {
-  static code = "04";
-  static message() {
-    return "dflow executeFunction() cannot execute async functions";
-  }
-  constructor() {
-    super(DflowErrorCannotExecuteAsyncFunction.message());
-  }
-  toJSON(): DflowSerializableErrorCode {
-    return { _: DflowErrorCannotExecuteAsyncFunction.code };
   }
 }

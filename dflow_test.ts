@@ -7,8 +7,7 @@ import {
   DflowNode,
   DflowOutput,
 } from "./dflow.js";
-
-type DflowDataType = (typeof Dflow.dataTypes)[number];
+import type { DflowDataType } from "./dflow.js";
 
 const { input, output } = Dflow;
 
@@ -17,6 +16,15 @@ const bool = true;
 const str = "string";
 const arr = [num, bool, str];
 const obj = { foo: num, bar: str };
+
+const dataTypes: DflowDataType[] = [
+  "null",
+  "boolean",
+  "number",
+  "string",
+  "array",
+  "object",
+];
 
 class IdentityNode extends DflowNode {
   static kind = "Identity";
@@ -577,13 +585,13 @@ test("Dflow.canConnect()", () => {
     expected: boolean;
   }[] = [
     // Every source can connect to a target with same type.
-    ...Dflow.dataTypes.map((dataType) => ({
+    ...dataTypes.map((dataType) => ({
       sourceTypes: [dataType],
       targetTypes: [dataType],
       expected: true,
     })),
     // Every source can connect to a target with type "any".
-    ...Dflow.dataTypes.map((dataType) => ({
+    ...dataTypes.map((dataType) => ({
       sourceTypes: [dataType],
       targetTypes: [],
       expected: true,
@@ -595,32 +603,32 @@ test("Dflow.canConnect()", () => {
     { sourceTypes: ["array"], targetTypes: ["number"], expected: false },
     { sourceTypes: ["array"], targetTypes: ["object"], expected: false },
     { sourceTypes: ["array"], targetTypes: ["string"], expected: false },
-    { sourceTypes: ["array"], targetTypes: ["DflowId"], expected: false },
+    { sourceTypes: ["array"], targetTypes: ["null"], expected: false },
     { sourceTypes: ["boolean"], targetTypes: ["array"], expected: false },
     { sourceTypes: ["boolean"], targetTypes: ["number"], expected: false },
     { sourceTypes: ["boolean"], targetTypes: ["object"], expected: false },
     { sourceTypes: ["boolean"], targetTypes: ["string"], expected: false },
-    { sourceTypes: ["boolean"], targetTypes: ["DflowId"], expected: false },
+    { sourceTypes: ["boolean"], targetTypes: ["null"], expected: false },
     { sourceTypes: ["number"], targetTypes: ["array"], expected: false },
     { sourceTypes: ["number"], targetTypes: ["boolean"], expected: false },
     { sourceTypes: ["number"], targetTypes: ["object"], expected: false },
     { sourceTypes: ["number"], targetTypes: ["string"], expected: false },
-    { sourceTypes: ["number"], targetTypes: ["DflowId"], expected: false },
+    { sourceTypes: ["number"], targetTypes: ["null"], expected: false },
     { sourceTypes: ["object"], targetTypes: ["array"], expected: false },
     { sourceTypes: ["object"], targetTypes: ["boolean"], expected: false },
     { sourceTypes: ["object"], targetTypes: ["number"], expected: false },
     { sourceTypes: ["object"], targetTypes: ["string"], expected: false },
-    { sourceTypes: ["object"], targetTypes: ["DflowId"], expected: false },
+    { sourceTypes: ["object"], targetTypes: ["null"], expected: false },
     { sourceTypes: ["string"], targetTypes: ["array"], expected: false },
     { sourceTypes: ["string"], targetTypes: ["boolean"], expected: false },
     { sourceTypes: ["string"], targetTypes: ["number"], expected: false },
     { sourceTypes: ["string"], targetTypes: ["object"], expected: false },
-    { sourceTypes: ["string"], targetTypes: ["DflowId"], expected: false },
-    { sourceTypes: ["DflowId"], targetTypes: ["array"], expected: false },
-    { sourceTypes: ["DflowId"], targetTypes: ["boolean"], expected: false },
-    { sourceTypes: ["DflowId"], targetTypes: ["number"], expected: false },
-    { sourceTypes: ["DflowId"], targetTypes: ["object"], expected: false },
-    { sourceTypes: ["DflowId"], targetTypes: ["string"], expected: false },
+    { sourceTypes: ["string"], targetTypes: ["null"], expected: false },
+    { sourceTypes: ["null"], targetTypes: ["array"], expected: false },
+    { sourceTypes: ["null"], targetTypes: ["boolean"], expected: false },
+    { sourceTypes: ["null"], targetTypes: ["number"], expected: false },
+    { sourceTypes: ["null"], targetTypes: ["object"], expected: false },
+    { sourceTypes: ["null"], targetTypes: ["string"], expected: false },
   ];
 
   testCases.forEach(({ sourceTypes, targetTypes, expected }) => {
