@@ -272,41 +272,18 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
     }));
   }
 
-  get nodeIdsInsideFunctions(): DflowId[] {
-    const ancestorsOfReturnNodes = [];
-    // Find all "return" nodes and get their ancestors.
-    for (const node of [...this.#nodesMap.values()]) {
-      if (node.kind === "return")
-        ancestorsOfReturnNodes.push(
-          Dflow.ancestorsOfNodeId(node.id, this.nodeConnections),
-        );
-    }
-    // Flatten and deduplicate results.
-    return [...new Set(ancestorsOfReturnNodes.flat())];
-  }
-
   /**
    * Execute all nodes, sorted by their connections.
    */
   async run() {
     const executionReport: DflowExecutionReport = {
-      start: Date.now(),
-      end: Date.now(),
+      start: performance.now(),
+      end: performance.now(),
       steps: [],
     };
 
-    // Get nodeIds
-    // 1. filtered by nodes inside functions
-    // 2. sorted by graph hierarchy
-    const nodeIdsExcluded = this.nodeIdsInsideFunctions;
-    const nodeIds = Dflow.sortNodesByLevel(
-      [...this.#nodesMap.keys()].filter(
-        (nodeId) => !nodeIdsExcluded.includes(nodeId),
-      ),
-      this.nodeConnections,
-    );
-
-    for (const nodeId of nodeIds) {
+    // Loop over nodeIds sorted by graph hierarchy.
+      for (const nodeId of Dflow.sortNodesByLevel( Array.from(this.#nodesMap.keys()), this.nodeConnections)) {
       const node = this.#nodesMap.get(nodeId) as DflowNode;
 
       // If some input data is not valid.
@@ -321,16 +298,16 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
         continue;
       }
 
-      if (node.run.constructor.name === "AsyncFunction") {
-        await node.run();
-      } else {
+      if (node.run.constructor.name === "Function") {
         node.run();
+      } else if (node.run.constructor.name === "AsyncFunction") {
+        await node.run();
       }
 
       executionReport.steps.push(Dflow.executionNodeInfo(node));
     }
 
-    executionReport.end = Date.now();
+    executionReport.end = performance.now();
 
     this.executionReport = executionReport;
   }
@@ -344,53 +321,19 @@ export class Dflow implements DflowSerializable<DflowSerializableGraph> {
     };
   }
 
-  static ancestorsOfNodeId(
-    nodeId: DflowId,
-    nodeConnections: DflowNodeConnection[],
-  ): DflowId[] {
-    const parentsNodeIds = Dflow.parentsOfNodeId(nodeId, nodeConnections);
-    if (parentsNodeIds.length === 0) return [];
-    return parentsNodeIds.reduce<DflowId[]>(
-      (accumulator, parentNodeId, index, array) => {
-        const ancestors = Dflow.ancestorsOfNodeId(
-          parentNodeId,
-          nodeConnections,
-        );
-        const result = accumulator.concat(ancestors);
-        // On last iteration, remove duplicates
-        return index === array.length - 1
-          ? [...new Set(array.concat(result))]
-          : result;
-      },
-      [],
-    );
-  }
-
   /**
-   * Check that types of source are compatible with types of target.
+   * Check that source types are compatible with target types.
    */
   static canConnect(
     sourceTypes: DflowDataType[],
     targetTypes: DflowDataType[],
   ) {
-    if (
-      // If source can have any type
-      sourceTypes.length === 0 ||
-      // or target can have any type, source and target are compatible.
-      targetTypes.length === 0
-    )
-      return true;
+    // If source can have any type or
+    // target can have any type,
+    // then source and target are compatible.
+    if (sourceTypes.length === 0 || targetTypes.length === 0) return true;
     // Check if target accepts some of the `dataType` source can have.
     return targetTypes.some((dataType) => sourceTypes.includes(dataType));
-  }
-
-  static childrenOfNodeId(
-    nodeId: DflowId,
-    nodeConnections: { sourceId: DflowId; targetId: DflowId }[],
-  ) {
-    return nodeConnections
-      .filter(({ sourceId }) => nodeId === sourceId)
-      .map(({ targetId }) => targetId);
   }
 
   static executionNodeInfo(
@@ -666,6 +609,11 @@ type DflowIO = {
 export type DflowInputDefinition = {
   name?: string;
   types: DflowDataType[];
+  /**
+   * By default an input is **not** `optional`.
+   * If an input is `optional`, then its node will be executed even if the inputs has no data.
+   * If an input is not `optional` and its data is not defined then its node will not be executed.
+   */
   optional?: boolean;
 };
 
@@ -679,37 +627,33 @@ export type DflowSerializableInput = {
  * @implements DflowSerializable<DflowSerializableInput>
  */
 export class DflowInput
-  implements DflowIO, DflowSerializable<DflowSerializableInput>
+  implements DflowIO, DflowInputDefinition, DflowSerializable<DflowSerializableInput>
 {
   readonly id: DflowId;
 
-  readonly name?: string;
-
   readonly nodeId: DflowId;
-
-  readonly types: DflowDataType[];
 
   source?: DflowOutput;
 
-  /**
-   * By default an input is **not** `optional`.
-   * If an input is not `optional` and its data is not defined then its node will not be executed.
-   * If an input is `optional`, then its node will be executed even if the inputs has no data.
-   */
+  // DflowInputDefinition
+  name?: string;
+  types: DflowDataType[];
   optional?: boolean;
 
   constructor({
     id,
-    name,
     nodeId,
+    // DflowInputDefinition
+    name,
     optional,
     types,
   }: { id: DflowId; nodeId: DflowId } & DflowInputDefinition) {
-    if (name) this.name = name;
-    this.types = types;
     this.nodeId = nodeId;
     this.id = id;
-    if (optional) this.optional = optional;
+    // DflowInputDefinition
+    this.name = name;
+    this.types = types;
+    this.optional = optional;
   }
 
   /**
@@ -757,17 +701,18 @@ export type DflowSerializableOutput = {
  * @implements DflowSerializable<DflowSerializableOutput>
  */
 export class DflowOutput
-  implements DflowIO, DflowSerializable<DflowSerializableOutput>
+  implements DflowIO, DflowOutputDefinition, DflowSerializable<DflowSerializableOutput>
 {
   readonly id: DflowId;
 
-  readonly name?: string;
 
   readonly nodeId: DflowId;
 
-  readonly types: DflowDataType[];
-
-  private value: DflowData | undefined;
+  // DflowOutputDefinition
+  name?: string;
+  types: DflowDataType[];
+  // #value holds data
+  #value: DflowData | undefined;
 
   constructor({
     id,
@@ -780,16 +725,16 @@ export class DflowOutput
     this.types = types;
     this.nodeId = nodeId;
     this.id = id;
-    this.value = data;
+    this.#value = data;
   }
 
   get data(): DflowData | undefined {
-    return this.value;
+    return this.#value;
   }
 
   set data(arg: unknown) {
     if (arg === undefined) {
-      this.value === undefined;
+      this.#value === undefined;
       return;
     }
     const { types } = this;
@@ -803,16 +748,16 @@ export class DflowOutput
       (types.includes("object") && Dflow.isObject(arg)) ||
       (types.includes("array") && Dflow.isArray(arg))
     )
-      this.value = arg;
+      this.#value = arg;
   }
 
   clear() {
-    this.value = undefined;
+    this.#value = undefined;
   }
 
   toJSON(): DflowSerializableOutput {
     const obj: DflowSerializableOutput = { id: this.id };
-    if (this.value !== undefined) obj.d = this.value;
+    if (this.#value !== undefined) obj.d = this.#value;
     return obj;
   }
 }

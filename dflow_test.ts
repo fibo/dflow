@@ -102,21 +102,6 @@ function sample01() {
 // Dflow
 // ////////////////////////////////////////////////////////////////////////////
 
-test("Dflow.ancestorsOfNodeId", () => {
-  assert.deepEqual(
-    Dflow.ancestorsOfNodeId("n", [{ sourceId: "n1", targetId: "n" }]),
-    ["n1"],
-  );
-
-  assert.deepEqual(
-    Dflow.ancestorsOfNodeId("n", [
-      { sourceId: "n1", targetId: "n2" },
-      { sourceId: "n2", targetId: "n" },
-    ]),
-    ["n2", "n1"],
-  );
-});
-
 test("Dflow.inferDataType()", () => {
   [
     { input: arr, output: ["array"] },
