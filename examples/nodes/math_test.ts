@@ -1,14 +1,12 @@
-import { test } from "node:test"
-import { newDflow, testOneInOneOut, testOneOut } from "./_test-utils.js";
+import { test } from "node:test";
+import { newDflow, testOneInOneOut, testOneOut } from "./_test-utils.ts";
 
 test("mathAbs", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathAbs.kind;
 
-  [
-    { input: -1, output: 1 },
-  ].forEach(({ input, output }) => {
+  [{ input: -1, output: 1 }].forEach(({ input, output }) => {
     testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
@@ -18,9 +16,7 @@ test("mathCos", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathCos.kind;
 
-  [
-    { input: 1, output: Math.cos(1) },
-  ].forEach(({ input, output }) => {
+  [{ input: 1, output: Math.cos(1) }].forEach(({ input, output }) => {
     testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
@@ -30,9 +26,7 @@ test("mathCosh", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathCosh.kind;
 
-  [
-    { input: 1, output: Math.cosh(1) },
-  ].forEach(({ input, output }) => {
+  [{ input: 1, output: Math.cosh(1) }].forEach(({ input, output }) => {
     testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
@@ -42,9 +36,7 @@ test("mathFloor", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathFloor.kind;
 
-  [
-    { input: 1.2, output: Math.floor(1.2) },
-  ].forEach(({ input, output }) => {
+  [{ input: 1.2, output: Math.floor(1.2) }].forEach(({ input, output }) => {
     testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
@@ -92,9 +84,7 @@ test("mathRound", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathRound.kind;
 
-  [
-    { input: 1.2, output: Math.floor(1.2) },
-  ].forEach(({ input, output }) => {
+  [{ input: 1.2, output: Math.floor(1.2) }].forEach(({ input, output }) => {
     testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
@@ -104,9 +94,7 @@ test("mathSin", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathSin.kind;
 
-  [
-    { input: 1, output: Math.sin(1) },
-  ].forEach(({ input, output }) => {
+  [{ input: 1, output: Math.sin(1) }].forEach(({ input, output }) => {
     testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });
@@ -116,9 +104,7 @@ test("mathSinh", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.mathSinh.kind;
 
-  [
-    { input: 1, output: Math.sinh(1) },
-  ].forEach(({ input, output }) => {
+  [{ input: 1, output: Math.sinh(1) }].forEach(({ input, output }) => {
     testOneInOneOut<number, number>(dflow, nodeKind, input, output);
   });
 });

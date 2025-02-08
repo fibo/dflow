@@ -1,5 +1,5 @@
-import { Dflow } from "../dflow.js";
-import { nodesCatalog } from "./nodes/index.js";
+import { Dflow } from "../dflow.ts";
+import { nodesCatalog } from "./nodes/index.ts";
 
 function rungraph() {
   const dflow = new Dflow(nodesCatalog);

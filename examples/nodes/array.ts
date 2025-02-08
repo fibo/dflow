@@ -1,13 +1,11 @@
-import { Dflow, DflowArray, DflowId, DflowNode } from "../../dflow.js";
+import { Dflow, DflowNode } from "../../dflow.ts";
+import type { DflowArray } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
 class DflowArrayAt extends DflowNode {
   static kind = "arrayAt";
-  static inputs = [
-    input("array"),
-    input("number", { name: "index" }),
-  ];
+  static inputs = [input("array"), input("number", { name: "index" })];
   static outputs = [output()];
   run() {
     const array = this.input(0).data as DflowArray;
@@ -78,10 +76,7 @@ class DflowArrayPop extends DflowNode {
 
 class DflowArrayPush extends DflowNode {
   static kind = "arrayPush";
-  static inputs = [
-    input("array"),
-    input([], { name: "element" }),
-  ];
+  static inputs = [input("array"), input([], { name: "element" })];
   static outputs = [output("array")];
   run() {
     const array = (this.input(0).data as DflowArray).slice();

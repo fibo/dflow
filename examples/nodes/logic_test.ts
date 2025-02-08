@@ -1,6 +1,6 @@
-import { test } from "node:test"
-import { DflowData } from "../../dflow.js";
-import { newDflow, testOneInOneOut, testTwoInOneOut } from "./_test-utils.js";
+import { test } from "node:test";
+import type { DflowData } from "../../dflow.ts";
+import { newDflow, testOneInOneOut, testTwoInOneOut } from "./_test-utils.ts";
 
 test("DflowNodeAnd", () => {
   const dflow = newDflow();
@@ -12,17 +12,15 @@ test("DflowNodeAnd", () => {
     { inputs: [true, false], output: true && false },
     { inputs: [false, false], output: false && false },
     { inputs: [false, true], output: false && true },
-  ].forEach(
-    ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<boolean, boolean, boolean>(
-        dflow,
-        nodeKind,
-        input1,
-        input2,
-        output,
-      );
-    },
-  );
+  ].forEach(({ inputs: [input1, input2], output }) => {
+    testTwoInOneOut<boolean, boolean, boolean>(
+      dflow,
+      nodeKind,
+      input1,
+      input2,
+      output,
+    );
+  });
 });
 
 test("DflowNo", () => {
@@ -49,17 +47,15 @@ test("DflowNodeNullishCoaleshing", () => {
     { inputs: [undefined, false], output: false },
     { inputs: [42, undefined], output: 42 },
     { inputs: [undefined, 42], output: 42 },
-  ].forEach(
-    ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<DflowData, DflowData, DflowData>(
-        dflow,
-        nodeKind,
-        input1,
-        input2,
-        output,
-      );
-    },
-  );
+  ].forEach(({ inputs: [input1, input2], output }) => {
+    testTwoInOneOut<DflowData, DflowData, DflowData>(
+      dflow,
+      nodeKind,
+      input1,
+      input2,
+      output,
+    );
+  });
 });
 
 test("DflowNodeOr", () => {
@@ -72,15 +68,13 @@ test("DflowNodeOr", () => {
     { inputs: [true, false], output: true || false },
     { inputs: [false, false], output: false || false },
     { inputs: [false, true], output: false || true },
-  ].forEach(
-    ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<boolean, boolean, boolean>(
-        dflow,
-        nodeKind,
-        input1,
-        input2,
-        output,
-      );
-    },
-  );
+  ].forEach(({ inputs: [input1, input2], output }) => {
+    testTwoInOneOut<boolean, boolean, boolean>(
+      dflow,
+      nodeKind,
+      input1,
+      input2,
+      output,
+    );
+  });
 });

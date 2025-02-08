@@ -1,7 +1,7 @@
-import { strict as assert } from "node:assert"
-import { test } from "node:test"
-import { newDflow } from "./_test-utils.js";
-import { nodesCatalog as catalog } from "./index.js";
+import { strict as assert } from "node:assert";
+import { test } from "node:test";
+import { newDflow } from "./_test-utils.ts";
+import { nodesCatalog as catalog } from "./index.ts";
 
 test(catalog.newDate.kind, () => {
   const nodeKind = catalog.newDate.kind;

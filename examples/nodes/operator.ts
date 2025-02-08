@@ -1,4 +1,4 @@
-import { Dflow, DflowNode } from "../../dflow.js";
+import { Dflow, DflowNode } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
@@ -7,8 +7,8 @@ class DflowAddition extends DflowNode {
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
   run() {
-    this.output(0).data = (this.input(0).data as number) +
-      (this.input(1).data as number);
+    this.output(0).data =
+      (this.input(0).data as number) + (this.input(1).data as number);
   }
 }
 
@@ -18,8 +18,8 @@ class DflowDivision extends DflowNode {
   static outputs = [output("number")];
   run() {
     if (this.input(1).data) {
-      this.output(0).data = (this.input(0).data as number) /
-        (this.input(1).data as number);
+      this.output(0).data =
+        (this.input(0).data as number) / (this.input(1).data as number);
     } else {
       this.output(0).clear();
     }
@@ -89,8 +89,8 @@ class DflowMultiplication extends DflowNode {
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
   run() {
-    this.output(0).data = (this.input(0).data as number) *
-      (this.input(1).data as number);
+    this.output(0).data =
+      (this.input(0).data as number) * (this.input(1).data as number);
   }
 }
 
@@ -99,8 +99,8 @@ class DflowSubtraction extends DflowNode {
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
   run() {
-    this.output(0).data = (this.input(0).data as number) -
-      (this.input(1).data as number);
+    this.output(0).data =
+      (this.input(0).data as number) - (this.input(1).data as number);
   }
 }
 

@@ -1,14 +1,12 @@
-import { test } from "node:test"
-import { newDflow, testOneInOneOut, testThreeInOneOut } from "./_test-utils.js";
+import { test } from "node:test";
+import { newDflow, testOneInOneOut, testThreeInOneOut } from "./_test-utils.ts";
 
 test("stringLength", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.stringLength.kind;
 
-  [
-    { input: "foo", output: "foo".length },
-  ].forEach(({ input, output }) => {
+  [{ input: "foo", output: "foo".length }].forEach(({ input, output }) => {
     testOneInOneOut<string, number>(dflow, nodeKind, input, output);
   });
 });

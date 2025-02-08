@@ -1,9 +1,19 @@
 # dflow development
 
+## Requirements
+
+With [npm](https://www.npmjs.com/) install the following packages **without saving**:
+
+```sh
+npm install prettier typescript @types/node --no-save
+```
+
+## Contributing
+
 If you want to push code to GitHub repo, please install the commit hook
 
 ```sh
 npm run install_precommit_hook
 ```
 
-See also *example* scripts listed [here](./examples/README.md).
+See also _example_ scripts listed [here](./examples/README.md).

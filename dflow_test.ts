@@ -1,13 +1,13 @@
-import { test } from "node:test"
-import { strict as assert } from "node:assert"
+import { test } from "node:test";
+import { strict as assert } from "node:assert";
 
 import {
   Dflow,
   DflowErrorItemNotFound,
   DflowNode,
   DflowOutput,
-} from "./dflow.js";
-import type { DflowDataType } from "./dflow.js";
+} from "./dflow.ts";
+import type { DflowDataType } from "./dflow.ts";
 
 const { input, output } = Dflow;
 
@@ -102,22 +102,20 @@ function sample01() {
 // Dflow
 // ////////////////////////////////////////////////////////////////////////////
 
- test("Dflow.ancestorsOfNodeId", () => {
-   assert.deepEqual(
-     Dflow.ancestorsOfNodeId("n", [
-       { sourceId: "n1", targetId: "n" },
-     ]),
-     ["n1"],
-   );
+test("Dflow.ancestorsOfNodeId", () => {
+  assert.deepEqual(
+    Dflow.ancestorsOfNodeId("n", [{ sourceId: "n1", targetId: "n" }]),
+    ["n1"],
+  );
 
-   assert.deepEqual(
-     Dflow.ancestorsOfNodeId("n", [
-       { sourceId: "n1", targetId: "n2" },
-       { sourceId: "n2", targetId: "n" },
-     ]),
-     ["n2", "n1"],
-   );
- });
+  assert.deepEqual(
+    Dflow.ancestorsOfNodeId("n", [
+      { sourceId: "n1", targetId: "n2" },
+      { sourceId: "n2", targetId: "n" },
+    ]),
+    ["n2", "n1"],
+  );
+});
 
 test("Dflow.inferDataType()", () => {
   [
@@ -180,10 +178,7 @@ test("Dflow.isObject()", () => {
   // bad object
   assert.deepEqual(Dflow.isObject({ foo: () => {} }), false);
   // good nested object
-  assert.deepEqual(
-    Dflow.isObject({ foo: { bar: [{ quz: true }] } }),
-    true,
-  );
+  assert.deepEqual(Dflow.isObject({ foo: { bar: [{ quz: true }] } }), true);
   // bad nested object
   assert.deepEqual(Dflow.isObject({ foo: [1], bar: { quz: () => {} } }), false);
 });
@@ -398,43 +393,64 @@ test("dflow.newEdge()", () => {
 test("dflow.deleteNode()", () => {
   const { dflow, nodeId1, edgeId1 } = sample01();
   dflow.deleteNode(nodeId1);
-  assert.throws(() => {
-    dflow.getNodeById(nodeId1);
-  }, {
-    name: "Error",
-    message: DflowErrorItemNotFound.message({item: "node", nId: nodeId1 })
-  });
-  assert.throws(() => {
-    dflow.getEdgeById(edgeId1);
-  }, {
-    name: "Error",
-    message: DflowErrorItemNotFound.message({item: "edge", id: edgeId1 })
-  });
-  const nodeNotFoundId = "xxx"
-  assert.throws(() => {
-    dflow.deleteNode(nodeNotFoundId);
-  }, {
-    name: "Error",
-    message: DflowErrorItemNotFound.message({item: "node", nId: nodeNotFoundId })
-  });
+  assert.throws(
+    () => {
+      dflow.getNodeById(nodeId1);
+    },
+    {
+      name: "Error",
+      message: DflowErrorItemNotFound.message({ item: "node", nId: nodeId1 }),
+    },
+  );
+  assert.throws(
+    () => {
+      dflow.getEdgeById(edgeId1);
+    },
+    {
+      name: "Error",
+      message: DflowErrorItemNotFound.message({ item: "edge", id: edgeId1 }),
+    },
+  );
+  const nodeNotFoundId = "xxx";
+  assert.throws(
+    () => {
+      dflow.deleteNode(nodeNotFoundId);
+    },
+    {
+      name: "Error",
+      message: DflowErrorItemNotFound.message({
+        item: "node",
+        nId: nodeNotFoundId,
+      }),
+    },
+  );
 });
 
 test("dflow.deleteEdge()", () => {
   const { dflow, edgeId1 } = sample01();
   dflow.deleteEdge(edgeId1);
-  assert.throws(() => {
-    dflow.getEdgeById(edgeId1);
-  }, {
-    name: "Error",
-    message: DflowErrorItemNotFound.message({item: "edge", id: edgeId1 })
-  });
-  const edgeNotFoundId = "xxx"
-  assert.throws(() => {
-    dflow.deleteEdge(edgeNotFoundId);
-  }, {
-    name: "Error",
-    message: DflowErrorItemNotFound.message({item: "edge", id: edgeNotFoundId })
-  });
+  assert.throws(
+    () => {
+      dflow.getEdgeById(edgeId1);
+    },
+    {
+      name: "Error",
+      message: DflowErrorItemNotFound.message({ item: "edge", id: edgeId1 }),
+    },
+  );
+  const edgeNotFoundId = "xxx";
+  assert.throws(
+    () => {
+      dflow.deleteEdge(edgeNotFoundId);
+    },
+    {
+      name: "Error",
+      message: DflowErrorItemNotFound.message({
+        item: "edge",
+        id: edgeNotFoundId,
+      }),
+    },
+  );
 });
 
 // DflowOutput

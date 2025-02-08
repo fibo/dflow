@@ -1,14 +1,14 @@
-import type { DflowNodesCatalog } from "../../dflow.js";
-import { catalog as arrayCatalog } from "./array.js";
-import { catalog as conditionalCatalog } from "./conditional.js";
-import { catalog as consoleCatalog } from "./console.js";
-import { catalog as dateCatalog } from "./date.js";
-import { catalog as logicCatalog } from "./logic.js";
-import { catalog as mathCatalog } from "./math.js";
-import { catalog as numberCatalog } from "./number.js";
-import { catalog as objectCatalog } from "./object.js";
-import { catalog as operatorCatalog } from "./operator.js";
-import { catalog as stringCatalog } from "./string.js";
+import type { DflowNodesCatalog } from "../../dflow.ts";
+import { catalog as arrayCatalog } from "./array.ts";
+import { catalog as conditionalCatalog } from "./conditional.ts";
+import { catalog as consoleCatalog } from "./console.ts";
+import { catalog as dateCatalog } from "./date.ts";
+import { catalog as logicCatalog } from "./logic.ts";
+import { catalog as mathCatalog } from "./math.ts";
+import { catalog as numberCatalog } from "./number.ts";
+import { catalog as objectCatalog } from "./object.ts";
+import { catalog as operatorCatalog } from "./operator.ts";
+import { catalog as stringCatalog } from "./string.ts";
 
 export const nodesCatalog: DflowNodesCatalog = {
   ...arrayCatalog,

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "allowImportingTsExtensions": false,
+    "allowJs": false,
     "noEmit": false,
     "outDir": ".",
     // To build stripped JS, but emit declarations with JSDoc preserved:
@@ -9,9 +11,8 @@
     //
     "removeComments": false,
     "declaration": false
-
   },
   "extends": "./tsconfig.json",
   "exclude": ["./dflow_test.ts", "./examples"],
-  "include": ["./dflow.ts", "./test-utils.ts"]
+  "include": ["./dflow.ts"]
 }

@@ -1,7 +1,5 @@
-/*
-Create a host with an API context.
-*/
-import { Dflow, DflowNode } from "../dflow.js";
+// Create a host with an API context.
+import { Dflow, DflowNode } from "../dflow.ts";
 
 const { output } = Dflow;
 

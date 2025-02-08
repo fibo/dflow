@@ -116,4 +116,3 @@ Available examples are listed [here](https://github.com/fibo/dflow/blob/main/exa
 [MIT](https://fibo.github.io/mit-license)
 
 [dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"
-

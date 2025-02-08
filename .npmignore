@@ -1,4 +1,3 @@
-.ts-node.env
 .typescript.env
 dflow.ts
 dflow_test.ts

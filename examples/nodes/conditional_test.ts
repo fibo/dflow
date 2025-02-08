@@ -1,7 +1,7 @@
-import { strict as assert } from "node:assert"
-import { test } from "node:test"
-import { DflowData } from "../../dflow.js";
-import { newDflow } from "./_test-utils.js";
+import { strict as assert } from "node:assert";
+import { test } from "node:test";
+import type { DflowData } from "../../dflow.ts";
+import { newDflow } from "./_test-utils.ts";
 
 function testConditionalIf(
   input1?: DflowData,
@@ -45,9 +45,7 @@ test("DflowNodeIf", () => {
     { input1: false, input2: 1, input3: 2, output: 2 },
     { input1: "", input2: 1, input3: 2, output: 2 },
     { input1: "str", input2: 1, input3: 2, output: 1 },
-  ].forEach(
-    ({ input1, input2, input3, output }) => {
-      testConditionalIf(input1, input2, input3, output);
-    },
-  );
+  ].forEach(({ input1, input2, input3, output }) => {
+    testConditionalIf(input1, input2, input3, output);
+  });
 });

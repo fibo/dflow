@@ -4,8 +4,8 @@
   "type": "module",
   "version": "0.44.0",
   "exports": {
-    "import": "dflow.js",
-    "types": "dflow.d.ts"
+    "import": "./dflow.js",
+    "types": "./dflow.d.ts"
   },
   "license": "MIT",
   "author": {
@@ -19,14 +19,15 @@
     "example:context": "node --env-file .typescript.env examples/context.ts",
     "example:execution-report": "node --env-file .typescript.env examples/execution-report.ts",
     "example:usage": "node examples/usage.js",
-    "install_precommit_hook": "echo '#!/bin/sh\nnpm test' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
+    "install_precommit_hook": "echo '#!/bin/sh\nnpm test\nnpm run prettier--check\nnpm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
+    "prettier": "prettier --write .",
+    "prettier--check": "prettier --check .",
     "prebuild": "npm run check_types",
-    "pretest": "npm run build",
     "preversion": "npm run build",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
     "test": "npm run test:dflow && npm run test:nodes",
     "test:dflow": "node --test --env-file .typescript.env dflow_test.ts",
-    "test:nodes": "node --test --env-file .ts-node.env examples/nodes/*_test.ts"
+    "test:nodes": "node --test --env-file .typescript.env examples/nodes/*_test.ts"
   },
   "repository": {
     "type": "git",
@@ -35,10 +36,5 @@
   "keywords": [
     "dataflow",
     "dataflow-programming"
-  ],
-  "devDependencies": {
-    "@types/node": "^22.5.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
-  }
+  ]
 }

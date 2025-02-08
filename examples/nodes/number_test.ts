@@ -1,6 +1,6 @@
-import { test } from "node:test"
-import { DflowData } from "../../dflow.js";
-import { newDflow, testOneInOneOut } from "./_test-utils.js";
+import { test } from "node:test";
+import type { DflowData } from "../../dflow.ts";
+import { newDflow, testOneInOneOut } from "./_test-utils.ts";
 
 test("isFinite", () => {
   const dflow = newDflow();
@@ -10,11 +10,9 @@ test("isFinite", () => {
   [
     { input: 1, output: true },
     { input: Infinity, output: false },
-  ].forEach(
-    ({ input, output }) => {
-      testOneInOneOut<number, boolean>(dflow, nodeKind, input, output);
-    },
-  );
+  ].forEach(({ input, output }) => {
+    testOneInOneOut<number, boolean>(dflow, nodeKind, input, output);
+  });
 });
 
 test("isInteger", () => {
@@ -44,9 +42,7 @@ test("parseFloat", () => {
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.parseFloat.kind;
 
-  [
-    { input: "1.5", output: 1.5 },
-  ].forEach(({ input, output }) => {
+  [{ input: "1.5", output: 1.5 }].forEach(({ input, output }) => {
     testOneInOneOut<unknown, number>(dflow, nodeKind, input, output);
   });
 });

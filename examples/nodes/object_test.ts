@@ -1,6 +1,6 @@
-import { test } from "node:test"
-import { DflowArray, DflowObject } from "../../dflow.js";
-import { newDflow, testOneInOneOut } from "./_test-utils.js";
+import { test } from "node:test";
+import type { DflowArray, DflowObject } from "../../dflow.ts";
+import { newDflow, testOneInOneOut } from "./_test-utils.ts";
 
 test("objectKeys", () => {
   const dflow = newDflow();

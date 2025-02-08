@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
     // TODO
     // API should be improved and simplified in order to enable
-    // "allowJs": true,
     // "checkJs": true,
+    "erasableSyntaxOnly": true,
     "lib": ["dom", "es2023"],
     "module": "es6",
-		"moduleResolution": "node",
+    "moduleResolution": "node",
     "noEmit": true,
     "strict": true,
     "target": "es2023"
-
   },
   "exclude": ["./node_modules"],
-  "include": ["./**/*.ts"]
+  "include": ["./dflow.d.ts", "./**/*.ts"]
 }

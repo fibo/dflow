@@ -1,15 +1,13 @@
-import { test } from "node:test"
-import { DflowData } from "../../dflow.js";
-import { newDflow, testTwoInOneOut } from "./_test-utils.js";
+import { test } from "node:test";
+import type { DflowData } from "../../dflow.ts";
+import { newDflow, testTwoInOneOut } from "./_test-utils.ts";
 
 test("addition", () => {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
   const nodeKind = catalog.addition.kind;
 
-  [
-    { inputs: [2, 2], output: 4 },
-  ].forEach(
+  [{ inputs: [2, 2], output: 4 }].forEach(
     ({ inputs: [input1, input2], output }) => {
       testTwoInOneOut<number, number, number>(
         dflow,
@@ -31,17 +29,15 @@ test("division", () => {
     { inputs: [2, 2], output: 1 },
     { inputs: [0, 1], output: 0 },
     { inputs: [1, 0], output: undefined },
-  ].forEach(
-    ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<number, number, number>(
-        dflow,
-        nodeKind,
-        input1,
-        input2,
-        output,
-      );
-    },
-  );
+  ].forEach(({ inputs: [input1, input2], output }) => {
+    testTwoInOneOut<number, number, number>(
+      dflow,
+      nodeKind,
+      input1,
+      input2,
+      output,
+    );
+  });
 });
 
 test("equality", () => {
@@ -70,17 +66,15 @@ test("equality", () => {
       inputs: ["x", "x"],
       output: true,
     },
-  ].forEach(
-    ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<DflowData, DflowData, boolean>(
-        dflow,
-        nodeKind,
-        input1,
-        input2,
-        output,
-      );
-    },
-  );
+  ].forEach(({ inputs: [input1, input2], output }) => {
+    testTwoInOneOut<DflowData, DflowData, boolean>(
+      dflow,
+      nodeKind,
+      input1,
+      input2,
+      output,
+    );
+  });
 });
 
 test("greaterThan", () => {
@@ -181,17 +175,15 @@ test("inequality", () => {
       inputs: ["x", "x"],
       output: false,
     },
-  ].forEach(
-    ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<DflowData, DflowData, boolean>(
-        dflow,
-        nodeKind,
-        input1,
-        input2,
-        output,
-      );
-    },
-  );
+  ].forEach(({ inputs: [input1, input2], output }) => {
+    testTwoInOneOut<DflowData, DflowData, boolean>(
+      dflow,
+      nodeKind,
+      input1,
+      input2,
+      output,
+    );
+  });
 });
 
 test("multiplication", () => {

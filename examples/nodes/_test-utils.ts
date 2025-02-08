@@ -1,8 +1,8 @@
-import { strict as assert } from "node:assert"
-import { Dflow } from "../../dflow.js";
-import { nodesCatalog } from "./index.js";
+import { strict as assert } from "node:assert";
+import { Dflow } from "../../dflow.ts";
+import { nodesCatalog } from "./index.ts";
 
-export function newDflow () {
+export function newDflow() {
   return new Dflow(nodesCatalog);
 }
 
@@ -16,10 +16,7 @@ export function testOneOut<Output>(
   assert.deepEqual(testNode.output(0).data, output);
 }
 
-export function testOneInOneOut<
-  Input,
-  Output,
->(
+export function testOneInOneOut<Input, Output>(
   dflow: Dflow,
   nodeKind: string,
   input?: Input,
@@ -36,11 +33,7 @@ export function testOneInOneOut<
   assert.deepEqual(testNode.output(0).data, output);
 }
 
-export function testOneInTwoOut<
-  Input,
-  Output1,
-  Output2,
->(
+export function testOneInTwoOut<Input, Output1, Output2>(
   dflow: Dflow,
   nodeKind: string,
   input?: Input,
@@ -59,11 +52,7 @@ export function testOneInTwoOut<
   assert.deepEqual(testNode.output(1).data, output2);
 }
 
-export function testTwoInOneOut<
-  Input1,
-  Input2,
-  Output,
->(
+export function testTwoInOneOut<Input1, Input2, Output>(
   dflow: Dflow,
   nodeKind: string,
   input1?: Input1,
@@ -73,15 +62,15 @@ export function testTwoInOneOut<
   const catalog = dflow.nodesCatalog;
   const dataNode1 = Dflow.isDflowData(input1)
     ? dflow.newNode({
-      kind: catalog.data.kind,
-      outputs: [{ data: input1 }],
-    })
+        kind: catalog.data.kind,
+        outputs: [{ data: input1 }],
+      })
     : undefined;
   const dataNode2 = Dflow.isDflowData(input2)
     ? dflow.newNode({
-      kind: catalog.data.kind,
-      outputs: [{ data: input2 }],
-    })
+        kind: catalog.data.kind,
+        outputs: [{ data: input2 }],
+      })
     : undefined;
   const testNode = dflow.newNode({ kind: nodeKind });
   if (dataNode1) {
@@ -94,12 +83,7 @@ export function testTwoInOneOut<
   assert.deepEqual(testNode.output(0).data, output);
 }
 
-export function testThreeInOneOut<
-  Input1,
-  Input2,
-  Input3,
-  Output,
->(
+export function testThreeInOneOut<Input1, Input2, Input3, Output>(
   dflow: Dflow,
   nodeKind: string,
   input1?: Input1,
@@ -110,21 +94,21 @@ export function testThreeInOneOut<
   const catalog = dflow.nodesCatalog;
   const dataNode1 = Dflow.isDflowData(input1)
     ? dflow.newNode({
-      kind: catalog.data.kind,
-      outputs: [{ data: input1 }],
-    })
+        kind: catalog.data.kind,
+        outputs: [{ data: input1 }],
+      })
     : undefined;
   const dataNode2 = Dflow.isDflowData(input2)
     ? dflow.newNode({
-      kind: catalog.data.kind,
-      outputs: [{ data: input2 }],
-    })
+        kind: catalog.data.kind,
+        outputs: [{ data: input2 }],
+      })
     : undefined;
   const dataNode3 = Dflow.isDflowData(input3)
     ? dflow.newNode({
-      kind: catalog.data.kind,
-      outputs: [{ data: input3 }],
-    })
+        kind: catalog.data.kind,
+        outputs: [{ data: input3 }],
+      })
     : undefined;
   const testNode = dflow.newNode({ kind: nodeKind });
   if (dataNode1) {
