@@ -10,9 +10,11 @@
     "module": "es6",
     "moduleResolution": "node",
     "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "strict": true,
     "target": "es2023"
   },
   "exclude": ["./node_modules"],
-  "include": ["./dflow.d.ts", "./**/*.ts"]
+  "include": ["./dflow.ts", "./dflow_test.ts", "./examples/"]
 }
