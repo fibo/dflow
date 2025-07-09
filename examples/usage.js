@@ -1,6 +1,6 @@
 // Keep in sync with README.md file.
 
-import { Dflow, DflowNode } from "../dflow.js";
+import { Dflow, DflowNode } from "dflow";
 
 const { input, output } = Dflow;
 

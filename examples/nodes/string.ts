@@ -2,7 +2,7 @@ import { Dflow, DflowNode } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
-export class DflowNodeStringLength extends DflowNode {
+class DflowNodeStringLength extends DflowNode {
   static kind = "stringLength";
   static inputs = [input("string")];
   static outputs = [output("number")];
@@ -11,7 +11,7 @@ export class DflowNodeStringLength extends DflowNode {
   }
 }
 
-export class DflowNodeSubstring extends DflowNode {
+class DflowNodeSubstring extends DflowNode {
   static kind = "substring";
   static inputs = [
     input("string"),

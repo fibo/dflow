@@ -1,4 +1,3 @@
-import type { DflowNodesCatalog } from "../../dflow.ts";
 import { catalog as arrayCatalog } from "./array.ts";
 import { catalog as conditionalCatalog } from "./conditional.ts";
 import { catalog as consoleCatalog } from "./console.ts";
@@ -10,7 +9,7 @@ import { catalog as objectCatalog } from "./object.ts";
 import { catalog as operatorCatalog } from "./operator.ts";
 import { catalog as stringCatalog } from "./string.ts";
 
-export const nodesCatalog: DflowNodesCatalog = {
+export const nodesCatalog = {
   ...arrayCatalog,
   ...conditionalCatalog,
   ...consoleCatalog,
