@@ -60,6 +60,22 @@ export class Dflow implements Serializable<DflowGraph> {
     this.context = {};
   }
 
+  #executionNodeInfo(node: DflowNode, error?: string): DflowExecutionNodeInfo {
+    const { id, k, o } = node.toJSON();
+    const info: DflowExecutionNodeInfo = { id, k };
+    if (o) info.o = o;
+    if (error) info.err = error;
+    return info;
+  }
+
+  getEdgeById(id: string): DflowEdge | undefined {
+    return this.#edgesMap.get(id);
+  }
+
+  getNodeById(id: string): DflowNode | undefined {
+    return this.#nodesMap.get(id);
+  }
+
   /**
    * Empty graph.
    */
@@ -85,8 +101,6 @@ export class Dflow implements Serializable<DflowGraph> {
    * ```ts
    * dflow.connect(nodeA, outputPosition).to(nodeB, inputPosition);
    * ```
-   *
-   * @throws {DflowErrorItemNotFound}
    */
   connect(sourceNode: DflowNode, sourcePosition = 0) {
     return {
@@ -103,28 +117,28 @@ export class Dflow implements Serializable<DflowGraph> {
 
   /**
    * Delete edge with given id.
-   * @throws {DflowErrorItemNotFound}
    */
   deleteEdge(edgeId: string) {
-    const edge = this.getEdgeById(edgeId);
-    // Cleanup target input.
-    const [targetNodeId, targetInputId] = edge.target;
-    const targetNode = this.getNodeById(targetNodeId);
-    const targetInput = targetNode.getInputById(targetInputId);
-    // Disconnect target
-    targetInput.source = undefined;
+    const edge = this.#edgesMap.get(edgeId);
+    if (!edge) return;
     // Delete edge.
     this.#edgesMap.delete(edgeId);
+    // Cleanup target input.
+    const targetInput = this.#nodesMap
+      .get(edge.target[0])
+      ?.getInputById(edge.target[1]);
+    if (targetInput) targetInput.source = undefined;
   }
 
   /**
    * Delete node with given id.
-   * @throws {DflowErrorItemNotFound}
    */
   deleteNode(nodeId: string) {
-    // 1. First of all, get node. It will throw if node does not exist.
-    const node = this.getNodeById(nodeId);
-    // 2. Then, delete all edges connected to node.
+    // 1. Finally, delete node.
+    const node = this.#nodesMap.get(nodeId);
+    if (!node) return;
+    this.#nodesMap.delete(nodeId);
+    // 2. Delete all edges connected to node.
     for (const edge of this.edges) {
       const {
         source: [sourceNodeId],
@@ -133,8 +147,6 @@ export class Dflow implements Serializable<DflowGraph> {
       if (sourceNodeId === node.id || targetNodeId === node.id)
         this.deleteEdge(edge.id);
     }
-    // 3. Finally, delete node.
-    this.#nodesMap.delete(nodeId);
   }
 
   /**
@@ -148,24 +160,6 @@ export class Dflow implements Serializable<DflowGraph> {
     if (wantedId && !itemMap.has(wantedId)) return wantedId;
     const id = `${idPrefix}${itemMap.size}`;
     return itemMap.has(id) ? this.generateItemId(itemMap, idPrefix) : id;
-  }
-
-  /**
-   * @throws {DflowErrorItemNotFound}
-   */
-  getEdgeById(id: string): DflowEdge {
-    const item = this.#edgesMap.get(id);
-    if (!item) throw new DflowErrorItemNotFound("edge", { id });
-    return item;
-  }
-
-  /**
-   * @throws {DflowErrorItemNotFound}
-   */
-  getNodeById(id: string): DflowNode {
-    const item = this.#nodesMap.get(id);
-    if (!item) throw new DflowErrorItemNotFound("node", { nodeId: id });
-    return item;
   }
 
   newNode(arg: {
@@ -206,7 +200,7 @@ export class Dflow implements Serializable<DflowGraph> {
   }
 
   /**
-   * @throws {DflowErrorItemNotFound}
+   * Create a new edge.
    */
   newEdge(
     arg: { id?: string } & Pick<DflowEdge, "source" | "target">
@@ -215,26 +209,27 @@ export class Dflow implements Serializable<DflowGraph> {
 
     const edge = { ...arg, id };
 
-    this.#edgesMap.set(edge.id, edge);
+    const sourceNode = this.#nodesMap.get(edge.source[0]);
+    const targetNode = this.#nodesMap.get(edge.target[0]);
 
-    const [sourceNodeId, sourceOutputId] = edge.source;
-    const [targetNodeId, targetInputId] = edge.target;
+    if (sourceNode && targetNode) {
+      const sourceOutput = sourceNode.getOutputById(edge.source[1]);
+      const targetInput = targetNode.getInputById(edge.target[1]);
 
-    const sourceNode = this.getNodeById(sourceNodeId);
-    const targetNode = this.getNodeById(targetNodeId);
-    const sourceOutput = sourceNode.getOutputById(sourceOutputId);
-    const targetInput = targetNode.getInputById(targetInputId);
+      if (
+        sourceOutput &&
+        targetInput &&
+        Dflow.canConnect(sourceOutput.types, targetInput.types)
+      ) {
+        this.#edgesMap.set(edge.id, edge);
+        targetInput.source = sourceOutput;
+        return edge;
+      }
+    }
 
-    if (!Dflow.canConnect(sourceOutput.types, targetInput.types))
-      throw new DflowErrorCannotConnectSourceToTarget({
-        source: [sourceNode.id, sourceOutput.id],
-        target: [targetNode.id, targetInput.id]
-      });
-
-    targetInput.source = sourceOutput;
-
-    return edge;
+    throw new Error(`Cannot create edge ${JSON.stringify(edge)}`);
   }
+
   /**
    * List edge objects.
    */
@@ -280,9 +275,8 @@ export class Dflow implements Serializable<DflowGraph> {
       // If some input data is not valid.
       if (!node.inputsDataAreValid) {
         // Notify into execution report.
-        const error = new DflowErrorInvalidInputData(nodeId);
         executionReport.steps.push(
-          Dflow.executionNodeInfo(node, error.toJSON())
+          this.#executionNodeInfo(node, "Invalid input")
         );
         // Cleanup outputs and go to next node.
         node.clearOutputs();
@@ -295,7 +289,7 @@ export class Dflow implements Serializable<DflowGraph> {
         await node.run();
       }
 
-      executionReport.steps.push(Dflow.executionNodeInfo(node));
+      executionReport.steps.push(this.#executionNodeInfo(node));
     }
 
     executionReport.end = performance.now();
@@ -325,17 +319,6 @@ export class Dflow implements Serializable<DflowGraph> {
     if (sourceTypes.length === 0 || targetTypes.length === 0) return true;
     // Check if target accepts some of the `dataType` source can have.
     return targetTypes.some((dataType) => sourceTypes.includes(dataType));
-  }
-
-  static executionNodeInfo(
-    node: DflowNode,
-    error?: DflowSerializableError
-  ): DflowExecutionNodeInfo {
-    const { id, k, o } = node.toJSON();
-    const info: DflowExecutionNodeInfo = { id, k };
-    if (o) info.o = o;
-    if (error) info.err = error;
-    return info;
   }
 
   /**
@@ -853,50 +836,33 @@ export class DflowNode implements Serializable<DflowNodeObj> {
   }
 
   /**
-   * @throws {DflowErrorItemNotFound}
+   * Get input by id.
    */
-  getInputById(id: string): DflowInput {
-    const item = this.#inputsMap.get(id);
-    if (!item) throw new DflowErrorItemNotFound("input", { id });
-    return item;
+  getInputById(id: string): DflowInput | undefined {
+    return this.#inputsMap.get(id);
+  }
+
+  /**
+   * Get output by id.
+   */
+  getOutputById(id: string): DflowOutput | undefined {
+    return this.#outputsMap.get(id);
   }
 
   /**
    * Get input by position.
-   *
-   * @throws {DflowErrorItemNotFound}
+   * @remarks This should be called inside `DflowNode.run()`. There is no check that the position is valid.
    */
   input(position: number): DflowInput {
-    const id = this.#inputPosition[position];
-    if (!id)
-      throw new DflowErrorItemNotFound("input", {
-        id: this.id,
-        nodeId: this.id,
-        position
-      });
-    return this.getInputById(id);
-  }
-
-  /**
-   * @throws {DflowErrorItemNotFound}
-   */
-  getOutputById(id: string): DflowOutput {
-    const item = this.#outputsMap.get(id);
-    if (!item)
-      throw new DflowErrorItemNotFound("output", { id, nodeId: this.id });
-    return item;
+    return this.#inputsMap.get(this.#inputPosition[position]) as DflowInput;
   }
 
   /**
    * Get output by position.
-   *
-   * @throws {DflowErrorItemNotFound}
+   * @remarks This should be called inside `DflowNode.run()`. There is no check that the position is valid.
    */
   output(position: number): DflowOutput {
-    const id = this.#outputPosition[position];
-    if (!id)
-      throw new DflowErrorItemNotFound("output", { nodeId: this.id, position });
-    return this.getOutputById(id);
+    return this.#outputsMap.get(this.#outputPosition[position]) as DflowOutput;
   }
 
   /** @ignore this method, it should be overridden. */
@@ -975,8 +941,8 @@ export type DflowNodesCatalog = Record<DflowNode["kind"], DflowNodeDefinition>;
  * the serialized node except its inputs; an error, if any.
  */
 export type DflowExecutionNodeInfo = Omit<DflowNodeObj, "i"> & {
-  /** Error during execution */
-  err?: DflowSerializableError;
+  /** Error message during execution */
+  err?: string;
 };
 
 export type DflowExecutionReport = {
@@ -1016,157 +982,9 @@ class DflowNodeData extends DflowNode {
  * This class is used to instantiate a new node which `kind` was not found in `nodesCatalog`.
  * The "unknown" node class is not included in `coreNodesCatalog`.
  */
-export class DflowNodeUnknown extends DflowNode {}
+class DflowNodeUnknown extends DflowNode {}
 
 /** Builtin nodes, always included in `nodesCatalog`. */
 export const coreNodesCatalog: DflowNodesCatalog = {
   [DflowNodeData.kind]: DflowNodeData
 };
-
-// Dflow errors
-// ////////////////////////////////////////////////////////////////////
-
-export type DflowSerializableErrorCode = {
-  /** error code */
-  _: string;
-};
-
-export type DflowSerializableError =
-  | DflowSerializableErrorItemNotFound
-  | DflowSerializableErrorInvalidInputData
-  | DflowSerializableErrorCannotConnectSourceToTarget;
-
-export type DflowSerializableErrorCannotConnectSourceToTarget =
-  DflowSerializableErrorCode & {
-    /** source */
-    s: DflowErrorCannotConnectSourceToTarget["source"];
-    /** target */
-    t: DflowErrorCannotConnectSourceToTarget["target"];
-  };
-
-export class DflowErrorCannotConnectSourceToTarget
-  extends Error
-  implements Serializable<DflowSerializableErrorCannotConnectSourceToTarget>
-{
-  readonly source: DflowEdge["source"];
-  readonly target: DflowEdge["target"];
-  static code = "01";
-  static message({
-    s,
-    t
-  }: Omit<DflowSerializableErrorCannotConnectSourceToTarget, "_">) {
-    return `Cannot connect source ${s.join()} to target ${t.join()}`;
-  }
-  constructor({
-    source,
-    target
-  }: Pick<DflowErrorCannotConnectSourceToTarget, "source" | "target">) {
-    super(
-      DflowErrorCannotConnectSourceToTarget.message({ s: source, t: target })
-    );
-    this.source = source;
-    this.target = target;
-  }
-  toJSON(): DflowSerializableErrorCannotConnectSourceToTarget {
-    return {
-      _: DflowErrorCannotConnectSourceToTarget.code,
-      s: this.source,
-      t: this.target
-    };
-  }
-}
-
-export type DflowSerializableErrorInvalidInputData =
-  DflowSerializableErrorCode & {
-    /** nodeId */
-    nId: DflowErrorInvalidInputData["nodeId"];
-  };
-
-export class DflowErrorInvalidInputData
-  extends Error
-  implements Serializable<DflowSerializableErrorInvalidInputData>
-{
-  static code = "02";
-  readonly nodeId: string;
-  static message({
-    nId: nodeId
-  }: Omit<DflowSerializableErrorInvalidInputData, "_">) {
-    return `Invalid input data in node ${nodeId}`;
-  }
-  constructor(nodeId: DflowErrorInvalidInputData["nodeId"]) {
-    super(DflowErrorInvalidInputData.message({ nId: nodeId }));
-    this.nodeId = nodeId;
-  }
-  toJSON(): DflowSerializableErrorInvalidInputData {
-    return {
-      _: DflowErrorInvalidInputData.code,
-      nId: this.nodeId
-    };
-  }
-}
-
-export type DflowSerializableErrorItemNotFound = DflowSerializableErrorCode & {
-  item: DflowErrorItemNotFound["item"];
-  id?: DflowErrorItemNotFound["info"]["id"];
-  /** nodeId */
-  nId?: DflowErrorItemNotFound["info"]["nodeId"];
-  /** position */
-  p?: DflowErrorItemNotFound["info"]["position"];
-};
-
-export class DflowErrorItemNotFound
-  extends Error
-  implements Serializable<DflowSerializableErrorItemNotFound>
-{
-  static code = "03";
-  readonly item: "node" | "edge" | "input" | "output";
-  readonly info: Partial<{
-    id: string;
-    nodeId: string;
-    position: number;
-  }>;
-  static message({
-    item,
-    id,
-    nId: nodeId,
-    p: position
-  }: Omit<DflowSerializableErrorItemNotFound, "_">) {
-    return `Not found ${[
-      `item=${item}`,
-      id ? `id=${id}` : "",
-      nodeId ? `nodeId=${nodeId}` : "",
-      position ? `position=${position}` : ""
-    ]
-      .filter((str) => str !== "")
-      .join()}`;
-  }
-  constructor(
-    item: DflowErrorItemNotFound["item"],
-    info: DflowErrorItemNotFound["info"] = {}
-  ) {
-    super(
-      DflowErrorItemNotFound.message({
-        item,
-        id: info.id,
-        nId: info.nodeId,
-        p: info.position
-      })
-    );
-    this.item = item;
-    this.info = info;
-  }
-  toJSON(): DflowSerializableErrorItemNotFound {
-    const {
-      item,
-      info: { id, nodeId, position }
-    } = this;
-    const obj: DflowSerializableErrorItemNotFound = {
-      item,
-      _: DflowErrorItemNotFound.code
-    };
-    if (id) obj.id = id;
-    if (nodeId) obj.nId = nodeId;
-    if (position) obj.p = position;
-    return obj;
-  }
-}

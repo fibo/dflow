@@ -1,12 +1,7 @@
 import { test } from "node:test";
 import { strict as assert } from "node:assert";
 
-import {
-  Dflow,
-  DflowErrorItemNotFound,
-  DflowNode,
-  DflowOutput
-} from "./dflow.ts";
+import { Dflow, DflowNode, DflowOutput } from "./dflow.ts";
 import type { DflowDataType } from "./dflow.ts";
 
 const { input, output } = Dflow;
@@ -377,65 +372,23 @@ test("dflow.newEdge()", () => {
 
 test("dflow.deleteNode()", () => {
   const { dflow, nodeId1, edgeId1 } = sample01();
-  dflow.deleteNode(nodeId1);
-  assert.throws(
-    () => {
-      dflow.getNodeById(nodeId1);
-    },
-    {
-      name: "Error",
-      message: DflowErrorItemNotFound.message({ item: "node", nId: nodeId1 })
-    }
-  );
-  assert.throws(
-    () => {
-      dflow.getEdgeById(edgeId1);
-    },
-    {
-      name: "Error",
-      message: DflowErrorItemNotFound.message({ item: "edge", id: edgeId1 })
-    }
-  );
   const nodeNotFoundId = "xxx";
-  assert.throws(
-    () => {
-      dflow.deleteNode(nodeNotFoundId);
-    },
-    {
-      name: "Error",
-      message: DflowErrorItemNotFound.message({
-        item: "node",
-        nId: nodeNotFoundId
-      })
-    }
-  );
+  dflow.deleteNode(nodeNotFoundId);
+  assert.equal(dflow.nodes.length, 2);
+  assert.ok(dflow.getNodeById(nodeId1) !== undefined);
+  dflow.deleteNode(nodeId1);
+  assert.equal(dflow.getNodeById(nodeId1), undefined);
+  assert.equal(dflow.getEdgeById(edgeId1), undefined);
 });
 
 test("dflow.deleteEdge()", () => {
   const { dflow, edgeId1 } = sample01();
-  dflow.deleteEdge(edgeId1);
-  assert.throws(
-    () => {
-      dflow.getEdgeById(edgeId1);
-    },
-    {
-      name: "Error",
-      message: DflowErrorItemNotFound.message({ item: "edge", id: edgeId1 })
-    }
-  );
   const edgeNotFoundId = "xxx";
-  assert.throws(
-    () => {
-      dflow.deleteEdge(edgeNotFoundId);
-    },
-    {
-      name: "Error",
-      message: DflowErrorItemNotFound.message({
-        item: "edge",
-        id: edgeNotFoundId
-      })
-    }
-  );
+  dflow.deleteEdge(edgeNotFoundId);
+  assert.equal(dflow.edges.length, 1);
+  assert.ok(dflow.getEdgeById(edgeId1) !== undefined);
+  dflow.deleteEdge(edgeId1);
+  assert.equal(dflow.getEdgeById(edgeId1), undefined);
 });
 
 // DflowOutput
