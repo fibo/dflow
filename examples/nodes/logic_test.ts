@@ -11,14 +11,14 @@ test("DflowNodeAnd", () => {
     { inputs: [true, true], output: true && true },
     { inputs: [true, false], output: true && false },
     { inputs: [false, false], output: false && false },
-    { inputs: [false, true], output: false && true },
+    { inputs: [false, true], output: false && true }
   ].forEach(({ inputs: [input1, input2], output }) => {
     testTwoInOneOut<boolean, boolean, boolean>(
       dflow,
       nodeKind,
       input1,
       input2,
-      output,
+      output
     );
   });
 });
@@ -30,7 +30,7 @@ test("DflowNo", () => {
 
   [
     { input: true, output: false },
-    { input: false, output: true },
+    { input: false, output: true }
   ].forEach(({ input, output }) => {
     testOneInOneOut<boolean, boolean>(dflow, nodeKind, input, output);
   });
@@ -46,14 +46,14 @@ test("DflowNodeNullishCoaleshing", () => {
     { inputs: [undefined, true], output: true },
     { inputs: [undefined, false], output: false },
     { inputs: [42, undefined], output: 42 },
-    { inputs: [undefined, 42], output: 42 },
+    { inputs: [undefined, 42], output: 42 }
   ].forEach(({ inputs: [input1, input2], output }) => {
     testTwoInOneOut<DflowData, DflowData, DflowData>(
       dflow,
       nodeKind,
       input1,
       input2,
-      output,
+      output
     );
   });
 });
@@ -67,14 +67,14 @@ test("DflowNodeOr", () => {
     { inputs: [true, true], output: true || true },
     { inputs: [true, false], output: true || false },
     { inputs: [false, false], output: false || false },
-    { inputs: [false, true], output: false || true },
+    { inputs: [false, true], output: false || true }
   ].forEach(({ inputs: [input1, input2], output }) => {
     testTwoInOneOut<boolean, boolean, boolean>(
       dflow,
       nodeKind,
       input1,
       input2,
-      output,
+      output
     );
   });
 });

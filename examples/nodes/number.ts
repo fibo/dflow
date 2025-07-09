@@ -42,5 +42,5 @@ export const catalog = {
   [DflowIsFinite.kind]: DflowIsFinite,
   [DflowIsInteger.kind]: DflowIsInteger,
   [DflowParseFloat.kind]: DflowParseFloat,
-  [DflowParseInt.kind]: DflowParseInt,
+  [DflowParseInt.kind]: DflowParseInt
 };

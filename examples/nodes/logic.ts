@@ -42,5 +42,5 @@ export const catalog = {
   [DflowNodeAnd.kind]: DflowNodeAnd,
   [DflowNodeNot.kind]: DflowNodeNot,
   [DflowNodeNullishCoaleshing.kind]: DflowNodeNullishCoaleshing,
-  [DflowNodeOr.kind]: DflowNodeOr,
+  [DflowNodeOr.kind]: DflowNodeOr
 };

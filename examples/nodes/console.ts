@@ -11,5 +11,5 @@ class DflowConsoleLog extends DflowNode {
 }
 
 export const catalog = {
-  [DflowConsoleLog.kind]: DflowConsoleLog,
+  [DflowConsoleLog.kind]: DflowConsoleLog
 };

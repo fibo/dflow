@@ -114,5 +114,5 @@ export const catalog = {
   [DflowMathPI.kind]: DflowMathPI,
   [DflowMathRound.kind]: DflowMathRound,
   [DflowMathSin.kind]: DflowMathSin,
-  [DflowMathSinh.kind]: DflowMathSinh,
+  [DflowMathSinh.kind]: DflowMathSinh
 };

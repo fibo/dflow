@@ -21,14 +21,14 @@ test("substring", () => {
       input1: "hello",
       input2: 2,
       input3: undefined,
-      output: "llo",
+      output: "llo"
     },
     {
       input1: "hello",
       input2: 2,
       input3: 4,
-      output: "ll",
-    },
+      output: "ll"
+    }
   ].forEach(({ input1, input2, input3, output }) => {
     testThreeInOneOut<string, number, number, string>(
       dflow,
@@ -36,7 +36,7 @@ test("substring", () => {
       input1,
       input2,
       input3,
-      output,
+      output
     );
   });
 });

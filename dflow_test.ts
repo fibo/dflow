@@ -5,7 +5,7 @@ import {
   Dflow,
   DflowErrorItemNotFound,
   DflowNode,
-  DflowOutput,
+  DflowOutput
 } from "./dflow.ts";
 import type { DflowDataType } from "./dflow.ts";
 
@@ -23,7 +23,7 @@ const dataTypes: DflowDataType[] = [
   "number",
   "string",
   "array",
-  "object",
+  "object"
 ];
 
 class IdentityNode extends DflowNode {
@@ -64,12 +64,12 @@ class SleepNode extends DflowNode {
 }
 
 const nodesCatalog1 = {
-  [IdentityNode.kind]: IdentityNode,
+  [IdentityNode.kind]: IdentityNode
 };
 
 const nodesCatalog2 = {
   [SumNode.kind]: SumNode,
-  [SleepNode.kind]: SleepNode,
+  [SleepNode.kind]: SleepNode
 };
 
 function sample01() {
@@ -83,17 +83,17 @@ function sample01() {
   dflow.newNode({
     id: nodeId1,
     kind: catalog.Identity.kind,
-    outputs: [{ id: pinId1 }],
+    outputs: [{ id: pinId1 }]
   });
   dflow.newNode({
     id: nodeId2,
     kind: catalog.Identity.kind,
-    inputs: [{ id: pinId2 }],
+    inputs: [{ id: pinId2 }]
   });
   dflow.newEdge({
     id: edgeId1,
     source: [nodeId1, pinId1],
-    target: [nodeId2, pinId2],
+    target: [nodeId2, pinId2]
   });
 
   return { dflow, nodeId1, nodeId2, pinId1, pinId2, edgeId1 };
@@ -111,7 +111,7 @@ test("Dflow.inferDataType()", () => {
     { input: null, output: ["null"] },
     { input: obj, output: ["object"] },
     { input: str, output: ["string"] },
-    { input: undefined, output: [] },
+    { input: undefined, output: [] }
   ].forEach(({ input, output }) => {
     assert.deepEqual(Dflow.inferDataType(input).join(), output.join());
   });
@@ -134,7 +134,7 @@ test("Dflow.isArray()", () => {
   // bad nested array
   assert.deepEqual(
     Dflow.isArray([1, [2, 3], [{ foo: 42 }], [true, () => {}]]),
-    false,
+    false
   );
 });
 
@@ -264,11 +264,11 @@ test("Dflow.isValidDataType()", () => {
   assert.deepEqual(Dflow.isValidDataType(["boolean", "array"], arr), true);
   assert.deepEqual(
     Dflow.isValidDataType(["string", "number", "boolean"], bool),
-    true,
+    true
   );
   assert.deepEqual(
     Dflow.isValidDataType(["number", "object", "string"], num),
-    true,
+    true
   );
   assert.deepEqual(Dflow.isValidDataType(["object", "string"], null), false);
   assert.deepEqual(Dflow.isValidDataType(["array", "object"], obj), true);
@@ -277,7 +277,7 @@ test("Dflow.isValidDataType()", () => {
   assert.deepEqual(Dflow.isValidDataType(["number", "array"], bool), false);
   assert.deepEqual(
     Dflow.isValidDataType(["boolean", "object", "string"], num),
-    false,
+    false
   );
   assert.deepEqual(Dflow.isValidDataType(["object", "string"], null), false);
   assert.deepEqual(Dflow.isValidDataType(["array", "boolean"], obj), false);
@@ -308,23 +308,23 @@ test("dflow.run()", async () => {
   dflow.newNode({
     id: "num",
     kind: catalog.data.kind,
-    outputs: [{ id: "out", data: 2 }],
+    outputs: [{ id: "out", data: 2 }]
   });
   const sumNode = dflow.newNode({
     id: "sum",
     kind: catalog.Sum.kind,
     inputs: [{ id: "in1" }, { id: "in2" }],
-    outputs: [{ id: "out" }],
+    outputs: [{ id: "out" }]
   });
   dflow.newEdge({
     id: "e1",
     source: ["num", "out"],
-    target: ["sum", "in1"],
+    target: ["sum", "in1"]
   });
   dflow.newEdge({
     id: "e2",
     source: ["num", "out"],
-    target: ["sum", "in2"],
+    target: ["sum", "in2"]
   });
 
   // Add also an async node.
@@ -344,7 +344,7 @@ test("dflow.newNode()", () => {
   const nodeId1 = "node1";
   const node1 = dflow.newNode({
     kind: catalog.Identity.kind,
-    id: nodeId1,
+    id: nodeId1
   });
   assert.deepEqual(node1.id, nodeId1);
   assert.deepEqual(node1.kind, catalog.Identity.kind);
@@ -353,7 +353,7 @@ test("dflow.newNode()", () => {
   const inputId1 = "input1";
   const node2 = dflow.newNode({
     kind: catalog.Identity.kind,
-    inputs: [{ id: inputId1 }],
+    inputs: [{ id: inputId1 }]
   });
   const node2Obj = node2.toJSON();
   assert.deepEqual(node2Obj.i?.[0]?.id, inputId1);
@@ -362,7 +362,7 @@ test("dflow.newNode()", () => {
   const outputId1 = "output1";
   const node3 = dflow.newNode({
     kind: catalog.Identity.kind,
-    outputs: [{ id: outputId1 }],
+    outputs: [{ id: outputId1 }]
   });
   const node3Obj = node3.toJSON();
   assert.deepEqual(node3Obj.o?.[0]?.id, outputId1);
@@ -384,8 +384,8 @@ test("dflow.deleteNode()", () => {
     },
     {
       name: "Error",
-      message: DflowErrorItemNotFound.message({ item: "node", nId: nodeId1 }),
-    },
+      message: DflowErrorItemNotFound.message({ item: "node", nId: nodeId1 })
+    }
   );
   assert.throws(
     () => {
@@ -393,8 +393,8 @@ test("dflow.deleteNode()", () => {
     },
     {
       name: "Error",
-      message: DflowErrorItemNotFound.message({ item: "edge", id: edgeId1 }),
-    },
+      message: DflowErrorItemNotFound.message({ item: "edge", id: edgeId1 })
+    }
   );
   const nodeNotFoundId = "xxx";
   assert.throws(
@@ -405,9 +405,9 @@ test("dflow.deleteNode()", () => {
       name: "Error",
       message: DflowErrorItemNotFound.message({
         item: "node",
-        nId: nodeNotFoundId,
-      }),
-    },
+        nId: nodeNotFoundId
+      })
+    }
   );
 });
 
@@ -420,8 +420,8 @@ test("dflow.deleteEdge()", () => {
     },
     {
       name: "Error",
-      message: DflowErrorItemNotFound.message({ item: "edge", id: edgeId1 }),
-    },
+      message: DflowErrorItemNotFound.message({ item: "edge", id: edgeId1 })
+    }
   );
   const edgeNotFoundId = "xxx";
   assert.throws(
@@ -432,9 +432,9 @@ test("dflow.deleteEdge()", () => {
       name: "Error",
       message: DflowErrorItemNotFound.message({
         item: "edge",
-        id: edgeNotFoundId,
-      }),
-    },
+        id: edgeNotFoundId
+      })
+    }
   );
 });
 
@@ -589,13 +589,13 @@ test("Dflow.canConnect()", () => {
     ...dataTypes.map((dataType) => ({
       sourceTypes: [dataType],
       targetTypes: [dataType],
-      expected: true,
+      expected: true
     })),
     // Every source can connect to a target with type "any".
     ...dataTypes.map((dataType) => ({
       sourceTypes: [dataType],
       targetTypes: [],
-      expected: true,
+      expected: true
     })),
     // Every source with type "any" can connect to a target with type "any".
     { sourceTypes: [], targetTypes: [], expected: true },
@@ -629,7 +629,7 @@ test("Dflow.canConnect()", () => {
     { sourceTypes: ["null"], targetTypes: ["boolean"], expected: false },
     { sourceTypes: ["null"], targetTypes: ["number"], expected: false },
     { sourceTypes: ["null"], targetTypes: ["object"], expected: false },
-    { sourceTypes: ["null"], targetTypes: ["string"], expected: false },
+    { sourceTypes: ["null"], targetTypes: ["string"], expected: false }
   ];
 
   testCases.forEach(({ sourceTypes, targetTypes, expected }) => {

@@ -114,5 +114,5 @@ export const catalog = {
   [DflowLessThanOrEqual.kind]: DflowLessThanOrEqual,
   [DflowInequality.kind]: DflowInequality,
   [DflowMultiplication.kind]: DflowMultiplication,
-  [DflowSubtraction.kind]: DflowSubtraction,
+  [DflowSubtraction.kind]: DflowSubtraction
 };

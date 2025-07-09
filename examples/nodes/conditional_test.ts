@@ -7,22 +7,22 @@ function testConditionalIf(
   input1?: DflowData,
   input2?: DflowData,
   input3?: DflowData,
-  output?: DflowData,
+  output?: DflowData
 ) {
   const dflow = newDflow();
   const catalog = dflow.nodesCatalog;
 
   const dataNode1 = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ data: input1 }],
+    outputs: [{ data: input1 }]
   });
   const dataNode2 = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ data: input2 }],
+    outputs: [{ data: input2 }]
   });
   const dataNode3 = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ data: input3 }],
+    outputs: [{ data: input3 }]
   });
   const testNode = dflow.newNode({ kind: catalog.if.kind });
 
@@ -39,12 +39,12 @@ test("DflowNodeIf", () => {
       input1: undefined,
       input2: undefined,
       input3: undefined,
-      output: undefined,
+      output: undefined
     },
     { input1: true, input2: 1, input3: 2, output: 1 },
     { input1: false, input2: 1, input3: 2, output: 2 },
     { input1: "", input2: 1, input3: 2, output: 2 },
-    { input1: "str", input2: 1, input3: 2, output: 1 },
+    { input1: "str", input2: 1, input3: 2, output: 1 }
   ].forEach(({ input1, input2, input3, output }) => {
     testConditionalIf(input1, input2, input3, output);
   });

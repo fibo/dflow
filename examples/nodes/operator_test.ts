@@ -14,9 +14,9 @@ test("addition", () => {
         nodeKind,
         input1,
         input2,
-        output,
+        output
       );
-    },
+    }
   );
 });
 
@@ -28,14 +28,14 @@ test("division", () => {
   [
     { inputs: [2, 2], output: 1 },
     { inputs: [0, 1], output: 0 },
-    { inputs: [1, 0], output: undefined },
+    { inputs: [1, 0], output: undefined }
   ].forEach(({ inputs: [input1, input2], output }) => {
     testTwoInOneOut<number, number, number>(
       dflow,
       nodeKind,
       input1,
       input2,
-      output,
+      output
     );
   });
 });
@@ -48,31 +48,31 @@ test("equality", () => {
   [
     {
       inputs: [1, 2],
-      output: false,
+      output: false
     },
     {
       inputs: [1, 1],
-      output: true,
+      output: true
     },
     {
       inputs: [1, "1"],
-      output: true,
+      output: true
     },
     {
       inputs: ["a", "b"],
-      output: false,
+      output: false
     },
     {
       inputs: ["x", "x"],
-      output: true,
-    },
+      output: true
+    }
   ].forEach(({ inputs: [input1, input2], output }) => {
     testTwoInOneOut<DflowData, DflowData, boolean>(
       dflow,
       nodeKind,
       input1,
       input2,
-      output,
+      output
     );
   });
 });
@@ -89,9 +89,9 @@ test("greaterThan", () => {
         nodeKind,
         input1,
         input2,
-        output,
+        output
       );
-    },
+    }
   );
 });
 
@@ -107,9 +107,9 @@ test("greaterThanOrEqual", () => {
         nodeKind,
         input1,
         input2,
-        output,
+        output
       );
-    },
+    }
   );
 });
 
@@ -125,9 +125,9 @@ test("lessThan", () => {
         nodeKind,
         input1,
         input2,
-        output,
+        output
       );
-    },
+    }
   );
 });
 
@@ -143,9 +143,9 @@ test("lessThanOrEqual", () => {
         nodeKind,
         input1,
         input2,
-        output,
+        output
       );
-    },
+    }
   );
 });
 
@@ -157,31 +157,31 @@ test("inequality", () => {
   [
     {
       inputs: [1, 2],
-      output: true,
+      output: true
     },
     {
       inputs: [1, 1],
-      output: false,
+      output: false
     },
     {
       inputs: [1, "1"],
-      output: false,
+      output: false
     },
     {
       inputs: ["a", "b"],
-      output: true,
+      output: true
     },
     {
       inputs: ["x", "x"],
-      output: false,
-    },
+      output: false
+    }
   ].forEach(({ inputs: [input1, input2], output }) => {
     testTwoInOneOut<DflowData, DflowData, boolean>(
       dflow,
       nodeKind,
       input1,
       input2,
-      output,
+      output
     );
   });
 });
@@ -198,9 +198,9 @@ test("multiplication", () => {
         nodeKind,
         input1,
         input2,
-        output,
+        output
       );
-    },
+    }
   );
 });
 
@@ -216,8 +216,8 @@ test("subtraction", () => {
         nodeKind,
         input1,
         input2,
-        output,
+        output
       );
-    },
+    }
   );
 });

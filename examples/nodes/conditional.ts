@@ -7,7 +7,7 @@ class DflowNodeIf extends DflowNode {
   static inputs = [
     input([], { name: "condition" }),
     input([], { name: "then" }),
-    input([], { name: "else" }),
+    input([], { name: "else" })
   ];
   static outputs = [output()];
   run() {
@@ -18,5 +18,5 @@ class DflowNodeIf extends DflowNode {
 }
 
 export const catalog = {
-  [DflowNodeIf.kind]: DflowNodeIf,
+  [DflowNodeIf.kind]: DflowNodeIf
 };

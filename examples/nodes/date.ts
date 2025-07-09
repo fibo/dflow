@@ -4,7 +4,7 @@ const { input, output } = Dflow;
 
 const dateOutputs = [
   output("string"),
-  output("number", { name: "milliseconds" }),
+  output("number", { name: "milliseconds" })
 ];
 
 class DflowDateNew extends DflowNode {
@@ -40,5 +40,5 @@ class DflowDateNow extends DflowNode {
 
 export const catalog = {
   [DflowDateNew.kind]: DflowDateNew,
-  [DflowDateNow.kind]: DflowDateNow,
+  [DflowDateNow.kind]: DflowDateNow
 };

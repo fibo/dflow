@@ -50,7 +50,7 @@ test("mathMax", () => {
     { input: [1, 2, undefined], output: undefined },
     { input: [1, 2, "x"], output: undefined },
     { input: [1, 2, 3], output: 3 },
-    { input: [1, 2, "3"], output: 3 },
+    { input: [1, 2, "3"], output: 3 }
   ].forEach(({ input, output }) => {
     testOneInOneOut<unknown[], unknown>(dflow, nodeKind, input, output);
   });
@@ -65,7 +65,7 @@ test("mathMin", () => {
     { input: [1, 2, undefined], output: undefined },
     { input: [1, 2, "x"], output: undefined },
     { input: [1, 2, 3], output: 1 },
-    { input: ["1", 2, 3], output: 1 },
+    { input: ["1", 2, 3], output: 1 }
   ].forEach(({ input, output }) => {
     testOneInOneOut<unknown[], unknown>(dflow, nodeKind, input, output);
   });

@@ -33,7 +33,7 @@ class CustomNode extends DflowNode {
 }
 
 const nodesCatalog = {
-  [CustomNode.kind]: CustomNode,
+  [CustomNode.kind]: CustomNode
 };
 
 async function contextExample() {

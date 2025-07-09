@@ -23,7 +23,7 @@ class DflowConsoleLog extends DflowNode {
 
 const nodesCatalog = {
   [DflowMathSin.kind]: DflowMathSin,
-  [DflowConsoleLog.kind]: DflowConsoleLog,
+  [DflowConsoleLog.kind]: DflowConsoleLog
   // DflowNodeData is a core node
 };
 
@@ -36,7 +36,7 @@ function rungraph() {
   const numNode = dflow.newNode({
     kind: catalog.data.kind,
     // set numNode output to π / 2
-    outputs: [{ data: Math.PI / 2 }],
+    outputs: [{ data: Math.PI / 2 }]
   });
   const sinNode = dflow.newNode({ kind: catalog.mathSin.kind });
   const consoleLogNode = dflow.newNode({ kind: catalog.consoleLog.kind });

@@ -12,7 +12,7 @@ test("objectKeys", () => {
       dflow,
       nodeKind,
       input,
-      Object.keys(input),
+      Object.keys(input)
     );
   });
 });
@@ -27,7 +27,7 @@ test("objectValues", () => {
       dflow,
       nodeKind,
       input,
-      Object.values(input),
+      Object.values(input)
     );
   });
 });

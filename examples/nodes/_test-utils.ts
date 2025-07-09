@@ -9,7 +9,7 @@ export function newDflow() {
 export function testOneOut<Output>(
   dflow: Dflow,
   nodeKind: string,
-  output: Output,
+  output: Output
 ) {
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.run();
@@ -20,12 +20,12 @@ export function testOneInOneOut<Input, Output>(
   dflow: Dflow,
   nodeKind: string,
   input?: Input,
-  output?: Output,
+  output?: Output
 ) {
   const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ data: Dflow.isDflowData(input) ? input : undefined }],
+    outputs: [{ data: Dflow.isDflowData(input) ? input : undefined }]
   });
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
@@ -38,12 +38,12 @@ export function testOneInTwoOut<Input, Output1, Output2>(
   nodeKind: string,
   input?: Input,
   output1?: Output1,
-  output2?: Output2,
+  output2?: Output2
 ) {
   const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
     kind: catalog.data.kind,
-    outputs: [{ data: Dflow.isDflowData(input) ? input : undefined }],
+    outputs: [{ data: Dflow.isDflowData(input) ? input : undefined }]
   });
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
@@ -57,19 +57,19 @@ export function testTwoInOneOut<Input1, Input2, Output>(
   nodeKind: string,
   input1?: Input1,
   input2?: Input2,
-  output?: Output,
+  output?: Output
 ) {
   const catalog = dflow.nodesCatalog;
   const dataNode1 = Dflow.isDflowData(input1)
     ? dflow.newNode({
         kind: catalog.data.kind,
-        outputs: [{ data: input1 }],
+        outputs: [{ data: input1 }]
       })
     : undefined;
   const dataNode2 = Dflow.isDflowData(input2)
     ? dflow.newNode({
         kind: catalog.data.kind,
-        outputs: [{ data: input2 }],
+        outputs: [{ data: input2 }]
       })
     : undefined;
   const testNode = dflow.newNode({ kind: nodeKind });
@@ -89,25 +89,25 @@ export function testThreeInOneOut<Input1, Input2, Input3, Output>(
   input1?: Input1,
   input2?: Input2,
   input3?: Input3,
-  output?: Output,
+  output?: Output
 ) {
   const catalog = dflow.nodesCatalog;
   const dataNode1 = Dflow.isDflowData(input1)
     ? dflow.newNode({
         kind: catalog.data.kind,
-        outputs: [{ data: input1 }],
+        outputs: [{ data: input1 }]
       })
     : undefined;
   const dataNode2 = Dflow.isDflowData(input2)
     ? dflow.newNode({
         kind: catalog.data.kind,
-        outputs: [{ data: input2 }],
+        outputs: [{ data: input2 }]
       })
     : undefined;
   const dataNode3 = Dflow.isDflowData(input3)
     ? dflow.newNode({
         kind: catalog.data.kind,
-        outputs: [{ data: input3 }],
+        outputs: [{ data: input3 }]
       })
     : undefined;
   const testNode = dflow.newNode({ kind: nodeKind });

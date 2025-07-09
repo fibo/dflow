@@ -20,5 +20,5 @@ export const nodesCatalog: DflowNodesCatalog = {
   ...numberCatalog,
   ...objectCatalog,
   ...operatorCatalog,
-  ...stringCatalog,
+  ...stringCatalog
 };

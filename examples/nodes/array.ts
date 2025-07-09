@@ -18,7 +18,7 @@ class DflowArrayIncludes extends DflowNode {
   static kind = "arrayIncludes";
   static inputs = [
     input("array", { name: "array" }),
-    input("string", { name: "element" }),
+    input("string", { name: "element" })
   ];
   static outputs = [output("boolean")];
   run() {
@@ -35,12 +35,12 @@ class DflowArrayJoin extends DflowNode {
   static kind = "arrayJoin";
   static inputs = [
     input("array", { name: "array" }),
-    input("string", { name: "separator", optional: true }),
+    input("string", { name: "separator", optional: true })
   ];
   static outputs = [output("string")];
   run() {
     this.output(0).data = (this.input(0).data as Array<unknown>).join(
-      this.input(1).data as string | undefined,
+      this.input(1).data as string | undefined
     );
   }
 }
@@ -64,7 +64,7 @@ class DflowArrayPop extends DflowNode {
   static inputs = [input("array")];
   static outputs = [
     output([], { name: "element" }),
-    output("array", { name: "rest" }),
+    output("array", { name: "rest" })
   ];
   run() {
     const array = (this.input(0).data as DflowArray).slice();
@@ -103,7 +103,7 @@ class DflowArrayShift extends DflowNode {
   static inputs = [input("array")];
   static outputs = [
     output([], { name: "element" }),
-    output("array", { name: "rest" }),
+    output("array", { name: "rest" })
   ];
   run() {
     const array = (this.input(0).data as DflowArray).slice();
@@ -118,7 +118,7 @@ class DflowArraySlice extends DflowNode {
   static inputs = [
     input("array"),
     input("number", { name: "start" }),
-    input("number", { name: "end", optional: true }),
+    input("number", { name: "end", optional: true })
   ];
   static outputs = [output("array")];
   run() {
@@ -143,5 +143,5 @@ export const catalog = {
   [DflowArrayPush.kind]: DflowArrayPush,
   [DflowArrayReverse.kind]: DflowArrayReverse,
   [DflowArrayShift.kind]: DflowArrayShift,
-  [DflowArraySlice.kind]: DflowArraySlice,
+  [DflowArraySlice.kind]: DflowArraySlice
 };

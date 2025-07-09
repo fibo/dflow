@@ -40,7 +40,7 @@ class SleepNode extends DflowNode {
 const nodesCatalog = {
   [NumNode.kind]: NumNode,
   [SumNode.kind]: SumNode,
-  [SleepNode.kind]: SleepNode,
+  [SleepNode.kind]: SleepNode
 };
 
 async function runGraph() {
@@ -50,21 +50,21 @@ async function runGraph() {
 
   const numNode = dflow.newNode({
     kind: NumNode.kind,
-    outputs: [{ id: "out", data: 21 }],
+    outputs: [{ id: "out", data: 21 }]
   });
   const sumNode = dflow.newNode({
     kind: SumNode.kind,
     // Optional `id`. If Dflow is edited in a view, it can handy to reuse ids.
     id: "sum",
     inputs: [{ id: "in1" }, { id: "in2" }],
-    outputs: [{ id: "out" }],
+    outputs: [{ id: "out" }]
   });
 
   // Connect nodes. Both `dflow.connect()` and `dflow.newEdge()` are used here.
   dflow.connect(numNode).to(sumNode);
   dflow.newEdge({
     source: [numNode.id, "out"],
-    target: ["sum", "in2"],
+    target: ["sum", "in2"]
   });
 
   // Add also an async node.

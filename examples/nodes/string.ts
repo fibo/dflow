@@ -16,7 +16,7 @@ export class DflowNodeSubstring extends DflowNode {
   static inputs = [
     input("string"),
     input("number", { name: "start" }),
-    input("number", { name: "end", optional: true }),
+    input("number", { name: "end", optional: true })
   ];
   static outputs = [output("string")];
   run() {
@@ -29,5 +29,5 @@ export class DflowNodeSubstring extends DflowNode {
 
 export const catalog = {
   [DflowNodeSubstring.kind]: DflowNodeSubstring,
-  [DflowNodeStringLength.kind]: DflowNodeStringLength,
+  [DflowNodeStringLength.kind]: DflowNodeStringLength
 };

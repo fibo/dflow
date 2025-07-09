@@ -19,7 +19,7 @@
     "example:context": "node --env-file .typescript.env examples/context.ts",
     "example:execution-report": "node --env-file .typescript.env examples/execution-report.ts",
     "example:usage": "node examples/usage.js",
-    "install_precommit_hook": "echo '#!/bin/sh\nnpm test\nnpm run prettier--check\nnpm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
+    "install_precommit_hook": "echo '#!/bin/sh\nnpm test && npm run prettier--check && npm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
     "prettier": "prettier --write .",
     "prettier--check": "prettier --check .",
     "prebuild": "npm run check_types",
@@ -36,5 +36,8 @@
   "keywords": [
     "dataflow",
     "dataflow-programming"
-  ]
+  ],
+  "prettier": {
+    "trailingComma": "none"
+  }
 }

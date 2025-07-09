@@ -9,7 +9,7 @@ test("isFinite", () => {
 
   [
     { input: 1, output: true },
-    { input: Infinity, output: false },
+    { input: Infinity, output: false }
   ].forEach(({ input, output }) => {
     testOneInOneOut<number, boolean>(dflow, nodeKind, input, output);
   });
@@ -26,13 +26,13 @@ test("isInteger", () => {
     { input: 1.5, output: false },
     { input: true, output: false },
     { input: "x", output: false },
-    { input: NaN, output: false },
+    { input: NaN, output: false }
   ].forEach((input) => {
     testOneInOneOut<DflowData, boolean>(
       dflow,
       nodeKind,
       input,
-      Number.isInteger(input),
+      Number.isInteger(input)
     );
   });
 });
@@ -54,7 +54,7 @@ test("parseInt", () => {
 
   [
     { input: "1.2", output: 1 },
-    { input: "1", output: 1 },
+    { input: "1", output: 1 }
   ].forEach(({ input, output }) => {
     testOneInOneOut<string, number>(dflow, nodeKind, input, output);
   });

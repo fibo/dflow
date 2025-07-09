@@ -23,5 +23,5 @@ class DflowObjectValues extends DflowNode {
 
 export const catalog = {
   [DflowObjectKeys.kind]: DflowObjectKeys,
-  [DflowObjectValues.kind]: DflowObjectValues,
+  [DflowObjectValues.kind]: DflowObjectValues
 };
