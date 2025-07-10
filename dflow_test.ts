@@ -95,7 +95,7 @@ function sample01() {
 }
 
 // Dflow
-// ////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////
 
 test("Dflow.inferDataType()", () => {
   [
@@ -163,134 +163,171 @@ test("Dflow.isObject()", () => {
   assert.deepEqual(Dflow.isObject({ foo: [1], bar: { quz: () => {} } }), false);
 });
 
-test("Dflow.isValidDataType()", () => {
+test("Dflow.isValidData()", () => {
   // Any type.
 
-  assert.deepEqual(Dflow.isValidDataType([], arr), true);
-  assert.deepEqual(Dflow.isValidDataType([], bool), true);
-  assert.deepEqual(Dflow.isValidDataType([], num), true);
-  assert.deepEqual(Dflow.isValidDataType([], null), true);
-  assert.deepEqual(Dflow.isValidDataType([], obj), true);
-  assert.deepEqual(Dflow.isValidDataType([], str), true);
-  assert.deepEqual(Dflow.isValidDataType([], undefined), true);
-  assert.deepEqual(Dflow.isValidDataType([], Infinity), false);
-  assert.deepEqual(Dflow.isValidDataType([], NaN), false);
+  assert.deepEqual(Dflow.isValidData([], arr), true);
+  assert.deepEqual(Dflow.isValidData([], bool), true);
+  assert.deepEqual(Dflow.isValidData([], num), true);
+  assert.deepEqual(Dflow.isValidData([], null), true);
+  assert.deepEqual(Dflow.isValidData([], obj), true);
+  assert.deepEqual(Dflow.isValidData([], str), true);
+  assert.deepEqual(Dflow.isValidData([], undefined), true);
+  assert.deepEqual(Dflow.isValidData([], Infinity), false);
+  assert.deepEqual(Dflow.isValidData([], NaN), false);
 
   // The `array` type.
 
-  assert.deepEqual(Dflow.isValidDataType(["array"], arr), true);
-  assert.deepEqual(Dflow.isValidDataType(["boolean"], arr), false);
-  assert.deepEqual(Dflow.isValidDataType(["null"], arr), false);
-  assert.deepEqual(Dflow.isValidDataType(["number"], arr), false);
-  assert.deepEqual(Dflow.isValidDataType(["object"], arr), false);
-  assert.deepEqual(Dflow.isValidDataType(["string"], arr), false);
+  assert.deepEqual(Dflow.isValidData(["array"], arr), true);
+  assert.deepEqual(Dflow.isValidData(["boolean"], arr), false);
+  assert.deepEqual(Dflow.isValidData(["null"], arr), false);
+  assert.deepEqual(Dflow.isValidData(["number"], arr), false);
+  assert.deepEqual(Dflow.isValidData(["object"], arr), false);
+  assert.deepEqual(Dflow.isValidData(["string"], arr), false);
 
-  assert.deepEqual(Dflow.isValidDataType(["array"], Infinity), false);
-  assert.deepEqual(Dflow.isValidDataType(["array"], NaN), false);
-  assert.deepEqual(Dflow.isValidDataType(["array"], undefined), false);
+  assert.deepEqual(Dflow.isValidData(["array"], Infinity), false);
+  assert.deepEqual(Dflow.isValidData(["array"], NaN), false);
+  assert.deepEqual(Dflow.isValidData(["array"], undefined), false);
 
   // The `boolean` type.
 
-  assert.deepEqual(Dflow.isValidDataType(["array"], bool), false);
-  assert.deepEqual(Dflow.isValidDataType(["boolean"], bool), true);
-  assert.deepEqual(Dflow.isValidDataType(["null"], bool), false);
-  assert.deepEqual(Dflow.isValidDataType(["number"], bool), false);
-  assert.deepEqual(Dflow.isValidDataType(["object"], bool), false);
-  assert.deepEqual(Dflow.isValidDataType(["string"], bool), false);
+  assert.deepEqual(Dflow.isValidData(["array"], bool), false);
+  assert.deepEqual(Dflow.isValidData(["boolean"], bool), true);
+  assert.deepEqual(Dflow.isValidData(["null"], bool), false);
+  assert.deepEqual(Dflow.isValidData(["number"], bool), false);
+  assert.deepEqual(Dflow.isValidData(["object"], bool), false);
+  assert.deepEqual(Dflow.isValidData(["string"], bool), false);
 
-  assert.deepEqual(Dflow.isValidDataType(["boolean"], Infinity), false);
-  assert.deepEqual(Dflow.isValidDataType(["boolean"], NaN), false);
-  assert.deepEqual(Dflow.isValidDataType(["boolean"], undefined), false);
+  assert.deepEqual(Dflow.isValidData(["boolean"], Infinity), false);
+  assert.deepEqual(Dflow.isValidData(["boolean"], NaN), false);
+  assert.deepEqual(Dflow.isValidData(["boolean"], undefined), false);
 
   // The `null` type.
 
-  assert.deepEqual(Dflow.isValidDataType(["array"], null), false);
-  assert.deepEqual(Dflow.isValidDataType(["boolean"], null), false);
-  assert.deepEqual(Dflow.isValidDataType(["null"], null), true);
-  assert.deepEqual(Dflow.isValidDataType(["number"], null), false);
-  assert.deepEqual(Dflow.isValidDataType(["object"], null), false);
-  assert.deepEqual(Dflow.isValidDataType(["string"], null), false);
+  assert.deepEqual(Dflow.isValidData(["array"], null), false);
+  assert.deepEqual(Dflow.isValidData(["boolean"], null), false);
+  assert.deepEqual(Dflow.isValidData(["null"], null), true);
+  assert.deepEqual(Dflow.isValidData(["number"], null), false);
+  assert.deepEqual(Dflow.isValidData(["object"], null), false);
+  assert.deepEqual(Dflow.isValidData(["string"], null), false);
 
-  assert.deepEqual(Dflow.isValidDataType(["null"], Infinity), false);
-  assert.deepEqual(Dflow.isValidDataType(["null"], NaN), false);
-  assert.deepEqual(Dflow.isValidDataType(["null"], undefined), false);
+  assert.deepEqual(Dflow.isValidData(["null"], Infinity), false);
+  assert.deepEqual(Dflow.isValidData(["null"], NaN), false);
+  assert.deepEqual(Dflow.isValidData(["null"], undefined), false);
 
   // The `number` type.
 
-  assert.deepEqual(Dflow.isValidDataType(["array"], num), false);
-  assert.deepEqual(Dflow.isValidDataType(["boolean"], num), false);
-  assert.deepEqual(Dflow.isValidDataType(["null"], num), false);
-  assert.deepEqual(Dflow.isValidDataType(["number"], num), true);
-  assert.deepEqual(Dflow.isValidDataType(["object"], num), false);
-  assert.deepEqual(Dflow.isValidDataType(["string"], num), false);
+  assert.deepEqual(Dflow.isValidData(["array"], num), false);
+  assert.deepEqual(Dflow.isValidData(["boolean"], num), false);
+  assert.deepEqual(Dflow.isValidData(["null"], num), false);
+  assert.deepEqual(Dflow.isValidData(["number"], num), true);
+  assert.deepEqual(Dflow.isValidData(["object"], num), false);
+  assert.deepEqual(Dflow.isValidData(["string"], num), false);
 
-  assert.deepEqual(Dflow.isValidDataType(["number"], Infinity), false);
-  assert.deepEqual(Dflow.isValidDataType(["number"], NaN), false);
-  assert.deepEqual(Dflow.isValidDataType(["number"], undefined), false);
+  assert.deepEqual(Dflow.isValidData(["number"], Infinity), false);
+  assert.deepEqual(Dflow.isValidData(["number"], NaN), false);
+  assert.deepEqual(Dflow.isValidData(["number"], undefined), false);
 
   // The `object` type.
 
-  assert.deepEqual(Dflow.isValidDataType(["array"], obj), false);
-  assert.deepEqual(Dflow.isValidDataType(["boolean"], obj), false);
-  assert.deepEqual(Dflow.isValidDataType(["null"], obj), false);
-  assert.deepEqual(Dflow.isValidDataType(["number"], obj), false);
-  assert.deepEqual(Dflow.isValidDataType(["object"], obj), true);
-  assert.deepEqual(Dflow.isValidDataType(["string"], obj), false);
+  assert.deepEqual(Dflow.isValidData(["array"], obj), false);
+  assert.deepEqual(Dflow.isValidData(["boolean"], obj), false);
+  assert.deepEqual(Dflow.isValidData(["null"], obj), false);
+  assert.deepEqual(Dflow.isValidData(["number"], obj), false);
+  assert.deepEqual(Dflow.isValidData(["object"], obj), true);
+  assert.deepEqual(Dflow.isValidData(["string"], obj), false);
 
-  assert.deepEqual(Dflow.isValidDataType(["object"], Infinity), false);
-  assert.deepEqual(Dflow.isValidDataType(["object"], NaN), false);
-  assert.deepEqual(Dflow.isValidDataType(["object"], undefined), false);
+  assert.deepEqual(Dflow.isValidData(["object"], Infinity), false);
+  assert.deepEqual(Dflow.isValidData(["object"], NaN), false);
+  assert.deepEqual(Dflow.isValidData(["object"], undefined), false);
 
   // The `string` type.
 
-  assert.deepEqual(Dflow.isValidDataType(["array"], str), false);
-  assert.deepEqual(Dflow.isValidDataType(["boolean"], str), false);
-  assert.deepEqual(Dflow.isValidDataType(["null"], str), false);
-  assert.deepEqual(Dflow.isValidDataType(["number"], str), false);
-  assert.deepEqual(Dflow.isValidDataType(["object"], str), false);
-  assert.deepEqual(Dflow.isValidDataType(["string"], str), true);
+  assert.deepEqual(Dflow.isValidData(["array"], str), false);
+  assert.deepEqual(Dflow.isValidData(["boolean"], str), false);
+  assert.deepEqual(Dflow.isValidData(["null"], str), false);
+  assert.deepEqual(Dflow.isValidData(["number"], str), false);
+  assert.deepEqual(Dflow.isValidData(["object"], str), false);
+  assert.deepEqual(Dflow.isValidData(["string"], str), true);
 
-  assert.deepEqual(Dflow.isValidDataType(["string"], Infinity), false);
-  assert.deepEqual(Dflow.isValidDataType(["string"], NaN), false);
-  assert.deepEqual(Dflow.isValidDataType(["string"], undefined), false);
+  assert.deepEqual(Dflow.isValidData(["string"], Infinity), false);
+  assert.deepEqual(Dflow.isValidData(["string"], NaN), false);
+  assert.deepEqual(Dflow.isValidData(["string"], undefined), false);
 
   // Multiple types, no particular order here.
 
-  assert.deepEqual(Dflow.isValidDataType(["boolean", "array"], arr), true);
+  assert.deepEqual(Dflow.isValidData(["boolean", "array"], arr), true);
   assert.deepEqual(
-    Dflow.isValidDataType(["string", "number", "boolean"], bool),
+    Dflow.isValidData(["string", "number", "boolean"], bool),
     true
   );
   assert.deepEqual(
-    Dflow.isValidDataType(["number", "object", "string"], num),
+    Dflow.isValidData(["number", "object", "string"], num),
     true
   );
-  assert.deepEqual(Dflow.isValidDataType(["object", "string"], null), false);
-  assert.deepEqual(Dflow.isValidDataType(["array", "object"], obj), true);
-  assert.deepEqual(Dflow.isValidDataType(["array", "string"], str), true);
-  assert.deepEqual(Dflow.isValidDataType(["boolean", "string"], arr), false);
-  assert.deepEqual(Dflow.isValidDataType(["number", "array"], bool), false);
+  assert.deepEqual(Dflow.isValidData(["object", "string"], null), false);
+  assert.deepEqual(Dflow.isValidData(["array", "object"], obj), true);
+  assert.deepEqual(Dflow.isValidData(["array", "string"], str), true);
+  assert.deepEqual(Dflow.isValidData(["boolean", "string"], arr), false);
+  assert.deepEqual(Dflow.isValidData(["number", "array"], bool), false);
   assert.deepEqual(
-    Dflow.isValidDataType(["boolean", "object", "string"], num),
+    Dflow.isValidData(["boolean", "object", "string"], num),
     false
   );
-  assert.deepEqual(Dflow.isValidDataType(["object", "string"], null), false);
-  assert.deepEqual(Dflow.isValidDataType(["array", "boolean"], obj), false);
-  assert.deepEqual(Dflow.isValidDataType(["number", "array"], str), false);
+  assert.deepEqual(Dflow.isValidData(["object", "string"], null), false);
+  assert.deepEqual(Dflow.isValidData(["array", "boolean"], obj), false);
+  assert.deepEqual(Dflow.isValidData(["number", "array"], str), false);
 });
 
 test("new Dflow has an empty graph", () => {
   const dflow = new Dflow({});
-  assert.deepEqual(dflow.toJSON(), { nodes: [], edges: [] });
+  assert.deepEqual(dflow.toJSON(), { graph: { n: [], e: [] } });
 });
 
-test("dflow.clear()", () => {
+test("dflow.toJSON()", () => {
   const { dflow } = sample01();
-  dflow.clear();
 
-  const graph = dflow.toJSON();
-  assert.deepEqual(graph.nodes.length, 0);
-  assert.deepEqual(graph.edges.length, 0);
+  assert.deepEqual(dflow.toJSON(), {
+    graph: {
+      e: [
+        {
+          id: "e2",
+          s: ["n1", "p1"],
+          t: ["n2", "p2"]
+        }
+      ],
+      n: [
+        {
+          i: [
+            {
+              id: "i0"
+            }
+          ],
+          id: "n1",
+          k: "Identity",
+          o: [
+            {
+              id: "p1"
+            }
+          ]
+        },
+        {
+          i: [
+            {
+              id: "p2"
+            }
+          ],
+          id: "n2",
+          k: "Identity",
+          o: [
+            {
+              id: "o0"
+            }
+          ]
+        }
+      ]
+    }
+  });
 });
 
 test("dflow.run()", async () => {
@@ -372,9 +409,6 @@ test("dflow.newEdge()", () => {
 
 test("dflow.deleteNode()", () => {
   const { dflow, nodeId1, edgeId1 } = sample01();
-  const nodeNotFoundId = "xxx";
-  dflow.deleteNode(nodeNotFoundId);
-  assert.equal(dflow.nodes.length, 2);
   assert.ok(dflow.getNodeById(nodeId1) !== undefined);
   dflow.deleteNode(nodeId1);
   assert.equal(dflow.getNodeById(nodeId1), undefined);
@@ -383,16 +417,13 @@ test("dflow.deleteNode()", () => {
 
 test("dflow.deleteEdge()", () => {
   const { dflow, edgeId1 } = sample01();
-  const edgeNotFoundId = "xxx";
-  dflow.deleteEdge(edgeNotFoundId);
-  assert.equal(dflow.edges.length, 1);
   assert.ok(dflow.getEdgeById(edgeId1) !== undefined);
   dflow.deleteEdge(edgeId1);
   assert.equal(dflow.getEdgeById(edgeId1), undefined);
 });
 
 // DflowOutput
-// ////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////
 
 function testOutputSetData(data: unknown, types: DflowDataType[] = []) {
   const output = new DflowOutput({ id: "test", nodeId: "node", types });

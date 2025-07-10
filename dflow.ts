@@ -39,12 +39,23 @@ interface Serializable<Data extends DflowData> {
 // Dflow
 // ////////////////////////////////////////////////////////////////////
 
+// Helper to generate an id unique in its scope.
+const generateItemId = (
+  itemMap: Map<string, unknown>,
+  idPrefix: string,
+  wantedId?: string
+): string => {
+  if (wantedId && !itemMap.has(wantedId)) return wantedId;
+  const id = `${idPrefix}${itemMap.size}`;
+  return itemMap.has(id) ? generateItemId(itemMap, idPrefix) : id;
+};
+
 /**
  * A `Dflow` represents a program as an executable graph.
  * A graph can contain nodes and edges.
  * Nodes are executed, sorted by their connections.
  */
-export class Dflow implements Serializable<DflowGraph> {
+export class Dflow {
   readonly context: Record<string, unknown>;
 
   readonly nodesCatalog: DflowNodesCatalog;
@@ -56,7 +67,10 @@ export class Dflow implements Serializable<DflowGraph> {
   executionReport: DflowExecutionReport | null = null;
 
   constructor(nodesCatalog: DflowNodesCatalog) {
-    this.nodesCatalog = { ...nodesCatalog, ...coreNodesCatalog };
+    this.nodesCatalog = {
+      ...nodesCatalog,
+      [DflowNodeData.kind]: DflowNodeData
+    };
     this.context = {};
   }
 
@@ -68,20 +82,40 @@ export class Dflow implements Serializable<DflowGraph> {
     return info;
   }
 
+  #levelOfNodeId(nodeId: string, nodeConnections: DflowNodeConnection[]) {
+    const parentsNodeIds = nodeConnections
+      .filter(({ targetId }) => nodeId === targetId)
+      .map(({ sourceId }) => sourceId);
+    // 1. A node with no parent as level zero.
+    if (parentsNodeIds.length === 0) return 0;
+    // 2. Otherwise its level is the max level of its parents plus one.
+    let maxLevel = 0;
+    for (const parentNodeId of parentsNodeIds)
+      maxLevel = Math.max(
+        this.#levelOfNodeId(parentNodeId, nodeConnections),
+        maxLevel
+      );
+    return maxLevel + 1;
+  }
+
+  // Sort node ids by their level in the graph.
+  #sortedNodesIds(): string[] {
+    const nodeIds = Array.from(this.#nodesMap.keys());
+    const nodeConnections: DflowNodeConnection[] = [
+      ...this.#edgesMap.values()
+    ].map((edge) => ({ sourceId: edge.s[0], targetId: edge.t[0] }));
+    const levelOf: Record<string, number> = {};
+    for (const nodeId of nodeIds)
+      levelOf[nodeId] = this.#levelOfNodeId(nodeId, nodeConnections);
+    return nodeIds.slice().sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
+  }
+
   getEdgeById(id: string): DflowEdge | undefined {
     return this.#edgesMap.get(id);
   }
 
   getNodeById(id: string): DflowNode | undefined {
     return this.#nodesMap.get(id);
-  }
-
-  /**
-   * Empty graph.
-   */
-  clear() {
-    this.#nodesMap.clear();
-    this.#edgesMap.clear();
   }
 
   /**
@@ -124,9 +158,7 @@ export class Dflow implements Serializable<DflowGraph> {
     // Delete edge.
     this.#edgesMap.delete(edgeId);
     // Cleanup target input.
-    const targetInput = this.#nodesMap
-      .get(edge.target[0])
-      ?.getInputById(edge.target[1]);
+    const targetInput = this.#nodesMap.get(edge.t[0])?.getInputById(edge.t[1]);
     if (targetInput) targetInput.source = undefined;
   }
 
@@ -139,27 +171,9 @@ export class Dflow implements Serializable<DflowGraph> {
     if (!node) return;
     this.#nodesMap.delete(nodeId);
     // 2. Delete all edges connected to node.
-    for (const edge of this.edges) {
-      const {
-        source: [sourceNodeId],
-        target: [targetNodeId]
-      } = edge;
-      if (sourceNodeId === node.id || targetNodeId === node.id)
+    for (const edge of this.#edgesMap.values())
+      if (edge.s[0] === node.id || edge.t[0] === node.id)
         this.deleteEdge(edge.id);
-    }
-  }
-
-  /**
-   * Helper to generate an id unique in its scope.
-   */
-  generateItemId(
-    itemMap: Map<string, unknown>,
-    idPrefix: string,
-    wantedId?: string
-  ): string {
-    if (wantedId && !itemMap.has(wantedId)) return wantedId;
-    const id = `${idPrefix}${itemMap.size}`;
-    return itemMap.has(id) ? this.generateItemId(itemMap, idPrefix) : id;
   }
 
   newNode(arg: {
@@ -170,7 +184,7 @@ export class Dflow implements Serializable<DflowGraph> {
   }): DflowNode {
     const NodeClass = this.nodesCatalog[arg.kind] ?? DflowNodeUnknown;
 
-    const id = this.generateItemId(this.#nodesMap, "n", arg.id);
+    const id = generateItemId(this.#nodesMap, "n", arg.id);
 
     const inputs =
       NodeClass.inputs?.map((definition, i) => {
@@ -202,19 +216,21 @@ export class Dflow implements Serializable<DflowGraph> {
   /**
    * Create a new edge.
    */
-  newEdge(
-    arg: { id?: string } & Pick<DflowEdge, "source" | "target">
-  ): DflowEdge {
-    const id = this.generateItemId(this.#edgesMap, "e", arg.id);
+  newEdge(arg: {
+    id?: string;
+    source: [nodeId: string, outputId: string];
+    target: [nodeId: string, inputId: string];
+  }): DflowEdge {
+    const id = generateItemId(this.#edgesMap, "e", arg.id);
 
-    const edge = { ...arg, id };
+    const edge: DflowEdge = { id, s: arg.source, t: arg.target };
 
-    const sourceNode = this.#nodesMap.get(edge.source[0]);
-    const targetNode = this.#nodesMap.get(edge.target[0]);
+    const sourceNode = this.#nodesMap.get(edge.s[0]);
+    const targetNode = this.#nodesMap.get(edge.t[0]);
 
     if (sourceNode && targetNode) {
-      const sourceOutput = sourceNode.getOutputById(edge.source[1]);
-      const targetInput = targetNode.getInputById(edge.target[1]);
+      const sourceOutput = sourceNode.getOutputById(edge.s[1]);
+      const targetInput = targetNode.getInputById(edge.t[1]);
 
       if (
         sourceOutput &&
@@ -227,32 +243,7 @@ export class Dflow implements Serializable<DflowGraph> {
       }
     }
 
-    throw new Error(`Cannot create edge ${JSON.stringify(edge)}`);
-  }
-
-  /**
-   * List edge objects.
-   */
-  get edges(): Pick<DflowEdge, "id" | "source" | "target">[] {
-    return [...this.#edgesMap.values()].map(({ id, source, target }) => ({
-      id,
-      source,
-      target
-    }));
-  }
-
-  /**
-   * List node objects.
-   */
-  get nodes(): DflowNodeObj[] {
-    return [...this.#nodesMap.values()].map((item) => item.toJSON());
-  }
-
-  get nodeConnections(): DflowNodeConnection[] {
-    return [...this.#edgesMap.values()].map((edge) => ({
-      sourceId: edge.source[0],
-      targetId: edge.target[0]
-    }));
+    throw new Error(`Cannot create edge ${JSON.stringify(arg)}`);
   }
 
   /**
@@ -266,10 +257,7 @@ export class Dflow implements Serializable<DflowGraph> {
     };
 
     // Loop over nodeIds sorted by graph hierarchy.
-    for (const nodeId of Dflow.sortNodesByLevel(
-      Array.from(this.#nodesMap.keys()),
-      this.nodeConnections
-    )) {
+    for (const nodeId of this.#sortedNodesIds()) {
       const node = this.#nodesMap.get(nodeId) as DflowNode;
 
       // If some input data is not valid.
@@ -297,12 +285,12 @@ export class Dflow implements Serializable<DflowGraph> {
     this.executionReport = executionReport;
   }
 
-  toJSON(): DflowGraph {
+  toJSON(): { graph: DflowGraph } {
     return {
-      nodes: [...this.#nodesMap.values()].map((item) => item.toJSON()),
-      edges: [...this.#edgesMap.values()].map(
-        ({ id, source: s, target: t }) => ({ id, s, t })
-      )
+      graph: {
+        n: [...this.#nodesMap.values()].map((item) => item.toJSON()),
+        e: [...this.#edgesMap.values()]
+      }
     };
   }
 
@@ -332,19 +320,6 @@ export class Dflow implements Serializable<DflowGraph> {
     if (Dflow.isArray(arg)) return ["array"];
     if (Dflow.isObject(arg)) return ["object"];
     return [];
-  }
-
-  static levelOfNodeId(nodeId: string, nodeConnections: DflowNodeConnection[]) {
-    const parentsNodeIds = Dflow.parentsOfNodeId(nodeId, nodeConnections);
-    // 1. A node with no parent as level zero.
-    if (parentsNodeIds.length === 0) return 0;
-    // 2. Otherwise its level is the max level of its parents plus one.
-    let maxLevel = 0;
-    for (const parentNodeId of parentsNodeIds) {
-      const level = Dflow.levelOfNodeId(parentNodeId, nodeConnections);
-      maxLevel = Math.max(level, maxLevel);
-    }
-    return maxLevel + 1;
   }
 
   /**
@@ -461,26 +436,6 @@ export class Dflow implements Serializable<DflowGraph> {
     return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
 
-  static parentsOfNodeId(
-    nodeId: string,
-    nodeConnections: { sourceId: string; targetId: string }[]
-  ) {
-    return nodeConnections
-      .filter(({ targetId }) => nodeId === targetId)
-      .map(({ sourceId }) => sourceId);
-  }
-
-  static sortNodesByLevel(
-    nodeIds: string[],
-    nodeConnections: DflowNodeConnection[]
-  ): string[] {
-    const levelOf: Record<string, number> = {};
-    for (const nodeId of nodeIds) {
-      levelOf[nodeId] = Dflow.levelOfNodeId(nodeId, nodeConnections);
-    }
-    return nodeIds.slice().sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
-  }
-
   /**
    * Type guard for `DflowArray`.
    * It checks recursively that every element is some `DflowData`.
@@ -527,7 +482,7 @@ export class Dflow implements Serializable<DflowGraph> {
   /**
    * Validate that data belongs to some of given types.
    */
-  static isValidDataType(types: DflowDataType[], data: unknown) {
+  static isValidData(types: DflowDataType[], data: unknown) {
     if (types.length === 0)
       return data === undefined || Dflow.isDflowData(data);
     return types.some((dataType) =>
@@ -803,14 +758,14 @@ export class DflowNode implements Serializable<DflowNodeObj> {
 
     // Inputs.
     for (const obj of inputs) {
-      const id = host.generateItemId(this.#inputsMap, "i", obj.id);
+      const id = generateItemId(this.#inputsMap, "i", obj.id);
       this.#inputsMap.set(id, new DflowInput({ ...obj, id, nodeId: this.id }));
       this.#inputPosition.push(id);
     }
 
     // Outputs.
     for (const obj of outputs) {
-      const id = host.generateItemId(this.#outputsMap, "o", obj.id);
+      const id = generateItemId(this.#outputsMap, "o", obj.id);
       this.#outputsMap.set(
         id,
         new DflowOutput({ ...obj, id, nodeId: this.id })
@@ -824,7 +779,7 @@ export class DflowNode implements Serializable<DflowNodeObj> {
       // Ignore optional inputs with no data.
       if (optional && data === undefined) continue;
       // Validate input data.
-      if (Dflow.isValidDataType(types, data)) continue;
+      if (Dflow.isValidData(types, data)) continue;
       // Some input is not valid.
       return false;
     }
@@ -884,29 +839,21 @@ export class DflowNode implements Serializable<DflowNodeObj> {
 // DflowEdge
 // ////////////////////////////////////////////////////////////////////
 
-export type DflowEdgeObj = {
-  id: string;
-  /** source */
-  s: DflowEdge["source"];
-  /** target */
-  t: DflowEdge["target"];
-};
-
 /**
  * `DflowEdge` connects an `DflowOutput` to a `DflowInput`.
  */
 export type DflowEdge = {
-  readonly id: string;
+  id: string;
 
   /**
-   * Path to output.
+   * Source output coordinates.
    */
-  readonly source: [nodeId: string, outputId: string];
+  s: [nodeId: string, outputId: string];
 
   /**
-   * Path to input.
+   * Target input coordinates.
    */
-  readonly target: [nodeId: string, inputId: string];
+  t: [nodeId: string, inputId: string];
 };
 
 // DflowNodesCatalog
@@ -952,8 +899,10 @@ export type DflowExecutionReport = {
 };
 
 export type DflowGraph = {
-  nodes: DflowNodeObj[];
-  edges: DflowEdgeObj[];
+  /** nodes */
+  n: DflowNodeObj[];
+  /** edges */
+  e: DflowEdge[];
 };
 
 type DflowNodeConnection = { sourceId: string; targetId: string };
@@ -978,13 +927,6 @@ class DflowNodeData extends DflowNode {
   }
 }
 
-/**
- * This class is used to instantiate a new node which `kind` was not found in `nodesCatalog`.
- * The "unknown" node class is not included in `coreNodesCatalog`.
- */
+// This class is used to instantiate a new node which `kind` was not found in `nodesCatalog`.
+// The "unknown" node class is not included in `coreNodesCatalog`.
 class DflowNodeUnknown extends DflowNode {}
-
-/** Builtin nodes, always included in `nodesCatalog`. */
-export const coreNodesCatalog: DflowNodesCatalog = {
-  [DflowNodeData.kind]: DflowNodeData
-};
