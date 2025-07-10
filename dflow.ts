@@ -24,18 +24,6 @@ export type DflowDataType =
   | "array"
   | "object";
 
-/**
- * Every dflow item (`DflowNode`, `DflowEdge`, etc.) is serializable into JSON.
- */
-interface Serializable<Data extends DflowData> {
-  /**
-   * Return serializable data,
-   * i.e. an object that can be converted to JSON format.
-   * It will be called by `JSON.stringify`.
-   */
-  toJSON(): Data;
-}
-
 // Dflow
 // ////////////////////////////////////////////////////////////////////
 
@@ -82,7 +70,10 @@ export class Dflow {
     return info;
   }
 
-  #levelOfNodeId(nodeId: string, nodeConnections: DflowNodeConnection[]) {
+  #levelOfNodeId(
+    nodeId: string,
+    nodeConnections: Array<{ sourceId: string; targetId: string }>
+  ): number {
     const parentsNodeIds = nodeConnections
       .filter(({ targetId }) => nodeId === targetId)
       .map(({ sourceId }) => sourceId);
@@ -101,9 +92,10 @@ export class Dflow {
   // Sort node ids by their level in the graph.
   #sortedNodesIds(): string[] {
     const nodeIds = Array.from(this.#nodesMap.keys());
-    const nodeConnections: DflowNodeConnection[] = [
-      ...this.#edgesMap.values()
-    ].map((edge) => ({ sourceId: edge.s[0], targetId: edge.t[0] }));
+    const nodeConnections = [...this.#edgesMap.values()].map((edge) => ({
+      sourceId: edge.s[0],
+      targetId: edge.t[0]
+    }));
     const levelOf: Record<string, number> = {};
     for (const nodeId of nodeIds)
       levelOf[nodeId] = this.#levelOfNodeId(nodeId, nodeConnections);
@@ -550,9 +542,7 @@ export type DflowInputObj = {
 /**
  * A `DflowInput` is a node input.
  */
-export class DflowInput
-  implements DflowIO, DflowInputDefinition, Serializable<DflowInputObj>
-{
+export class DflowInput implements DflowIO, DflowInputDefinition {
   readonly id: string;
 
   readonly nodeId: string;
@@ -622,9 +612,7 @@ export type DflowOutputObj = {
 /**
  * A `DflowOutput` is a node output.
  */
-export class DflowOutput
-  implements DflowIO, DflowOutputDefinition, Serializable<DflowOutputObj>
-{
+export class DflowOutput implements DflowIO, DflowOutputDefinition {
   readonly id: string;
 
   readonly nodeId: string;
@@ -719,7 +707,7 @@ export type DflowNodeObj = {
  * ```
  *
  */
-export class DflowNode implements Serializable<DflowNodeObj> {
+export class DflowNode {
   readonly id: string;
 
   #inputsMap: Map<string, DflowInput> = new Map();
@@ -904,8 +892,6 @@ export type DflowGraph = {
   /** edges */
   e: DflowEdge[];
 };
-
-type DflowNodeConnection = { sourceId: string; targetId: string };
 
 // Dflow core nodes
 // ////////////////////////////////////////////////////////////////////
