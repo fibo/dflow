@@ -52,22 +52,12 @@ export class Dflow {
 
   #edgesMap: Map<string, DflowEdge> = new Map();
 
-  executionReport: DflowExecutionReport | null = null;
-
   constructor(nodesCatalog: DflowNodesCatalog) {
     this.nodesCatalog = {
       ...nodesCatalog,
       [DflowNodeData.kind]: DflowNodeData
     };
     this.context = {};
-  }
-
-  #executionNodeInfo(node: DflowNode, error?: string): DflowExecutionNodeInfo {
-    const { id, k, o } = node.toJSON();
-    const info: DflowExecutionNodeInfo = { id, k };
-    if (o) info.o = o;
-    if (error) info.err = error;
-    return info;
   }
 
   #levelOfNodeId(
@@ -245,22 +235,12 @@ export class Dflow {
    * Execute all nodes, sorted by their connections.
    */
   async run() {
-    const executionReport: DflowExecutionReport = {
-      start: performance.now(),
-      end: performance.now(),
-      steps: []
-    };
-
     // Loop over nodeIds sorted by graph hierarchy.
     for (const nodeId of this.#sortedNodesIds()) {
       const node = this.#nodesMap.get(nodeId) as DflowNode;
 
       // If some input data is not valid.
       if (!node.inputsDataAreValid) {
-        // Notify into execution report.
-        executionReport.steps.push(
-          this.#executionNodeInfo(node, "Invalid input")
-        );
         // Cleanup outputs and go to next node.
         node.clearOutputs();
         continue;
@@ -271,21 +251,13 @@ export class Dflow {
       } else if (node.run.constructor.name === "AsyncFunction") {
         await node.run();
       }
-
-      executionReport.steps.push(this.#executionNodeInfo(node));
     }
-
-    executionReport.end = performance.now();
-
-    this.executionReport = executionReport;
   }
 
-  toJSON(): { graph: DflowGraph } {
+  get graph(): DflowGraph {
     return {
-      graph: {
-        n: [...this.#nodesMap.values()].map((item) => item.toJSON()),
-        e: [...this.#edgesMap.values()]
-      }
+      n: [...this.#nodesMap.values()].map((item) => item.toJSON()),
+      e: [...this.#edgesMap.values()]
     };
   }
 
@@ -863,21 +835,6 @@ export interface DflowNodeDefinition {
  * ```
  */
 export type DflowNodesCatalog = Record<DflowNode["kind"], DflowNodeDefinition>;
-
-/**
- * Contains info about node execution, that is:
- * the serialized node except its inputs; an error, if any.
- */
-export type DflowExecutionNodeInfo = Omit<DflowNodeObj, "i"> & {
-  /** Error message during execution */
-  err?: string;
-};
-
-export type DflowExecutionReport = {
-  start: number;
-  end: number;
-  steps: DflowExecutionNodeInfo[];
-};
 
 export type DflowGraph = {
   /** nodes */

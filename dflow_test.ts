@@ -281,52 +281,50 @@ test("Dflow.isValidData()", () => {
 
 test("new Dflow has an empty graph", () => {
   const dflow = new Dflow({});
-  assert.deepEqual(dflow.toJSON(), { graph: { n: [], e: [] } });
+  assert.deepEqual(dflow.graph, { n: [], e: [] });
 });
 
-test("dflow.toJSON()", () => {
+test("dflow.graph", () => {
   const { dflow } = sample01();
 
-  assert.deepEqual(dflow.toJSON(), {
-    graph: {
-      e: [
-        {
-          id: "e2",
-          s: ["n1", "p1"],
-          t: ["n2", "p2"]
-        }
-      ],
-      n: [
-        {
-          i: [
-            {
-              id: "i0"
-            }
-          ],
-          id: "n1",
-          k: "Identity",
-          o: [
-            {
-              id: "p1"
-            }
-          ]
-        },
-        {
-          i: [
-            {
-              id: "p2"
-            }
-          ],
-          id: "n2",
-          k: "Identity",
-          o: [
-            {
-              id: "o0"
-            }
-          ]
-        }
-      ]
-    }
+  assert.deepEqual(dflow.graph, {
+    e: [
+      {
+        id: "e2",
+        s: ["n1", "p1"],
+        t: ["n2", "p2"]
+      }
+    ],
+    n: [
+      {
+        i: [
+          {
+            id: "i0"
+          }
+        ],
+        id: "n1",
+        k: "Identity",
+        o: [
+          {
+            id: "p1"
+          }
+        ]
+      },
+      {
+        i: [
+          {
+            id: "p2"
+          }
+        ],
+        id: "n2",
+        k: "Identity",
+        o: [
+          {
+            id: "o0"
+          }
+        ]
+      }
+    ]
   });
 });
 
