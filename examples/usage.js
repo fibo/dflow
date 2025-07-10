@@ -4,7 +4,7 @@ import { Dflow, DflowNode } from "dflow";
 
 const { input, output } = Dflow;
 
-class DflowMathSin extends DflowNode {
+class MathSin extends DflowNode {
   static kind = "mathSin";
   static inputs = [input("number")];
   static outputs = [output("number")];
@@ -13,7 +13,7 @@ class DflowMathSin extends DflowNode {
   }
 }
 
-class DflowConsoleLog extends DflowNode {
+class ConsoleLog extends DflowNode {
   static kind = "consoleLog";
   static inputs = [input()];
   run() {
@@ -22,31 +22,27 @@ class DflowConsoleLog extends DflowNode {
 }
 
 const nodesCatalog = {
-  [DflowMathSin.kind]: DflowMathSin,
-  [DflowConsoleLog.kind]: DflowConsoleLog
-  // DflowNodeData is a core node
+  [MathSin.kind]: MathSin,
+  [ConsoleLog.kind]: ConsoleLog
 };
 
-function rungraph() {
-  // use builtin nodes
-  const dflow = new Dflow(nodesCatalog);
-  const catalog = dflow.nodesCatalog;
+// Create a Dflow instance with the given nodes.
+const dflow = new Dflow(nodesCatalog);
 
-  // create nodes
-  const numNode = dflow.newNode({
-    kind: catalog.data.kind,
-    // set numNode output to π / 2
-    outputs: [{ data: Math.PI / 2 }]
-  });
-  const sinNode = dflow.newNode({ kind: catalog.mathSin.kind });
-  const consoleLogNode = dflow.newNode({ kind: catalog.consoleLog.kind });
+// Create nodes.
+const sinNode = dflow.newNode({ kind: "mathSin" });
+const consoleLogNode = dflow.newNode({ kind: "consoleLog" });
 
-  // connect numNode to sinNode and sinNode to consoleLog
-  dflow.connect(numNode).to(sinNode);
-  dflow.connect(sinNode).to(consoleLogNode);
+// DflowNodeData is a core node, its kind is "data".
+const numNode = dflow.newNode({
+  kind: "data",
+  // set numNode output to π / 2
+  outputs: [{ data: Math.PI / 2 }]
+});
 
-  // run graph
-  dflow.run();
-}
+// Connect numNode to sinNode and sinNode to consoleLog
+dflow.connect(numNode).to(sinNode);
+dflow.connect(sinNode).to(consoleLogNode);
 
-rungraph();
+// run graph
+dflow.run();

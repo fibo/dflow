@@ -12,12 +12,20 @@ npm install dflow
 
 ## How it works
 
+### What is a Dflow graph
+
 A **node** represents a block of code: it can have **inputs** and **outputs**.
 
 An **edge** connects an input to an output.
 
 A **graph** represents a program.
 It can contain nodes and edges. Nodes are executed, sorted by their connections.
+
+### About inputs and outputs
+
+An **input** is just a reference to its connected output, if any.
+
+An **output** can be connected to multiple inputs, and hold a **data** value that can be `undefined` or any value that can be serialized into JSON.
 
 ## Features
 
@@ -26,10 +34,10 @@ It can contain nodes and edges. Nodes are executed, sorted by their connections.
 - A graph can be saved as a JSON file. It can be then loaded and executed.
 - It is easy to create nodes: just extend `DflowNode` class, define its inputs and outputs and the `run()` function.
 - Minimal internal type system: it is possible to connect an output of type `T` to an input of type `U`, if and only if `U` includes `T`.
-- It is possible to define functions represented by nodes and edges.
 
 **NOTA BENE**: it is supposed that you implement your own nodes, for example node `addition` could be implemented using bigint or some floating point library, according to your needs.
-However an example nodes catalog with basic JavaScript features can be imported from `dflow/nodes`.
+
+An example of nodes implementing basic JavaScript features can be found in [examples/nodes](https://github.com/fibo/dflow/tree/main/examples/nodes).
 
 ## Usage
 
@@ -60,7 +68,7 @@ import { Dflow, DflowNode } from "dflow";
 
 const { input, output } = Dflow;
 
-class DflowMathSin extends DflowNode {
+class MathSin extends DflowNode {
   static kind = "mathSin";
   static inputs = [input("number")];
   static outputs = [output("number")];
@@ -69,7 +77,7 @@ class DflowMathSin extends DflowNode {
   }
 }
 
-class DflowConsoleLog extends DflowNode {
+class ConsoleLog extends DflowNode {
   static kind = "consoleLog";
   static inputs = [input()];
   run() {
@@ -78,36 +86,33 @@ class DflowConsoleLog extends DflowNode {
 }
 
 const nodesCatalog = {
-  [DflowMathSin.kind]: DflowMathSin,
-  [DflowConsoleLog.kind]: DflowConsoleLog
-  // DflowNodeData is a core node
+  [MathSin.kind]: MathSin,
+  [ConsoleLog.kind]: ConsoleLog
 };
 
-function rungraph() {
-  const dflow = new Dflow(nodesCatalog);
-  const catalog = dflow.nodesCatalog;
+// Create a Dflow instance with the given nodes.
+const dflow = new Dflow(nodesCatalog);
 
-  // create nodes
-  const numNode = dflow.newNode({
-    kind: catalog.data.kind,
-    // set numNode output to π / 2
-    outputs: [{ data: Math.PI / 2 }]
-  });
-  const sinNode = dflow.newNode({ kind: catalog.mathSin.kind });
-  const consoleLogNode = dflow.newNode({ kind: catalog.consoleLog.kind });
+// Create nodes.
+const sinNode = dflow.newNode({ kind: "mathSin" });
+const consoleLogNode = dflow.newNode({ kind: "consoleLog" });
 
-  // connect numNode to sinNode and sinNode to consoleLog
-  dflow.connect(numNode).to(sinNode);
-  dflow.connect(sinNode).to(consoleLogNode);
+// DflowNodeData is a core node, its kind is "data".
+const numNode = dflow.newNode({
+  kind: "data",
+  // set numNode output to π / 2
+  outputs: [{ data: Math.PI / 2 }]
+});
 
-  // run graph
-  dflow.run();
-}
+// Connect numNode to sinNode and sinNode to consoleLog
+dflow.connect(numNode).to(sinNode);
+dflow.connect(sinNode).to(consoleLogNode);
 
-rungraph();
+// run graph
+dflow.run();
 ```
 
-A graph can be executed asynchronously with `await dflow.run()`: see [custom nodes example](https://github.com/fibo/dflow/blob/main/examples/custom-nodes.js).
+A graph can be executed asynchronously with `await dflow.run()`: see [async nodes example](https://github.com/fibo/dflow/blob/main/examples/async-nodes.js).
 
 Available examples are listed [here](https://github.com/fibo/dflow/blob/main/examples).
 

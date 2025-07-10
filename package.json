@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc --removeComments --project tsconfig.build.json && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
     "check_types": "tsc",
-    "example:custom-nodes": "node examples/custom-nodes.js",
+    "example:async-nodes": "node examples/async-nodes.js",
     "example:context": "node --env-file .typescript.env examples/context.ts",
     "example:execution-report": "node --env-file .typescript.env examples/execution-report.ts",
     "example:usage": "node examples/usage.js",
