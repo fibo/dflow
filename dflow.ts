@@ -168,6 +168,9 @@ export class Dflow {
         this.deleteEdge(edge.id);
   }
 
+  /**
+   * Create a new edge.
+   */
   newNode(arg: {
     kind: string;
     id?: string;
@@ -535,14 +538,10 @@ export type DflowInputDefinition = {
   optional?: boolean;
 };
 
-export type DflowInputObj = {
-  id: string;
-};
-
 /**
  * A `DflowInput` is a node input.
  */
-export class DflowInput implements DflowIO, DflowInputDefinition {
+class DflowInput implements DflowIO, DflowInputDefinition {
   readonly id: string;
 
   readonly nodeId: string;
@@ -576,10 +575,6 @@ export class DflowInput implements DflowIO, DflowInputDefinition {
   get data(): DflowData | undefined {
     return this.source?.data;
   }
-
-  toJSON(): DflowInputObj {
-    return { id: this.id };
-  }
 }
 
 // DflowOutput
@@ -601,12 +596,6 @@ export type DflowOutputDefinition = {
   name?: string;
   types: DflowDataType[];
   data?: DflowData;
-};
-
-export type DflowOutputObj = {
-  id: string;
-  /** data */
-  d?: DflowData;
 };
 
 /**
@@ -664,25 +653,23 @@ export class DflowOutput implements DflowIO, DflowOutputDefinition {
   clear() {
     this.#value = undefined;
   }
-
-  toJSON(): DflowOutputObj {
-    const obj: DflowOutputObj = { id: this.id };
-    if (this.#value !== undefined) obj.d = this.#value;
-    return obj;
-  }
 }
 
 // DflowNode
 // ////////////////////////////////////////////////////////////////////
 
-export type DflowNodeObj = {
+type DflowNodeObj = {
   id: string;
   /** kind */
-  k: DflowNode["kind"];
+  k: string;
   /** inputs */
-  i?: DflowInputObj[];
+  i?: Array<{ id: string }>;
   /** outputs */
-  o?: DflowOutputObj[];
+  o?: Array<{
+    id: string;
+    /** data */
+    d?: DflowData;
+  }>;
 };
 
 /**
@@ -814,10 +801,16 @@ export class DflowNode {
   toJSON(): DflowNodeObj {
     const obj: DflowNodeObj = { id: this.id, k: this.kind };
 
-    const inputs = [...this.#inputsMap.values()].map((item) => item.toJSON());
+    const inputs = [...this.#inputsMap.values()].map((item) => ({
+      id: item.id
+    }));
     if (inputs.length > 0) obj.i = inputs;
 
-    const outputs = [...this.#outputsMap.values()].map((item) => item.toJSON());
+    const outputs = [...this.#outputsMap.values()].map((item) => {
+      const obj: { id: string; d?: DflowData } = { id: item.id };
+      if (item.data !== undefined) obj.d = item.data;
+      return obj;
+    });
     if (outputs.length > 0) obj.o = outputs;
 
     return obj;
