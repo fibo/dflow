@@ -12,7 +12,7 @@ export type DflowData =
   | DflowArray
   | DflowObject;
 
-export type DflowObject = { [Key in string]?: DflowData };
+export type DflowObject = { [Key in string]: DflowData };
 
 export type DflowArray = DflowData[];
 
@@ -481,19 +481,6 @@ export class Dflow {
   }
 }
 
-/**
- * `DflowIO` is a base type for `DflowInput` and `DflowOutput`.
- */
-type DflowIO = {
-  readonly id: string;
-
-  readonly name?: string;
-
-  readonly nodeId: string;
-
-  readonly types: DflowDataType[];
-};
-
 // DflowInput
 // ////////////////////////////////////////////////////////////////////
 
@@ -524,11 +511,15 @@ export type DflowInputDefinition = {
 /**
  * A `DflowInput` is a reference to a `DflowOutput` source, if connected.
  */
-type DflowInput = DflowIO &
-  DflowInputDefinition & {
-    readonly data: DflowData | undefined;
-    source?: DflowOutput;
-  };
+type DflowInput = {
+  id: string;
+  nodeId: string;
+  name?: string;
+  optional?: boolean;
+  types: DflowDataType[];
+  readonly data: DflowData | undefined;
+  source?: DflowOutput;
+};
 
 // DflowOutput
 // ////////////////////////////////////////////////////////////////////
@@ -546,66 +537,23 @@ type DflowInput = DflowIO &
  * ```
  */
 export type DflowOutputDefinition = {
-  name?: string;
   types: DflowDataType[];
+  name?: string;
   data?: DflowData;
 };
 
 /**
  * A `DflowOutput` is a node output.
  */
-export class DflowOutput implements DflowIO, DflowOutputDefinition {
-  readonly id: string;
-
-  readonly nodeId: string;
-
-  // DflowOutputDefinition
+type DflowOutput = {
+  id: string;
+  nodeId: string;
   name?: string;
   types: DflowDataType[];
-  #data: DflowData | undefined;
-
-  constructor({
-    id,
-    data,
-    name,
-    nodeId,
-    types
-  }: { id: string; nodeId: string } & DflowOutputDefinition) {
-    if (name) this.name = name;
-    this.types = types;
-    this.nodeId = nodeId;
-    this.id = id;
-    this.#data = data;
-  }
-
-  get data(): DflowData | undefined {
-    return this.#data;
-  }
-
-  set data(arg: unknown) {
-    if (arg === undefined) {
-      this.#data === undefined;
-      return;
-    }
-    const { types } = this;
-    if (
-      // Has any type and `arg` is some valid data...
-      (types.length === 0 && Dflow.isDflowData(arg)) ||
-      // ... or output type corresponds to `arg` type.
-      (types.includes("null") && arg === null) ||
-      (types.includes("boolean") && typeof arg === "boolean") ||
-      (types.includes("string") && typeof arg === "string") ||
-      (types.includes("number") && Dflow.isNumber(arg)) ||
-      (types.includes("object") && Dflow.isObject(arg)) ||
-      (types.includes("array") && Dflow.isArray(arg))
-    )
-      this.#data = arg;
-  }
-
-  clear() {
-    this.#data = undefined;
-  }
-}
+  data?: DflowData;
+  /** Cleanup output data. */
+  clear(): void;
+};
 
 // DflowNode
 // ////////////////////////////////////////////////////////////////////
@@ -615,7 +563,7 @@ export class DflowOutput implements DflowIO, DflowOutputDefinition {
  */
 export interface DflowNodeDefinition {
   new (arg: ConstructorParameters<typeof DflowNode>[0]): DflowNode;
-  kind: DflowNode["kind"];
+  kind: string;
   inputs?: DflowInputDefinition[];
   outputs?: DflowOutputDefinition[];
 }
@@ -695,6 +643,7 @@ export class DflowNode {
     // Inputs.
     for (const obj of inputs) {
       const id = generateItemId(this.#inputsMap, "i", obj.id);
+      this.#inputPosition.push(id);
       this.#inputsMap.set(id, {
         ...obj,
         id,
@@ -703,17 +652,43 @@ export class DflowNode {
           return this.source?.data;
         }
       });
-      this.#inputPosition.push(id);
     }
 
     // Outputs.
     for (const obj of outputs) {
       const id = generateItemId(this.#outputsMap, "o", obj.id);
-      this.#outputsMap.set(
-        id,
-        new DflowOutput({ ...obj, id, nodeId: this.id })
-      );
       this.#outputPosition.push(id);
+      let { data: _data, types, ...rest } = obj;
+      this.#outputsMap.set(id, {
+        ...rest,
+        id,
+        nodeId: this.id,
+        types,
+        clear() {
+          _data = undefined;
+        },
+        get data(): DflowData | undefined {
+          return _data;
+        },
+        set data(arg: DflowData) {
+          if (arg === undefined) {
+            _data = undefined;
+            return;
+          }
+          if (
+            // Has any type and `arg` is some valid data...
+            (types.length === 0 && Dflow.isDflowData(arg)) ||
+            // ... or output type corresponds to `arg` type.
+            (types.includes("null") && arg === null) ||
+            (types.includes("boolean") && typeof arg === "boolean") ||
+            (types.includes("string") && typeof arg === "string") ||
+            (types.includes("number") && Dflow.isNumber(arg)) ||
+            (types.includes("object") && Dflow.isObject(arg)) ||
+            (types.includes("array") && Dflow.isArray(arg))
+          )
+            _data = arg;
+        }
+      });
     }
   }
 
