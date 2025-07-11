@@ -6,8 +6,8 @@ class StringLength extends DflowNode {
   static kind = "stringLength";
   static inputs = [input("string")];
   static outputs = [output("number")];
-  run() {
-    this.output(0).data = (this.input(0).data as string).length;
+  run(input: string) {
+    this.output(0).data = input.length;
   }
 }
 
@@ -19,11 +19,8 @@ class Substring extends DflowNode {
     input("number", { name: "end", optional: true })
   ];
   static outputs = [output("string")];
-  run() {
-    const str = this.input(0).data as string;
-    const start = this.input(1).data as number;
-    const end = this.input(2).data as number;
-    this.output(0).data = str.substring(start, end);
+  run(input: string, start: number, end?: number) {
+    this.output(0).data = input.substring(start, end);
   }
 }
 

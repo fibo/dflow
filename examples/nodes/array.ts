@@ -1,5 +1,5 @@
 import { Dflow, DflowNode } from "../../dflow.ts";
-import type { DflowArray } from "../../dflow.ts";
+import type { DflowArray, DflowData } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
@@ -7,9 +7,7 @@ class ArrayAt extends DflowNode {
   static kind = "arrayAt";
   static inputs = [input("array"), input("number", { name: "index" })];
   static outputs = [output()];
-  run() {
-    const array = this.input(0).data as DflowArray;
-    const index = this.input(1).data as number;
+  run(array: DflowArray, index: number) {
     this.output(0).data = array.at(index);
   }
 }
@@ -21,13 +19,8 @@ class ArrayIncludes extends DflowNode {
     input("string", { name: "element" })
   ];
   static outputs = [output("boolean")];
-  run() {
-    const data = this.input(0).data;
-    const element = this.input(1).data;
-
-    if (Array.isArray(data) && typeof element !== "undefined") {
-      this.output(0).data = data.includes(element);
-    }
+  run(data: DflowArray, element: string) {
+    this.output(0).data = data.includes(element);
   }
 }
 
@@ -38,10 +31,8 @@ class ArrayJoin extends DflowNode {
     input("string", { name: "separator", optional: true })
   ];
   static outputs = [output("string")];
-  run() {
-    this.output(0).data = (this.input(0).data as Array<unknown>).join(
-      this.input(1).data as string | undefined
-    );
+  run(array: DflowArray, separator: string | undefined) {
+    this.output(0).data = array.join(separator);
   }
 }
 
@@ -49,13 +40,8 @@ class ArrayLength extends DflowNode {
   static kind = "arrayLength";
   static inputs = [input("array")];
   static outputs = [output("number")];
-  run() {
-    const data = this.input(0).data;
-    if (Array.isArray(data)) {
-      this.output(0).data = data.length;
-    } else {
-      this.output(0).clear;
-    }
+  run(array: DflowArray) {
+    this.output(0).data = array.length;
   }
 }
 
@@ -66,8 +52,7 @@ class ArrayPop extends DflowNode {
     output([], { name: "element" }),
     output("array", { name: "rest" })
   ];
-  run() {
-    const array = (this.input(0).data as DflowArray).slice();
+  run(array: DflowArray) {
     const element = array.pop();
     this.output(0).data = element;
     this.output(1).data = array;
@@ -78,12 +63,8 @@ class ArrayPush extends DflowNode {
   static kind = "arrayPush";
   static inputs = [input("array"), input([], { name: "element" })];
   static outputs = [output("array")];
-  run() {
-    const array = (this.input(0).data as DflowArray).slice();
-    const element = this.input(1).data;
-    if (element) {
-      array.push(element);
-    }
+  run(array: DflowArray, element: DflowData) {
+    if (element) array.push(element);
     this.output(0).data = array;
   }
 }
@@ -92,8 +73,7 @@ class ArrayReverse extends DflowNode {
   static kind = "arrayReverse";
   static inputs = [input("array")];
   static outputs = [input("array")];
-  run() {
-    const array = (this.input(0).data as DflowArray).slice();
+  run(array: DflowArray) {
     this.output(0).data = array.reverse();
   }
 }
@@ -105,8 +85,7 @@ class ArrayShift extends DflowNode {
     output([], { name: "element" }),
     output("array", { name: "rest" })
   ];
-  run() {
-    const array = (this.input(0).data as DflowArray).slice();
+  run(array: DflowArray) {
     const element = array.shift();
     this.output(0).data = element;
     this.output(1).data = array;
@@ -121,11 +100,7 @@ class ArraySlice extends DflowNode {
     input("number", { name: "end", optional: true })
   ];
   static outputs = [output("array")];
-  run() {
-    const array = super.input(0).data as DflowArray;
-    const start = super.input(1).data as number;
-    const end = super.input(2).data;
-
+  run(array: DflowArray, start: number, end?: number) {
     if (typeof end === "number") {
       super.output(0).data = array.slice(start, end);
     } else {

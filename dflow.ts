@@ -243,14 +243,22 @@ export class Dflow {
       // If some input data is not valid.
       if (!node.inputsDataAreValid) {
         // Cleanup outputs and go to next node.
-        node.clearOutputs();
+        for (const output of node.outputsMap.values()) {
+          output.clear();
+        }
         continue;
       }
 
+      const inputData: Array<DflowData | undefined> = [];
+      for (let position = 0; position < node.inputPosition.length; position++) {
+        inputData[position] = node.inputsMap.get(
+          node.inputPosition[position]
+        )?.source?.data;
+      }
       if (node.run.constructor.name === "Function") {
-        node.run();
+        node.run(...inputData);
       } else if (node.run.constructor.name === "AsyncFunction") {
-        await node.run();
+        await node.run(...inputData);
       }
     }
   }
@@ -597,7 +605,7 @@ type DflowNodeObj = {
 export class DflowNode {
   readonly id: string;
 
-  #inputPosition: string[] = [];
+  inputPosition: string[] = [];
 
   #outputPosition: string[] = [];
 
@@ -633,7 +641,7 @@ export class DflowNode {
     // Inputs.
     for (const obj of inputs) {
       const id = generateItemId(this.inputsMap, "i", obj.id);
-      this.#inputPosition.push(id);
+      this.inputPosition.push(id);
       this.inputsMap.set(id, {
         ...obj,
         id,
@@ -703,7 +711,7 @@ export class DflowNode {
    * @remarks This should be called inside `DflowNode.run()`. There is no check that the position is valid.
    */
   input(position: number): DflowInput {
-    return this.inputsMap.get(this.#inputPosition[position]) as DflowInput;
+    return this.inputsMap.get(this.inputPosition[position]) as DflowInput;
   }
 
   /**
@@ -715,7 +723,7 @@ export class DflowNode {
   }
 
   /** @ignore this method, it should be overridden. */
-  run(): void | Promise<void> {}
+  run(..._inputData: Array<DflowData | undefined>): void | Promise<void> {}
 
   toJSON(): DflowNodeObj {
     const obj: DflowNodeObj = { id: this.id, k: this.kind };

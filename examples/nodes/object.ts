@@ -7,8 +7,8 @@ class ObjectKeys extends DflowNode {
   static kind = "objectKeys";
   static inputs = [input("object")];
   static outputs = [output("array")];
-  run() {
-    this.output(0).data = Object.keys(this.input(0).data as DflowObject);
+  run(input: DflowObject) {
+    this.output(0).data = Object.keys(input);
   }
 }
 
@@ -16,8 +16,8 @@ class ObjectValues extends DflowNode {
   static kind = "objectValues";
   static inputs = [input("object")];
   static outputs = [output("array")];
-  run() {
-    this.output(0).data = Object.values(this.input(0).data as DflowObject);
+  run(input: DflowObject) {
+    this.output(0).data = Object.values(input);
   }
 }
 

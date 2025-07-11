@@ -1,4 +1,5 @@
 import { Dflow, DflowNode } from "../../dflow.ts";
+import type { DflowData } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
@@ -10,10 +11,8 @@ class NodeIf extends DflowNode {
     input([], { name: "else" })
   ];
   static outputs = [output()];
-  run() {
-    this.output(0).data = this.input(0).data
-      ? this.input(1).data
-      : this.input(2).data;
+  run(condition: DflowData, then: DflowData, elseValue: DflowData) {
+    this.output(0).data = condition ? then : elseValue;
   }
 }
 

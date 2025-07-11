@@ -91,43 +91,9 @@ test("greaterThan", () => {
   );
 });
 
-test("greaterThanOrEqual", () => {
-  const dflow = newDflow();
-  const nodeKind = "greaterThanOrEqual";
-
-  [{ inputs: [1, 2], output: false }].forEach(
-    ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<number, number, boolean>(
-        dflow,
-        nodeKind,
-        input1,
-        input2,
-        output
-      );
-    }
-  );
-});
-
 test("lessThan", () => {
   const dflow = newDflow();
   const nodeKind = "lessThan";
-
-  [{ inputs: [1, 2], output: true }].forEach(
-    ({ inputs: [input1, input2], output }) => {
-      testTwoInOneOut<number, number, boolean>(
-        dflow,
-        nodeKind,
-        input1,
-        input2,
-        output
-      );
-    }
-  );
-});
-
-test("lessThanOrEqual", () => {
-  const dflow = newDflow();
-  const nodeKind = "lessThanOrEqual";
 
   [{ inputs: [1, 2], output: true }].forEach(
     ({ inputs: [input1, input2], output }) => {

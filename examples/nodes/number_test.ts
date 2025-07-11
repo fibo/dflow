@@ -8,7 +8,8 @@ test("isFinite", () => {
 
   [
     { input: 1, output: true },
-    { input: Infinity, output: false }
+    // Infinity is not serializable, JSON.stringify will convert it to null.
+    { input: Infinity, output: undefined }
   ].forEach(({ input, output }) => {
     testOneInOneOut<number, boolean>(dflow, nodeKind, input, output);
   });
@@ -39,19 +40,16 @@ test("parseFloat", () => {
   const dflow = newDflow();
   const nodeKind = "parseFloat";
 
-  [{ input: "1.5", output: 1.5 }].forEach(({ input, output }) => {
-    testOneInOneOut<unknown, number>(dflow, nodeKind, input, output);
-  });
-});
-
-test("parseInt", () => {
-  const dflow = newDflow();
-  const nodeKind = "parseInt";
-
   [
-    { input: "1.2", output: 1 },
-    { input: "1", output: 1 }
+    {
+      input: "1.5",
+      output: 1.5
+    },
+    {
+      input: "1",
+      output: 1
+    }
   ].forEach(({ input, output }) => {
-    testOneInOneOut<string, number>(dflow, nodeKind, input, output);
+    testOneInOneOut<unknown, number>(dflow, nodeKind, input, output);
   });
 });

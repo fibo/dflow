@@ -11,9 +11,8 @@ class NewDate extends DflowNode {
   static kind = "newDate";
   static inputs = [input(["string", "number"], { optional: true })];
   static outputs = dateOutputs;
-  run() {
-    const input = this.input(0).data;
-    if (typeof input === "string" || typeof input === "number") {
+  run(input?: string | number) {
+    if (input) {
       const date = new Date(input);
       const serializedDate = date.toJSON();
       if (serializedDate !== null) {

@@ -4,10 +4,10 @@ const { input, output } = Dflow;
 
 class IsFinite extends DflowNode {
   static kind = "isFinite";
-  static inputs = [input()];
+  static inputs = [input("number")];
   static outputs = [output("boolean")];
-  run() {
-    this.output(0).data = Number.isFinite(this.input(0).data);
+  run(input: number) {
+    this.output(0).data = Number.isFinite(input);
   }
 }
 
@@ -15,8 +15,8 @@ class IsInteger extends DflowNode {
   static kind = "isInteger";
   static inputs = [input()];
   static outputs = [output("boolean")];
-  run() {
-    this.output(0).data = Number.isInteger(this.input(0).data);
+  run(input: number) {
+    this.output(0).data = Number.isInteger(input);
   }
 }
 
@@ -24,18 +24,9 @@ class ParseFloat extends DflowNode {
   static kind = "parseFloat";
   static inputs = [input("string")];
   static outputs = [output("number")];
-  run() {
-    this.output(0).data = parseFloat(this.input(0).data as string);
+  run(input: string) {
+    this.output(0).data = parseFloat(input);
   }
 }
 
-class ParseInt extends DflowNode {
-  static kind = "parseInt";
-  static inputs = [input(["number", "string"])];
-  static outputs = [output("number")];
-  run() {
-    this.output(0).data = parseInt(this.input(0).data as string);
-  }
-}
-
-export default [IsFinite, IsInteger, ParseFloat, ParseInt];
+export default [IsFinite, IsInteger, ParseFloat];
