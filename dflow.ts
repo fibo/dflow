@@ -140,7 +140,7 @@ export class Dflow {
     // Delete edge.
     this.#edgesMap.delete(edgeId);
     // Cleanup target input.
-    const targetInput = this.#nodesMap.get(edge.t[0])?.getInputById(edge.t[1]);
+    const targetInput = this.#nodesMap.get(edge.t[0])?.inputsMap.get(edge.t[1]);
     if (targetInput) targetInput.source = undefined;
   }
 
@@ -207,14 +207,14 @@ export class Dflow {
     const id = generateItemId(this.#edgesMap, "e", arg.id);
 
     const edge: DflowEdge = { id, s: arg.source, t: arg.target };
-    const cause = { code: "", edge };
+    const cause: { code?: string; edge: DflowEdge } = { edge };
 
     const sourceNode = this.#nodesMap.get(edge.s[0]);
     const targetNode = this.#nodesMap.get(edge.t[0]);
 
     if (sourceNode && targetNode) {
-      const sourceOutput = sourceNode.getOutputById(edge.s[1]);
-      const targetInput = targetNode.getInputById(edge.t[1]);
+      const sourceOutput = sourceNode.outputsMap.get(edge.s[1]);
+      const targetInput = targetNode.inputsMap.get(edge.t[1]);
 
       if (sourceOutput && targetInput) {
         if (Dflow.canConnect(sourceOutput.types, targetInput.types)) {
@@ -597,13 +597,13 @@ type DflowNodeObj = {
 export class DflowNode {
   readonly id: string;
 
-  #inputsMap: Map<string, DflowInput> = new Map();
-
-  #outputsMap: Map<string, DflowOutput> = new Map();
-
   #inputPosition: string[] = [];
 
   #outputPosition: string[] = [];
+
+  inputsMap: Map<string, DflowInput> = new Map();
+
+  outputsMap: Map<string, DflowOutput> = new Map();
 
   /**
    * Every dflow node must have its own `kind` that is used as a *unique key* to find it in the set of node definitions.
@@ -632,9 +632,9 @@ export class DflowNode {
 
     // Inputs.
     for (const obj of inputs) {
-      const id = generateItemId(this.#inputsMap, "i", obj.id);
+      const id = generateItemId(this.inputsMap, "i", obj.id);
       this.#inputPosition.push(id);
-      this.#inputsMap.set(id, {
+      this.inputsMap.set(id, {
         ...obj,
         id,
         nodeId: this.id,
@@ -646,10 +646,10 @@ export class DflowNode {
 
     // Outputs.
     for (const obj of outputs) {
-      const id = generateItemId(this.#outputsMap, "o", obj.id);
+      const id = generateItemId(this.outputsMap, "o", obj.id);
       this.#outputPosition.push(id);
       let { data: _data, types, ...rest } = obj;
-      this.#outputsMap.set(id, {
+      this.outputsMap.set(id, {
         ...rest,
         id,
         nodeId: this.id,
@@ -683,7 +683,7 @@ export class DflowNode {
   }
 
   get inputsDataAreValid(): boolean {
-    for (const { data, types, optional } of this.#inputsMap.values()) {
+    for (const { data, types, optional } of this.inputsMap.values()) {
       // Ignore optional inputs with no data.
       if (optional && data === undefined) continue;
       // Validate input data.
@@ -695,21 +695,7 @@ export class DflowNode {
   }
 
   clearOutputs() {
-    for (const output of this.#outputsMap.values()) output.clear();
-  }
-
-  /**
-   * Get input by id.
-   */
-  getInputById(id: string): DflowInput | undefined {
-    return this.#inputsMap.get(id);
-  }
-
-  /**
-   * Get output by id.
-   */
-  getOutputById(id: string): DflowOutput | undefined {
-    return this.#outputsMap.get(id);
+    for (const output of this.outputsMap.values()) output.clear();
   }
 
   /**
@@ -717,7 +703,7 @@ export class DflowNode {
    * @remarks This should be called inside `DflowNode.run()`. There is no check that the position is valid.
    */
   input(position: number): DflowInput {
-    return this.#inputsMap.get(this.#inputPosition[position]) as DflowInput;
+    return this.inputsMap.get(this.#inputPosition[position]) as DflowInput;
   }
 
   /**
@@ -725,7 +711,7 @@ export class DflowNode {
    * @remarks This should be called inside `DflowNode.run()`. There is no check that the position is valid.
    */
   output(position: number): DflowOutput {
-    return this.#outputsMap.get(this.#outputPosition[position]) as DflowOutput;
+    return this.outputsMap.get(this.#outputPosition[position]) as DflowOutput;
   }
 
   /** @ignore this method, it should be overridden. */
@@ -734,12 +720,12 @@ export class DflowNode {
   toJSON(): DflowNodeObj {
     const obj: DflowNodeObj = { id: this.id, k: this.kind };
 
-    const inputs = [...this.#inputsMap.values()].map((item) => ({
+    const inputs = [...this.inputsMap.values()].map((item) => ({
       id: item.id
     }));
     if (inputs.length > 0) obj.i = inputs;
 
-    const outputs = [...this.#outputsMap.values()].map((item) => {
+    const outputs = [...this.outputsMap.values()].map((item) => {
       const obj: { id: string; d?: DflowData } = { id: item.id };
       if (item.data !== undefined) obj.d = item.data;
       return obj;
