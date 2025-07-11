@@ -100,14 +100,6 @@ export class Dflow {
     return nodeIds.slice().sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
   }
 
-  getEdgeById(id: string): DflowEdge | undefined {
-    return this.#edgesMap.get(id);
-  }
-
-  getNodeById(id: string): DflowNode | undefined {
-    return this.#nodesMap.get(id);
-  }
-
   /**
    * Connect node A to node B.
    *
@@ -157,12 +149,10 @@ export class Dflow {
    */
   deleteNode(nodeId: string) {
     // Delete node.
-    const node = this.#nodesMap.get(nodeId);
-    if (!node) return;
     this.#nodesMap.delete(nodeId);
     // Delete all edges connected to node.
     for (const edge of this.#edgesMap.values())
-      if (edge.s[0] === node.id || edge.t[0] === node.id)
+      if (edge.s[0] === nodeId || edge.t[0] === nodeId)
         this.deleteEdge(edge.id);
   }
 

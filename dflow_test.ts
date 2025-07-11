@@ -391,10 +391,7 @@ test("dflow.newNode()", () => {
 });
 
 test("dflow.newEdge()", () => {
-  const { dflow, edgeId1 } = sample01();
-
-  const edge1 = dflow.getEdgeById(edgeId1);
-  assert.deepEqual(edgeId1, edge1?.id);
+  const { dflow } = sample01();
 
   assert.throws(
     () => {
@@ -405,18 +402,21 @@ test("dflow.newEdge()", () => {
 });
 
 test("dflow.deleteNode()", () => {
-  const { dflow, nodeId1, edgeId1 } = sample01();
-  assert.ok(dflow.getNodeById(nodeId1) !== undefined);
+  const { dflow, nodeId1 } = sample01();
   dflow.deleteNode(nodeId1);
-  assert.equal(dflow.getNodeById(nodeId1), undefined);
-  assert.equal(dflow.getEdgeById(edgeId1), undefined);
+  // Only one node left.
+  assert.equal(dflow.graph.n.length, 1);
+  // Edge is deleted.
+  assert.equal(dflow.graph.e.length, 0);
 });
 
 test("dflow.deleteEdge()", () => {
   const { dflow, edgeId1 } = sample01();
-  assert.ok(dflow.getEdgeById(edgeId1) !== undefined);
   dflow.deleteEdge(edgeId1);
-  assert.equal(dflow.getEdgeById(edgeId1), undefined);
+  // No edges.
+  assert.equal(dflow.graph.e.length, 0);
+  // Nodes are preserved.
+  assert.equal(dflow.graph.n.length, 2);
 });
 
 test("Dflow.canConnect()", () => {
