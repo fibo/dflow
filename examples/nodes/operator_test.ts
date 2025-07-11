@@ -4,8 +4,7 @@ import { newDflow, testTwoInOneOut } from "./_test-utils.ts";
 
 test("addition", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.addition.kind;
+  const nodeKind = "addition";
 
   [{ inputs: [2, 2], output: 4 }].forEach(
     ({ inputs: [input1, input2], output }) => {
@@ -22,8 +21,7 @@ test("addition", () => {
 
 test("division", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.division.kind;
+  const nodeKind = "division";
 
   [
     { inputs: [2, 2], output: 1 },
@@ -42,8 +40,7 @@ test("division", () => {
 
 test("equality", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.equality.kind;
+  const nodeKind = "equality";
 
   [
     {
@@ -79,8 +76,7 @@ test("equality", () => {
 
 test("greaterThan", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.greaterThan.kind;
+  const nodeKind = "greaterThan";
 
   [{ inputs: [1, 2], output: false }].forEach(
     ({ inputs: [input1, input2], output }) => {
@@ -97,8 +93,7 @@ test("greaterThan", () => {
 
 test("greaterThanOrEqual", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.greaterThanOrEqual.kind;
+  const nodeKind = "greaterThanOrEqual";
 
   [{ inputs: [1, 2], output: false }].forEach(
     ({ inputs: [input1, input2], output }) => {
@@ -115,8 +110,7 @@ test("greaterThanOrEqual", () => {
 
 test("lessThan", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.lessThan.kind;
+  const nodeKind = "lessThan";
 
   [{ inputs: [1, 2], output: true }].forEach(
     ({ inputs: [input1, input2], output }) => {
@@ -133,8 +127,7 @@ test("lessThan", () => {
 
 test("lessThanOrEqual", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.lessThanOrEqual.kind;
+  const nodeKind = "lessThanOrEqual";
 
   [{ inputs: [1, 2], output: true }].forEach(
     ({ inputs: [input1, input2], output }) => {
@@ -151,8 +144,7 @@ test("lessThanOrEqual", () => {
 
 test("inequality", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.inequality.kind;
+  const nodeKind = "inequality";
 
   [
     {
@@ -188,8 +180,7 @@ test("inequality", () => {
 
 test("multiplication", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.multiplication.kind;
+  const nodeKind = "multiplication";
 
   [{ inputs: [2, 2], output: 4 }].forEach(
     ({ inputs: [input1, input2], output }) => {
@@ -206,8 +197,7 @@ test("multiplication", () => {
 
 test("subtraction", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.subtraction.kind;
+  const nodeKind = "subtraction";
 
   [{ inputs: [2, 2], output: 0 }].forEach(
     ({ inputs: [input1, input2], output }) => {

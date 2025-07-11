@@ -10,8 +10,7 @@ import {
 
 test("arrayAt", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.arrayAt.kind;
+  const nodeKind = "arrayAt";
 
   [
     { input1: ["a"], input2: 0, output: "a" },
@@ -31,8 +30,7 @@ test("arrayAt", () => {
 
 test("arrayIncludes", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.arrayIncludes.kind;
+  const nodeKind = "arrayIncludes";
 
   [
     { inputs: { array: ["a", "b"], element: "c" }, output: false },
@@ -50,8 +48,7 @@ test("arrayIncludes", () => {
 
 test("arrayJoin", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.arrayJoin.kind;
+  const nodeKind = "arrayJoin";
 
   [
     { inputs: { array: ["a", "b"], separator: "/" }, output: "a/b" },
@@ -70,8 +67,7 @@ test("arrayJoin", () => {
 
 test("arrayLength", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.arrayLength.kind;
+  const nodeKind = "arrayLength";
 
   [{ input: ["a"], output: 1 }].forEach(({ input, output }) => {
     testOneInOneOut<DflowArray, number>(dflow, nodeKind, input, output);
@@ -80,8 +76,7 @@ test("arrayLength", () => {
 
 test("arrayPop", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.arrayPop.kind;
+  const nodeKind = "arrayPop";
 
   [{ input: [1, 2, 3], output1: 3, output2: [1, 2] }].forEach(
     ({ input, output1, output2 }) => {
@@ -98,8 +93,7 @@ test("arrayPop", () => {
 
 test("arrayPush", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.arrayPush.kind;
+  const nodeKind = "arrayPush";
 
   [
     { input1: [], input2: undefined, output: [] },
@@ -119,8 +113,7 @@ test("arrayPush", () => {
 
 test("arrayReverse", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.arrayReverse.kind;
+  const nodeKind = "arrayReverse";
 
   [{ input: [1, 2, 3], output: [3, 2, 1] }].forEach(({ input, output }) => {
     testOneInOneOut<DflowArray, DflowArray>(dflow, nodeKind, input, output);
@@ -129,8 +122,7 @@ test("arrayReverse", () => {
 
 test("arrayShift", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.arrayShift.kind;
+  const nodeKind = "arrayShift";
 
   [{ input: [1, 2, 3], output1: 1, output2: [2, 3] }].forEach(
     ({ input, output1, output2 }) => {
@@ -147,8 +139,7 @@ test("arrayShift", () => {
 
 test("arraySlice", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.arraySlice.kind;
+  const nodeKind = "arraySlice";
 
   [
     {

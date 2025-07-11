@@ -1,23 +1,23 @@
-import { catalog as arrayCatalog } from "./array.ts";
-import { catalog as conditionalCatalog } from "./conditional.ts";
-import { catalog as consoleCatalog } from "./console.ts";
-import { catalog as dateCatalog } from "./date.ts";
-import { catalog as logicCatalog } from "./logic.ts";
-import { catalog as mathCatalog } from "./math.ts";
-import { catalog as numberCatalog } from "./number.ts";
-import { catalog as objectCatalog } from "./object.ts";
-import { catalog as operatorCatalog } from "./operator.ts";
-import { catalog as stringCatalog } from "./string.ts";
+import arrayNodes from "./array.ts";
+import conditionalNodes from "./conditional.ts";
+import consoleNodes from "./console.ts";
+import dateNodes from "./date.ts";
+import logicNodes from "./logic.ts";
+import mathNodes from "./math.ts";
+import numberNodes from "./number.ts";
+import objectNodes from "./object.ts";
+import operatorNodes from "./operator.ts";
+import stringNodes from "./string.ts";
 
-export const nodesCatalog = {
-  ...arrayCatalog,
-  ...conditionalCatalog,
-  ...consoleCatalog,
-  ...dateCatalog,
-  ...logicCatalog,
-  ...mathCatalog,
-  ...numberCatalog,
-  ...objectCatalog,
-  ...operatorCatalog,
-  ...stringCatalog
-};
+export const nodeDefinitions = [
+  ...arrayNodes,
+  ...conditionalNodes,
+  ...consoleNodes,
+  ...dateNodes,
+  ...logicNodes,
+  ...mathNodes,
+  ...numberNodes,
+  ...objectNodes,
+  ...operatorNodes,
+  ...stringNodes
+];

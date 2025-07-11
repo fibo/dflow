@@ -1,9 +1,9 @@
 import { strict as assert } from "node:assert";
 import { Dflow } from "../../dflow.ts";
-import { nodesCatalog } from "./index.ts";
+import { nodeDefinitions } from "./index.ts";
 
 export function newDflow() {
-  return new Dflow(nodesCatalog);
+  return new Dflow(nodeDefinitions);
 }
 
 export function testOneOut<Output>(
@@ -22,9 +22,8 @@ export function testOneInOneOut<Input, Output>(
   input?: Input,
   output?: Output
 ) {
-  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
-    kind: catalog.data.kind,
+    kind: "data",
     outputs: [{ data: Dflow.isDflowData(input) ? input : undefined }]
   });
   const testNode = dflow.newNode({ kind: nodeKind });
@@ -40,9 +39,8 @@ export function testOneInTwoOut<Input, Output1, Output2>(
   output1?: Output1,
   output2?: Output2
 ) {
-  const catalog = dflow.nodesCatalog;
   const dataNode = dflow.newNode({
-    kind: catalog.data.kind,
+    kind: "data",
     outputs: [{ data: Dflow.isDflowData(input) ? input : undefined }]
   });
   const testNode = dflow.newNode({ kind: nodeKind });
@@ -59,16 +57,15 @@ export function testTwoInOneOut<Input1, Input2, Output>(
   input2?: Input2,
   output?: Output
 ) {
-  const catalog = dflow.nodesCatalog;
   const dataNode1 = Dflow.isDflowData(input1)
     ? dflow.newNode({
-        kind: catalog.data.kind,
+        kind: "data",
         outputs: [{ data: input1 }]
       })
     : undefined;
   const dataNode2 = Dflow.isDflowData(input2)
     ? dflow.newNode({
-        kind: catalog.data.kind,
+        kind: "data",
         outputs: [{ data: input2 }]
       })
     : undefined;
@@ -91,22 +88,21 @@ export function testThreeInOneOut<Input1, Input2, Input3, Output>(
   input3?: Input3,
   output?: Output
 ) {
-  const catalog = dflow.nodesCatalog;
   const dataNode1 = Dflow.isDflowData(input1)
     ? dflow.newNode({
-        kind: catalog.data.kind,
+        kind: "data",
         outputs: [{ data: input1 }]
       })
     : undefined;
   const dataNode2 = Dflow.isDflowData(input2)
     ? dflow.newNode({
-        kind: catalog.data.kind,
+        kind: "data",
         outputs: [{ data: input2 }]
       })
     : undefined;
   const dataNode3 = Dflow.isDflowData(input3)
     ? dflow.newNode({
-        kind: catalog.data.kind,
+        kind: "data",
         outputs: [{ data: input3 }]
       })
     : undefined;

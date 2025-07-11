@@ -32,12 +32,8 @@ class CustomNode extends DflowNode {
   }
 }
 
-const nodesCatalog = {
-  [CustomNode.kind]: CustomNode
-};
-
 async function contextExample() {
-  const dflow = new Dflow(nodesCatalog);
+  const dflow = new Dflow([CustomNode]);
 
   const apiKey = "s3cret";
   const apiClient = new ApiClient(apiKey);

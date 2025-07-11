@@ -3,8 +3,7 @@ import { newDflow, testOneInOneOut, testThreeInOneOut } from "./_test-utils.ts";
 
 test("stringLength", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.stringLength.kind;
+  const nodeKind = "stringLength";
 
   [{ input: "foo", output: "foo".length }].forEach(({ input, output }) => {
     testOneInOneOut<string, number>(dflow, nodeKind, input, output);
@@ -13,8 +12,7 @@ test("stringLength", () => {
 
 test("substring", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.substring.kind;
+  const nodeKind = "substring";
 
   [
     {

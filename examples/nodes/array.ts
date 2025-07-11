@@ -3,7 +3,7 @@ import type { DflowArray } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
-class DflowArrayAt extends DflowNode {
+class ArrayAt extends DflowNode {
   static kind = "arrayAt";
   static inputs = [input("array"), input("number", { name: "index" })];
   static outputs = [output()];
@@ -14,7 +14,7 @@ class DflowArrayAt extends DflowNode {
   }
 }
 
-class DflowArrayIncludes extends DflowNode {
+class ArrayIncludes extends DflowNode {
   static kind = "arrayIncludes";
   static inputs = [
     input("array", { name: "array" }),
@@ -31,7 +31,7 @@ class DflowArrayIncludes extends DflowNode {
   }
 }
 
-class DflowArrayJoin extends DflowNode {
+class ArrayJoin extends DflowNode {
   static kind = "arrayJoin";
   static inputs = [
     input("array", { name: "array" }),
@@ -45,7 +45,7 @@ class DflowArrayJoin extends DflowNode {
   }
 }
 
-class DflowArrayLength extends DflowNode {
+class ArrayLength extends DflowNode {
   static kind = "arrayLength";
   static inputs = [input("array")];
   static outputs = [output("number")];
@@ -59,7 +59,7 @@ class DflowArrayLength extends DflowNode {
   }
 }
 
-class DflowArrayPop extends DflowNode {
+class ArrayPop extends DflowNode {
   static kind = "arrayPop";
   static inputs = [input("array")];
   static outputs = [
@@ -74,7 +74,7 @@ class DflowArrayPop extends DflowNode {
   }
 }
 
-class DflowArrayPush extends DflowNode {
+class ArrayPush extends DflowNode {
   static kind = "arrayPush";
   static inputs = [input("array"), input([], { name: "element" })];
   static outputs = [output("array")];
@@ -88,7 +88,7 @@ class DflowArrayPush extends DflowNode {
   }
 }
 
-class DflowArrayReverse extends DflowNode {
+class ArrayReverse extends DflowNode {
   static kind = "arrayReverse";
   static inputs = [input("array")];
   static outputs = [input("array")];
@@ -98,7 +98,7 @@ class DflowArrayReverse extends DflowNode {
   }
 }
 
-class DflowArrayShift extends DflowNode {
+class ArrayShift extends DflowNode {
   static kind = "arrayShift";
   static inputs = [input("array")];
   static outputs = [
@@ -113,7 +113,7 @@ class DflowArrayShift extends DflowNode {
   }
 }
 
-class DflowArraySlice extends DflowNode {
+class ArraySlice extends DflowNode {
   static kind = "arraySlice";
   static inputs = [
     input("array"),
@@ -134,14 +134,14 @@ class DflowArraySlice extends DflowNode {
   }
 }
 
-export const catalog = {
-  [DflowArrayAt.kind]: DflowArrayAt,
-  [DflowArrayIncludes.kind]: DflowArrayIncludes,
-  [DflowArrayJoin.kind]: DflowArrayJoin,
-  [DflowArrayLength.kind]: DflowArrayLength,
-  [DflowArrayPop.kind]: DflowArrayPop,
-  [DflowArrayPush.kind]: DflowArrayPush,
-  [DflowArrayReverse.kind]: DflowArrayReverse,
-  [DflowArrayShift.kind]: DflowArrayShift,
-  [DflowArraySlice.kind]: DflowArraySlice
-};
+export default [
+  ArrayAt,
+  ArrayIncludes,
+  ArrayJoin,
+  ArrayLength,
+  ArrayPop,
+  ArrayPush,
+  ArrayReverse,
+  ArrayShift,
+  ArraySlice
+];

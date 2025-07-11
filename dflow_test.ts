@@ -58,14 +58,9 @@ class SleepNode extends DflowNode {
   }
 }
 
-const nodesCatalog1 = {
-  [IdentityNode.kind]: IdentityNode
-};
+const nodeDefinitions1 = [IdentityNode];
 
-const nodesCatalog2 = {
-  [SumNode.kind]: SumNode,
-  [SleepNode.kind]: SleepNode
-};
+const nodeDefinitions2 = [SumNode, SleepNode];
 
 function sample01() {
   const nodeId1 = "n1";
@@ -73,16 +68,15 @@ function sample01() {
   const pinId1 = "p1";
   const pinId2 = "p2";
   const edgeId1 = "e2";
-  const dflow = new Dflow(nodesCatalog1);
-  const catalog = dflow.nodesCatalog;
+  const dflow = new Dflow(nodeDefinitions1);
   dflow.newNode({
     id: nodeId1,
-    kind: catalog.Identity.kind,
+    kind: "Identity",
     outputs: [{ id: pinId1 }]
   });
   dflow.newNode({
     id: nodeId2,
-    kind: catalog.Identity.kind,
+    kind: "Identity",
     inputs: [{ id: pinId2 }]
   });
   dflow.newEdge({
@@ -280,7 +274,7 @@ test("Dflow.isValidData()", () => {
 });
 
 test("new Dflow has an empty graph", () => {
-  const dflow = new Dflow({});
+  const dflow = new Dflow([]);
   assert.deepEqual(dflow.graph, { n: [], e: [] });
 });
 
@@ -329,20 +323,19 @@ test("dflow.graph", () => {
 });
 
 test("dflow.run()", async () => {
-  const dflow = new Dflow(nodesCatalog2);
-  const catalog = dflow.nodesCatalog;
+  const dflow = new Dflow(nodeDefinitions2);
 
   // Num#out=2 -> Sum#in1 |
   //                      |-> Sum#out=4
   // Num#out=2 -> Sum#in2 |
   dflow.newNode({
     id: "num",
-    kind: catalog.data.kind,
+    kind: "data",
     outputs: [{ id: "out", data: 2 }]
   });
   const sumNode = dflow.newNode({
     id: "sum",
-    kind: catalog.Sum.kind,
+    kind: "Sum",
     inputs: [{ id: "in1" }, { id: "in2" }],
     outputs: [{ id: "out" }]
   });
@@ -358,7 +351,7 @@ test("dflow.run()", async () => {
   });
 
   // Add also an async node.
-  dflow.newNode({ id: "sleep", kind: catalog.Sleep.kind });
+  dflow.newNode({ id: "sleep", kind: "Sleep" });
 
   await dflow.run();
 
@@ -367,22 +360,21 @@ test("dflow.run()", async () => {
 });
 
 test("dflow.newNode()", () => {
-  const dflow = new Dflow(nodesCatalog1);
-  const catalog = dflow.nodesCatalog;
+  const dflow = new Dflow(nodeDefinitions1);
 
   // newNode with id
   const nodeId1 = "node1";
   const node1 = dflow.newNode({
-    kind: catalog.Identity.kind,
+    kind: "Identity",
     id: nodeId1
   });
   assert.deepEqual(node1.id, nodeId1);
-  assert.deepEqual(node1.kind, catalog.Identity.kind);
+  assert.deepEqual(node1.kind, "Identity");
 
   // newNode with inputs
   const inputId1 = "input1";
   const node2 = dflow.newNode({
-    kind: catalog.Identity.kind,
+    kind: "Identity",
     inputs: [{ id: inputId1 }]
   });
   const node2Obj = node2.toJSON();
@@ -391,7 +383,7 @@ test("dflow.newNode()", () => {
   // newNode with outputs
   const outputId1 = "output1";
   const node3 = dflow.newNode({
-    kind: catalog.Identity.kind,
+    kind: "Identity",
     outputs: [{ id: outputId1 }]
   });
   const node3Obj = node3.toJSON();
@@ -403,6 +395,13 @@ test("dflow.newEdge()", () => {
 
   const edge1 = dflow.getEdgeById(edgeId1);
   assert.deepEqual(edgeId1, edge1?.id);
+
+  assert.throws(
+    () => {
+      dflow.newEdge({ source: ["xxx", "out"], target: ["yyy", "in"] });
+    },
+    { message: "Cannot create edge" }
+  );
 });
 
 test("dflow.deleteNode()", () => {

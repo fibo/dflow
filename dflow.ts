@@ -38,6 +38,13 @@ const generateItemId = (
   return itemMap.has(id) ? generateItemId(itemMap, idPrefix) : id;
 };
 
+export type DflowGraph = {
+  /** nodes */
+  n: DflowNodeObj[];
+  /** edges */
+  e: DflowEdge[];
+};
+
 /**
  * A `Dflow` represents a program as an executable graph.
  * A graph can contain nodes and edges.
@@ -46,17 +53,18 @@ const generateItemId = (
 export class Dflow {
   readonly context: Record<string, unknown>;
 
-  readonly nodesCatalog: DflowNodesCatalog;
+  #nodeDefinitions: Map<string, DflowNodeDefinition> = new Map();
 
   #nodesMap: Map<string, DflowNode> = new Map();
 
   #edgesMap: Map<string, DflowEdge> = new Map();
 
-  constructor(nodesCatalog: DflowNodesCatalog) {
-    this.nodesCatalog = {
-      ...nodesCatalog,
-      [DflowNodeData.kind]: DflowNodeData
-    };
+  constructor(nodeDefinitions: Array<DflowNodeDefinition>) {
+    // Define core nodes.
+    this.#nodeDefinitions.set(DflowNodeData.kind, DflowNodeData);
+    // Add given node definitions.
+    for (const nodeDefinition of nodeDefinitions)
+      this.#nodeDefinitions.set(nodeDefinition.kind, nodeDefinition);
     this.context = {};
   }
 
@@ -67,9 +75,9 @@ export class Dflow {
     const parentsNodeIds = nodeConnections
       .filter(({ targetId }) => nodeId === targetId)
       .map(({ sourceId }) => sourceId);
-    // 1. A node with no parent as level zero.
+    // A node with no parent as level zero.
     if (parentsNodeIds.length === 0) return 0;
-    // 2. Otherwise its level is the max level of its parents plus one.
+    // Otherwise its level is the max level of its parents plus one.
     let maxLevel = 0;
     for (const parentNodeId of parentsNodeIds)
       maxLevel = Math.max(
@@ -148,11 +156,11 @@ export class Dflow {
    * Delete node with given id.
    */
   deleteNode(nodeId: string) {
-    // 1. Finally, delete node.
+    // Delete node.
     const node = this.#nodesMap.get(nodeId);
     if (!node) return;
     this.#nodesMap.delete(nodeId);
-    // 2. Delete all edges connected to node.
+    // Delete all edges connected to node.
     for (const edge of this.#edgesMap.values())
       if (edge.s[0] === node.id || edge.t[0] === node.id)
         this.deleteEdge(edge.id);
@@ -167,7 +175,7 @@ export class Dflow {
     inputs?: { id?: string }[];
     outputs?: { id?: string; data?: DflowData }[];
   }): DflowNode {
-    const NodeClass = this.nodesCatalog[arg.kind] ?? DflowNodeUnknown;
+    const NodeClass = this.#nodeDefinitions.get(arg.kind) ?? DflowNodeUnknown;
 
     const id = generateItemId(this.#nodesMap, "n", arg.id);
 
@@ -209,6 +217,7 @@ export class Dflow {
     const id = generateItemId(this.#edgesMap, "e", arg.id);
 
     const edge: DflowEdge = { id, s: arg.source, t: arg.target };
+    const cause = { code: "", edge };
 
     const sourceNode = this.#nodesMap.get(edge.s[0]);
     const targetNode = this.#nodesMap.get(edge.t[0]);
@@ -217,18 +226,20 @@ export class Dflow {
       const sourceOutput = sourceNode.getOutputById(edge.s[1]);
       const targetInput = targetNode.getInputById(edge.t[1]);
 
-      if (
-        sourceOutput &&
-        targetInput &&
-        Dflow.canConnect(sourceOutput.types, targetInput.types)
-      ) {
-        this.#edgesMap.set(edge.id, edge);
-        targetInput.source = sourceOutput;
-        return edge;
+      if (sourceOutput && targetInput) {
+        if (Dflow.canConnect(sourceOutput.types, targetInput.types)) {
+          this.#edgesMap.set(edge.id, edge);
+          targetInput.source = sourceOutput;
+          return edge;
+        } else {
+          cause.code = "IncompatibleTypes";
+        }
+      } else {
+        cause.code = "SourceOrTargetNotFound";
       }
     }
 
-    throw new Error(`Cannot create edge ${JSON.stringify(arg)}`);
+    throw new Error("Cannot create edge", { cause });
   }
 
   /**
@@ -630,6 +641,16 @@ export class DflowOutput implements DflowIO, DflowOutputDefinition {
 // DflowNode
 // ////////////////////////////////////////////////////////////////////
 
+/**
+ * A class extending `DflowNode` must implement `DflowNodeDefinition` interface.
+ */
+export interface DflowNodeDefinition {
+  new (arg: ConstructorParameters<typeof DflowNode>[0]): DflowNode;
+  kind: DflowNode["kind"];
+  inputs?: DflowInputDefinition[];
+  outputs?: DflowOutputDefinition[];
+}
+
 type DflowNodeObj = {
   id: string;
   /** kind */
@@ -678,8 +699,7 @@ export class DflowNode {
   #outputPosition: string[] = [];
 
   /**
-   * Every dflow node must have its own `kind` that is used as *key*
-   * to address it in the nodes catalog.
+   * Every dflow node must have its own `kind` that is used as a *unique key* to find it in the set of node definitions.
    */
   readonly kind: string;
 
@@ -809,40 +829,6 @@ export type DflowEdge = {
   t: [nodeId: string, inputId: string];
 };
 
-// DflowNodesCatalog
-// ////////////////////////////////////////////////////////////////////
-
-/**
- * A class extending `DflowNode` must implement `DflowNodeDefinition` interface,
- * to be used as a value in a `DflowNodesCatalog`.
- */
-export interface DflowNodeDefinition {
-  new (arg: ConstructorParameters<typeof DflowNode>[0]): DflowNode;
-  kind: DflowNode["kind"];
-  inputs?: DflowInputDefinition[];
-  outputs?: DflowOutputDefinition[];
-}
-
-/**
- * A `DflowNodesCatalog` is a record containing node classes indexed by their kind.
- *
- * @example
- *
- * ```ts
- * const nodesCatalog: DflowNodesCatalog = {
- *   [MyNodeClass.kind]: MyNodeClass
- * }
- * ```
- */
-export type DflowNodesCatalog = Record<DflowNode["kind"], DflowNodeDefinition>;
-
-export type DflowGraph = {
-  /** nodes */
-  n: DflowNodeObj[];
-  /** edges */
-  e: DflowEdge[];
-};
-
 // Dflow core nodes
 // ////////////////////////////////////////////////////////////////////
 
@@ -864,5 +850,7 @@ class DflowNodeData extends DflowNode {
 }
 
 // This class is used to instantiate a new node which `kind` was not found in `nodesCatalog`.
-// The "unknown" node class is not included in `coreNodesCatalog`.
-class DflowNodeUnknown extends DflowNode {}
+class DflowNodeUnknown extends DflowNode {
+  static inputs = [];
+  static outputs = [];
+}

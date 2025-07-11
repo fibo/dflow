@@ -2,7 +2,7 @@ import { Dflow, DflowNode } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
-class DflowIsFinite extends DflowNode {
+class IsFinite extends DflowNode {
   static kind = "isFinite";
   static inputs = [input()];
   static outputs = [output("boolean")];
@@ -11,7 +11,7 @@ class DflowIsFinite extends DflowNode {
   }
 }
 
-class DflowIsInteger extends DflowNode {
+class IsInteger extends DflowNode {
   static kind = "isInteger";
   static inputs = [input()];
   static outputs = [output("boolean")];
@@ -20,7 +20,7 @@ class DflowIsInteger extends DflowNode {
   }
 }
 
-class DflowParseFloat extends DflowNode {
+class ParseFloat extends DflowNode {
   static kind = "parseFloat";
   static inputs = [input("string")];
   static outputs = [output("number")];
@@ -29,7 +29,7 @@ class DflowParseFloat extends DflowNode {
   }
 }
 
-class DflowParseInt extends DflowNode {
+class ParseInt extends DflowNode {
   static kind = "parseInt";
   static inputs = [input(["number", "string"])];
   static outputs = [output("number")];
@@ -38,9 +38,4 @@ class DflowParseInt extends DflowNode {
   }
 }
 
-export const catalog = {
-  [DflowIsFinite.kind]: DflowIsFinite,
-  [DflowIsInteger.kind]: DflowIsInteger,
-  [DflowParseFloat.kind]: DflowParseFloat,
-  [DflowParseInt.kind]: DflowParseInt
-};
+export default [IsFinite, IsInteger, ParseFloat, ParseInt];

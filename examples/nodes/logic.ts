@@ -2,7 +2,7 @@ import { Dflow, DflowNode } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
-class DflowNodeAnd extends DflowNode {
+class And extends DflowNode {
   static kind = "and";
   static inputs = [input("boolean"), input("boolean")];
   static outputs = [output("boolean")];
@@ -11,7 +11,7 @@ class DflowNodeAnd extends DflowNode {
   }
 }
 
-class DflowNodeNot extends DflowNode {
+class Not extends DflowNode {
   static kind = "not";
   static inputs = [input("boolean")];
   static outputs = [output("boolean")];
@@ -20,7 +20,7 @@ class DflowNodeNot extends DflowNode {
   }
 }
 
-class DflowNodeNullishCoaleshing extends DflowNode {
+class NullishCoaleshing extends DflowNode {
   static kind = "??";
   static inputs = [input(), input()];
   static outputs = [output()];
@@ -29,7 +29,7 @@ class DflowNodeNullishCoaleshing extends DflowNode {
   }
 }
 
-class DflowNodeOr extends DflowNode {
+class Or extends DflowNode {
   static kind = "or";
   static inputs = [input("boolean"), input("boolean")];
   static outputs = [output("boolean")];
@@ -38,9 +38,4 @@ class DflowNodeOr extends DflowNode {
   }
 }
 
-export const catalog = {
-  [DflowNodeAnd.kind]: DflowNodeAnd,
-  [DflowNodeNot.kind]: DflowNodeNot,
-  [DflowNodeNullishCoaleshing.kind]: DflowNodeNullishCoaleshing,
-  [DflowNodeOr.kind]: DflowNodeOr
-};
+export default [And, Not, NullishCoaleshing, Or];

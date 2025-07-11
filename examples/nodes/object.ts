@@ -3,7 +3,7 @@ import type { DflowObject } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
-class DflowObjectKeys extends DflowNode {
+class ObjectKeys extends DflowNode {
   static kind = "objectKeys";
   static inputs = [input("object")];
   static outputs = [output("array")];
@@ -12,7 +12,7 @@ class DflowObjectKeys extends DflowNode {
   }
 }
 
-class DflowObjectValues extends DflowNode {
+class ObjectValues extends DflowNode {
   static kind = "objectValues";
   static inputs = [input("object")];
   static outputs = [output("array")];
@@ -21,7 +21,4 @@ class DflowObjectValues extends DflowNode {
   }
 }
 
-export const catalog = {
-  [DflowObjectKeys.kind]: DflowObjectKeys,
-  [DflowObjectValues.kind]: DflowObjectValues
-};
+export default [ObjectKeys, ObjectValues];

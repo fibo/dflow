@@ -2,7 +2,7 @@ import { Dflow, DflowNode } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
-class DflowAddition extends DflowNode {
+class Addition extends DflowNode {
   static kind = "addition";
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
@@ -12,7 +12,7 @@ class DflowAddition extends DflowNode {
   }
 }
 
-class DflowDivision extends DflowNode {
+class Division extends DflowNode {
   static kind = "division";
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
@@ -26,7 +26,7 @@ class DflowDivision extends DflowNode {
   }
 }
 
-class DflowEquality extends DflowNode {
+class Equality extends DflowNode {
   static kind = "equality";
   static inputs = [input(), input()];
   static outputs = [output("boolean")];
@@ -35,7 +35,7 @@ class DflowEquality extends DflowNode {
   }
 }
 
-class DflowLessThan extends DflowNode {
+class LessThan extends DflowNode {
   static kind = "lessThan";
   static inputs = [input("number"), input("number")];
   static outputs = [output("boolean")];
@@ -45,7 +45,7 @@ class DflowLessThan extends DflowNode {
   }
 }
 
-class DflowLessThanOrEqual extends DflowNode {
+class LessThanOrEqual extends DflowNode {
   static kind = "lessThanOrEqual";
   static inputs = [input("number"), input("number")];
   static outputs = [output("boolean")];
@@ -55,7 +55,7 @@ class DflowLessThanOrEqual extends DflowNode {
   }
 }
 
-class DflowGreaterThan extends DflowNode {
+class GreaterThan extends DflowNode {
   static kind = "greaterThan";
   static inputs = [input("number"), input("number")];
   static outputs = [output("boolean")];
@@ -65,7 +65,7 @@ class DflowGreaterThan extends DflowNode {
   }
 }
 
-class DflowGreaterThanOrEqual extends DflowNode {
+class GreaterThanOrEqual extends DflowNode {
   static kind = "greaterThanOrEqual";
   static inputs = [input("number"), input("number")];
   static outputs = [output("boolean")];
@@ -75,7 +75,7 @@ class DflowGreaterThanOrEqual extends DflowNode {
   }
 }
 
-class DflowInequality extends DflowNode {
+class Inequality extends DflowNode {
   static kind = "inequality";
   static inputs = [input(), input()];
   static outputs = [output("boolean")];
@@ -84,7 +84,7 @@ class DflowInequality extends DflowNode {
   }
 }
 
-class DflowMultiplication extends DflowNode {
+class Multiplication extends DflowNode {
   static kind = "multiplication";
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
@@ -94,7 +94,7 @@ class DflowMultiplication extends DflowNode {
   }
 }
 
-class DflowSubtraction extends DflowNode {
+class Subtraction extends DflowNode {
   static kind = "subtraction";
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
@@ -104,15 +104,15 @@ class DflowSubtraction extends DflowNode {
   }
 }
 
-export const catalog = {
-  [DflowAddition.kind]: DflowAddition,
-  [DflowDivision.kind]: DflowDivision,
-  [DflowEquality.kind]: DflowEquality,
-  [DflowGreaterThan.kind]: DflowGreaterThan,
-  [DflowGreaterThanOrEqual.kind]: DflowGreaterThanOrEqual,
-  [DflowLessThan.kind]: DflowLessThan,
-  [DflowLessThanOrEqual.kind]: DflowLessThanOrEqual,
-  [DflowInequality.kind]: DflowInequality,
-  [DflowMultiplication.kind]: DflowMultiplication,
-  [DflowSubtraction.kind]: DflowSubtraction
-};
+export default [
+  Addition,
+  Division,
+  Equality,
+  GreaterThan,
+  GreaterThanOrEqual,
+  LessThan,
+  LessThanOrEqual,
+  Inequality,
+  Multiplication,
+  Subtraction
+];

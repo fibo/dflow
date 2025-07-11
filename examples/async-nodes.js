@@ -37,14 +37,8 @@ class SleepNode extends DflowNode {
   }
 }
 
-const nodesCatalog = {
-  [NumNode.kind]: NumNode,
-  [SumNode.kind]: SumNode,
-  [SleepNode.kind]: SleepNode
-};
-
 async function runGraph() {
-  const dflow = new Dflow(nodesCatalog);
+  const dflow = new Dflow([NumNode, SumNode, SleepNode]);
 
   // Create two nodes, num and sum.
 

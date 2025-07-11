@@ -10,21 +10,20 @@ function testConditionalIf(
   output?: DflowData
 ) {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
 
   const dataNode1 = dflow.newNode({
-    kind: catalog.data.kind,
+    kind: "data",
     outputs: [{ data: input1 }]
   });
   const dataNode2 = dflow.newNode({
-    kind: catalog.data.kind,
+    kind: "data",
     outputs: [{ data: input2 }]
   });
   const dataNode3 = dflow.newNode({
-    kind: catalog.data.kind,
+    kind: "data",
     outputs: [{ data: input3 }]
   });
-  const testNode = dflow.newNode({ kind: catalog.if.kind });
+  const testNode = dflow.newNode({ kind: "if" });
 
   dflow.connect(dataNode1).to(testNode, 0);
   dflow.connect(dataNode2).to(testNode, 1);

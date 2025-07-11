@@ -4,8 +4,7 @@ import { newDflow, testOneInOneOut } from "./_test-utils.ts";
 
 test("objectKeys", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.objectKeys.kind;
+  const nodeKind = "objectKeys";
 
   [{ foo: true }].forEach((input) => {
     testOneInOneOut<DflowObject, DflowArray>(
@@ -19,8 +18,7 @@ test("objectKeys", () => {
 
 test("objectValues", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.objectValues.kind;
+  const nodeKind = "objectValues";
 
   [{ foo: true }].forEach((input) => {
     testOneInOneOut<DflowObject, DflowArray>(

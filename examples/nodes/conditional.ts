@@ -2,7 +2,7 @@ import { Dflow, DflowNode } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
-class DflowNodeIf extends DflowNode {
+class NodeIf extends DflowNode {
   static kind = "if";
   static inputs = [
     input([], { name: "condition" }),
@@ -17,6 +17,4 @@ class DflowNodeIf extends DflowNode {
   }
 }
 
-export const catalog = {
-  [DflowNodeIf.kind]: DflowNodeIf
-};
+export default [NodeIf];

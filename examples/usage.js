@@ -21,13 +21,8 @@ class ConsoleLog extends DflowNode {
   }
 }
 
-const nodesCatalog = {
-  [MathSin.kind]: MathSin,
-  [ConsoleLog.kind]: ConsoleLog
-};
-
 // Create a Dflow instance with the given nodes.
-const dflow = new Dflow(nodesCatalog);
+const dflow = new Dflow([MathSin, ConsoleLog]);
 
 // Create nodes.
 const sinNode = dflow.newNode({ kind: "mathSin" });

@@ -4,8 +4,7 @@ import { newDflow } from "./_test-utils.ts";
 
 test("newDate", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.newDate.kind;
+  const nodeKind = "newDate";
 
   const testNode = dflow.newNode({ kind: nodeKind });
 
@@ -20,8 +19,7 @@ test("newDate", () => {
 
 test("now", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.now.kind;
+  const nodeKind = "now";
 
   const testNode = dflow.newNode({ kind: nodeKind });
 

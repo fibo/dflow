@@ -2,10 +2,9 @@ import { test } from "node:test";
 import type { DflowData } from "../../dflow.ts";
 import { newDflow, testOneInOneOut, testTwoInOneOut } from "./_test-utils.ts";
 
-test("DflowNodeAnd", () => {
+test("And", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.and.kind;
+  const nodeKind = "and";
 
   [
     { inputs: [true, true], output: true && true },
@@ -23,10 +22,9 @@ test("DflowNodeAnd", () => {
   });
 });
 
-test("DflowNo", () => {
+test("Not", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.not.kind;
+  const nodeKind = "not";
 
   [
     { input: true, output: false },
@@ -36,10 +34,9 @@ test("DflowNo", () => {
   });
 });
 
-test("DflowNodeNullishCoaleshing", () => {
+test("NullishCoaleshing", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog["??"].kind;
+  const nodeKind = "??";
 
   [
     { inputs: [undefined, undefined], output: undefined },
@@ -58,10 +55,9 @@ test("DflowNodeNullishCoaleshing", () => {
   });
 });
 
-test("DflowNodeOr", () => {
+test("Or", () => {
   const dflow = newDflow();
-  const catalog = dflow.nodesCatalog;
-  const nodeKind = catalog.or.kind;
+  const nodeKind = "or";
 
   [
     { inputs: [true, true], output: true || true },

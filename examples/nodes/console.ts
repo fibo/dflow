@@ -2,7 +2,7 @@ import { Dflow, DflowNode } from "../../dflow.ts";
 
 const { input } = Dflow;
 
-class DflowConsoleLog extends DflowNode {
+class ConsoleLog extends DflowNode {
   static kind = "consoleLog";
   static inputs = [input()];
   run() {
@@ -10,6 +10,4 @@ class DflowConsoleLog extends DflowNode {
   }
 }
 
-export const catalog = {
-  [DflowConsoleLog.kind]: DflowConsoleLog
-};
+export default [ConsoleLog];

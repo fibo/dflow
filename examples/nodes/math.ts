@@ -2,7 +2,7 @@ import { Dflow, DflowNode } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
-class DflowMathAbs extends DflowNode {
+class MathAbs extends DflowNode {
   static kind = "mathAbs";
   static inputs = [input("number")];
   static outputs = [output("number")];
@@ -11,7 +11,7 @@ class DflowMathAbs extends DflowNode {
   }
 }
 
-class DflowMathCos extends DflowNode {
+class MathCos extends DflowNode {
   static kind = "mathCos";
   static inputs = [input("number")];
   static outputs = [output("number")];
@@ -20,7 +20,7 @@ class DflowMathCos extends DflowNode {
   }
 }
 
-class DflowMathCosh extends DflowNode {
+class MathCosh extends DflowNode {
   static kind = "mathCosh";
   static inputs = [input("number")];
   static outputs = [output("number")];
@@ -29,7 +29,7 @@ class DflowMathCosh extends DflowNode {
   }
 }
 
-class DflowMathFloor extends DflowNode {
+class MathFloor extends DflowNode {
   static kind = "mathFloor";
   static inputs = [input("number")];
   static outputs = [output("number")];
@@ -38,7 +38,7 @@ class DflowMathFloor extends DflowNode {
   }
 }
 
-class DflowMathMax extends DflowNode {
+class MathMax extends DflowNode {
   static kind = "mathMax";
   static inputs = [input("array")];
   static outputs = [output("number")];
@@ -55,7 +55,7 @@ class DflowMathMax extends DflowNode {
   }
 }
 
-class DflowMathMin extends DflowNode {
+class MathMin extends DflowNode {
   static kind = "mathMin";
   static inputs = [input("array")];
   static outputs = [output("number")];
@@ -72,12 +72,12 @@ class DflowMathMin extends DflowNode {
   }
 }
 
-class DflowMathPI extends DflowNode {
+class MathPI extends DflowNode {
   static kind = "mathPI";
   static outputs = [output("number", { name: "π", data: Math.PI })];
 }
 
-class DflowMathRound extends DflowNode {
+class MathRound extends DflowNode {
   static kind = "mathRound";
   static inputs = [input("number")];
   static outputs = [output("number")];
@@ -86,7 +86,7 @@ class DflowMathRound extends DflowNode {
   }
 }
 
-class DflowMathSin extends DflowNode {
+class MathSin extends DflowNode {
   static kind = "mathSin";
   static inputs = [input("number")];
   static outputs = [output("number")];
@@ -95,7 +95,7 @@ class DflowMathSin extends DflowNode {
   }
 }
 
-class DflowMathSinh extends DflowNode {
+class MathSinh extends DflowNode {
   static kind = "mathSinh";
   static inputs = [input("number")];
   static outputs = [output("number")];
@@ -104,15 +104,15 @@ class DflowMathSinh extends DflowNode {
   }
 }
 
-export const catalog = {
-  [DflowMathAbs.kind]: DflowMathAbs,
-  [DflowMathCos.kind]: DflowMathCos,
-  [DflowMathCosh.kind]: DflowMathCosh,
-  [DflowMathFloor.kind]: DflowMathFloor,
-  [DflowMathMax.kind]: DflowMathMax,
-  [DflowMathMin.kind]: DflowMathMin,
-  [DflowMathPI.kind]: DflowMathPI,
-  [DflowMathRound.kind]: DflowMathRound,
-  [DflowMathSin.kind]: DflowMathSin,
-  [DflowMathSinh.kind]: DflowMathSinh
-};
+export default [
+  MathAbs,
+  MathCos,
+  MathCosh,
+  MathFloor,
+  MathMax,
+  MathMin,
+  MathPI,
+  MathRound,
+  MathSin,
+  MathSinh
+];

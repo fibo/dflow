@@ -7,7 +7,7 @@ const dateOutputs = [
   output("number", { name: "milliseconds" })
 ];
 
-class DflowNodeNewDate extends DflowNode {
+class NewDate extends DflowNode {
   static kind = "newDate";
   static inputs = [input(["string", "number"], { optional: true })];
   static outputs = dateOutputs;
@@ -28,7 +28,7 @@ class DflowNodeNewDate extends DflowNode {
   }
 }
 
-class DflowNodeNow extends DflowNode {
+class Now extends DflowNode {
   static kind = "now";
   static outputs = dateOutputs;
   run() {
@@ -38,7 +38,4 @@ class DflowNodeNow extends DflowNode {
   }
 }
 
-export const catalog = {
-  [DflowNodeNewDate.kind]: DflowNodeNewDate,
-  [DflowNodeNow.kind]: DflowNodeNow
-};
+export default [NewDate, Now];
