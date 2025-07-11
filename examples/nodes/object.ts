@@ -1,14 +1,14 @@
-import { Dflow, DflowNode } from "../../dflow.ts";
+import { DflowNode } from "../../dflow.ts";
 import type { DflowObject } from "../../dflow.ts";
 
-const { input, output } = Dflow;
+const { input, output } = DflowNode;
 
 class ObjectKeys extends DflowNode {
   static kind = "objectKeys";
   static inputs = [input("object")];
   static outputs = [output("array")];
   run(input: DflowObject) {
-    this.output(0).data = Object.keys(input);
+    return Object.keys(input);
   }
 }
 
@@ -17,7 +17,7 @@ class ObjectValues extends DflowNode {
   static inputs = [input("object")];
   static outputs = [output("array")];
   run(input: DflowObject) {
-    this.output(0).data = Object.values(input);
+    return Object.values(input);
   }
 }
 

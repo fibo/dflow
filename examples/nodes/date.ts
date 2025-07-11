@@ -1,6 +1,6 @@
-import { Dflow, DflowNode } from "../../dflow.ts";
+import { DflowNode } from "../../dflow.ts";
 
-const { input, output } = Dflow;
+const { input, output } = DflowNode;
 
 const dateOutputs = [
   output("string"),
@@ -16,14 +16,12 @@ class NewDate extends DflowNode {
       const date = new Date(input);
       const serializedDate = date.toJSON();
       if (serializedDate !== null) {
-        this.output(0).data = serializedDate;
-        this.output(1).data = date.getTime();
+        return [serializedDate, date.getTime()];
       }
     }
     // Return current date if no input
     const d = new Date();
-    this.output(0).data = d.toJSON();
-    this.output(1).data = d.getTime();
+    return [d.toJSON(), d.getTime()];
   }
 }
 
@@ -32,8 +30,7 @@ class Now extends DflowNode {
   static outputs = dateOutputs;
   run() {
     const now = Date.now();
-    this.output(0).data = new Date(now).toJSON();
-    this.output(1).data = now;
+    return [new Date(now).toJSON(), now];
   }
 }
 

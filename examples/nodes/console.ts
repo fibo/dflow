@@ -1,7 +1,7 @@
-import { Dflow, DflowNode } from "../../dflow.ts";
+import { DflowNode } from "../../dflow.ts";
 import type { DflowData } from "../../dflow.ts";
 
-const { input } = Dflow;
+const { input } = DflowNode;
 
 class ConsoleLog extends DflowNode {
   static kind = "consoleLog";

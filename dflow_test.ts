@@ -4,7 +4,7 @@ import { strict as assert } from "node:assert";
 import { Dflow, DflowNode } from "./dflow.ts";
 import type { DflowDataType } from "./dflow.ts";
 
-const { input, output } = Dflow;
+const { input, output } = DflowNode;
 
 const num = 1;
 const bool = true;
@@ -25,8 +25,8 @@ class IdentityNode extends DflowNode {
   static kind = "Identity";
   static inputs = [input("number")];
   static outputs = [output("number")];
-  run() {
-    this.output(0).data = this.input(0).data;
+  run(input: number) {
+    return input;
   }
 }
 
@@ -34,10 +34,8 @@ class SumNode extends DflowNode {
   static kind = "Sum";
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
-  run() {
-    const data0 = this.input(0).data as number;
-    const data1 = this.input(1).data as number;
-    this.output(0).data = data0 + data1;
+  run(a: number, b: number) {
+    return a + b;
   }
 }
 
@@ -87,9 +85,6 @@ function sample01() {
 
   return { dflow, nodeId1, nodeId2, pinId1, pinId2, edgeId1 };
 }
-
-// Dflow
-// ////////////////////////////////////////////////////////////////////
 
 test("Dflow.inferDataType()", () => {
   [

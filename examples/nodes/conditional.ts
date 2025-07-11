@@ -1,7 +1,7 @@
-import { Dflow, DflowNode } from "../../dflow.ts";
+import { DflowNode } from "../../dflow.ts";
 import type { DflowData } from "../../dflow.ts";
 
-const { input, output } = Dflow;
+const { input, output } = DflowNode;
 
 class NodeIf extends DflowNode {
   static kind = "if";
@@ -12,7 +12,7 @@ class NodeIf extends DflowNode {
   ];
   static outputs = [output()];
   run(condition: DflowData, then: DflowData, elseValue: DflowData) {
-    this.output(0).data = condition ? then : elseValue;
+    return condition ? then : elseValue;
   }
 }
 

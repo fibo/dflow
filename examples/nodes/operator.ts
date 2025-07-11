@@ -1,14 +1,14 @@
-import { Dflow, DflowNode } from "../../dflow.ts";
+import { DflowNode } from "../../dflow.ts";
 import type { DflowData } from "../../dflow.ts";
 
-const { input, output } = Dflow;
+const { input, output } = DflowNode;
 
 class Addition extends DflowNode {
   static kind = "addition";
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
   run(a: number, b: number) {
-    this.output(0).data = a + b;
+    return a + b;
   }
 }
 
@@ -17,11 +17,7 @@ class Division extends DflowNode {
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
   run(a: number, b: number) {
-    if (b) {
-      this.output(0).data = a / b;
-    } else {
-      this.output(0).clear();
-    }
+    if (b) return a / b;
   }
 }
 
@@ -30,7 +26,7 @@ class Equality extends DflowNode {
   static inputs = [input(), input()];
   static outputs = [output("boolean")];
   run(a: DflowData, b: DflowData) {
-    this.output(0).data = a == b;
+    return a == b;
   }
 }
 
@@ -39,7 +35,7 @@ class LessThan extends DflowNode {
   static inputs = [input("number"), input("number")];
   static outputs = [output("boolean")];
   run(a: number, b: number) {
-    this.output(0).data = a < b;
+    return a < b;
   }
 }
 
@@ -48,7 +44,7 @@ class GreaterThan extends DflowNode {
   static inputs = [input("number"), input("number")];
   static outputs = [output("boolean")];
   run(a: number, b: number) {
-    this.output(0).data = a > b;
+    return a > b;
   }
 }
 
@@ -57,7 +53,7 @@ class Inequality extends DflowNode {
   static inputs = [input(), input()];
   static outputs = [output("boolean")];
   run(a: DflowData, b: DflowData) {
-    this.output(0).data = a != b;
+    return a != b;
   }
 }
 
@@ -66,7 +62,7 @@ class Multiplication extends DflowNode {
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
   run(a: number, b: number) {
-    this.output(0).data = a * b;
+    return a * b;
   }
 }
 
@@ -75,7 +71,7 @@ class Subtraction extends DflowNode {
   static inputs = [input("number"), input("number")];
   static outputs = [output("number")];
   run(a: number, b: number) {
-    this.output(0).data = a - b;
+    return a - b;
   }
 }
 

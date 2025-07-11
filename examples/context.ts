@@ -1,43 +1,35 @@
 // Create a host with an API context.
 import { Dflow, DflowNode } from "../dflow.ts";
 
-const { output } = Dflow;
-
 class ApiClient {
   apiKey: string;
-
-  static isApiClient(client: unknown): client is ApiClient {
-    return client instanceof ApiClient;
-  }
 
   constructor(apiKey: ApiClient["apiKey"]) {
     this.apiKey = apiKey;
   }
 
   async fetchSomeData(): Promise<string> {
-    return await Promise.resolve("foo");
+    return await Promise.resolve("SUCCESS");
   }
 }
 
+type Context = {
+  apiClient: ApiClient;
+};
+
 class CustomNode extends DflowNode {
   static kind = "Custom";
-  static outputs = [output("string")];
-
-  async run() {
-    const apiClient = this.host.context.apiClient;
-
-    if (ApiClient.isApiClient(apiClient)) {
-      this.output(0).data = await apiClient.fetchSomeData();
-    }
+  static outputs = [DflowNode.output("string")];
+  async run({ apiClient }: Context) {
+    const result = await apiClient.fetchSomeData();
+    return result;
   }
 }
 
 async function contextExample() {
   const dflow = new Dflow([CustomNode]);
 
-  const apiKey = "s3cret";
-  const apiClient = new ApiClient(apiKey);
-  dflow.context.apiClient = apiClient;
+  dflow.context.apiClient = new ApiClient("s3cret");
 
   dflow.newNode({ kind: CustomNode.kind });
 

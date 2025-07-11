@@ -1,13 +1,13 @@
-import { Dflow, DflowNode } from "../../dflow.ts";
+import { DflowNode } from "../../dflow.ts";
 
-const { input, output } = Dflow;
+const { input, output } = DflowNode;
 
 class StringLength extends DflowNode {
   static kind = "stringLength";
   static inputs = [input("string")];
   static outputs = [output("number")];
   run(input: string) {
-    this.output(0).data = input.length;
+    return input.length;
   }
 }
 
@@ -20,7 +20,7 @@ class Substring extends DflowNode {
   ];
   static outputs = [output("string")];
   run(input: string, start: number, end?: number) {
-    this.output(0).data = input.substring(start, end);
+    return input.substring(start, end);
   }
 }
 

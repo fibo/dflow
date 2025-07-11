@@ -27,6 +27,8 @@ export type DflowDataType =
 // Dflow
 // ////////////////////////////////////////////////////////////////////
 
+const UNIMPLEMENTED = Symbol("unimplemented");
+
 // Helper to generate an id unique in its scope.
 const generateItemId = (
   itemMap: Map<string, unknown>,
@@ -235,17 +237,14 @@ export class Dflow {
   /**
    * Execute all nodes, sorted by their connections.
    */
-  async run() {
+  async run(): Promise<void> {
     // Loop over nodeIds sorted by graph hierarchy.
     for (const nodeId of this.#sortedNodesIds()) {
       const node = this.#nodesMap.get(nodeId) as DflowNode;
 
       // If some input data is not valid.
       if (!node.inputsDataAreValid) {
-        // Cleanup outputs and go to next node.
-        for (const output of node.outputsMap.values()) {
-          output.clear();
-        }
+        node.clearOutputs();
         continue;
       }
 
@@ -255,10 +254,36 @@ export class Dflow {
           node.inputPosition[position]
         )?.source?.data;
       }
+      let result: unknown;
       if (node.run.constructor.name === "Function") {
-        node.run(...inputData);
-      } else if (node.run.constructor.name === "AsyncFunction") {
-        await node.run(...inputData);
+        result = node.run(...inputData, this.context) as DflowData | undefined;
+      }
+      if (node.run.constructor.name === "AsyncFunction") {
+        result = (await node.run(...inputData, this.context)) as
+          | DflowData
+          | undefined;
+      }
+      // If run() is not implemented, then it is a constant node.
+      if (result === UNIMPLEMENTED) {
+        continue;
+      }
+      if (result === undefined || !Dflow.isDflowData(result)) {
+        node.clearOutputs();
+        continue;
+      }
+      if (node.outputPosition.length === 1) {
+        node.outputsMap.get(node.outputPosition[0])!.data = result;
+      }
+      if (node.outputPosition.length > 1) {
+        for (
+          let position = 0;
+          position < node.outputPosition.length;
+          position++
+        ) {
+          node.outputsMap.get(node.outputPosition[position])!.data = (
+            result as DflowArray
+          )[position];
+        }
       }
     }
   }
@@ -296,120 +321,6 @@ export class Dflow {
     if (Dflow.isArray(arg)) return ["array"];
     if (Dflow.isObject(arg)) return ["object"];
     return [];
-  }
-
-  /**
-   * `Dlow.input()` is a `DflowInputDefinition` helper.
-   *
-   * @example
-   *
-   * ```ts
-   * const { input } = Dflow;
-   *
-   * export class Echo extends DflowNode {
-   *   static kind = "echo";
-   *   static inputs = [input("string")];
-   *   run () {
-   *     console.log(this.input(0).data);
-   *   }
-   * }
-   * ```
-   *
-   * Input with `number` type.
-   *
-   * @example
-   *
-   * ```ts
-   * Dflow.input("number")
-   * ```
-   *
-   * Optional `number` input.
-   *
-   * @example
-   *
-   * ```ts
-   * Dflow.input("number", { optional: true })
-   * ```
-   *
-   * Input that accepts both `number` and `string` type.
-   *
-   * @example
-   *
-   * ```ts
-   * Dflow.input(["number", "string"])
-   * ```
-   *
-   * Input with any type.
-   *
-   * @example
-   *
-   * ```ts
-   * Dflow.input()
-   * ```
-   *
-   * Input with type `array` and name.
-   *
-   * @example
-   *
-   * ```ts
-   * Dflow.input("array", { name: "list" })
-   * ```
-   *
-   * Input with any type and named "foo".
-   *
-   * @example
-   *
-   * ```ts
-   * Dflow.input([], { name: "foo" })
-   * ```
-   */
-  static input(
-    typing: DflowDataType | DflowDataType[] = [],
-    rest?: Omit<DflowInputDefinition, "types">
-  ): DflowInputDefinition {
-    return {
-      types: typeof typing === "string" ? [typing] : typing,
-      ...rest
-    };
-  }
-
-  /**
-   * `Dflow.output()` is a `DflowOutputDefinition` helper.
-   *
-   * @example
-   *
-   * ```ts
-   * const { output } = Dflow;
-   *
-   * export class MathPI extends DflowNode {
-   *   static kind = "mathPI";
-   *   static outputs = [output("number", { name: "π", data: Math.PI })];
-   * }
-   * ```
-   *
-   * Named output with `number` type.
-   *
-   * @example
-   *
-   * ```ts
-   * Dflow.output("number", { name: "answer" })
-   * ```
-   *
-   * @see {@link Dflow.input} for other similar examples.
-   *
-   * `DflowOutputDefinition` has also an optional `data` attribute.
-   *
-   * @example
-   *
-   * ```ts
-   * Dflow.output("number", { data: 42, name: "answer" })
-   * ```
-   */
-  static output(
-    typing: DflowDataType | DflowDataType[] = [],
-    rest?: Omit<DflowOutputDefinition, "types">
-  ): DflowOutputDefinition {
-    return { types: typeof typing === "string" ? [typing] : typing, ...rest };
   }
 
   /**
@@ -594,9 +505,8 @@ type DflowNodeObj = {
  *   static kind = "addition";
  *   static inputs = [input("number"), input("number")];
  *   static outputs = [output("number")];
- *   run() {
- *     this.output(0).data = (this.input(0).data as number) +
- *       (this.input(1).data as number);
+ *   run(a: number, b: number) {
+ *     return a + b;
  *   }
  * }
  * ```
@@ -607,20 +517,133 @@ export class DflowNode {
 
   inputPosition: string[] = [];
 
-  #outputPosition: string[] = [];
+  outputPosition: string[] = [];
 
   inputsMap: Map<string, DflowInput> = new Map();
 
   outputsMap: Map<string, DflowOutput> = new Map();
 
   /**
-   * Every dflow node must have its own `kind` that is used as a *unique key* to find it in the set of node definitions.
+   * `DflowNode.input()` is a `DflowInputDefinition` helper.
+   *
+   * @example
+   *
+   * ```ts
+   * const { input } = Dflow;
+   *
+   * export class Echo extends DflowNode {
+   *   static kind = "echo";
+   *   static inputs = [input("string")];
+   *   run () {
+   *     console.log(this.input(0).data);
+   *   }
+   * }
+   * ```
+   *
+   * Input with `number` type.
+   *
+   * @example
+   *
+   * ```ts
+   * DflowNode.input("number")
+   * ```
+   *
+   * Optional `number` input.
+   *
+   * @example
+   *
+   * ```ts
+   * DflowNode.input("number", { optional: true })
+   * ```
+   *
+   * Input that accepts both `number` and `string` type.
+   *
+   * @example
+   *
+   * ```ts
+   * DflowNode.input(["number", "string"])
+   * ```
+   *
+   * Input with any type.
+   *
+   * @example
+   *
+   * ```ts
+   * DflowNode.input()
+   * ```
+   *
+   * Input with type `array` and name.
+   *
+   * @example
+   *
+   * ```ts
+   * DflowNode.input("array", { name: "list" })
+   * ```
+   *
+   * Input with any type and named "foo".
+   *
+   * @example
+   *
+   * ```ts
+   * DflowNode.input([], { name: "foo" })
+   * ```
+   */
+  static input(
+    typing: DflowDataType | DflowDataType[] = [],
+    rest?: Omit<DflowInputDefinition, "types">
+  ): DflowInputDefinition {
+    return {
+      types: typeof typing === "string" ? [typing] : typing,
+      ...rest
+    };
+  }
+
+  /**
+   * `DflowNode.output()` is a `DflowOutputDefinition` helper.
+   *
+   * @example
+   *
+   * ```ts
+   * const { output } = DflowNode;
+   *
+   * export class MathPI extends DflowNode {
+   *   static kind = "mathPI";
+   *   static outputs = [output("number", { name: "π", data: Math.PI })];
+   * }
+   * ```
+   *
+   * Named output with `number` type.
+   *
+   * @example
+   *
+   * ```ts
+   * DflowNode.output("number", { name: "answer" })
+   * ```
+   *
+   * @see {@link DflowNode.input} for other similar examples.
+   *
+   * `DflowOutputDefinition` has also an optional `data` attribute.
+   *
+   * @example
+   *
+   * ```ts
+   * DflowNode.output("number", { data: 42, name: "answer" })
+   * ```
+   */
+  static output(
+    typing: DflowDataType | DflowDataType[] = [],
+    rest?: Omit<DflowOutputDefinition, "types">
+  ): DflowOutputDefinition {
+    return { types: typeof typing === "string" ? [typing] : typing, ...rest };
+  }
+
+  /**
+   * Every dflow node must have its own `kind` that is used as a *unique key*.
    */
   readonly kind: string;
 
   /**
    * `DflowNode` has a reference to its `Dflow` host.
-   * It can be used in the node `run()` implementation.
    */
   readonly host: Dflow;
 
@@ -655,7 +678,7 @@ export class DflowNode {
     // Outputs.
     for (const obj of outputs) {
       const id = generateItemId(this.outputsMap, "o", obj.id);
-      this.#outputPosition.push(id);
+      this.outputPosition.push(id);
       let { data: _data, types, ...rest } = obj;
       this.outputsMap.set(id, {
         ...rest,
@@ -719,11 +742,18 @@ export class DflowNode {
    * @remarks This should be called inside `DflowNode.run()`. There is no check that the position is valid.
    */
   output(position: number): DflowOutput {
-    return this.outputsMap.get(this.#outputPosition[position]) as DflowOutput;
+    return this.outputsMap.get(this.outputPosition[position]) as DflowOutput;
   }
 
-  /** @ignore this method, it should be overridden. */
-  run(..._inputData: Array<DflowData | undefined>): void | Promise<void> {}
+  /**
+   * First arguments are inputs data, which are `DflowData | undefined`.
+   * Last argument is the `Dflow` context which is a `Record<string, unknown>`.
+   */
+  run(
+    ..._args: Array<DflowData | undefined | Record<string, unknown>>
+  ): unknown | Promise<unknown> {
+    return UNIMPLEMENTED;
+  }
 
   toJSON(): DflowNodeObj {
     const obj: DflowNodeObj = { id: this.id, k: this.kind };
@@ -769,7 +799,7 @@ export type DflowEdge = {
 
 class DflowNodeData extends DflowNode {
   static kind = "data";
-  static outputs = [Dflow.output()];
+  static outputs = [DflowNode.output()];
   constructor({
     outputs,
     ...rest
