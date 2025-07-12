@@ -1,6 +1,6 @@
 import { Dflow, DflowNode } from "../dflow.js";
 
-const { input, output } = Dflow;
+const { input, output } = DflowNode;
 
 class NumNode extends DflowNode {
   static kind = "Num";
@@ -31,9 +31,9 @@ class SleepNode extends DflowNode {
   kind = "Sleep";
   async run() {
     const numSeconds = 2;
-    console.log("sleep node start", `(will sleep ${numSeconds} seconds) zZz`);
+    console.info("sleep node start", `(will sleep ${numSeconds} seconds) zZz`);
     await sleep(numSeconds);
-    console.log("sleep node end");
+    console.info("sleep node end");
   }
 }
 
@@ -67,8 +67,7 @@ async function runGraph() {
   // Run graph asynchronously.
   await dflow.run();
 
-  const sum = sumNode.output(0);
-  console.log(sum.data); // 42
+  console.info(JSON.stringify(dflow.graph, null, 2));
 }
 
 runGraph();

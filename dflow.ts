@@ -135,10 +135,10 @@ export class Dflow {
         );
         if (!sourceOutput || !targetInput)
           throw new Error("Source output or target input not found");
-        this.newEdge({
-          source: [sourceNode!.id, sourceOutput.id],
-          target: [targetNode!.id, targetInput.id]
-        });
+        this.edge(
+          [sourceNode!.id, sourceOutput.id],
+          [targetNode!.id, targetInput.id]
+        );
       }
     };
   }
@@ -208,14 +208,14 @@ export class Dflow {
   /**
    * Create a new edge.
    */
-  newEdge(arg: {
-    id?: string;
-    source: [nodeId: string, outputId: string];
-    target: [nodeId: string, inputId: string];
-  }): DflowEdge {
-    const id = generateItemId(this.#edgesMap, "e", arg.id);
+  edge(
+    source: [nodeId: string, outputId: string],
+    target: [nodeId: string, inputId: string],
+    wantedId?: string
+  ): DflowEdge {
+    const id = generateItemId(this.#edgesMap, "e", wantedId);
 
-    const edge: DflowEdge = { id, s: arg.source, t: arg.target };
+    const edge: DflowEdge = { id, s: source, t: target };
     const cause: { code?: string; edge: DflowEdge } = { edge };
 
     const sourceNode = this.#nodesMap.get(edge.s[0]);
@@ -540,20 +540,6 @@ export class DflowNode {
 
   /**
    * `DflowNode.input()` is a helper to define inputs.
-   *
-   * @example
-   *
-   * ```ts
-   * const { input } = Dflow;
-   *
-   * export class Echo extends DflowNode {
-   *   static kind = "echo";
-   *   static inputs = [input("string")];
-   *   run () {
-   *     console.log(this.input(0).data);
-   *   }
-   * }
-   * ```
    *
    * Input with `number` type.
    *

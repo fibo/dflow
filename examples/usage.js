@@ -2,7 +2,7 @@
 
 import { Dflow, DflowNode } from "dflow";
 
-const { input, output } = Dflow;
+const { input, output } = DflowNode;
 
 class MathSin extends DflowNode {
   static kind = "mathSin";

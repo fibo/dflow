@@ -3,12 +3,12 @@ import type { DflowData } from "../../dflow.ts";
 
 const { input } = DflowNode;
 
-class ConsoleLog extends DflowNode {
-  static kind = "consoleLog";
+class ConsoleInfo extends DflowNode {
+  static kind = "consoleInfo";
   static inputs = [input()];
   run(data: DflowData) {
-    console.log(data);
+    console.info(data);
   }
 }
 
-export default [ConsoleLog];
+export default [ConsoleInfo];

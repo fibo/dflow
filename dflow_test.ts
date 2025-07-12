@@ -50,9 +50,9 @@ function sleep(seconds = 1) {
 class SleepNode extends DflowNode {
   static kind = "Sleep";
   async run() {
-    console.log("sleep node start");
+    console.info("sleep node start");
     await sleep();
-    console.log("sleep node end");
+    console.info("sleep node end");
   }
 }
 
@@ -77,11 +77,7 @@ function sample01() {
     kind: "Identity",
     inputs: [{ id: pinId2 }]
   });
-  dflow.newEdge({
-    id: edgeId1,
-    source: [nodeId1, pinId1],
-    target: [nodeId2, pinId2]
-  });
+  dflow.edge([nodeId1, pinId1], [nodeId2, pinId2], edgeId1);
 
   return { dflow, nodeId1, nodeId2, pinId1, pinId2, edgeId1 };
 }
@@ -316,16 +312,8 @@ test("dflow.run()", async () => {
     inputs: [{ id: "in1" }, { id: "in2" }],
     outputs: [{ id: "out" }]
   });
-  dflow.newEdge({
-    id: "e1",
-    source: ["num", "out"],
-    target: ["sum", "in1"]
-  });
-  dflow.newEdge({
-    id: "e2",
-    source: ["num", "out"],
-    target: ["sum", "in2"]
-  });
+  dflow.edge(["num", "out"], ["sum", "in1"], "e1");
+  dflow.edge(["num", "out"], ["sum", "in2"], "e2");
 
   // Add also an async node.
   dflow.newNode({ id: "sleep", kind: "Sleep" });
@@ -370,12 +358,12 @@ test("dflow.newNode()", () => {
   });
 });
 
-test("dflow.newEdge()", () => {
+test("dflow.edge()", () => {
   const { dflow } = sample01();
 
   assert.throws(
     () => {
-      dflow.newEdge({ source: ["xxx", "out"], target: ["yyy", "in"] });
+      dflow.edge(["xxx", "out"], ["yyy", "in"]);
     },
     { message: "Cannot create edge" }
   );

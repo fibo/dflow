@@ -34,7 +34,7 @@ async function contextExample() {
 
   await dflow.run();
 
-  console.log(JSON.stringify(dflow.graph, null, 2));
+  console.info(JSON.stringify(dflow.graph, null, 2));
 }
 
 contextExample();
