@@ -173,7 +173,6 @@ export class Dflow {
     outputs?: { id?: string; data?: DflowData }[];
   }): {
     id: string;
-    toJSON(): DflowNodeObj;
   } {
     const NodeClass = this.#nodeDefinitions.get(arg.kind) ?? DflowNodeUnknown;
 
@@ -203,12 +202,7 @@ export class Dflow {
 
     this.#nodesMap.set(node.id, node);
 
-    return {
-      id,
-      toJSON() {
-        return node.toJSON();
-      }
-    };
+    return { id };
   }
 
   /**
@@ -269,12 +263,10 @@ export class Dflow {
       }
       let result: unknown;
       if (node.run.constructor.name === "Function") {
-        result = node.run(...inputData, this.context) as DflowData | undefined;
+        result = node.run(...inputData) as DflowData | undefined;
       }
       if (node.run.constructor.name === "AsyncFunction") {
-        result = (await node.run(...inputData, this.context)) as
-          | DflowData
-          | undefined;
+        result = (await node.run(...inputData)) as DflowData | undefined;
       }
       // If run() is not implemented, then it is a constant node.
       if (result === UNIMPLEMENTED) {
@@ -303,7 +295,18 @@ export class Dflow {
 
   get graph(): DflowGraph {
     return {
-      n: [...this.#nodesMap.values()].map((item) => item.toJSON()),
+      n: [...this.#nodesMap.values()].map((node) => {
+        const obj: DflowNodeObj = { id: node.id, k: node.kind };
+
+        const outputs = [...node.outputsMap.values()].map((item) => {
+          const obj: { d?: DflowData } = {};
+          if (item.data !== undefined) obj.d = item.data;
+          return obj;
+        });
+        if (outputs.length > 0) obj.o = outputs;
+
+        return obj;
+      }),
       e: [...this.#edgesMap.values()]
     };
   }
@@ -492,16 +495,15 @@ export interface DflowNodeDefinition {
 
 type DflowNodeObj = {
   id: string;
-  /** kind */
+  /** Node kind */
   k: string;
-  /** inputs */
-  i?: Array<{ id: string }>;
-  /** outputs */
+  /** Node outputs */
   o?: Array<{
-    id: string;
     /** data */
     d?: DflowData;
   }>;
+  /** Last error message. */
+  err?: string;
 };
 
 /**
@@ -739,31 +741,13 @@ export class DflowNode {
   }
 
   /**
-   * First arguments are inputs data, which are `DflowData | undefined`.
-   * Last argument is the `Dflow` context which is a `Record<string, unknown>`.
+   * Every `DflowNode` can implement `run()` method.
+   * Arguments are node inputs data.
+   * Return value is the output data.
+   * If `run()` is not implemented, then the node is a constant node.
    */
-  run(
-    ..._args: Array<DflowData | undefined | Record<string, unknown>>
-  ): unknown | Promise<unknown> {
+  run(..._args: Array<DflowData | undefined>): unknown | Promise<unknown> {
     return UNIMPLEMENTED;
-  }
-
-  toJSON(): DflowNodeObj {
-    const obj: DflowNodeObj = { id: this.id, k: this.kind };
-
-    const inputs = [...this.inputsMap.values()].map((item) => ({
-      id: item.id
-    }));
-    if (inputs.length > 0) obj.i = inputs;
-
-    const outputs = [...this.outputsMap.values()].map((item) => {
-      const obj: { id: string; d?: DflowData } = { id: item.id };
-      if (item.data !== undefined) obj.d = item.data;
-      return obj;
-    });
-    if (outputs.length > 0) obj.o = outputs;
-
-    return obj;
   }
 }
 

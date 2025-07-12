@@ -29,11 +29,13 @@ function testConditionalIf(
   dflow.connect(dataNode2).to(testNode, 1);
   dflow.connect(dataNode3).to(testNode, 2);
   dflow.run();
-  assert.deepEqual(testNode.toJSON().o?.[0].d, output);
+  const testNodeOutput = dflow.graph.n.find((node) => node.id === testNode.id)
+    ?.o?.[0];
+  assert.deepEqual(testNodeOutput?.d, output);
 }
 
 test("DflowNodeIf", () => {
-  [
+  for (const { input1, input2, input3, output } of [
     {
       input1: undefined,
       input2: undefined,
@@ -44,7 +46,6 @@ test("DflowNodeIf", () => {
     { input1: false, input2: 1, input3: 2, output: 2 },
     { input1: "", input2: 1, input3: 2, output: 2 },
     { input1: "str", input2: 1, input3: 2, output: 1 }
-  ].forEach(({ input1, input2, input3, output }) => {
+  ])
     testConditionalIf(input1, input2, input3, output);
-  });
 });

@@ -13,7 +13,10 @@ export function testOneOut<Output>(
 ) {
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.run();
-  assert.deepEqual(testNode.toJSON().o?.[0]?.d, output);
+  assert.deepEqual(
+    dflow.graph.n.find((node) => node.id === testNode.id)?.o?.[0]?.d,
+    output
+  );
 }
 
 export function testOneInOneOut<Input, Output>(
@@ -29,7 +32,10 @@ export function testOneInOneOut<Input, Output>(
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
   dflow.run();
-  assert.deepEqual(testNode.toJSON().o?.[0]?.d, output);
+  const testNodeOutput = dflow.graph.n.find(
+    (node) => node.id === testNode.id
+  )?.o;
+  assert.deepEqual(testNodeOutput?.[0].d, output);
 }
 
 export function testOneInTwoOut<Input, Output1, Output2>(
@@ -46,8 +52,11 @@ export function testOneInTwoOut<Input, Output1, Output2>(
   const testNode = dflow.newNode({ kind: nodeKind });
   dflow.connect(dataNode).to(testNode);
   dflow.run();
-  assert.deepEqual(testNode.toJSON().o?.[0]?.d, output1);
-  assert.deepEqual(testNode.toJSON().o?.[1]?.d, output2);
+  const testNodeOutput = dflow.graph.n.find(
+    (node) => node.id === testNode.id
+  )?.o;
+  assert.deepEqual(testNodeOutput?.[0].d, output1);
+  assert.deepEqual(testNodeOutput?.[1].d, output2);
 }
 
 export function testTwoInOneOut<Input1, Input2, Output>(
@@ -73,7 +82,10 @@ export function testTwoInOneOut<Input1, Input2, Output>(
   if (dataNode1) dflow.connect(dataNode1).to(testNode, 0);
   if (dataNode2) dflow.connect(dataNode2).to(testNode, 1);
   dflow.run();
-  assert.deepEqual(testNode.toJSON().o?.[0]?.d, output);
+  const testNodeOutput = dflow.graph.n.find(
+    (node) => node.id === testNode.id
+  )?.o;
+  assert.deepEqual(testNodeOutput?.[0].d, output);
 }
 
 export function testThreeInOneOut<Input1, Input2, Input3, Output>(
@@ -107,5 +119,8 @@ export function testThreeInOneOut<Input1, Input2, Input3, Output>(
   if (dataNode2) dflow.connect(dataNode2).to(testNode, 1);
   if (dataNode3) dflow.connect(dataNode3).to(testNode, 2);
   dflow.run();
-  assert.deepEqual(testNode.toJSON().o?.[0]?.d, output);
+  const testNodeOutput = dflow.graph.n.find(
+    (node) => node.id === testNode.id
+  )?.o;
+  assert.deepEqual(testNodeOutput?.[0].d, output);
 }

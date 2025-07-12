@@ -286,32 +286,14 @@ test("dflow.graph", () => {
     ],
     n: [
       {
-        i: [
-          {
-            id: "i0"
-          }
-        ],
         id: "n1",
         k: "Identity",
-        o: [
-          {
-            id: "p1"
-          }
-        ]
+        o: [{}]
       },
       {
-        i: [
-          {
-            id: "p2"
-          }
-        ],
         id: "n2",
         k: "Identity",
-        o: [
-          {
-            id: "o0"
-          }
-        ]
+        o: [{}]
       }
     ]
   });
@@ -350,38 +332,42 @@ test("dflow.run()", async () => {
 
   await dflow.run();
 
-  const sumNodeObj = sumNode.toJSON();
-  assert.deepEqual(sumNodeObj.o?.[0]?.d, 4);
+  assert.deepEqual(
+    dflow.graph.n.find((node) => node.id === sumNode.id)?.o?.[0]?.d,
+    4
+  );
 });
 
 test("dflow.newNode()", () => {
   const dflow = new Dflow(nodeDefinitions1);
 
   // newNode with id
-  const nodeId1 = "node1";
   const node1 = dflow.newNode({
     kind: "Identity",
-    id: nodeId1
+    id: "node1"
   });
-  assert.deepEqual(node1.id, nodeId1);
-
-  // newNode with inputs
-  const inputId1 = "input1";
-  const node2 = dflow.newNode({
-    kind: "Identity",
-    inputs: [{ id: inputId1 }]
-  });
-  const node2Obj = node2.toJSON();
-  assert.deepEqual(node2Obj.i?.[0]?.id, inputId1);
 
   // newNode with outputs
-  const outputId1 = "output1";
-  const node3 = dflow.newNode({
-    kind: "Identity",
-    outputs: [{ id: outputId1 }]
+  const node2 = dflow.newNode({
+    kind: "data",
+    outputs: [{ data: 42 }]
   });
-  const node3Obj = node3.toJSON();
-  assert.deepEqual(node3Obj.o?.[0]?.id, outputId1);
+
+  assert.deepEqual(dflow.graph, {
+    n: [
+      {
+        id: node1.id,
+        k: "Identity",
+        o: [{}]
+      },
+      {
+        id: node2.id,
+        k: "data",
+        o: [{ d: 42 }]
+      }
+    ],
+    e: []
+  });
 });
 
 test("dflow.newEdge()", () => {

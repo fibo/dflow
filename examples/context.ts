@@ -8,20 +8,19 @@ class ApiClient {
     this.apiKey = apiKey;
   }
 
-  async fetchSomeData(): Promise<string> {
-    return await Promise.resolve("SUCCESS");
+  async fetchSomeData(
+    payload: string
+  ): Promise<{ status: string; payload: string }> {
+    return await Promise.resolve({ status: "SUCCESS", payload });
   }
 }
 
-type Context = {
-  apiClient: ApiClient;
-};
-
 class CustomNode extends DflowNode {
   static kind = "Custom";
-  static outputs = [DflowNode.output("string")];
-  async run({ apiClient }: Context) {
-    const result = await apiClient.fetchSomeData();
+  static outputs = [DflowNode.output("object")];
+  async run() {
+    const apiClient = this.host.context.apiClient as ApiClient;
+    const result = await apiClient.fetchSomeData("foo");
     return result;
   }
 }
