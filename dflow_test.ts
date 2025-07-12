@@ -67,14 +67,12 @@ function sample01() {
   const pinId2 = "p2";
   const edgeId1 = "e2";
   const dflow = new Dflow(nodeDefinitions1);
-  dflow.newNode({
+  dflow.node("Identity", {
     id: nodeId1,
-    kind: "Identity",
     outputs: [{ id: pinId1 }]
   });
-  dflow.newNode({
+  dflow.node("Identity", {
     id: nodeId2,
-    kind: "Identity",
     inputs: [{ id: pinId2 }]
   });
   dflow.edge([nodeId1, pinId1], [nodeId2, pinId2], edgeId1);
@@ -301,14 +299,12 @@ test("dflow.run()", async () => {
   // Num#out=2 -> Sum#in1 |
   //                      |-> Sum#out=4
   // Num#out=2 -> Sum#in2 |
-  dflow.newNode({
+  dflow.node("data", {
     id: "num",
-    kind: "data",
     outputs: [{ id: "out", data: 2 }]
   });
-  const sumNode = dflow.newNode({
+  const sumNode = dflow.node("Sum", {
     id: "sum",
-    kind: "Sum",
     inputs: [{ id: "in1" }, { id: "in2" }],
     outputs: [{ id: "out" }]
   });
@@ -316,7 +312,7 @@ test("dflow.run()", async () => {
   dflow.edge(["num", "out"], ["sum", "in2"], "e2");
 
   // Add also an async node.
-  dflow.newNode({ id: "sleep", kind: "Sleep" });
+  dflow.node("Sleep", { id: "sleep" });
 
   await dflow.run();
 
@@ -330,16 +326,10 @@ test("dflow.newNode()", () => {
   const dflow = new Dflow(nodeDefinitions1);
 
   // newNode with id
-  const node1 = dflow.newNode({
-    kind: "Identity",
-    id: "node1"
-  });
+  const node1 = dflow.node("Identity", { id: "node1" });
 
   // newNode with outputs
-  const node2 = dflow.newNode({
-    kind: "data",
-    outputs: [{ data: 42 }]
-  });
+  const node2 = dflow.node("data", { outputs: [{ data: 42 }] });
 
   assert.deepEqual(dflow.graph, {
     n: [

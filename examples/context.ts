@@ -30,7 +30,7 @@ async function contextExample() {
 
   dflow.context.apiClient = new ApiClient("s3cret");
 
-  dflow.newNode({ kind: CustomNode.kind });
+  dflow.node(CustomNode.kind);
 
   await dflow.run();
 

@@ -6,7 +6,7 @@ test("newDate", () => {
   const dflow = newDflow();
   const nodeKind = "newDate";
 
-  const testNode = dflow.newNode({ kind: nodeKind });
+  const testNode = dflow.node(nodeKind);
 
   dflow.run();
 
@@ -24,7 +24,7 @@ test("now", () => {
   const dflow = newDflow();
   const nodeKind = "now";
 
-  const testNode = dflow.newNode({ kind: nodeKind });
+  const testNode = dflow.node(nodeKind);
 
   dflow.run();
 

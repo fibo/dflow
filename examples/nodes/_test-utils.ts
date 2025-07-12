@@ -11,7 +11,7 @@ export function testOneOut<Output>(
   nodeKind: string,
   output: Output
 ) {
-  const testNode = dflow.newNode({ kind: nodeKind });
+  const testNode = dflow.node(nodeKind);
   dflow.run();
   assert.deepEqual(
     dflow.graph.n.find((node) => node.id === testNode.id)?.o?.[0]?.d,
@@ -25,11 +25,10 @@ export function testOneInOneOut<Input, Output>(
   input?: Input,
   output?: Output
 ) {
-  const dataNode = dflow.newNode({
-    kind: "data",
+  const dataNode = dflow.node("data", {
     outputs: [{ data: Dflow.isDflowData(input) ? input : undefined }]
   });
-  const testNode = dflow.newNode({ kind: nodeKind });
+  const testNode = dflow.node(nodeKind);
   dflow.connect(dataNode).to(testNode);
   dflow.run();
   const testNodeOutput = dflow.graph.n.find(
@@ -45,11 +44,10 @@ export function testOneInTwoOut<Input, Output1, Output2>(
   output1?: Output1,
   output2?: Output2
 ) {
-  const dataNode = dflow.newNode({
-    kind: "data",
+  const dataNode = dflow.node("data", {
     outputs: [{ data: Dflow.isDflowData(input) ? input : undefined }]
   });
-  const testNode = dflow.newNode({ kind: nodeKind });
+  const testNode = dflow.node(nodeKind);
   dflow.connect(dataNode).to(testNode);
   dflow.run();
   const testNodeOutput = dflow.graph.n.find(
@@ -67,18 +65,12 @@ export function testTwoInOneOut<Input1, Input2, Output>(
   output?: Output
 ) {
   const dataNode1 = Dflow.isDflowData(input1)
-    ? dflow.newNode({
-        kind: "data",
-        outputs: [{ data: input1 }]
-      })
+    ? dflow.node("data", { outputs: [{ data: input1 }] })
     : undefined;
   const dataNode2 = Dflow.isDflowData(input2)
-    ? dflow.newNode({
-        kind: "data",
-        outputs: [{ data: input2 }]
-      })
+    ? dflow.node("data", { outputs: [{ data: input2 }] })
     : undefined;
-  const testNode = dflow.newNode({ kind: nodeKind });
+  const testNode = dflow.node(nodeKind);
   if (dataNode1) dflow.connect(dataNode1).to(testNode, 0);
   if (dataNode2) dflow.connect(dataNode2).to(testNode, 1);
   dflow.run();
@@ -97,24 +89,15 @@ export function testThreeInOneOut<Input1, Input2, Input3, Output>(
   output?: Output
 ) {
   const dataNode1 = Dflow.isDflowData(input1)
-    ? dflow.newNode({
-        kind: "data",
-        outputs: [{ data: input1 }]
-      })
+    ? dflow.node("data", { outputs: [{ data: input1 }] })
     : undefined;
   const dataNode2 = Dflow.isDflowData(input2)
-    ? dflow.newNode({
-        kind: "data",
-        outputs: [{ data: input2 }]
-      })
+    ? dflow.node("data", { outputs: [{ data: input2 }] })
     : undefined;
   const dataNode3 = Dflow.isDflowData(input3)
-    ? dflow.newNode({
-        kind: "data",
-        outputs: [{ data: input3 }]
-      })
+    ? dflow.node("data", { outputs: [{ data: input3 }] })
     : undefined;
-  const testNode = dflow.newNode({ kind: nodeKind });
+  const testNode = dflow.node(nodeKind);
   if (dataNode1) dflow.connect(dataNode1).to(testNode, 0);
   if (dataNode2) dflow.connect(dataNode2).to(testNode, 1);
   if (dataNode3) dflow.connect(dataNode3).to(testNode, 2);

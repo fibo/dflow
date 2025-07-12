@@ -89,12 +89,11 @@ class ConsoleLog extends DflowNode {
 const dflow = new Dflow([MathSin, ConsoleLog]);
 
 // Create nodes.
-const sinNode = dflow.newNode({ kind: "mathSin" });
-const consoleLogNode = dflow.newNode({ kind: "consoleLog" });
+const sinNode = dflow.node("mathSin");
+const consoleLogNode = dflow.node("consoleLog");
 
 // DflowNodeData is a core node, its kind is "data".
-const numNode = dflow.newNode({
-  kind: "data",
+const numNode = dflow.node("data", {
   // set numNode output to π / 2
   outputs: [{ data: Math.PI / 2 }]
 });

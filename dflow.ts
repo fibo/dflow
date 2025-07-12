@@ -166,15 +166,17 @@ export class Dflow {
   /**
    * Create a new node.
    */
-  newNode(arg: {
-    kind: string;
-    id?: string;
-    inputs?: { id?: string }[];
-    outputs?: { id?: string; data?: DflowData }[];
-  }): {
+  node(
+    kind: string,
+    arg: {
+      id?: string;
+      inputs?: { id?: string }[];
+      outputs?: { id?: string; data?: DflowData }[];
+    } = {}
+  ): {
     id: string;
   } {
-    const NodeClass = this.#nodeDefinitions.get(arg.kind) ?? DflowNodeUnknown;
+    const NodeClass = this.#nodeDefinitions.get(kind) ?? DflowNodeUnknown;
 
     const id = generateItemId(this.#nodesMap, "n", arg.id);
 
@@ -194,7 +196,7 @@ export class Dflow {
 
     const node = new NodeClass({
       id,
-      kind: arg.kind,
+      kind,
       host: this,
       inputs,
       outputs
