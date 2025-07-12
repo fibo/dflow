@@ -30,21 +30,42 @@ export type DflowDataType =
 const UNIMPLEMENTED = Symbol();
 
 // Helper to generate an id unique in its scope.
-const generateItemId = (
+const newId = (
   itemMap: Map<string, unknown>,
   idPrefix: string,
   wantedId?: string
 ): string => {
   if (wantedId && !itemMap.has(wantedId)) return wantedId;
   const id = `${idPrefix}${itemMap.size}`;
-  return itemMap.has(id) ? generateItemId(itemMap, idPrefix) : id;
+  return itemMap.has(id) ? newId(itemMap, idPrefix) : id;
 };
 
 export type DflowGraph = {
   /** nodes */
-  n: DflowNodeObj[];
+  n: Record<
+    string,
+    {
+      /** Node kind */
+      k: string;
+      /** Node outputs */
+      o?: Array<{
+        /** data */
+        d?: DflowData;
+      }>;
+      /** Last error message. */
+      err?: string;
+    }
+  >;
   /** links */
-  l: DflowLink[];
+  l: Record<
+    string,
+    [
+      sourceNodeId: string,
+      sourceOutputPosition: number,
+      targetNodeId: string,
+      targetInputPosition: number
+    ]
+  >;
 };
 
 /**
@@ -128,13 +149,14 @@ export class Dflow {
     kind: string,
     arg: {
       id?: string;
+      // TODO remove inputs arg
       inputs?: { id?: string }[];
       outputs?: { id?: string; data?: DflowData }[];
     } = {}
   ): string {
     const NodeClass = this.#nodeDefinitions.get(kind) ?? DflowNodeUnknown;
 
-    const id = generateItemId(this.#nodesMap, "n", arg.id);
+    const id = newId(this.#nodesMap, "n", arg.id);
 
     const inputs =
       NodeClass.inputs?.map((definition, i) => {
@@ -172,36 +194,31 @@ export class Dflow {
     target: string | [nodeId: string, inputPosition: number],
     wantedId?: string
   ): string {
-    const id = generateItemId(this.#linksMap, "l", wantedId);
+    const id = newId(this.#linksMap, "l", wantedId);
 
     const link: DflowLink = {
       id,
       s: typeof source === "string" ? [source, 0] : source,
       t: typeof target === "string" ? [target, 0] : target
     };
-    const cause: { code?: string; link: DflowLink } = { link };
 
     const sourceNode = this.#nodesMap.get(link.s[0]);
     const targetNode = this.#nodesMap.get(link.t[0]);
 
     if (sourceNode && targetNode) {
-      const sourceOutput = sourceNode.outputs[link.s[1]];
-      const targetInput = targetNode.inputs[link.t[1]];
+      const source = sourceNode.outputs[link.s[1]];
+      const target = targetNode.inputs[link.t[1]];
 
-      if (sourceOutput && targetInput) {
-        if (Dflow.canConnect(sourceOutput.types, targetInput.types)) {
+      if (source && target) {
+        if (Dflow.canConnect(source.types, target.types)) {
           this.#linksMap.set(link.id, link);
-          targetInput.source = sourceOutput;
+          target.source = source;
           return id;
-        } else {
-          cause.code = "IncompatibleTypes";
         }
-      } else {
-        cause.code = "SourceOrTargetNotFound";
       }
     }
 
-    throw new Error("Cannot create link", { cause });
+    throw new Error("Cannot create link", { cause: { link } });
   }
 
   /**
@@ -244,21 +261,29 @@ export class Dflow {
   }
 
   get graph(): DflowGraph {
-    return {
-      n: [...this.#nodesMap.values()].map((node) => {
-        const obj: DflowNodeObj = { id: node.id, k: node.kind };
-
-        const outputs = node.outputs.map((item) => {
-          const obj: { d?: DflowData } = {};
-          if (item.data !== undefined) obj.d = item.data;
-          return obj;
-        });
-        if (outputs.length > 0) obj.o = outputs;
-
-        return obj;
-      }),
-      l: [...this.#linksMap.values()]
-    };
+    const n: DflowGraph["n"] = {};
+    for (const [nodeId, node] of this.#nodesMap.entries()) {
+      const outputs: Array<{ d?: DflowData }> = [];
+      for (const output of node.outputs) {
+        const obj: { d?: DflowData } = {};
+        if (output.data !== undefined) obj.d = output.data;
+        outputs.push(obj);
+      }
+      n[nodeId] = {
+        k: node.kind,
+        o: outputs
+      };
+    }
+    const l: DflowGraph["l"] = {};
+    for (const [linkId, link] of this.#linksMap.entries()) {
+      l[linkId] = [
+        link.s[0], // source node id
+        link.s[1], // source output position
+        link.t[0], // target node id
+        link.t[1] // target input position
+      ];
+    }
+    return { n, l };
   }
 
   /**
@@ -373,6 +398,7 @@ export class Dflow {
  * ```
  */
 export type DflowInputDefinition = {
+  /** Ignored by Dflow, but could be used by UI. */
   name?: string;
   types: DflowDataType[];
   /**
@@ -388,7 +414,6 @@ export type DflowInputDefinition = {
  */
 type DflowInput = {
   nodeId: string;
-  name?: string;
   optional?: boolean;
   types: DflowDataType[];
   readonly data: DflowData | undefined;
@@ -411,8 +436,9 @@ type DflowInput = {
  * ```
  */
 export type DflowOutputDefinition = {
-  types: DflowDataType[];
+  /** Ignored by Dflow, but could be used by UI. */
   name?: string;
+  types: DflowDataType[];
   data?: DflowData;
 };
 
@@ -422,7 +448,6 @@ export type DflowOutputDefinition = {
 type DflowOutput = {
   id: string;
   nodeId: string;
-  name?: string;
   types: DflowDataType[];
   data?: DflowData;
   /** Cleanup output data. */
@@ -440,19 +465,6 @@ type DflowNodeDefinition = {
   kind: string;
   inputs?: DflowInputDefinition[];
   outputs?: DflowOutputDefinition[];
-};
-
-type DflowNodeObj = {
-  id: string;
-  /** Node kind */
-  k: string;
-  /** Node outputs */
-  o?: Array<{
-    /** data */
-    d?: DflowData;
-  }>;
-  /** Last error message. */
-  err?: string;
 };
 
 /**
@@ -682,7 +694,7 @@ export class DflowNode {
 /**
  * `DflowLink` connects an `DflowOutput` to a `DflowInput`.
  */
-export type DflowLink = {
+type DflowLink = {
   id: string;
 
   /**

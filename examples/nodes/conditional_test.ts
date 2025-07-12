@@ -20,8 +20,7 @@ function testConditionalIf(
   dflow.link(dataNode2, [testNodeId, 1]);
   dflow.link(dataNode3, [testNodeId, 2]);
   dflow.run();
-  const testNodeOutput = dflow.graph.n.find((node) => node.id === testNodeId)
-    ?.o?.[0];
+  const testNodeOutput = dflow.graph.n[testNodeId]?.o?.[0];
   assert.deepEqual(testNodeOutput?.d, output);
 }
 

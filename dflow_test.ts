@@ -256,32 +256,18 @@ test("Dflow.isValidData()", () => {
 
 test("new Dflow has an empty graph", () => {
   const dflow = new Dflow([]);
-  assert.deepEqual(dflow.graph, { n: [], l: [] });
+  assert.deepEqual(dflow.graph, { n: {}, l: {} });
 });
 
 test("dflow.graph", () => {
   const { dflow } = sample01();
 
   assert.deepEqual(dflow.graph, {
-    l: [
-      {
-        id: "e1",
-        s: ["n1", 0],
-        t: ["n2", 0]
-      }
-    ],
-    n: [
-      {
-        id: "n1",
-        k: "Identity",
-        o: [{}]
-      },
-      {
-        id: "n2",
-        k: "Identity",
-        o: [{}]
-      }
-    ]
+    l: { e1: ["n1", 0, "n2", 0] },
+    n: {
+      n1: { k: "Identity", o: [{}] },
+      n2: { k: "Identity", o: [{}] }
+    }
   });
 });
 
@@ -307,10 +293,7 @@ test("dflow.run()", async () => {
 
   await dflow.run();
 
-  assert.deepEqual(
-    dflow.graph.n.find((node) => node.id === sumNodeId)?.o?.[0]?.d,
-    4
-  );
+  assert.deepEqual(dflow.graph.n[sumNodeId]?.o?.[0]?.d, 4);
 });
 
 test("dflow.newNode()", () => {
@@ -324,19 +307,17 @@ test("dflow.newNode()", () => {
   const nodeId2 = dflow.node("data", { outputs: [{ data: 42 }] });
 
   assert.deepEqual(dflow.graph, {
-    n: [
-      {
-        id: nodeId1,
+    n: {
+      [nodeId1]: {
         k: "Identity",
         o: [{}]
       },
-      {
-        id: nodeId2,
+      [nodeId2]: {
         k: "data",
         o: [{ d: 42 }]
       }
-    ],
-    l: []
+    },
+    l: {}
   });
 });
 
@@ -360,18 +341,18 @@ test("dflow.delete(nodeId)", () => {
   const { dflow, nodeId1 } = sample01();
   dflow.delete(nodeId1);
   // Only one node left.
-  assert.equal(dflow.graph.n.length, 1);
+  assert.equal(Object.keys(dflow.graph.n).length, 1);
   // Link is deleted.
-  assert.equal(dflow.graph.l.length, 0);
+  assert.equal(Object.keys(dflow.graph.l).length, 0);
 });
 
 test("dflow.delete(linkId)", () => {
   const { dflow, linkId1 } = sample01();
   dflow.delete(linkId1);
   // No links.
-  assert.equal(dflow.graph.l.length, 0);
+  assert.equal(Object.keys(dflow.graph.l).length, 0);
   // Nodes are preserved.
-  assert.equal(dflow.graph.n.length, 2);
+  assert.equal(Object.keys(dflow.graph.n).length, 2);
 });
 
 test("Dflow.canConnect()", () => {
