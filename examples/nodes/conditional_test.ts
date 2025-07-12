@@ -14,13 +14,13 @@ function testConditionalIf(
   const dataNode1 = dflow.node("data", { outputs: [{ data: input1 }] });
   const dataNode2 = dflow.node("data", { outputs: [{ data: input2 }] });
   const dataNode3 = dflow.node("data", { outputs: [{ data: input3 }] });
-  const testNode = dflow.node("if");
+  const testNodeId = dflow.node("if");
 
-  dflow.connect(dataNode1).to(testNode, 0);
-  dflow.connect(dataNode2).to(testNode, 1);
-  dflow.connect(dataNode3).to(testNode, 2);
+  dflow.link(dataNode1, [testNodeId, 0]);
+  dflow.link(dataNode2, [testNodeId, 1]);
+  dflow.link(dataNode3, [testNodeId, 2]);
   dflow.run();
-  const testNodeOutput = dflow.graph.n.find((node) => node.id === testNode.id)
+  const testNodeOutput = dflow.graph.n.find((node) => node.id === testNodeId)
     ?.o?.[0];
   assert.deepEqual(testNodeOutput?.d, output);
 }

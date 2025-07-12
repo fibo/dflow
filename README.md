@@ -16,10 +16,11 @@ npm install dflow
 
 A **node** represents a block of code: it can have **inputs** and **outputs**.
 
-An **edge** connects an input to an output.
+A **link** connects an input to an output.
 
 A **graph** represents a program.
-It can contain nodes and edges. Nodes are executed, sorted by their connections.
+It can contain nodes and links.
+Nodes are executed, sorted by their connections.
 
 ### About inputs and outputs
 

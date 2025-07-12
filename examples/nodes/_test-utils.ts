@@ -11,10 +11,10 @@ export function testOneOut<Output>(
   nodeKind: string,
   output: Output
 ) {
-  const testNode = dflow.node(nodeKind);
+  const testNodeId = dflow.node(nodeKind);
   dflow.run();
   assert.deepEqual(
-    dflow.graph.n.find((node) => node.id === testNode.id)?.o?.[0]?.d,
+    dflow.graph.n.find((node) => node.id === testNodeId)?.o?.[0]?.d,
     output
   );
 }
@@ -25,14 +25,14 @@ export function testOneInOneOut<Input, Output>(
   input?: Input,
   output?: Output
 ) {
-  const dataNode = dflow.node("data", {
+  const dataNodeId = dflow.node("data", {
     outputs: [{ data: Dflow.isDflowData(input) ? input : undefined }]
   });
-  const testNode = dflow.node(nodeKind);
-  dflow.connect(dataNode).to(testNode);
+  const testNodeId = dflow.node(nodeKind);
+  dflow.link(dataNodeId, testNodeId);
   dflow.run();
   const testNodeOutput = dflow.graph.n.find(
-    (node) => node.id === testNode.id
+    (node) => node.id === testNodeId
   )?.o;
   assert.deepEqual(testNodeOutput?.[0].d, output);
 }
@@ -44,14 +44,14 @@ export function testOneInTwoOut<Input, Output1, Output2>(
   output1?: Output1,
   output2?: Output2
 ) {
-  const dataNode = dflow.node("data", {
+  const dataNodeId = dflow.node("data", {
     outputs: [{ data: Dflow.isDflowData(input) ? input : undefined }]
   });
-  const testNode = dflow.node(nodeKind);
-  dflow.connect(dataNode).to(testNode);
+  const testNodeId = dflow.node(nodeKind);
+  dflow.link(dataNodeId, testNodeId);
   dflow.run();
   const testNodeOutput = dflow.graph.n.find(
-    (node) => node.id === testNode.id
+    (node) => node.id === testNodeId
   )?.o;
   assert.deepEqual(testNodeOutput?.[0].d, output1);
   assert.deepEqual(testNodeOutput?.[1].d, output2);
@@ -64,18 +64,18 @@ export function testTwoInOneOut<Input1, Input2, Output>(
   input2?: Input2,
   output?: Output
 ) {
-  const dataNode1 = Dflow.isDflowData(input1)
+  const dataNodeId1 = Dflow.isDflowData(input1)
     ? dflow.node("data", { outputs: [{ data: input1 }] })
     : undefined;
-  const dataNode2 = Dflow.isDflowData(input2)
+  const dataNodeId2 = Dflow.isDflowData(input2)
     ? dflow.node("data", { outputs: [{ data: input2 }] })
     : undefined;
-  const testNode = dflow.node(nodeKind);
-  if (dataNode1) dflow.connect(dataNode1).to(testNode, 0);
-  if (dataNode2) dflow.connect(dataNode2).to(testNode, 1);
+  const testNodeId = dflow.node(nodeKind);
+  if (dataNodeId1) dflow.link(dataNodeId1, [testNodeId, 0]);
+  if (dataNodeId2) dflow.link(dataNodeId2, [testNodeId, 1]);
   dflow.run();
   const testNodeOutput = dflow.graph.n.find(
-    (node) => node.id === testNode.id
+    (node) => node.id === testNodeId
   )?.o;
   assert.deepEqual(testNodeOutput?.[0].d, output);
 }
@@ -88,22 +88,22 @@ export function testThreeInOneOut<Input1, Input2, Input3, Output>(
   input3?: Input3,
   output?: Output
 ) {
-  const dataNode1 = Dflow.isDflowData(input1)
+  const dataNodeId1 = Dflow.isDflowData(input1)
     ? dflow.node("data", { outputs: [{ data: input1 }] })
     : undefined;
-  const dataNode2 = Dflow.isDflowData(input2)
+  const dataNodeId2 = Dflow.isDflowData(input2)
     ? dflow.node("data", { outputs: [{ data: input2 }] })
     : undefined;
-  const dataNode3 = Dflow.isDflowData(input3)
+  const dataNodeId3 = Dflow.isDflowData(input3)
     ? dflow.node("data", { outputs: [{ data: input3 }] })
     : undefined;
-  const testNode = dflow.node(nodeKind);
-  if (dataNode1) dflow.connect(dataNode1).to(testNode, 0);
-  if (dataNode2) dflow.connect(dataNode2).to(testNode, 1);
-  if (dataNode3) dflow.connect(dataNode3).to(testNode, 2);
+  const testNodeId = dflow.node(nodeKind);
+  if (dataNodeId1) dflow.link(dataNodeId1, [testNodeId, 0]);
+  if (dataNodeId2) dflow.link(dataNodeId2, [testNodeId, 1]);
+  if (dataNodeId3) dflow.link(dataNodeId3, [testNodeId, 2]);
   dflow.run();
   const testNodeOutput = dflow.graph.n.find(
-    (node) => node.id === testNode.id
+    (node) => node.id === testNodeId
   )?.o;
   assert.deepEqual(testNodeOutput?.[0].d, output);
 }

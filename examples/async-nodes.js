@@ -42,19 +42,19 @@ async function runGraph() {
 
   // Create two nodes, num and sum.
 
-  const numNode = dflow.node(NumNode.kind, {
+  const numNodeId = dflow.node(NumNode.kind, {
     outputs: [{ id: "out", data: 21 }]
   });
-  const sumNode = dflow.node(SumNode.kind, {
+  const sumNodeId = dflow.node(SumNode.kind, {
     // Optional `id`. If Dflow is edited in a view, it can handy to reuse ids.
     id: "sum",
     inputs: [{ id: "in1" }, { id: "in2" }],
     outputs: [{ id: "out" }]
   });
 
-  // Connect nodes. Both `dflow.connect()` and `dflow.edge()` are used here.
-  dflow.connect(numNode).to(sumNode);
-  dflow.edge([numNode.id, "out"], ["sum", "in2"]);
+  // Connect nodes.
+  dflow.link(numNodeId, [sumNodeId, 0]);
+  dflow.link(numNodeId, [sumNodeId, 1]);
 
   // Add also an async node.
   dflow.node(SleepNode.kind);

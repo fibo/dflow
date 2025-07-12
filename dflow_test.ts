@@ -63,21 +63,13 @@ const nodeDefinitions2 = [SumNode, SleepNode];
 function sample01() {
   const nodeId1 = "n1";
   const nodeId2 = "n2";
-  const pinId1 = "p1";
-  const pinId2 = "p2";
-  const edgeId1 = "e2";
+  const linkId1 = "e1";
   const dflow = new Dflow(nodeDefinitions1);
-  dflow.node("Identity", {
-    id: nodeId1,
-    outputs: [{ id: pinId1 }]
-  });
-  dflow.node("Identity", {
-    id: nodeId2,
-    inputs: [{ id: pinId2 }]
-  });
-  dflow.edge([nodeId1, pinId1], [nodeId2, pinId2], edgeId1);
+  dflow.node("Identity", { id: nodeId1 });
+  dflow.node("Identity", { id: nodeId2 });
+  dflow.link([nodeId1, 0], [nodeId2, 0], linkId1);
 
-  return { dflow, nodeId1, nodeId2, pinId1, pinId2, edgeId1 };
+  return { dflow, nodeId1, nodeId2, linkId1 };
 }
 
 test("Dflow.inferDataType()", () => {
@@ -264,18 +256,18 @@ test("Dflow.isValidData()", () => {
 
 test("new Dflow has an empty graph", () => {
   const dflow = new Dflow([]);
-  assert.deepEqual(dflow.graph, { n: [], e: [] });
+  assert.deepEqual(dflow.graph, { n: [], l: [] });
 });
 
 test("dflow.graph", () => {
   const { dflow } = sample01();
 
   assert.deepEqual(dflow.graph, {
-    e: [
+    l: [
       {
-        id: "e2",
-        s: ["n1", "p1"],
-        t: ["n2", "p2"]
+        id: "e1",
+        s: ["n1", 0],
+        t: ["n2", 0]
       }
     ],
     n: [
@@ -296,20 +288,19 @@ test("dflow.graph", () => {
 test("dflow.run()", async () => {
   const dflow = new Dflow(nodeDefinitions2);
 
-  // Num#out=2 -> Sum#in1 |
-  //                      |-> Sum#out=4
-  // Num#out=2 -> Sum#in2 |
+  // Num#out=2 -> | Sum#in1 |
+  //              |         |-> Sum#out=4
+  // Num#out=2 -> | Sum#in2 |
   dflow.node("data", {
     id: "num",
-    outputs: [{ id: "out", data: 2 }]
+    outputs: [{ data: 2 }]
   });
-  const sumNode = dflow.node("Sum", {
-    id: "sum",
+  const sumNodeId = dflow.node("Sum", {
     inputs: [{ id: "in1" }, { id: "in2" }],
     outputs: [{ id: "out" }]
   });
-  dflow.edge(["num", "out"], ["sum", "in1"], "e1");
-  dflow.edge(["num", "out"], ["sum", "in2"], "e2");
+  dflow.link(["num", 0], [sumNodeId, 0]);
+  dflow.link(["num", 0], [sumNodeId, 1]);
 
   // Add also an async node.
   dflow.node("Sleep", { id: "sleep" });
@@ -317,7 +308,7 @@ test("dflow.run()", async () => {
   await dflow.run();
 
   assert.deepEqual(
-    dflow.graph.n.find((node) => node.id === sumNode.id)?.o?.[0]?.d,
+    dflow.graph.n.find((node) => node.id === sumNodeId)?.o?.[0]?.d,
     4
   );
 });
@@ -326,36 +317,42 @@ test("dflow.newNode()", () => {
   const dflow = new Dflow(nodeDefinitions1);
 
   // newNode with id
-  const node1 = dflow.node("Identity", { id: "node1" });
+  const nodeId1 = "node1";
+  dflow.node("Identity", { id: nodeId1 });
 
   // newNode with outputs
-  const node2 = dflow.node("data", { outputs: [{ data: 42 }] });
+  const nodeId2 = dflow.node("data", { outputs: [{ data: 42 }] });
 
   assert.deepEqual(dflow.graph, {
     n: [
       {
-        id: node1.id,
+        id: nodeId1,
         k: "Identity",
         o: [{}]
       },
       {
-        id: node2.id,
+        id: nodeId2,
         k: "data",
         o: [{ d: 42 }]
       }
     ],
-    e: []
+    l: []
   });
 });
 
-test("dflow.edge()", () => {
-  const { dflow } = sample01();
+test("dflow.link()", () => {
+  const dflow = new Dflow(nodeDefinitions1);
+
+  const nodeId1 = dflow.node("Identity");
+  const nodeId2 = dflow.node("Identity");
+  const linkId = dflow.link(nodeId1, nodeId2);
+  assert.equal(typeof linkId, "string");
 
   assert.throws(
     () => {
-      dflow.edge(["xxx", "out"], ["yyy", "in"]);
+      dflow.link("not found 1", nodeId2);
     },
-    { message: "Cannot create edge" }
+    { message: "Cannot create link" }
   );
 });
 
@@ -364,15 +361,15 @@ test("dflow.delete(nodeId)", () => {
   dflow.delete(nodeId1);
   // Only one node left.
   assert.equal(dflow.graph.n.length, 1);
-  // Edge is deleted.
-  assert.equal(dflow.graph.e.length, 0);
+  // Link is deleted.
+  assert.equal(dflow.graph.l.length, 0);
 });
 
-test("dflow.delete(edgeId)", () => {
-  const { dflow, edgeId1 } = sample01();
-  dflow.delete(edgeId1);
-  // No edges.
-  assert.equal(dflow.graph.e.length, 0);
+test("dflow.delete(linkId)", () => {
+  const { dflow, linkId1 } = sample01();
+  dflow.delete(linkId1);
+  // No links.
+  assert.equal(dflow.graph.l.length, 0);
   // Nodes are preserved.
   assert.equal(dflow.graph.n.length, 2);
 });

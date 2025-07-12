@@ -6,12 +6,12 @@ test("newDate", () => {
   const dflow = newDflow();
   const nodeKind = "newDate";
 
-  const testNode = dflow.node(nodeKind);
+  const testNodeId = dflow.node(nodeKind);
 
   dflow.run();
 
   const testNodeOutput = dflow.graph.n.find(
-    (node) => node.id === testNode.id
+    (node) => node.id === testNodeId
   )?.o;
   const output0 = testNodeOutput?.[0].d;
   const output1 = testNodeOutput?.[1].d;
@@ -24,12 +24,12 @@ test("now", () => {
   const dflow = newDflow();
   const nodeKind = "now";
 
-  const testNode = dflow.node(nodeKind);
+  const testNodeId = dflow.node(nodeKind);
 
   dflow.run();
 
   const testNodeOutput = dflow.graph.n.find(
-    (node) => node.id === testNode.id
+    (node) => node.id === testNodeId
   )?.o;
   const output0 = testNodeOutput?.[0].d;
   const output1 = testNodeOutput?.[1].d;
