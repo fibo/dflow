@@ -1,5 +1,5 @@
+.github/
 .typescript.env
-DEVELOP.md
 dflow.ts
 dflow_test.ts
 tsconfig.build.json
