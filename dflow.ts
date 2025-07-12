@@ -144,28 +144,23 @@ export class Dflow {
   }
 
   /**
-   * Delete edge with given id.
+   * Delete node or edge with given id.
    */
-  deleteEdge(edgeId: string) {
-    const edge = this.#edgesMap.get(edgeId);
+  delete(id: string) {
+    // Delete node.
+    if (this.#nodesMap.delete(id)) {
+      // Delete all edges connected to node.
+      for (const edge of this.#edgesMap.values())
+        if (edge.s[0] === id || edge.t[0] === id) this.delete(edge.id);
+    }
+    // Delete edge.
+    const edge = this.#edgesMap.get(id);
     if (!edge) return;
     // Delete edge.
-    this.#edgesMap.delete(edgeId);
+    this.#edgesMap.delete(id);
     // Cleanup target input.
     const targetInput = this.#nodesMap.get(edge.t[0])?.inputsMap.get(edge.t[1]);
     if (targetInput) targetInput.source = undefined;
-  }
-
-  /**
-   * Delete node with given id.
-   */
-  deleteNode(nodeId: string) {
-    // Delete node.
-    this.#nodesMap.delete(nodeId);
-    // Delete all edges connected to node.
-    for (const edge of this.#edgesMap.values())
-      if (edge.s[0] === nodeId || edge.t[0] === nodeId)
-        this.deleteEdge(edge.id);
   }
 
   /**

@@ -395,18 +395,18 @@ test("dflow.newEdge()", () => {
   );
 });
 
-test("dflow.deleteNode()", () => {
+test("dflow.delete(nodeId)", () => {
   const { dflow, nodeId1 } = sample01();
-  dflow.deleteNode(nodeId1);
+  dflow.delete(nodeId1);
   // Only one node left.
   assert.equal(dflow.graph.n.length, 1);
   // Edge is deleted.
   assert.equal(dflow.graph.e.length, 0);
 });
 
-test("dflow.deleteEdge()", () => {
+test("dflow.delete(edgeId)", () => {
   const { dflow, edgeId1 } = sample01();
-  dflow.deleteEdge(edgeId1);
+  dflow.delete(edgeId1);
   // No edges.
   assert.equal(dflow.graph.e.length, 0);
   // Nodes are preserved.
