@@ -350,8 +350,8 @@ test("dflow.run()", async () => {
 
   await dflow.run();
 
-  const sum = sumNode.output(0);
-  assert.deepEqual(sum.data, 4);
+  const sumNodeObj = sumNode.toJSON();
+  assert.deepEqual(sumNodeObj.o?.[0]?.d, 4);
 });
 
 test("dflow.newNode()", () => {
@@ -364,7 +364,6 @@ test("dflow.newNode()", () => {
     id: nodeId1
   });
   assert.deepEqual(node1.id, nodeId1);
-  assert.deepEqual(node1.kind, "Identity");
 
   // newNode with inputs
   const inputId1 = "input1";

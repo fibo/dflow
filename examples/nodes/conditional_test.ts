@@ -29,7 +29,7 @@ function testConditionalIf(
   dflow.connect(dataNode2).to(testNode, 1);
   dflow.connect(dataNode3).to(testNode, 2);
   dflow.run();
-  assert.deepEqual(testNode.output(0).data, output);
+  assert.deepEqual(testNode.toJSON().o?.[0].d, output);
 }
 
 test("DflowNodeIf", () => {

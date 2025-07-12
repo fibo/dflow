@@ -10,8 +10,9 @@ test("newDate", () => {
 
   dflow.run();
 
-  const output0 = testNode.output(0).data;
-  const output1 = testNode.output(1).data;
+  const obj = testNode.toJSON();
+  const output0 = obj.o?.[0].d;
+  const output1 = obj.o?.[1].d;
 
   assert.equal(typeof output0, "string");
   assert.equal(typeof output1, "number");
@@ -25,8 +26,9 @@ test("now", () => {
 
   dflow.run();
 
-  const output0 = testNode.output(0).data;
-  const output1 = testNode.output(1).data;
+  const obj = testNode.toJSON();
+  const output0 = obj.o?.[0].d;
+  const output1 = obj.o?.[1].d;
 
   assert.equal(typeof output0, "string");
   assert.equal(typeof output1, "number");

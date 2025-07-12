@@ -120,14 +120,24 @@ export class Dflow {
    * dflow.connect(nodeA, outputPosition).to(nodeB, inputPosition);
    * ```
    */
-  connect(sourceNode: DflowNode, sourcePosition = 0) {
+  connect({ id: sourceNodeId }: { id: string }, sourcePosition = 0) {
     return {
-      to: (targetNode: DflowNode, targetPosition = 0) => {
-        const sourceOutput = sourceNode.output(sourcePosition);
-        const targetInput = targetNode.input(targetPosition);
+      to: ({ id: targetNodeId }: { id: string }, targetPosition = 0) => {
+        const sourceNode = this.#nodesMap.get(sourceNodeId);
+        const targetNode = this.#nodesMap.get(targetNodeId);
+        if (!sourceNode || !targetNode)
+          throw new Error("Source or target node not found");
+        const sourceOutput = sourceNode.outputsMap.get(
+          sourceNode.outputPosition[sourcePosition]
+        );
+        const targetInput = targetNode.inputsMap.get(
+          targetNode.inputPosition[targetPosition]
+        );
+        if (!sourceOutput || !targetInput)
+          throw new Error("Source output or target input not found");
         this.newEdge({
-          source: [sourceNode.id, sourceOutput.id],
-          target: [targetNode.id, targetInput.id]
+          source: [sourceNode!.id, sourceOutput.id],
+          target: [targetNode!.id, targetInput.id]
         });
       }
     };
@@ -159,14 +169,17 @@ export class Dflow {
   }
 
   /**
-   * Create a new edge.
+   * Create a new node.
    */
   newNode(arg: {
     kind: string;
     id?: string;
     inputs?: { id?: string }[];
     outputs?: { id?: string; data?: DflowData }[];
-  }): DflowNode {
+  }): {
+    id: string;
+    toJSON(): DflowNodeObj;
+  } {
     const NodeClass = this.#nodeDefinitions.get(arg.kind) ?? DflowNodeUnknown;
 
     const id = generateItemId(this.#nodesMap, "n", arg.id);
@@ -195,7 +208,12 @@ export class Dflow {
 
     this.#nodesMap.set(node.id, node);
 
-    return node;
+    return {
+      id,
+      toJSON() {
+        return node.toJSON();
+      }
+    };
   }
 
   /**
@@ -524,7 +542,7 @@ export class DflowNode {
   outputsMap: Map<string, DflowOutput> = new Map();
 
   /**
-   * `DflowNode.input()` is a `DflowInputDefinition` helper.
+   * `DflowNode.input()` is a helper to define inputs.
    *
    * @example
    *
@@ -599,7 +617,7 @@ export class DflowNode {
   }
 
   /**
-   * `DflowNode.output()` is a `DflowOutputDefinition` helper.
+   * `DflowNode.output()` is a helper to define outputs.
    *
    * @example
    *
@@ -691,11 +709,7 @@ export class DflowNode {
         get data(): DflowData | undefined {
           return _data;
         },
-        set data(arg: DflowData) {
-          if (arg === undefined) {
-            _data = undefined;
-            return;
-          }
+        set data(arg: unknown) {
           if (
             // Has any type and `arg` is some valid data...
             (types.length === 0 && Dflow.isDflowData(arg)) ||
@@ -727,22 +741,6 @@ export class DflowNode {
 
   clearOutputs() {
     for (const output of this.outputsMap.values()) output.clear();
-  }
-
-  /**
-   * Get input by position.
-   * @remarks This should be called inside `DflowNode.run()`. There is no check that the position is valid.
-   */
-  input(position: number): DflowInput {
-    return this.inputsMap.get(this.inputPosition[position]) as DflowInput;
-  }
-
-  /**
-   * Get output by position.
-   * @remarks This should be called inside `DflowNode.run()`. There is no check that the position is valid.
-   */
-  output(position: number): DflowOutput {
-    return this.outputsMap.get(this.outputPosition[position]) as DflowOutput;
   }
 
   /**
