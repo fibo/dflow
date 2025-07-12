@@ -1,6 +1,6 @@
 {
   "name": "dflow",
-  "description": "is a minimal Dataflow programming engine",
+  "description": "A minimal Dataflow programming engine",
   "type": "module",
   "version": "0.44.0",
   "exports": {

@@ -1,6 +1,6 @@
 # Dflow
 
-> is a minimal [Dataflow programming][dataflow-wikipedia] engine
+> A minimal [Dataflow programming][dataflow-wikipedia] engine
 
 ## Installation
 
