@@ -94,12 +94,12 @@ type _DflowOutput = Pick<DflowOutput, "types"> & {
 /** @internal Helper to generate an id unique in its scope. */
 const newId = (
   itemMap: Map<string, unknown>,
-  idPrefix: string,
+  prefix: string,
   wantedId?: string
 ): string => {
   if (wantedId && !itemMap.has(wantedId)) return wantedId;
-  const id = `${idPrefix}${itemMap.size}`;
-  return itemMap.has(id) ? newId(itemMap, idPrefix) : id;
+  const id = `${prefix}${itemMap.size}`;
+  return itemMap.has(id) ? newId(itemMap, prefix) : id;
 };
 
 export type DflowGraph = {
@@ -229,7 +229,6 @@ export class Dflow {
     this.#nodesMap.set(
       id,
       new NodeClass({
-        id,
         kind,
         host: this,
         inputs: NodeClass.inputs ?? [],
@@ -500,8 +499,6 @@ type DflowNodeDefinition = {
  *
  */
 export class DflowNode {
-  id: string;
-
   inputs: _DflowInput[] = [];
   outputs: _DflowOutput[] = [];
 
@@ -610,19 +607,17 @@ export class DflowNode {
   readonly host: Dflow;
 
   constructor({
-    id,
     kind,
     host,
     inputs,
     outputs
-  }: Pick<DflowNode, "id" | "kind" | "host"> & {
+  }: Pick<DflowNode, "kind" | "host"> & {
     inputs: DflowInput[];
     outputs: Array<{
       data?: DflowData;
       types: DflowDataType[];
     }>;
   }) {
-    this.id = id;
     this.host = host;
     this.kind = kind;
 
