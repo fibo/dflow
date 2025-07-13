@@ -57,15 +57,7 @@ export type DflowGraph = {
     }
   >;
   /** links */
-  l: Record<
-    string,
-    [
-      sourceNodeId: string,
-      sourceOutputPosition: number,
-      targetNodeId: string,
-      targetInputPosition: number
-    ]
-  >;
+  l: Record<string, DflowLinkPath>;
 };
 
 /**
@@ -80,7 +72,7 @@ export class Dflow {
 
   #nodesMap: Map<string, DflowNode> = new Map();
 
-  #linksMap: Map<string, DflowLink> = new Map();
+  #linksMap: Map<string, DflowLinkPath> = new Map();
 
   constructor(nodeDefinitions: Array<DflowNodeDefinition>) {
     // Define core nodes.
@@ -91,7 +83,7 @@ export class Dflow {
     this.context = {};
   }
 
-  #levelOfNodeId(
+  #levelOfNode(
     nodeId: string,
     nodeConnections: Array<{ sourceId: string; targetId: string }>
   ): number {
@@ -104,22 +96,22 @@ export class Dflow {
     let maxLevel = 0;
     for (const parentNodeId of parentsNodeIds)
       maxLevel = Math.max(
-        this.#levelOfNodeId(parentNodeId, nodeConnections),
+        this.#levelOfNode(parentNodeId, nodeConnections),
         maxLevel
       );
     return maxLevel + 1;
   }
 
-  // Sort node ids by their level in the graph.
+  /** Sort node ids by their level in the graph. */
   #sortedNodesIds(): string[] {
     const nodeIds = Array.from(this.#nodesMap.keys());
     const nodeConnections = [...this.#linksMap.values()].map((link) => ({
-      sourceId: link.s[0],
-      targetId: link.t[0]
+      sourceId: link[0],
+      targetId: link[2]
     }));
     const levelOf: Record<string, number> = {};
     for (const nodeId of nodeIds)
-      levelOf[nodeId] = this.#levelOfNodeId(nodeId, nodeConnections);
+      levelOf[nodeId] = this.#levelOfNode(nodeId, nodeConnections);
     return nodeIds.slice().sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
   }
 
@@ -130,15 +122,15 @@ export class Dflow {
     // Delete node.
     if (this.#nodesMap.delete(id)) {
       // Delete all links connected to node.
-      for (const link of this.#linksMap.values())
-        if (link.s[0] === id || link.t[0] === id) this.delete(link.id);
+      for (const [linkId, link] of this.#linksMap.entries())
+        if (link[0] === id || link[2] === id) this.delete(linkId);
     }
     // Delete link.
     const link = this.#linksMap.get(id);
     if (!link) return;
     this.#linksMap.delete(id);
     // Cleanup target input.
-    const targetInput = this.#nodesMap.get(link.t[0])?.inputs[link.t[1]];
+    const targetInput = this.#nodesMap.get(link[2])?.inputs[link[3]];
     if (targetInput) targetInput.source = undefined;
   }
 
@@ -196,29 +188,33 @@ export class Dflow {
   ): string {
     const id = newId(this.#linksMap, "l", wantedId);
 
-    const link: DflowLink = {
-      id,
-      s: typeof source === "string" ? [source, 0] : source,
-      t: typeof target === "string" ? [target, 0] : target
-    };
+    const sourceNodeId = typeof source === "string" ? source : source[0];
+    const sourceOutputPosition = typeof source === "string" ? 0 : source[1];
+    const targetNodeId = typeof target === "string" ? target : target[0];
+    const targetPosition = typeof target === "string" ? 0 : target[1];
 
-    const sourceNode = this.#nodesMap.get(link.s[0]);
-    const targetNode = this.#nodesMap.get(link.t[0]);
+    const sourceNode = this.#nodesMap.get(sourceNodeId);
+    const targetNode = this.#nodesMap.get(targetNodeId);
 
     if (sourceNode && targetNode) {
-      const source = sourceNode.outputs[link.s[1]];
-      const target = targetNode.inputs[link.t[1]];
+      const source = sourceNode.outputs[sourceOutputPosition];
+      const target = targetNode.inputs[targetPosition];
 
       if (source && target) {
         if (Dflow.canConnect(source.types, target.types)) {
-          this.#linksMap.set(link.id, link);
+          this.#linksMap.set(id, [
+            sourceNodeId,
+            sourceOutputPosition,
+            targetNodeId,
+            targetPosition
+          ]);
           target.source = source;
           return id;
         }
       }
     }
 
-    throw new Error("Cannot create link", { cause: { link } });
+    throw new Error("Cannot create link", { cause: { source, target } });
   }
 
   /**
@@ -274,16 +270,7 @@ export class Dflow {
         o: outputs
       };
     }
-    const l: DflowGraph["l"] = {};
-    for (const [linkId, link] of this.#linksMap.entries()) {
-      l[linkId] = [
-        link.s[0], // source node id
-        link.s[1], // source output position
-        link.t[0], // target node id
-        link.t[1] // target input position
-      ];
-    }
-    return { n, l };
+    return { n, l: Object.fromEntries(this.#linksMap.entries()) };
   }
 
   /**
@@ -691,22 +678,12 @@ export class DflowNode {
 // DflowLink
 // ////////////////////////////////////////////////////////////////////
 
-/**
- * `DflowLink` connects an `DflowOutput` to a `DflowInput`.
- */
-type DflowLink = {
-  id: string;
-
-  /**
-   * Source output coordinates.
-   */
-  s: [nodeId: string, outputPosition: number];
-
-  /**
-   * Target input coordinates.
-   */
-  t: [nodeId: string, inputPosition: number];
-};
+export type DflowLinkPath = [
+  sourceNodeId: string,
+  sourceOutputPosition: number,
+  targetNodeId: string,
+  targetInputPosition: number
+];
 
 // Dflow core nodes
 // ////////////////////////////////////////////////////////////////////
