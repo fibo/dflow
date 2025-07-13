@@ -240,7 +240,7 @@ export class Dflow {
         set data(arg: unknown) {
           if (
             // Has any type and `arg` is some valid data...
-            (types.length === 0 && Dflow.isDflowData(arg)) ||
+            (types.length === 0 && Dflow.isData(arg)) ||
             // ... or output type corresponds to `arg` type.
             (types.includes("null") && arg === null) ||
             (types.includes("boolean") && typeof arg === "boolean") ||
@@ -281,16 +281,10 @@ export class Dflow {
   }
 
   /** Create a new node. Returns node id. */
-  node(
-    kind: string,
-    arg: {
-      id?: string;
-      outputs?: { data?: DflowData }[];
-    } = {}
-  ): string {
+  node(kind: string, wantedId?: string): string {
     const nodeDef = this.#nodeDefinitions.get(kind);
     if (!nodeDef) throw new Error("Unknown node", { cause: { kind } });
-    return this.#createNode(newId(this.#nodes, "n", arg.id), nodeDef);
+    return this.#createNode(newId(this.#nodes, "n", wantedId), nodeDef);
   }
 
   /**
@@ -298,7 +292,7 @@ export class Dflow {
    * @remarks If provided `arg` is not a valid `DflowData`, return value will be `undefined`.
    */
   data(arg: unknown, wantedId?: string): string {
-    const value = Dflow.isDflowData(arg) ? arg : undefined;
+    const value = Dflow.isData(arg) ? arg : undefined;
     return this.#createNode(newId(this.#nodes, "n", wantedId), {
       kind: "data",
       outputs: [{ types: Dflow.inferDataType(value) }],
@@ -393,7 +387,7 @@ export class Dflow {
       }
       // If result is undefined or not a valid Dflow data,
       // then clear the node outputs.
-      if (result === undefined || !Dflow.isDflowData(result)) {
+      if (result === undefined || !Dflow.isData(result)) {
         nodeOutputs.forEach((output) => output.clear());
         continue;
       }
@@ -538,7 +532,7 @@ export class Dflow {
    * It checks recursively that every element is some `DflowData`.
    */
   static isArray(arg: unknown): arg is DflowArray {
-    return Array.isArray(arg) && arg.every(Dflow.isDflowData);
+    return Array.isArray(arg) && arg.every(Dflow.isData);
   }
 
   /**
@@ -550,7 +544,7 @@ export class Dflow {
       typeof arg === "object" &&
       arg !== null &&
       !Array.isArray(arg) &&
-      Object.values(arg).every(Dflow.isDflowData)
+      Object.values(arg).every(Dflow.isData)
     );
   }
 
@@ -560,7 +554,7 @@ export class Dflow {
   }
 
   /** Type guard for `DflowData`. */
-  static isDflowData(arg: unknown): arg is DflowData {
+  static isData(arg: unknown): arg is DflowData {
     if (arg === undefined) return false;
     return (
       arg === null ||
@@ -574,8 +568,7 @@ export class Dflow {
 
   /** Validate that data belongs to some of given types. */
   static isValidData(types: DflowDataType[], data: unknown) {
-    if (types.length === 0)
-      return data === undefined || Dflow.isDflowData(data);
+    if (types.length === 0) return data === undefined || Dflow.isData(data);
     return types.some((dataType) =>
       dataType === "null"
         ? data === null

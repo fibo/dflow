@@ -73,8 +73,8 @@ function sample01() {
   const nodeId2 = "n2";
   const linkId1 = "e1";
   const dflow = new Dflow(nodeDefinitions1);
-  dflow.node("Identity", { id: nodeId1 });
-  dflow.node("Identity", { id: nodeId2 });
+  dflow.node("Identity", nodeId1);
+  dflow.node("Identity", nodeId2);
   dflow.link([nodeId1, 0], [nodeId2, 0], linkId1);
 
   return { dflow, nodeId1, nodeId2, linkId1 };
@@ -291,7 +291,7 @@ test("dflow.run()", async () => {
   dflow.link(["num", 0], [sumNodeId, 1]);
 
   // Add also an async node.
-  dflow.node("Sleep", { id: "sleep" });
+  dflow.node("Sleep");
 
   await dflow.run();
 
@@ -327,7 +327,7 @@ test("dflow.node()", () => {
   // Create a node.
   const nodeId1 = dflow.node("Identity");
   // Create node with id.
-  dflow.node("Identity", { id: "node2" });
+  dflow.node("Identity", "node2");
 
   assert.deepEqual(dflow.graph, {
     node: {
