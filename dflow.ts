@@ -114,8 +114,6 @@ export type DflowGraph = {
         /** data */
         d?: DflowData;
       }>;
-      /** Last error message. */
-      err?: string;
     }
   >;
   /** links */
@@ -373,10 +371,13 @@ export class Dflow {
         k: node.kind,
         o: outputs
       };
-      const err = this.#errorsMap.get(nodeId);
-      if (err) n[nodeId].err = err;
     }
     return { n, l: Object.fromEntries(this.#linksMap.entries()) };
+  }
+
+  /** Get error messages from last execution, indexed by node id. */
+  get error(): Record<string, string> {
+    return Object.fromEntries(this.#errorsMap.entries());
   }
 
   /** Check that source types are compatible with target types. */

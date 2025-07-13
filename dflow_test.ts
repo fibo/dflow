@@ -303,12 +303,12 @@ test("dflow.run() with error", () => {
   const nodeId1 = dflow.node("Opsss");
   // First run, it will not throw.
   dflow.run();
-  assert.equal(dflow.graph.n[nodeId1].err, undefined);
+  assert.equal(dflow.error[nodeId1], undefined);
   const nodeId2 = dflow.data(true);
   const linkId = dflow.link(nodeId2, nodeId1);
   // Second time, it will throw an error.
   dflow.run();
-  assert.equal(dflow.graph.n[nodeId1].err, "Opsss");
+  assert.equal(dflow.error[nodeId1], "Opsss");
   // Third time will throw an error, and show a message.
   dflow.ERR = (error) => {
     assert.equal(error.message, "Opsss");
@@ -318,7 +318,7 @@ test("dflow.run() with error", () => {
   // This time, it will not throw.
   dflow.delete(linkId);
   dflow.run();
-  assert.equal(dflow.graph.n[nodeId1].err, undefined);
+  assert.equal(dflow.error[nodeId1], undefined);
 });
 
 test("dflow.node()", () => {
