@@ -1,5 +1,6 @@
 // Create a host with an API context.
-import { Dflow, DflowNode } from "../dflow.ts";
+import { Dflow } from "../dflow.ts";
+import type { DflowNode } from "../dflow.ts";
 
 class ApiClient {
   apiKey: string;
@@ -15,26 +16,33 @@ class ApiClient {
   }
 }
 
-class CustomNode extends DflowNode {
-  static kind = "Custom";
-  static outputs = [DflowNode.output("object")];
+type Context = {
+  apiClient: ApiClient;
+};
+
+const CustomNode: DflowNode = {
+  kind: "Custom",
+  outputs: [Dflow.output("object")],
   async run() {
-    const apiClient = this.host.context.apiClient as ApiClient;
+    const apiClient = (this as unknown as Context).apiClient;
     const result = await apiClient.fetchSomeData("foo");
     return result;
   }
-}
+};
 
 async function contextExample() {
   const dflow = new Dflow([CustomNode]);
 
   dflow.context.apiClient = new ApiClient("s3cret");
 
-  dflow.node(CustomNode.kind);
+  const nodeId = dflow.node(CustomNode.kind);
 
   await dflow.run();
 
-  console.info(JSON.stringify(dflow.graph, null, 2));
+  const result = dflow.out[nodeId][0] as { status: string; payload: string };
+  if (!result || result.status !== "SUCCESS" || result.payload !== "foo")
+    console.error("Unexpected result:", result);
+  else console.info(result.status);
 }
 
 contextExample();

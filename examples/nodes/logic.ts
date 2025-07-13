@@ -1,42 +1,42 @@
-import { DflowNode } from "../../dflow.ts";
-import type { DflowData } from "../../dflow.ts";
+import { Dflow } from "../../dflow.ts";
+import type { DflowData, DflowNode } from "../../dflow.ts";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
-class And extends DflowNode {
-  static kind = "and";
-  static inputs = [input("boolean"), input("boolean")];
-  static outputs = [output("boolean")];
+const And: DflowNode = {
+  kind: "and",
+  inputs: [input("boolean"), input("boolean")],
+  outputs: [output("boolean")],
   run(a: boolean, b: boolean) {
     return a && b;
   }
-}
+};
 
-class Not extends DflowNode {
-  static kind = "not";
-  static inputs = [input("boolean")];
-  static outputs = [output("boolean")];
+const Not: DflowNode = {
+  kind: "not",
+  inputs: [input("boolean")],
+  outputs: [output("boolean")],
   run(a: boolean) {
     return !a;
   }
-}
+};
 
-class NullishCoaleshing extends DflowNode {
-  static kind = "??";
-  static inputs = [input(), input()];
-  static outputs = [output()];
+const NullishCoaleshing: DflowNode = {
+  kind: "??",
+  inputs: [input(), input()],
+  outputs: [output()],
   run(a: DflowData, b: DflowData) {
     return a ?? b;
   }
-}
+};
 
-class Or extends DflowNode {
-  static kind = "or";
-  static inputs = [input("boolean"), input("boolean")];
-  static outputs = [output("boolean")];
+const Or: DflowNode = {
+  kind: "or",
+  inputs: [input("boolean"), input("boolean")],
+  outputs: [output("boolean")],
   run(a: boolean, b: boolean) {
     return a || b;
   }
-}
+};
 
 export default [And, Not, NullishCoaleshing, Or];

@@ -1,103 +1,97 @@
-import { DflowNode } from "../../dflow.ts";
-import type { DflowArray, DflowData } from "../../dflow.ts";
+import { Dflow } from "../../dflow.ts";
+import type { DflowArray, DflowData, DflowNode } from "../../dflow.ts";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
-class ArrayAt extends DflowNode {
-  static kind = "arrayAt";
-  static inputs = [input("array"), input("number", { name: "index" })];
-  static outputs = [output()];
+const ArrayAt: DflowNode = {
+  kind: "arrayAt",
+  inputs: [input("array"), input("number", { name: "index" })],
+  outputs: [output()],
   run(array: DflowArray, index: number) {
     return array.at(index);
   }
-}
+};
 
-class ArrayIncludes extends DflowNode {
-  static kind = "arrayIncludes";
-  static inputs = [
+const ArrayIncludes: DflowNode = {
+  kind: "arrayIncludes",
+  inputs: [
     input("array", { name: "array" }),
     input("string", { name: "element" })
-  ];
-  static outputs = [output("boolean")];
+  ],
+  outputs: [output("boolean")],
   run(array: DflowArray, element: string) {
     return array.includes(element);
   }
-}
+};
 
-class ArrayJoin extends DflowNode {
-  static kind = "arrayJoin";
-  static inputs = [
+const ArrayJoin: DflowNode = {
+  kind: "arrayJoin",
+  inputs: [
     input("array", { name: "array" }),
     input("string", { name: "separator", optional: true })
-  ];
-  static outputs = [output("string")];
+  ],
+  outputs: [output("string")],
   run(array: DflowArray, separator: string | undefined) {
     return array.join(separator);
   }
-}
+};
 
-class ArrayLength extends DflowNode {
-  static kind = "arrayLength";
-  static inputs = [input("array")];
-  static outputs = [output("number")];
+const ArrayLength: DflowNode = {
+  kind: "arrayLength",
+  inputs: [input("array")],
+  outputs: [output("number")],
   run(array: DflowArray) {
     return array.length;
   }
-}
+};
 
-class ArrayPop extends DflowNode {
-  static kind = "arrayPop";
-  static inputs = [input("array")];
-  static outputs = [
-    output([], { name: "element" }),
-    output("array", { name: "rest" })
-  ];
+const ArrayPop: DflowNode = {
+  kind: "arrayPop",
+  inputs: [input("array")],
+  outputs: [output([], { name: "element" }), output("array", { name: "rest" })],
   run(array: DflowArray) {
     const element = array.pop();
     return [element, array];
   }
-}
+};
 
-class ArrayPush extends DflowNode {
-  static kind = "arrayPush";
-  static inputs = [input("array"), input([], { name: "element" })];
-  static outputs = [output("array")];
+const ArrayPush: DflowNode = {
+  kind: "arrayPush",
+  inputs: [input("array"), input([], { name: "element" })],
+  outputs: [output("array")],
   run(array: DflowArray, element: DflowData) {
     if (element) array.push(element);
     return array;
   }
-}
+};
 
-class ArrayReverse extends DflowNode {
-  static kind = "arrayReverse";
-  static inputs = [input("array")];
-  static outputs = [input("array")];
+const ArrayReverse: DflowNode = {
+  kind: "arrayReverse",
+  inputs: [input("array")],
+  outputs: [input("array")],
   run(array: DflowArray) {
     return array.reverse();
   }
-}
+};
 
-class ArrayShift extends DflowNode {
-  static kind = "arrayShift";
-  static inputs = [input("array")];
-  static outputs = [
-    output([], { name: "element" }),
-    output("array", { name: "rest" })
-  ];
+const ArrayShift: DflowNode = {
+  kind: "arrayShift",
+  inputs: [input("array")],
+  outputs: [output([], { name: "element" }), output("array", { name: "rest" })],
   run(array: DflowArray) {
     const element = array.shift();
     return [element, array];
   }
-}
+};
 
-class ArraySlice extends DflowNode {
-  static kind = "arraySlice";
-  static inputs = [
+const ArraySlice: DflowNode = {
+  kind: "arraySlice",
+  inputs: [
     input("array"),
     input("number", { name: "start" }),
     input("number", { name: "end", optional: true })
-  ];
-  static outputs = [output("array")];
+  ],
+  outputs: [output("array")],
   run(array: DflowArray, start: number, end?: number) {
     if (typeof end === "number") {
       return array.slice(start, end);
@@ -105,7 +99,7 @@ class ArraySlice extends DflowNode {
       return array.slice(start);
     }
   }
-}
+};
 
 export default [
   ArrayAt,

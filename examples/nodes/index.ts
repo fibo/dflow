@@ -1,6 +1,5 @@
 import arrayNodes from "./array.ts";
 import conditionalNodes from "./conditional.ts";
-import consoleNodes from "./console.ts";
 import dateNodes from "./date.ts";
 import logicNodes from "./logic.ts";
 import mathNodes from "./math.ts";
@@ -12,7 +11,6 @@ import stringNodes from "./string.ts";
 export const nodeDefinitions = [
   ...arrayNodes,
   ...conditionalNodes,
-  ...consoleNodes,
   ...dateNodes,
   ...logicNodes,
   ...mathNodes,

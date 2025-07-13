@@ -1,19 +1,19 @@
-import { DflowNode } from "../../dflow.ts";
-import type { DflowData } from "../../dflow.ts";
+import { Dflow } from "../../dflow.ts";
+import type { DflowData, DflowNode } from "../../dflow.ts";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
-class NodeIf extends DflowNode {
-  static kind = "if";
-  static inputs = [
+const NodeIf: DflowNode = {
+  kind: "if",
+  inputs: [
     input([], { name: "condition" }),
     input([], { name: "then" }),
     input([], { name: "else" })
-  ];
-  static outputs = [output()];
+  ],
+  outputs: [output()],
   run(condition: DflowData, then: DflowData, elseValue: DflowData) {
     return condition ? then : elseValue;
   }
-}
+};
 
 export default [NodeIf];

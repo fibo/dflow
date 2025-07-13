@@ -33,7 +33,7 @@ An **output** can be connected to multiple inputs, and hold a **data** value tha
 - Implemented in TypeScript.
 - Expressive and simple API.
 - A graph can be saved as a JSON file. It can be then loaded and executed.
-- It is easy to create nodes: just extend `DflowNode` class, define its inputs and outputs and the `run()` function.
+- It is easy to create nodes: just create a `DflowNode` object, define its inputs and outputs and the `run()` function.
 - Minimal internal type system: it is possible to connect an output of type `T` to an input of type `U`, if and only if `U` includes `T`.
 
 **NOTA BENE**: it is supposed that you implement your own nodes, for example node `addition` could be implemented using bigint or some floating point library, according to your needs.
@@ -65,26 +65,26 @@ You can run the following code with any of the following by cloning this repo an
 You should see a number `1` printed on output.
 
 ```javascript
-import { Dflow, DflowNode } from "dflow";
+import { Dflow } from "dflow";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
-class MathSin extends DflowNode {
-  static kind = "mathSin";
-  static inputs = [input("number")];
-  static outputs = [output("number")];
+const MathSin = {
+  kind: "mathSin",
+  inputs: [input("number")],
+  outputs: [output("number")],
   run(input) {
     return Math.sin(input);
   }
-}
+};
 
-class ConsoleLog extends DflowNode {
-  static kind = "consoleLog";
-  static inputs = [input()];
+const ConsoleLog = {
+  kind: "consoleLog",
+  inputs: [input()],
   run(input) {
     console.log(input);
   }
-}
+};
 
 // Create a Dflow instance with the given nodes.
 const dflow = new Dflow([MathSin, ConsoleLog]);

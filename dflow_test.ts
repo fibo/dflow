@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import { strict as assert } from "node:assert";
 
-import { Dflow, DflowNode } from "./dflow.ts";
-import type { DflowDataType } from "./dflow.ts";
+import { Dflow } from "./dflow.ts";
+import type { DflowDataType, DflowNode } from "./dflow.ts";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
 const num = 1;
 const bool = true;
@@ -21,23 +21,23 @@ const dataTypes: DflowDataType[] = [
   "object"
 ];
 
-class IdentityNode extends DflowNode {
-  static kind = "Identity";
-  static inputs = [input("number")];
-  static outputs = [output("number")];
+const IdentityNode: DflowNode = {
+  kind: "Identity",
+  inputs: [input("number")],
+  outputs: [output("number")],
   run(input: number) {
     return input;
   }
-}
+};
 
-class SumNode extends DflowNode {
-  static kind = "Sum";
-  static inputs = [input("number"), input("number")];
-  static outputs = [output("number")];
+const SumNode: DflowNode = {
+  kind: "Sum",
+  inputs: [input("number"), input("number")],
+  outputs: [output("number")],
   run(a: number, b: number) {
     return a + b;
   }
-}
+};
 
 function sleep(seconds = 1) {
   return new Promise<void>((resolve) => {
@@ -47,22 +47,22 @@ function sleep(seconds = 1) {
   });
 }
 
-class SleepNode extends DflowNode {
-  static kind = "Sleep";
+const SleepNode: DflowNode = {
+  kind: "Sleep",
   async run() {
     console.info("sleep node start");
     await sleep();
     console.info("sleep node end");
   }
-}
+};
 
-class ErrorNode extends DflowNode {
-  static kind = "Opsss";
-  static inputs = [input("boolean", { name: "shouldThrow" })];
+const ErrorNode: DflowNode = {
+  kind: "Opsss",
+  inputs: [input("boolean", { name: "shouldThrow" })],
   run(shouldThrow: boolean) {
     if (shouldThrow) throw new Error("Opsss");
   }
-}
+};
 
 const nodeDefinitions1 = [IdentityNode, ErrorNode];
 
@@ -363,6 +363,8 @@ test("dflow.data()", () => {
 
   // Create a data node with id.
   dflow.data(42, "TheAnswer");
+
+  dflow.run();
 
   assert.deepEqual(dflow.out, {
     [nodeId1]: ["Hello, World!"],

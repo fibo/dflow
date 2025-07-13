@@ -1,17 +1,17 @@
-import { Dflow, DflowNode } from "../dflow.js";
+import { Dflow } from "../dflow.js";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
 const sumNodeId = "sum";
 
-class SumNode extends DflowNode {
-  static kind = "Sum";
-  static inputs = [input(["number"]), input(["number"])];
-  static outputs = [output(["number"])];
+const SumNode = {
+  kind: "Sum",
+  inputs: [input(["number"]), input(["number"])],
+  outputs: [output(["number"])],
   run(a, b) {
     return a + b;
   }
-}
+};
 
 function sleep(timeout) {
   return new Promise((resolve) => {
@@ -21,15 +21,15 @@ function sleep(timeout) {
   });
 }
 
-class SleepNode extends DflowNode {
-  static kind = "Sleep";
+const SleepNode = {
+  kind: "Sleep",
   async run() {
     const timeout = 500;
     console.info("sleep node start", `(will sleep ${timeout} ms) zZz`);
     await sleep(timeout);
     console.info("sleep node end");
   }
-}
+};
 
 async function runGraph() {
   const dflow = new Dflow([SumNode, SleepNode]);

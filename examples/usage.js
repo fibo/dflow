@@ -1,25 +1,25 @@
 // Keep in sync with README.md file.
 
-import { Dflow, DflowNode } from "dflow";
+import { Dflow } from "dflow";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
-class MathSin extends DflowNode {
-  static kind = "mathSin";
-  static inputs = [input("number")];
-  static outputs = [output("number")];
+const MathSin = {
+  kind: "mathSin",
+  inputs: [input("number")],
+  outputs: [output("number")],
   run(input) {
     return Math.sin(input);
   }
-}
+};
 
-class ConsoleLog extends DflowNode {
-  static kind = "consoleLog";
-  static inputs = [input()];
+const ConsoleLog = {
+  kind: "consoleLog",
+  inputs: [input()],
   run(input) {
     console.log(input);
   }
-}
+};
 
 // Create a Dflow instance with the given nodes.
 const dflow = new Dflow([MathSin, ConsoleLog]);

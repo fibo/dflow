@@ -1,79 +1,79 @@
-import { DflowNode } from "../../dflow.ts";
-import type { DflowData } from "../../dflow.ts";
+import { Dflow } from "../../dflow.ts";
+import type { DflowData, DflowNode } from "../../dflow.ts";
 
-const { input, output } = DflowNode;
+const { input, output } = Dflow;
 
-class Addition extends DflowNode {
-  static kind = "addition";
-  static inputs = [input("number"), input("number")];
-  static outputs = [output("number")];
+const Addition: DflowNode = {
+  kind: "addition",
+  inputs: [input("number"), input("number")],
+  outputs: [output("number")],
   run(a: number, b: number) {
     return a + b;
   }
-}
+};
 
-class Division extends DflowNode {
-  static kind = "division";
-  static inputs = [input("number"), input("number")];
-  static outputs = [output("number")];
+const Division: DflowNode = {
+  kind: "division",
+  inputs: [input("number"), input("number")],
+  outputs: [output("number")],
   run(a: number, b: number) {
     if (b) return a / b;
   }
-}
+};
 
-class Equality extends DflowNode {
-  static kind = "equality";
-  static inputs = [input(), input()];
-  static outputs = [output("boolean")];
+const Equality: DflowNode = {
+  kind: "equality",
+  inputs: [input(), input()],
+  outputs: [output("boolean")],
   run(a: DflowData, b: DflowData) {
     return a == b;
   }
-}
+};
 
-class LessThan extends DflowNode {
-  static kind = "lessThan";
-  static inputs = [input("number"), input("number")];
-  static outputs = [output("boolean")];
+const LessThan: DflowNode = {
+  kind: "lessThan",
+  inputs: [input("number"), input("number")],
+  outputs: [output("boolean")],
   run(a: number, b: number) {
     return a < b;
   }
-}
+};
 
-class GreaterThan extends DflowNode {
-  static kind = "greaterThan";
-  static inputs = [input("number"), input("number")];
-  static outputs = [output("boolean")];
+const GreaterThan: DflowNode = {
+  kind: "greaterThan",
+  inputs: [input("number"), input("number")],
+  outputs: [output("boolean")],
   run(a: number, b: number) {
     return a > b;
   }
-}
+};
 
-class Inequality extends DflowNode {
-  static kind = "inequality";
-  static inputs = [input(), input()];
-  static outputs = [output("boolean")];
+const Inequality: DflowNode = {
+  kind: "inequality",
+  inputs: [input(), input()],
+  outputs: [output("boolean")],
   run(a: DflowData, b: DflowData) {
     return a != b;
   }
-}
+};
 
-class Multiplication extends DflowNode {
-  static kind = "multiplication";
-  static inputs = [input("number"), input("number")];
-  static outputs = [output("number")];
+const Multiplication: DflowNode = {
+  kind: "multiplication",
+  inputs: [input("number"), input("number")],
+  outputs: [output("number")],
   run(a: number, b: number) {
     return a * b;
   }
-}
+};
 
-class Subtraction extends DflowNode {
-  static kind = "subtraction";
-  static inputs = [input("number"), input("number")];
-  static outputs = [output("number")];
+const Subtraction: DflowNode = {
+  kind: "subtraction",
+  inputs: [input("number"), input("number")],
+  outputs: [output("number")],
   run(a: number, b: number) {
     return a - b;
   }
-}
+};
 
 export default [
   Addition,
