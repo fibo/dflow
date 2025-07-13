@@ -2,54 +2,44 @@ import { Dflow, DflowNode } from "../dflow.js";
 
 const { input, output } = DflowNode;
 
-class NumNode extends DflowNode {
-  static kind = "Num";
-  static outputs = [output(["number"])];
-  run() {}
-}
+const sumNodeId = "sum";
 
 class SumNode extends DflowNode {
   static kind = "Sum";
   static inputs = [input(["number"]), input(["number"])];
   static outputs = [output(["number"])];
-  run() {
-    const a = this.input(0).data;
-    const b = this.input(1).data;
-    this.output(0).data = a + b;
+  run(a, b) {
+    return a + b;
   }
 }
 
-function sleep(seconds = 1) {
+function sleep(timeout) {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve();
-    }, seconds * 1000);
+    }, timeout);
   });
 }
 
 class SleepNode extends DflowNode {
-  kind = "Sleep";
+  static kind = "Sleep";
   async run() {
-    const numSeconds = 2;
-    console.info("sleep node start", `(will sleep ${numSeconds} seconds) zZz`);
-    await sleep(numSeconds);
+    const timeout = 500;
+    console.info("sleep node start", `(will sleep ${timeout} ms) zZz`);
+    await sleep(timeout);
     console.info("sleep node end");
   }
 }
 
 async function runGraph() {
-  const dflow = new Dflow([NumNode, SumNode, SleepNode]);
+  const dflow = new Dflow([SumNode, SleepNode]);
 
   // Create two nodes, num and sum.
 
-  const numNodeId = dflow.node(NumNode.kind, {
-    outputs: [{ id: "out", data: 21 }]
-  });
+  const numNodeId = dflow.data(21);
   const sumNodeId = dflow.node(SumNode.kind, {
     // Optional `id`. If Dflow is edited in a view, it can handy to reuse ids.
-    id: "sum",
-    inputs: [{ id: "in1" }, { id: "in2" }],
-    outputs: [{ id: "out" }]
+    id: "sum"
   });
 
   // Connect nodes.
@@ -62,7 +52,9 @@ async function runGraph() {
   // Run graph asynchronously.
   await dflow.run();
 
-  console.info(JSON.stringify(dflow.graph, null, 2));
+  const graph = dflow.graph;
+  if (graph.n[sumNodeId].o[0].d !== 42)
+    console.error("Unexpected result", "\n", JSON.stringify(graph));
 }
 
 runGraph();

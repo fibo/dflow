@@ -41,7 +41,10 @@ class MathMin extends DflowNode {
 
 class MathPI extends DflowNode {
   static kind = "mathPI";
-  static outputs = [output("number", { name: "π", data: Math.PI })];
+  static outputs = [output("number", { name: "π" })];
+  run() {
+    return Math.PI;
+  }
 }
 
 class MathRound extends DflowNode {

@@ -60,7 +60,7 @@ class ErrorNode extends DflowNode {
   static kind = "Opsss";
   static inputs = [input("boolean", { name: "shouldThrow" })];
   run(shouldThrow: boolean) {
-    if (shouldThrow) throw new Error("Something went wrong");
+    if (shouldThrow) throw new Error("Opsss");
   }
 }
 
@@ -285,10 +285,7 @@ test("dflow.run()", async () => {
   // Num#out=2 -> | Sum#in1 |
   //              |         |-> Sum#out=4
   // Num#out=2 -> | Sum#in2 |
-  dflow.node("data", {
-    id: "num",
-    outputs: [{ data: 2 }]
-  });
+  dflow.data(2, "num");
   const sumNodeId = dflow.node("Sum");
   dflow.link(["num", 0], [sumNodeId, 0]);
   dflow.link(["num", 0], [sumNodeId, 1]);
@@ -307,26 +304,30 @@ test("dflow.run() with error", () => {
   // First run, it will not throw.
   dflow.run();
   assert.equal(dflow.graph.n[nodeId1].err, undefined);
-  const nodeId2 = dflow.node("data", { outputs: [{ data: true }] });
+  const nodeId2 = dflow.data(true);
   const linkId = dflow.link(nodeId2, nodeId1);
   // Second time, it will throw an error.
   dflow.run();
-  assert.equal(dflow.graph.n[nodeId1].err, "Something went wrong");
-  // Third time, it will not throw again.
+  assert.equal(dflow.graph.n[nodeId1].err, "Opsss");
+  // Third time will throw an error, and show a message.
+  dflow.ERR = (error) => {
+    assert.equal(error.message, "Opsss");
+    console.info("Error logged ✅");
+  };
+  dflow.run();
+  // This time, it will not throw.
   dflow.delete(linkId);
   dflow.run();
   assert.equal(dflow.graph.n[nodeId1].err, undefined);
 });
 
-test("dflow.newNode()", () => {
+test("dflow.node()", () => {
   const dflow = new Dflow(nodeDefinitions1);
 
-  // newNode with id
-  const nodeId1 = "node1";
-  dflow.node("Identity", { id: nodeId1 });
-
-  // newNode with outputs
-  const nodeId2 = dflow.node("data", { outputs: [{ data: 42 }] });
+  // Create a node.
+  const nodeId1 = dflow.node("Identity");
+  // Create node with id.
+  dflow.node("Identity", { id: "node2" });
 
   assert.deepEqual(dflow.graph, {
     n: {
@@ -334,9 +335,9 @@ test("dflow.newNode()", () => {
         k: "Identity",
         o: [{}]
       },
-      [nodeId2]: {
-        k: "data",
-        o: [{ d: 42 }]
+      node2: {
+        k: "Identity",
+        o: [{}]
       }
     },
     l: {}
@@ -357,6 +358,31 @@ test("dflow.link()", () => {
     },
     { message: "Cannot create link" }
   );
+});
+
+test("dflow.data()", () => {
+  // Data node is builtin, pass an empty node definitions list.
+  const dflow = new Dflow([]);
+
+  // Create a data node.
+  const nodeId1 = dflow.data("Hello, World!");
+
+  // Create a data node with id.
+  dflow.data(42, "TheAnswer");
+
+  assert.deepEqual(dflow.graph, {
+    n: {
+      [nodeId1]: {
+        k: "data",
+        o: [{ d: "Hello, World!" }]
+      },
+      TheAnswer: {
+        k: "data",
+        o: [{ d: 42 }]
+      }
+    },
+    l: {}
+  });
 });
 
 test("dflow.delete(nodeId)", () => {
