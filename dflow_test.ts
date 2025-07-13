@@ -289,10 +289,7 @@ test("dflow.run()", async () => {
     id: "num",
     outputs: [{ data: 2 }]
   });
-  const sumNodeId = dflow.node("Sum", {
-    inputs: [{ id: "in1" }, { id: "in2" }],
-    outputs: [{ id: "out" }]
-  });
+  const sumNodeId = dflow.node("Sum");
   dflow.link(["num", 0], [sumNodeId, 0]);
   dflow.link(["num", 0], [sumNodeId, 1]);
 
