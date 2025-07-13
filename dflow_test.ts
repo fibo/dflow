@@ -264,17 +264,17 @@ test("Dflow.isValidData()", () => {
 
 test("new Dflow has an empty graph", () => {
   const dflow = new Dflow([]);
-  assert.deepEqual(dflow.graph, { n: {}, l: {} });
+  assert.deepEqual(dflow.graph, { node: {}, link: {} });
 });
 
 test("dflow.graph", () => {
   const { dflow } = sample01();
 
   assert.deepEqual(dflow.graph, {
-    l: { e1: ["n1", 0, "n2", 0] },
-    n: {
-      n1: { k: "Identity", o: [{}] },
-      n2: { k: "Identity", o: [{}] }
+    link: { e1: ["n1", 0, "n2", 0] },
+    node: {
+      n1: "Identity",
+      n2: "Identity"
     }
   });
 });
@@ -295,7 +295,7 @@ test("dflow.run()", async () => {
 
   await dflow.run();
 
-  assert.deepEqual(dflow.graph.n[sumNodeId]?.o?.[0]?.d, 4);
+  assert.deepEqual(dflow.out[sumNodeId], [4]);
 });
 
 test("dflow.run() with error", () => {
@@ -330,17 +330,11 @@ test("dflow.node()", () => {
   dflow.node("Identity", { id: "node2" });
 
   assert.deepEqual(dflow.graph, {
-    n: {
-      [nodeId1]: {
-        k: "Identity",
-        o: [{}]
-      },
-      node2: {
-        k: "Identity",
-        o: [{}]
-      }
+    node: {
+      [nodeId1]: "Identity",
+      node2: "Identity"
     },
-    l: {}
+    link: {}
   });
 });
 
@@ -370,18 +364,9 @@ test("dflow.data()", () => {
   // Create a data node with id.
   dflow.data(42, "TheAnswer");
 
-  assert.deepEqual(dflow.graph, {
-    n: {
-      [nodeId1]: {
-        k: "data",
-        o: [{ d: "Hello, World!" }]
-      },
-      TheAnswer: {
-        k: "data",
-        o: [{ d: 42 }]
-      }
-    },
-    l: {}
+  assert.deepEqual(dflow.out, {
+    [nodeId1]: ["Hello, World!"],
+    TheAnswer: [42]
   });
 });
 
@@ -389,18 +374,18 @@ test("dflow.delete(nodeId)", () => {
   const { dflow, nodeId1 } = sample01();
   dflow.delete(nodeId1);
   // Only one node left.
-  assert.equal(Object.keys(dflow.graph.n).length, 1);
+  assert.equal(Object.keys(dflow.graph.node).length, 1);
   // Link is deleted.
-  assert.equal(Object.keys(dflow.graph.l).length, 0);
+  assert.equal(Object.keys(dflow.graph.link).length, 0);
 });
 
 test("dflow.delete(linkId)", () => {
   const { dflow, linkId1 } = sample01();
   dflow.delete(linkId1);
   // No links.
-  assert.equal(Object.keys(dflow.graph.l).length, 0);
+  assert.equal(Object.keys(dflow.graph.link).length, 0);
   // Nodes are preserved.
-  assert.equal(Object.keys(dflow.graph.n).length, 2);
+  assert.equal(Object.keys(dflow.graph.node).length, 2);
 });
 
 test("Dflow.canConnect()", () => {

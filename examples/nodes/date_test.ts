@@ -10,9 +10,7 @@ test("newDate", () => {
 
   dflow.run();
 
-  const testNodeOutput = dflow.graph.n[testNodeId]?.o;
-  const output0 = testNodeOutput?.[0].d;
-  const output1 = testNodeOutput?.[1].d;
+  const [output0, output1] = dflow.out[testNodeId];
 
   assert.equal(typeof output0, "string");
   assert.equal(typeof output1, "number");
@@ -26,9 +24,7 @@ test("now", () => {
 
   dflow.run();
 
-  const testNodeOutput = dflow.graph.n[testNodeId]?.o;
-  const output0 = testNodeOutput?.[0].d;
-  const output1 = testNodeOutput?.[1].d;
+  const [output0, output1] = dflow.out[testNodeId];
 
   assert.equal(typeof output0, "string");
   assert.equal(typeof output1, "number");

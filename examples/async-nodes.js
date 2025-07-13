@@ -52,9 +52,8 @@ async function runGraph() {
   // Run graph asynchronously.
   await dflow.run();
 
-  const graph = dflow.graph;
-  if (graph.n[sumNodeId].o[0].d !== 42)
-    console.error("Unexpected result", "\n", JSON.stringify(graph));
+  const result = dflow.out[sumNodeId][0];
+  if (result !== 42) console.error("Unexpected result", result);
 }
 
 runGraph();

@@ -103,21 +103,10 @@ const newId = (
 };
 
 export type DflowGraph = {
-  /** nodes */
-  n: Record<
-    string,
-    {
-      /** Node kind */
-      k: string;
-      /** Node outputs */
-      o?: Array<{
-        /** data */
-        d?: DflowData;
-      }>;
-    }
-  >;
-  /** links */
-  l: Record<string, DflowLinkPath>;
+  /** Nodes: key is node id, value is node kind. */
+  node: Record<string, string>;
+  /** Links: key is link id. */
+  link: Record<string, DflowLinkPath>;
 };
 
 /**
@@ -355,29 +344,25 @@ export class Dflow {
   }
 
   /**
-   * Dflow graph contains information about nodes, links, data outputs and errors.
-   * It is updated on every run.
+   * Dflow graph contains nodes and links.
    */
   get graph(): DflowGraph {
-    const n: DflowGraph["n"] = {};
-    for (const [nodeId, node] of this.#nodesMap.entries()) {
-      const outputs: Array<{ d?: DflowData }> = [];
-      for (const output of node.outputs) {
-        const obj: { d?: DflowData } = {};
-        if (output.data !== undefined) obj.d = output.data;
-        outputs.push(obj);
-      }
-      n[nodeId] = {
-        k: node.kind,
-        o: outputs
-      };
-    }
-    return { n, l: Object.fromEntries(this.#linksMap.entries()) };
+    const node: DflowGraph["node"] = {};
+    for (const [id, { kind }] of this.#nodesMap.entries()) node[id] = kind;
+    return { node, link: Object.fromEntries(this.#linksMap.entries()) };
   }
 
-  /** Get error messages from last execution, indexed by node id. */
+  /** Get error messages from last run, indexed by node id. */
   get error(): Record<string, string> {
     return Object.fromEntries(this.#errorsMap.entries());
+  }
+
+  /** Get output data of last run, indexed by node id. */
+  get out(): Record<string, Array<DflowData | undefined>> {
+    const outputs: Record<string, Array<DflowData | undefined>> = {};
+    for (const [nodeId, node] of this.#nodesMap.entries())
+      outputs[nodeId] = node.outputs.map((output) => output.data);
+    return outputs;
   }
 
   /** Check that source types are compatible with target types. */
