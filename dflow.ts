@@ -74,6 +74,9 @@ export class Dflow {
 
   #linksMap: Map<string, DflowLinkPath> = new Map();
 
+  /** Key is nodeId, value is an error message. */
+  #errorsMap: Map<string, string> = new Map();
+
   constructor(nodeDefinitions: Array<DflowNodeDefinition>) {
     // Define core nodes.
     this.#nodeDefinitions.set(DflowNodeData.kind, DflowNodeData);
@@ -221,13 +224,25 @@ export class Dflow {
    * Execute all nodes, sorted by their connections.
    */
   async run(): Promise<void> {
+    // Reset errors.
+    this.#errorsMap.clear();
     // Loop over nodeIds sorted by graph hierarchy.
     for (const nodeId of this.#sortedNodesIds()) {
-      const node = this.#nodesMap.get(nodeId) as DflowNode;
+      const node = this.#nodesMap.get(nodeId)!;
 
-      // If some input data is not valid.
-      if (!node.inputsDataAreValid) {
-        node.clearOutputs();
+      // Check if inputs data are valid.
+      let inputsDataAreValid = true;
+      for (const { data, types, optional } of node.inputs) {
+        // Ignore optional inputs with no data.
+        if (optional && data === undefined) continue;
+        // Validate input data.
+        if (Dflow.isValidData(types, data)) continue;
+        // Some input is not valid.
+        inputsDataAreValid = false;
+      }
+      // If some input data is not valid, then skip.
+      if (!inputsDataAreValid) {
+        node.outputs.forEach((output) => output.clear());
         continue;
       }
 
@@ -235,20 +250,26 @@ export class Dflow {
         (input) => input.source?.data
       );
       let result: unknown;
-      if (node.run.constructor.name === "Function") {
-        result = node.run(...inputData) as DflowData | undefined;
-      }
-      if (node.run.constructor.name === "AsyncFunction") {
-        result = (await node.run(...inputData)) as DflowData | undefined;
+      try {
+        if (node.run.constructor.name === "Function") {
+          result = node.run(...inputData);
+        }
+        if (node.run.constructor.name === "AsyncFunction") {
+          result = await node.run(...inputData);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        this.#errorsMap.set(nodeId, message);
       }
       // If run() is not implemented, then it is a constant node.
-      if (result === UNIMPLEMENTED) {
-        continue;
-      }
+      if (result === UNIMPLEMENTED) continue;
+      // If result is undefined or not a valid Dflow data,
+      // then clear the node outputs.
       if (result === undefined || !Dflow.isDflowData(result)) {
-        node.clearOutputs();
+        node.outputs.forEach((output) => output.clear());
         continue;
       }
+      // Copy result into node outputs.
       if (node.outputs.length === 1) node.outputs[0].data = result;
       if (node.outputs.length > 1)
         for (let position = 0; position < node.outputs.length; position++)
@@ -269,6 +290,8 @@ export class Dflow {
         k: node.kind,
         o: outputs
       };
+      const err = this.#errorsMap.get(nodeId);
+      if (err) n[nodeId].err = err;
     }
     return { n, l: Object.fromEntries(this.#linksMap.entries()) };
   }
@@ -646,22 +669,6 @@ export class DflowNode {
         }
       });
     }
-  }
-
-  get inputsDataAreValid(): boolean {
-    for (const { data, types, optional } of this.inputs) {
-      // Ignore optional inputs with no data.
-      if (optional && data === undefined) continue;
-      // Validate input data.
-      if (Dflow.isValidData(types, data)) continue;
-      // Some input is not valid.
-      return false;
-    }
-    return true;
-  }
-
-  clearOutputs() {
-    for (const output of this.outputs) output.clear();
   }
 
   /**

@@ -56,7 +56,15 @@ class SleepNode extends DflowNode {
   }
 }
 
-const nodeDefinitions1 = [IdentityNode];
+class ErrorNode extends DflowNode {
+  static kind = "Opsss";
+  static inputs = [input("boolean", { name: "shouldThrow" })];
+  run(shouldThrow: boolean) {
+    if (shouldThrow) throw new Error("Something went wrong");
+  }
+}
+
+const nodeDefinitions1 = [IdentityNode, ErrorNode];
 
 const nodeDefinitions2 = [SumNode, SleepNode];
 
@@ -294,6 +302,23 @@ test("dflow.run()", async () => {
   await dflow.run();
 
   assert.deepEqual(dflow.graph.n[sumNodeId]?.o?.[0]?.d, 4);
+});
+
+test("dflow.run() with error", () => {
+  const dflow = new Dflow(nodeDefinitions1);
+  const nodeId1 = dflow.node("Opsss");
+  // First run, it will not throw.
+  dflow.run();
+  assert.equal(dflow.graph.n[nodeId1].err, undefined);
+  const nodeId2 = dflow.node("data", { outputs: [{ data: true }] });
+  const linkId = dflow.link(nodeId2, nodeId1);
+  // Second time, it will throw an error.
+  dflow.run();
+  assert.equal(dflow.graph.n[nodeId1].err, "Something went wrong");
+  // Third time, it will not throw again.
+  dflow.delete(linkId);
+  dflow.run();
+  assert.equal(dflow.graph.n[nodeId1].err, undefined);
 });
 
 test("dflow.newNode()", () => {
