@@ -7,6 +7,7 @@
  * A `DflowData` represents any data that can be serialized into JSON.
  */
 export type DflowData =
+  | undefined
   | null
   | boolean
   | number
@@ -29,7 +30,7 @@ export type DflowDataType =
 // Inputs, outputs and links.
 // ////////////////////////////////////////////////////////////////////
 
-export type DflowLinkPath = [
+export type DflowLink = [
   sourceNodeId: string,
   sourcePosition: number,
   targetNodeId: string,
@@ -83,10 +84,9 @@ export type DflowOutput = {
   types: DflowDataType[];
 };
 
-/** @internal `_DflowOutput` holds the data that a node run() returns. */
+/** @internal `_DflowOutput` holds the output data of a node. */
 type _DflowOutput = Pick<DflowOutput, "types"> & {
-  data: DflowData | undefined;
-  /** Cleanup output data. */
+  data: DflowData;
   clear(): void;
 };
 
@@ -114,7 +114,7 @@ type _DflowOutput = Pick<DflowOutput, "types"> & {
  */
 export type DflowNode = {
   kind: string;
-  run(..._args: Array<DflowData | undefined>): unknown | Promise<unknown>;
+  run(..._args: DflowArray): unknown | Promise<unknown>;
   inputs?: DflowInput[];
   outputs?: DflowOutput[];
 };
@@ -122,22 +122,13 @@ export type DflowNode = {
 // Dflow
 // ////////////////////////////////////////////////////////////////////
 
-/** @internal Helper to generate an id unique in its scope. */
-const newId = (
-  itemMap: Map<string, unknown>,
-  prefix: string,
-  wantedId?: string
-): string => {
-  if (wantedId && !itemMap.has(wantedId)) return wantedId;
-  const id = `${prefix}${itemMap.size}`;
-  return itemMap.has(id) ? newId(itemMap, prefix) : id;
-};
-
 export type DflowGraph = {
   /** Nodes: key is node id, value is node kind. */
   node: Record<string, string>;
   /** Links: key is link id. */
-  link: Record<string, DflowLinkPath>;
+  link: Record<string, DflowLink>;
+  /** Data nodes: key is node id, value is data. */
+  data: Record<string, DflowData>;
 };
 
 /**
@@ -149,11 +140,14 @@ export class Dflow {
   /** Dflow node definitions indexed by node kind. */
   #nodeDefinitions: Map<string, DflowNode> = new Map();
 
-  /** Node instances indexed by node id. */
-  #nodes: Map<string, Pick<DflowNode, "kind" | "run">> = new Map();
+  /** Node kinds indexed by node id. */
+  #kinds: Map<string, string> = new Map();
+
+  /** Node run functions indexed by node id. */
+  #runs: Map<string, DflowNode["run"]> = new Map();
 
   /** Links indexed by link id. */
-  #links: Map<string, DflowLinkPath> = new Map();
+  #links: Map<string, DflowLink> = new Map();
 
   /** Key is nodeId, value is an error message. */
   #errors: Map<string, string> = new Map();
@@ -185,6 +179,17 @@ export class Dflow {
     this.context = {};
   }
 
+  /** Helper to generate an id unique in its scope. */
+  #newId(
+    itemMap: Map<string, unknown>,
+    prefix: string,
+    wantedId?: string
+  ): string {
+    if (wantedId && !itemMap.has(wantedId)) return wantedId;
+    const id = `${prefix}${itemMap.size}`;
+    return itemMap.has(id) ? this.#newId(itemMap, prefix) : id;
+  }
+
   /**
    * Every node has a level in the graph, given by its connections.
    * Nodes with no parent has level zero.
@@ -210,7 +215,7 @@ export class Dflow {
 
   /** Sort node ids by their level in the graph. */
   #sortedNodesIds(): string[] {
-    const nodeIds = Array.from(this.#nodes.keys());
+    const nodeIds = Array.from(this.#kinds.keys());
     const nodeConnections = [...this.#links.values()].map((link) => ({
       sourceId: link[0],
       targetId: link[2]
@@ -218,10 +223,36 @@ export class Dflow {
     const levelOf: Record<string, number> = {};
     for (const nodeId of nodeIds)
       levelOf[nodeId] = this.#levelOfNode(nodeId, nodeConnections);
-    return nodeIds.slice().sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
+    return nodeIds.sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
   }
 
-  #createNode(id: string, nodeDef: DflowNode) {
+  /** Delete node or link with given id. */
+  delete(id: string) {
+    // Delete node.
+    if (this.#kinds.delete(id)) {
+      // Delete functions or output data, if any.
+      this.#runs.delete(id);
+      this.#outputs.delete(id);
+      // Delete all links connected to node.
+      for (const [linkId, link] of this.#links.entries())
+        if (link[0] === id || link[2] === id) this.delete(linkId);
+    }
+    // Delete link.
+    const link = this.#links.get(id);
+    if (!link) return;
+    this.#links.delete(id);
+    // Disconnect target input.
+    const targetInput = this.#inputs.get(link[2])?.[link[3]];
+    if (targetInput) targetInput.source = undefined;
+  }
+
+  /** Create a new node. Returns node id. */
+  node(kind: string, wantedId?: string): string {
+    const nodeDef = this.#nodeDefinitions.get(kind);
+    if (!nodeDef) throw new Error("Cannot create node", { cause: { kind } });
+
+    const id = this.#newId(this.#kinds, "n", wantedId);
+
     // Inputs.
     const inputs: _DflowInput[] = [];
     for (const input of nodeDef.inputs ?? []) inputs.push({ ...input });
@@ -230,14 +261,14 @@ export class Dflow {
     // Outputs.
     const outputs: _DflowOutput[] = [];
     for (const { types } of nodeDef.outputs ?? []) {
-      let data: DflowData | undefined;
+      let data: DflowData;
       outputs.push({
         types,
+        get data(): DflowData {
+          return data;
+        },
         clear() {
           data = undefined;
-        },
-        get data(): DflowData | undefined {
-          return data;
         },
         set data(arg: unknown) {
           if (
@@ -257,51 +288,27 @@ export class Dflow {
     }
     this.#outputs.set(id, outputs);
 
-    this.#nodes.set(id, {
-      kind: nodeDef.kind,
-      run: nodeDef.run.bind(this.context)
-    });
+    this.#runs.set(id, nodeDef.run.bind(this.context));
+    this.#kinds.set(id, nodeDef.kind);
 
     return id;
   }
 
-  /** Delete node or link with given id. */
-  delete(id: string) {
-    // Delete node.
-    if (this.#nodes.delete(id)) {
-      // Delete all links connected to node.
-      for (const [linkId, link] of this.#links.entries())
-        if (link[0] === id || link[2] === id) this.delete(linkId);
-    }
-    // Delete link.
-    const link = this.#links.get(id);
-    if (!link) return;
-    this.#links.delete(id);
-    // Disconnect target input.
-    const targetInput = this.#inputs.get(link[2])?.[link[3]];
-    if (targetInput) targetInput.source = undefined;
-  }
-
-  /** Create a new node. Returns node id. */
-  node(kind: string, wantedId?: string): string {
-    const nodeDef = this.#nodeDefinitions.get(kind);
-    if (!nodeDef) throw new Error("Unknown node", { cause: { kind } });
-    return this.#createNode(newId(this.#nodes, "n", wantedId), nodeDef);
-  }
-
   /**
    * Create a new data node. Returns node id.
-   * @remarks If provided `arg` is not a valid `DflowData`, return value will be `undefined`.
+   * @remarks If value is not a valid `DflowData`, it will be set to `undefined`.
    */
-  data(arg: unknown, wantedId?: string): string {
-    const value = Dflow.isData(arg) ? arg : undefined;
-    return this.#createNode(newId(this.#nodes, "n", wantedId), {
-      kind: "data",
-      outputs: [{ types: Dflow.inferDataType(value) }],
-      run() {
-        return value;
+  data(value: DflowData, wantedId?: string): string {
+    const id = this.#newId(this.#kinds, "n", wantedId);
+    this.#kinds.set(id, "data");
+    this.#outputs.set(id, [
+      {
+        data: Dflow.isData(value) ? value : undefined,
+        types: Dflow.inferDataType(value),
+        clear() {}
       }
-    });
+    ]);
+    return id;
   }
 
   /**
@@ -313,7 +320,7 @@ export class Dflow {
     target: string | [nodeId: string, position: number],
     wantedId?: string
   ): string {
-    const id = newId(this.#links, "l", wantedId);
+    const id = this.#newId(this.#links, "l", wantedId);
 
     const sourceNodeId = typeof source === "string" ? source : source[0];
     const sourcePosition = typeof source === "string" ? 0 : source[1];
@@ -350,9 +357,15 @@ export class Dflow {
     this.#errors.clear();
     // Loop over nodeIds sorted by graph hierarchy.
     for (const nodeId of this.#sortedNodesIds()) {
-      const node = this.#nodes.get(nodeId)!;
+      const kind = this.#kinds.get(nodeId)!;
+
+      if (kind === "data") continue;
+
+      const run = this.#runs.get(nodeId)!;
+
       const nodeInputs = this.#inputs.get(nodeId) ?? [];
       const nodeOutputs = this.#outputs.get(nodeId) ?? [];
+      const numOutputs = nodeOutputs.length;
 
       // Check if inputs data are valid.
       let inputsDataAreValid = true;
@@ -373,15 +386,15 @@ export class Dflow {
       const inputData = nodeInputs.map((input) => input.source?.data);
       let result: unknown;
       try {
-        if (node.run.constructor.name === "Function") {
-          result = node.run(...inputData);
+        if (run.constructor.name === "Function") {
+          result = run(...inputData);
         }
-        if (node.run.constructor.name === "AsyncFunction") {
-          result = await node.run(...inputData);
+        if (run.constructor.name === "AsyncFunction") {
+          result = await run(...inputData);
         }
       } catch (err) {
         this.ERR?.(err);
-        // Store error message and cleanup node outputs.
+        // Store error message and clear node outputs.
         const message = err instanceof Error ? err.message : String(err);
         this.#errors.set(nodeId, message);
         nodeOutputs.forEach((output) => output.clear());
@@ -393,10 +406,10 @@ export class Dflow {
         nodeOutputs.forEach((output) => output.clear());
         continue;
       }
-      // Copy result into node outputs.
-      if (nodeOutputs.length === 1) nodeOutputs[0].data = result;
-      if (nodeOutputs.length > 1)
-        for (let position = 0; position < nodeOutputs.length; position++)
+      // Copy result into node .
+      if (numOutputs === 1) nodeOutputs[0].data = result;
+      if (numOutputs > 1)
+        for (let position = 0; position < numOutputs; position++)
           nodeOutputs[position].data = (result as DflowArray)[position];
     }
   }
@@ -406,8 +419,17 @@ export class Dflow {
    */
   get graph(): DflowGraph {
     const node: DflowGraph["node"] = {};
-    for (const [id, { kind }] of this.#nodes.entries()) node[id] = kind;
-    return { node, link: Object.fromEntries(this.#links.entries()) };
+    const data: DflowGraph["data"] = {};
+    for (const [id, kind] of this.#kinds.entries()) {
+      if (kind === "data")
+        data[id] = this.#outputs.get(id)?.[0]?.data as DflowData;
+      node[id] = kind;
+    }
+    return {
+      node,
+      link: Object.fromEntries(this.#links.entries()),
+      data
+    };
   }
 
   /** Get error messages from last run, indexed by node id. */
@@ -416,50 +438,53 @@ export class Dflow {
   }
 
   /** Get output data of last run, indexed by node id. */
-  get out(): Record<string, Array<DflowData | undefined>> {
-    const outputs: Record<string, Array<DflowData | undefined>> = {};
-    for (const nodeId of this.#nodes.keys())
-      outputs[nodeId] = this.#outputs.get(nodeId)!.map((output) => output.data);
-    return outputs;
+  get out(): Record<string, DflowArray> {
+    const out: Record<string, DflowArray> = {};
+    for (const nodeId of this.#kinds.keys()) {
+      const outputs = this.#outputs.get(nodeId)!;
+      out[nodeId] = [];
+      for (const output of outputs) out[nodeId].push(output.data);
+    }
+    return out;
   }
 
   /**
-   * `DflowNode.input()` is a helper to define inputs.
+   * `Dflow.input()` is a helper to define inputs.
    *
    * @example Input with `number` type.
    *
    * ```ts
-   * DflowNode.input("number")
+   * Dflow.input("number")
    * ```
    *
    * @example Optional `number` input.
    *
    * ```ts
-   * DflowNode.input("number", { optional: true })
+   * Dflow.input("number", { optional: true })
    * ```
    *
    * @example Input that accepts both `number` and `string` type.
    *
    * ```ts
-   * DflowNode.input(["number", "string"])
+   * Dflow.input(["number", "string"])
    * ```
    *
    * @example Input with any type.
    *
    * ```ts
-   * DflowNode.input()
+   * Dflow.input()
    * ```
    *
    * @example Input with type `array` and name.
    *
    * ```ts
-   * DflowNode.input("array", { name: "list" })
+   * Dflow.input("array", { name: "list" })
    * ```
    *
    * @example Input with any type and named "foo".
    *
    * ```ts
-   * DflowNode.input([], { name: "foo" })
+   * Dflow.input([], { name: "foo" })
    * ```
    */
   static input(
@@ -473,26 +498,22 @@ export class Dflow {
   }
 
   /**
-   * `DflowNode.output()` is a helper to define outputs.
+   * `Dflow.output()` is a helper to define outputs.
    *
    * @example
    *
    * ```ts
-   * const { output } = DflowNode;
-   *
-   * export class MathPI extends DflowNode {
-   *   static kind = "mathPI";
-   *   static outputs = [output("number", { name: "π" })];
-   *   run() {
-   *     return Math.PI;
-   *   }
+   * const MathPI: DflowNode = {
+   *   kind: "mathPI",
+   *   outputs: [Dflow.output("number", { name: "π" })],
+   *   run: () => Math.PI
    * }
    * ```
    *
    * @example Named output with `number` type.
    *
    * ```ts
-   * DflowNode.output("number", { name: "amount" })
+   * Dflow.output("number", { name: "amount" })
    * ```
    */
   static output(
@@ -556,7 +577,7 @@ export class Dflow {
   }
 
   /** Type guard for `DflowData`. */
-  static isData(arg: unknown): arg is DflowData {
+  static isData(arg: unknown): arg is Exclude<DflowData, undefined> {
     if (arg === undefined) return false;
     return (
       arg === null ||

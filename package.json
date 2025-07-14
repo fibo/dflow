@@ -18,7 +18,7 @@
     "example:async-nodes": "node examples/async-nodes.js",
     "example:context": "node --env-file .typescript.env examples/context.ts",
     "example:usage": "node --env-file .typescript.env examples/usage.ts",
-    "install_precommit_hook": "echo '#!/bin/sh\nnpm test && npm run prettier--check && npm run check_types && npm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
+    "install_precommit_hook": "echo '#!/bin/sh\nnpm test && npm run prettier--check && npm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
     "prettier": "prettier --write .",
     "prettier--check": "prettier --check .",
     "prebuild": "npm run check_types",

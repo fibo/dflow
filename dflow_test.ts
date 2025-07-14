@@ -264,7 +264,7 @@ test("Dflow.isValidData()", () => {
 
 test("new Dflow has an empty graph", () => {
   const dflow = new Dflow([]);
-  assert.deepEqual(dflow.graph, { node: {}, link: {} });
+  assert.deepEqual(dflow.graph, { node: {}, link: {}, data: {} });
 });
 
 test("dflow.graph", () => {
@@ -275,7 +275,8 @@ test("dflow.graph", () => {
     node: {
       n1: "Identity",
       n2: "Identity"
-    }
+    },
+    data: {}
   });
 });
 
@@ -334,7 +335,8 @@ test("dflow.node()", () => {
       [nodeId1]: "Identity",
       node2: "Identity"
     },
-    link: {}
+    link: {},
+    data: {}
   });
 });
 
@@ -363,6 +365,18 @@ test("dflow.data()", () => {
 
   // Create a data node with id.
   dflow.data(42, "TheAnswer");
+
+  assert.deepEqual(dflow.graph, {
+    data: {
+      [nodeId1]: "Hello, World!",
+      TheAnswer: 42
+    },
+    node: {
+      [nodeId1]: "data",
+      TheAnswer: "data"
+    },
+    link: {}
+  });
 
   dflow.run();
 

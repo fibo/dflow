@@ -1,40 +1,40 @@
 import { strict as assert } from "node:assert";
-import { Dflow } from "../../dflow.ts";
+import { Dflow, type DflowData } from "../../dflow.ts";
 import { nodeDefinitions } from "./index.ts";
 
 export function newDflow() {
   return new Dflow(nodeDefinitions);
 }
 
-export function testOneOut<Output>(
+export function testOneOut(
   dflow: Dflow,
   nodeKind: string,
-  output: Output
+  output: DflowData | undefined
 ) {
   const testNodeId = dflow.node(nodeKind);
   dflow.run();
-  assert.deepEqual(dflow.out[testNodeId][0], output);
+  assert.deepEqual(dflow.out[testNodeId], [output]);
 }
 
-export function testOneInOneOut<Input, Output>(
+export function testOneInOneOut(
   dflow: Dflow,
   nodeKind: string,
-  input?: Input,
-  output?: Output
+  input: DflowData,
+  output: DflowData | undefined
 ) {
   const dataNodeId = dflow.data(input);
   const testNodeId = dflow.node(nodeKind);
   dflow.link(dataNodeId, testNodeId);
   dflow.run();
-  assert.deepEqual(dflow.out[testNodeId][0], output);
+  assert.deepEqual(dflow.out[testNodeId], [output]);
 }
 
-export function testOneInTwoOut<Input, Output1, Output2>(
+export function testOneInTwoOut(
   dflow: Dflow,
   nodeKind: string,
-  input?: Input,
-  output1?: Output1,
-  output2?: Output2
+  input: DflowData,
+  output1: DflowData | undefined,
+  output2: DflowData | undefined
 ) {
   const dataNodeId = dflow.data(input);
   const testNodeId = dflow.node(nodeKind);
@@ -43,12 +43,12 @@ export function testOneInTwoOut<Input, Output1, Output2>(
   assert.deepEqual(dflow.out[testNodeId], [output1, output2]);
 }
 
-export function testTwoInOneOut<Input1, Input2, Output>(
+export function testTwoInOneOut(
   dflow: Dflow,
   nodeKind: string,
-  input1?: Input1,
-  input2?: Input2,
-  output?: Output
+  input1: DflowData,
+  input2: DflowData,
+  output: DflowData | undefined
 ) {
   const dataNodeId1 = dflow.data(input1);
   const dataNodeId2 = dflow.data(input2);
@@ -56,16 +56,16 @@ export function testTwoInOneOut<Input1, Input2, Output>(
   if (dataNodeId1) dflow.link(dataNodeId1, [testNodeId, 0]);
   if (dataNodeId2) dflow.link(dataNodeId2, [testNodeId, 1]);
   dflow.run();
-  assert.deepEqual(dflow.out[testNodeId][0], output);
+  assert.deepEqual(dflow.out[testNodeId], [output]);
 }
 
-export function testThreeInOneOut<Input1, Input2, Input3, Output>(
+export function testThreeInOneOut(
   dflow: Dflow,
   nodeKind: string,
-  input1?: Input1,
-  input2?: Input2,
-  input3?: Input3,
-  output?: Output
+  input1: DflowData,
+  input2: DflowData,
+  input3: DflowData,
+  output: DflowData | undefined
 ) {
   const dataNodeId1 = dflow.data(input1);
   const dataNodeId2 = dflow.data(input2);
@@ -75,5 +75,5 @@ export function testThreeInOneOut<Input1, Input2, Input3, Output>(
   if (dataNodeId2) dflow.link(dataNodeId2, [testNodeId, 1]);
   if (dataNodeId3) dflow.link(dataNodeId3, [testNodeId, 2]);
   dflow.run();
-  assert.deepEqual(dflow.out[testNodeId][0], output);
+  assert.deepEqual(dflow.out[testNodeId], [output]);
 }

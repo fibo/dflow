@@ -42,9 +42,7 @@ const MathMin: DflowNode = {
 const MathPI: DflowNode = {
   kind: "mathPI",
   outputs: [output("number", { name: "π" })],
-  run() {
-    return Math.PI;
-  }
+  run: () => Math.PI
 };
 
 const MathRound: DflowNode = {

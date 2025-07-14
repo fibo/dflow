@@ -1,5 +1,4 @@
-import { Dflow } from "../../dflow.ts";
-import type { DflowData, DflowNode } from "../../dflow.ts";
+import { Dflow, type DflowData, type DflowNode } from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
@@ -23,7 +22,7 @@ const Not: DflowNode = {
 
 const NullishCoaleshing: DflowNode = {
   kind: "??",
-  inputs: [input(), input()],
+  inputs: [input([], { optional: true }), input([], { optional: true })],
   outputs: [output()],
   run(a: DflowData, b: DflowData) {
     return a ?? b;

@@ -1,4 +1,5 @@
 .github/
+.prettierignore
 .typescript.env
 dflow.ts
 dflow_test.ts

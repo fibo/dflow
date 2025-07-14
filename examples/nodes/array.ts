@@ -1,5 +1,9 @@
-import { Dflow } from "../../dflow.ts";
-import type { DflowArray, DflowData, DflowNode } from "../../dflow.ts";
+import {
+  Dflow,
+  type DflowArray,
+  type DflowData,
+  type DflowNode
+} from "../../dflow.ts";
 
 const { input, output } = Dflow;
 
@@ -65,15 +69,6 @@ const ArrayPush: DflowNode = {
   }
 };
 
-const ArrayReverse: DflowNode = {
-  kind: "arrayReverse",
-  inputs: [input("array")],
-  outputs: [input("array")],
-  run(array: DflowArray) {
-    return array.reverse();
-  }
-};
-
 const ArrayShift: DflowNode = {
   kind: "arrayShift",
   inputs: [input("array")],
@@ -108,7 +103,6 @@ export default [
   ArrayLength,
   ArrayPop,
   ArrayPush,
-  ArrayReverse,
   ArrayShift,
   ArraySlice
 ];
