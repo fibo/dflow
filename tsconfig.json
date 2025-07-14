@@ -2,8 +2,6 @@
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "allowJs": true,
-    // TODO
-    // API should be improved and simplified in order to enable
     "checkJs": true,
     "erasableSyntaxOnly": true,
     "lib": ["dom", "es2023"],
@@ -22,6 +20,6 @@
     "dflow.d.ts",
     "dflow.ts",
     "dflow_test.ts",
-    "./examples/"
+    "examples/"
   ]
 }

@@ -5,7 +5,7 @@
 With [npm](https://www.npmjs.com/) install the following packages **without saving**:
 
 ```sh
-npm install prettier typescript @types/node --no-save
+npm install esbuild prettier typescript @types/node --no-save
 ```
 
 ## Contributing
