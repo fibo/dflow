@@ -3,25 +3,28 @@ import { Dflow, type DflowArray, type DflowNode } from "dflow";
 const { input, output } = Dflow;
 
 const MathAbs: DflowNode = {
-  kind: "mathAbs",
+  kind: "Math.abs",
   inputs: [input("number")],
   outputs: [output("number")],
-  run(input: number) {
-    return Math.abs(input);
-  }
+  run: Math.abs
 };
 
-const MathCos: DflowNode = {
-  kind: "mathCos",
+const MathPI: DflowNode = {
+  kind: "Math.PI",
+  outputs: [output("number", { name: "π" })],
+  run: () => Math.PI
+};
+
+const dynamicMathNodes = ["cos", "sin", "round"].map((method) => ({
+  kind: `Math.${method}`,
   inputs: [input("number")],
   outputs: [output("number")],
-  run(input: number) {
-    return Math.cos(input);
-  }
-};
+  // @ts-expect-error: expression of type 'string' can't be used to index type 'Math'.
+  run: Math[method]
+}));
 
 const MathMax: DflowNode = {
-  kind: "mathMax",
+  kind: "Math.max",
   inputs: [input("array")],
   outputs: [output("number")],
   run(array: DflowArray) {
@@ -30,7 +33,7 @@ const MathMax: DflowNode = {
 };
 
 const MathMin: DflowNode = {
-  kind: "mathMin",
+  kind: "Math.min",
   inputs: [input("array")],
   outputs: [output("number")],
   run(array: DflowArray) {
@@ -38,28 +41,4 @@ const MathMin: DflowNode = {
   }
 };
 
-const MathPI: DflowNode = {
-  kind: "mathPI",
-  outputs: [output("number", { name: "π" })],
-  run: () => Math.PI
-};
-
-const MathRound: DflowNode = {
-  kind: "mathRound",
-  inputs: [input("number")],
-  outputs: [output("number")],
-  run(input: number) {
-    return Math.round(input);
-  }
-};
-
-const MathSin: DflowNode = {
-  kind: "mathSin",
-  inputs: [input("number")],
-  outputs: [output("number")],
-  run(input: number) {
-    return Math.sin(input);
-  }
-};
-
-export default [MathAbs, MathCos, MathMax, MathMin, MathPI, MathRound, MathSin];
+export default [MathAbs, MathMax, MathMin, MathPI, ...dynamicMathNodes];

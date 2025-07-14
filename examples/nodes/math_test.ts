@@ -1,9 +1,9 @@
 import { test } from "node:test";
 import { newDflow, testOneInOneOut, testOneOut } from "./_test-utils.ts";
 
-test("mathAbs", () => {
+test("Math.abs", () => {
   const dflow = newDflow();
-  const nodeKind = "mathAbs";
+  const nodeKind = "Math.abs";
   for (const { input, output } of [
     { input: 1, output: 1 },
     { input: -1, output: 1 },
@@ -12,9 +12,9 @@ test("mathAbs", () => {
     testOneInOneOut(dflow, nodeKind, input, output);
 });
 
-test("mathCos", () => {
+test("Math.cos", () => {
   const dflow = newDflow();
-  const nodeKind = "mathCos";
+  const nodeKind = "Math.cos";
   for (const { input, output } of [
     { input: 1, output: Math.cos(1) },
     { input: 0, output: Math.cos(0) },
@@ -23,9 +23,9 @@ test("mathCos", () => {
     testOneInOneOut(dflow, nodeKind, input, output);
 });
 
-test("mathMax", () => {
+test("Math.max", () => {
   const dflow = newDflow();
-  const nodeKind = "mathMax";
+  const nodeKind = "Math.max";
   for (const { input, output } of [
     { input: [1, 2], output: 2 },
     { input: [1, 2, 3], output: 3 }
@@ -33,9 +33,9 @@ test("mathMax", () => {
     testOneInOneOut(dflow, nodeKind, input, output);
 });
 
-test("mathMin", () => {
+test("Math.min", () => {
   const dflow = newDflow();
-  const nodeKind = "mathMin";
+  const nodeKind = "Math.min";
   for (const { input, output } of [
     { input: [1, 2], output: 1 },
     { input: [1, -2, 3], output: -2 }
@@ -43,15 +43,15 @@ test("mathMin", () => {
     testOneInOneOut(dflow, nodeKind, input, output);
 });
 
-test("mathPI", () => {
+test("Math.PI", () => {
   const dflow = newDflow();
-  const nodeKind = "mathPI";
+  const nodeKind = "Math.PI";
   testOneOut(dflow, nodeKind, Math.PI);
 });
 
-test("mathRound", () => {
+test("Math.round", () => {
   const dflow = newDflow();
-  const nodeKind = "mathRound";
+  const nodeKind = "Math.round";
   for (const { input, output } of [
     { input: 1.4, output: Math.round(1.4) },
     { input: 1.5, output: Math.round(1.5) },
@@ -60,9 +60,9 @@ test("mathRound", () => {
     testOneInOneOut(dflow, nodeKind, input, output);
 });
 
-test("mathSin", () => {
+test("Math.sin", () => {
   const dflow = newDflow();
-  const nodeKind = "mathSin";
+  const nodeKind = "Math.sin";
   for (const { input, output } of [
     { input: 0, output: Math.sin(0) },
     { input: 1, output: Math.sin(1) },
