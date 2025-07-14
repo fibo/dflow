@@ -1,4 +1,4 @@
-import { Dflow, type DflowObject, type DflowNode } from "../../dflow.ts";
+import { Dflow, type DflowObject, type DflowNode } from "dflow";
 
 const { input, output } = Dflow;
 

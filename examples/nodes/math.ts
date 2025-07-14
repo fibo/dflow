@@ -1,5 +1,4 @@
-import { Dflow } from "../../dflow.ts";
-import type { DflowArray, DflowNode } from "../../dflow.ts";
+import { Dflow, type DflowArray, type DflowNode } from "dflow";
 
 const { input, output } = Dflow;
 
@@ -26,7 +25,7 @@ const MathMax: DflowNode = {
   inputs: [input("array")],
   outputs: [output("number")],
   run(array: DflowArray) {
-    return Math.max(...(array as number[]));
+    if (array.every((item) => Dflow.isNumber(item))) return Math.max(...array);
   }
 };
 
@@ -35,7 +34,7 @@ const MathMin: DflowNode = {
   inputs: [input("array")],
   outputs: [output("number")],
   run(array: DflowArray) {
-    return Math.min(...(array as number[]));
+    if (array.every((item) => Dflow.isNumber(item))) return Math.min(...array);
   }
 };
 

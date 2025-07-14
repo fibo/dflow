@@ -3,8 +3,8 @@
   "description": "A minimal Dataflow programming engine",
   "type": "module",
   "version": "0.44.0",
-  "types": "dflow.d.ts",
-  "exports": "dflow.js",
+  "types": "./dflow.d.ts",
+  "exports": "./dflow.js",
   "license": "MIT",
   "author": {
     "name": "Gianluca Casati",

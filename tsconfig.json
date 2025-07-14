@@ -12,7 +12,10 @@
     "noUnusedParameters": true,
     "strict": true,
     "target": "es2023",
-    "useUnknownInCatchVariables": true
+    "useUnknownInCatchVariables": true,
+    "paths": {
+      "dflow": ["./dflow.ts"]
+    }
   },
   "exclude": ["./node_modules"],
   "include": [

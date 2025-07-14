@@ -1,4 +1,4 @@
-import { Dflow } from "../dflow.js";
+import { Dflow } from "dflow";
 
 const { input, output } = Dflow;
 

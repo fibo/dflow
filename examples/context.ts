@@ -1,6 +1,5 @@
 // Create a host with an API context.
-import { Dflow } from "../dflow.ts";
-import type { DflowNode } from "../dflow.ts";
+import { Dflow, type DflowNode } from "dflow";
 
 class ApiClient {
   apiKey: string;

@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import { Dflow, type DflowData } from "../../dflow.ts";
+import { Dflow, type DflowData } from "dflow";
 import { nodeDefinitions } from "./index.ts";
 
 export function newDflow() {
