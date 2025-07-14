@@ -1,22 +1,22 @@
 // Keep in sync with README.md file.
 
-import { Dflow } from "dflow";
+import { Dflow, type DflowNode } from "../dflow.js";
 
 const { input, output } = Dflow;
 
-const MathSin = {
+const MathSin: DflowNode = {
   kind: "mathSin",
   inputs: [input("number")],
   outputs: [output("number")],
-  run(input) {
+  run(input: number) {
     return Math.sin(input);
   }
 };
 
-const ConsoleLog = {
+const ConsoleLog: DflowNode = {
   kind: "consoleLog",
   inputs: [input()],
-  run(input) {
+  run(input: unknown) {
     console.log(input);
   }
 };

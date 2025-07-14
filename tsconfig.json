@@ -4,7 +4,7 @@
     "allowJs": true,
     // TODO
     // API should be improved and simplified in order to enable
-    // "checkJs": true,
+    "checkJs": true,
     "erasableSyntaxOnly": true,
     "lib": ["dom", "es2023"],
     "module": "es6",
@@ -17,5 +17,11 @@
     "useUnknownInCatchVariables": true
   },
   "exclude": ["./node_modules"],
-  "include": ["./dflow.ts", "./dflow_test.ts", "./examples/"]
+  "include": [
+    "dflow.js",
+    "dflow.d.ts",
+    "dflow.ts",
+    "dflow_test.ts",
+    "./examples/"
+  ]
 }

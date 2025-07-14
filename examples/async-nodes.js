@@ -2,17 +2,23 @@ import { Dflow } from "../dflow.js";
 
 const { input, output } = Dflow;
 
-const sumNodeId = "sum";
-
 const SumNode = {
   kind: "Sum",
   inputs: [input(["number"]), input(["number"])],
   outputs: [output(["number"])],
+  /**
+   * @param {number} a
+   * @param {number} b
+   */
   run(a, b) {
     return a + b;
   }
 };
 
+/**
+ * @param {number} timeout
+ * @returns {Promise<void>}
+ */
 function sleep(timeout) {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -37,10 +43,7 @@ async function runGraph() {
   // Create two nodes, num and sum.
 
   const numNodeId = dflow.data(21);
-  const sumNodeId = dflow.node(SumNode.kind, {
-    // Optional `id`. If Dflow is edited in a view, it can handy to reuse ids.
-    id: "sum"
-  });
+  const sumNodeId = dflow.node(SumNode.kind, "sum");
 
   // Connect nodes.
   dflow.link(numNodeId, [sumNodeId, 0]);
@@ -52,7 +55,8 @@ async function runGraph() {
   // Run graph asynchronously.
   await dflow.run();
 
-  const result = dflow.out[sumNodeId][0];
+  // The id "sum" was passed as `wantedId` on SumNode .
+  const result = dflow.out.sum[0];
   if (result !== 42) console.error("Unexpected result", result);
 }
 

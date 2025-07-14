@@ -64,24 +64,24 @@ You can run the following code with any of the following by cloning this repo an
 
 You should see a number `1` printed on output.
 
-```javascript
-import { Dflow } from "dflow";
+```ts
+import { Dflow, type DflowNode } from "dflow";
 
 const { input, output } = Dflow;
 
-const MathSin = {
+const MathSin: DflowNode = {
   kind: "mathSin",
   inputs: [input("number")],
   outputs: [output("number")],
-  run(input) {
+  run(input: number) {
     return Math.sin(input);
   }
 };
 
-const ConsoleLog = {
+const ConsoleLog: DflowNode = {
   kind: "consoleLog",
   inputs: [input()],
-  run(input) {
+  run(input: unknown) {
     console.log(input);
   }
 };

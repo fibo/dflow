@@ -3,10 +3,8 @@
   "description": "A minimal Dataflow programming engine",
   "type": "module",
   "version": "0.44.0",
-  "exports": {
-    "import": "./dflow.js",
-    "types": "./dflow.d.ts"
-  },
+  "types": "dflow.d.ts",
+  "exports": "dflow.js",
   "license": "MIT",
   "author": {
     "name": "Gianluca Casati",
@@ -17,7 +15,7 @@
     "check_types": "tsc",
     "example:async-nodes": "node examples/async-nodes.js",
     "example:context": "node --env-file .typescript.env examples/context.ts",
-    "example:usage": "node examples/usage.js",
+    "example:usage": "node --env-file .typescript.env examples/usage.ts",
     "install_precommit_hook": "echo '#!/bin/sh\nnpm test && npm run prettier--check && npm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
     "prettier": "prettier --write .",
     "prettier--check": "prettier --check .",
