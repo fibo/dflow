@@ -9,6 +9,57 @@
     <link rel="stylesheet" href="./docs/style.css" />
   </head>
   <body>
-    <h1>dflow</h1>
+    <header>
+      <h1>dflow</h1>
+
+      <blockquote>
+        A minimal <em>Dataflow programming</em> engine
+      </blockquote>
+    </header>
+
+    <section>
+      <h2>Features</h2>
+
+      <ul>
+        <li>Expressive and simple API</li>
+        <li>It is easy to create nodes.</li>
+        <li>Written in TypeScript. Whole implementation is in this <a href="https://github.com/fibo/dflow/blob/main/dflow.ts">dflow.ts</a> file. Transpiled and minified it is around 4kb.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>API</h2>
+
+      <h3>Types</h3>
+
+      <h4>DflowNode</h4>
+
+      <p>
+      <code>DflowNode</code> represents a block of code: it can have inputs and outputs.
+      </p>
+
+      <pre><code>
+import { Dflow, type DflowNode } from "dflow";
+
+const Sum: DflowNode = {
+  kind: "sum",
+  inputs: [Dflow.input("number"), Dflow.input("number")];
+  outputs: [Dflow.output("number")];
+  run: (a: number, b: number) {
+    return a + b;
+  }
+}
+      </code></pre>
+
+      <h3>Instance methods</h3>
+
+      <h4>dflow.node()</h4>
+
+      <h4>dflow.link()</h4>
+    </section>
+
+    <footer>
+      GitHub repo: <a href="https://github.com/fibo/dflow">fibo/dflow</a>
+    </footer>
   </body>
 </html>
