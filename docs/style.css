@@ -15,7 +15,7 @@
 }
 
 html {
-  font-size: 18px;
+  font-size: 17px;
   font-family: var(--font-family);
   font-feature-settings: "calt" 1;
   color: var(--black);
@@ -39,6 +39,7 @@ body {
 
 a, a:visited, a:link, a:active, a:hover, a:focus {
   color: var(--link);
+  outline-color: var(--link);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -92,11 +93,48 @@ code, .code {
 }
 
 dl {
-  margin: 1em 0 1em 0.5rem;
+  margin: 0;
   padding: 1em;
+  line-height: 1.5;
+}
+dt {
+  font-weight: 500;
+  margin: 0.5em 0;
+}
+dd {
+  margin: 0 0 0 1.68em;
+}
+
+.links {
+  margin: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+}
+.links a {
+  text-decoration: none;
+  color: transparent;
+  min-width: 4rem;
+  min-height: 4rem;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+}
+.links a img {
+  width: 2.7rem;
+  height: 2.7rem;
+  transition: all 0.2s ease-in-out;
+}
+.links a:hover img, .links a:focus img {
+  width: 3rem;
+  height: 3rem;
+}
+.links a:active img {
+  width: 2.25rem;
+  height: 2.25rem;
 }
 
 footer {
-  padding-block: 1em;
+  padding: 1rem;
+  font-size: 0.75em;
 }
 
