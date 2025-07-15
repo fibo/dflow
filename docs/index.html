@@ -6,7 +6,7 @@
     <title>dflow</title>
     <link rel="icon" href="data:image/x-icon;base64,AA" />
     <meta name="description" content="A minimal Dataflow programming engine" />
-    <link rel="stylesheet" href="./docs/style.css">
+    <link rel="stylesheet" href="./style.css">
   </head>
   <body>
     <header>
@@ -18,11 +18,11 @@
 
       <div class="links">
         <a href="https://www.npmjs.com/package/dflow">
-          <img alt="npm package" src="./docs/svg/npm.svg">
+          <img alt="npm package" src="./svg/npm.svg">
         </a>
 
         <a href="https://github.com/fibo/dflow">
-          <img alt="GitHub repository" src="./docs/svg/github.svg">
+          <img alt="GitHub repository" src="./svg/github.svg">
         </a>
       </div>
 
@@ -30,7 +30,7 @@
         <h2>Features</h2>
 
         <dl>
-          <dt>Expressive and simple API</dt>
+          <dt>Expressive and simple API.</dt>
           <dt>It is easy to create nodes.</dt>
           <dt>Written in TypeScript.</dt>
           <dd>Whole implementation is in this <a href="https://github.com/fibo/dflow/blob/main/dflow.ts">dflow.ts</a> file. It is roughly 4kb once minified.</dd>
@@ -48,15 +48,24 @@
 
       <p><code>Dflow</code> constructor requires a list of node definitions.</p>
 
+<!-- ./snippets/helloWorld.ts -->
       <pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
+// Node definition.
 const helloWorld: DflowNode = {
   kind: "hello",
   run: () => console.log("Hello, World!")
 }
 
+// Create a dflow instance.
 const dflow = new Dflow([helloWorld]);
+
+// Add a node to the graph.
+dflow.node("hello")
+
+// Run the dflow graph.
+dflow.run()
       </code></pre>
 
       <h3 id="methods">Methods</h3>

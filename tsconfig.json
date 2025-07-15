@@ -23,6 +23,7 @@
     "dflow.d.ts",
     "dflow.ts",
     "dflow_test.ts",
-    "examples/"
+    "examples/",
+    "docs/snippets/"
   ]
 }

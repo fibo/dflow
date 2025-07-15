@@ -106,6 +106,7 @@ dd {
 }
 
 .links {
+  user-select: none;
   margin: 0.5rem;
   display: flex;
   gap: 0.25rem;

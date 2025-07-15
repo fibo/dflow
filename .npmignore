@@ -5,6 +5,5 @@ dflow.ts
 dflow_test.ts
 tsconfig.build.json
 tsconfig.json
-index.html
 docs/
 examples/

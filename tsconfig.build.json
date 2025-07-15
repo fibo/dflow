@@ -8,6 +8,6 @@
     "removeComments": false
   },
   "extends": "./tsconfig.json",
-  "exclude": ["dflow.js", "dflow.d.ts", "dflow_test.ts", "examples/"],
+  "exclude": ["dflow.js", "dflow.d.ts", "dflow_test.ts", "examples/", "docs/"],
   "include": ["./dflow.ts"]
 }
