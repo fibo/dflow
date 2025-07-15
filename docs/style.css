@@ -1,5 +1,102 @@
-*,
-*::before,
-*::after {
+:root {
+  --font-family: "Fira Code VF", monospace;
+  --black: #011235; /* Fibonacci sequence :) */
+  --white: #feedca; /* Fibonacci sequence reversed :))) */
+  --link: #ff6347;
+}
+
+/** Fira Code Variable Font */
+@font-face {
+  font-family: "Fira Code VF";
+  src: url("./fonts/FiraCode-VF.woff2") format("woff2-variations");
+
+  font-weight: 300 700;
+  font-style: normal;
+}
+
+html {
+  font-size: 18px;
+  font-family: var(--font-family);
+  font-feature-settings: "calt" 1;
+  color: var(--black);
+  background: var(--white);
+}
+
+*, *::before, *::after {
   box-sizing: border-box;
 }
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+*::selection {
+  color: var(--white);
+  background: var(--black);
+}
+
+a, a:visited, a:link, a:active, a:hover, a:focus {
+  color: var(--link);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 1.68em 0 1em 0.5rem;
+}
+
+h1 {
+  font-weight: 800;
+  font-size: 3em;
+}
+
+h2 {
+  font-weight: 700;
+  font-size: 2rem;
+}
+h3 {
+  font-weight: 600;
+  font-size: 1.68rem;
+}
+h4, h5, h6 {
+  font-weight: 600;
+  font-size: 1.4rem;
+}
+
+p {
+  max-width: 71ch;
+  margin: 1rem 0 1rem 0.5rem;
+}
+
+.description {
+  font-size: 1.2em;
+  margin: 1em 0 1em 0.68em;
+}
+
+header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+pre {
+  overflow: scroll;
+  margin: 1em 0;
+  padding: 0 0.5em;
+  background: #fff9db;
+}
+code, .code {
+  font-family: var(--font-family);
+  font-weight: 500;
+}
+
+dl {
+  margin: 1em 0 1em 0.5rem;
+  padding: 1em;
+}
+
+footer {
+  padding-block: 1em;
+}
+

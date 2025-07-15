@@ -4,7 +4,7 @@
 // ////////////////////////////////////////////////////////////////////
 
 /**
- * A `DflowData` represents any data that can be serialized into JSON.
+ * Includes JSON data types and `undefined`.
  */
 export type DflowData =
   | undefined
@@ -30,6 +30,7 @@ export type DflowDataType =
 // Inputs, outputs and links.
 // ////////////////////////////////////////////////////////////////////
 
+/** Connects two nodes in the graph. */
 export type DflowLink = [
   sourceNodeId: string,
   sourcePosition: number,
@@ -93,25 +94,7 @@ type _DflowOutput = Pick<DflowOutput, "types"> & {
 // DflowNode
 // ////////////////////////////////////////////////////////////////////
 
-/**
- * `DflowNode` represents a block of code: it can have inputs and outputs.
- *
- * @example
- *
- * ```ts
- * import { Dflow, type DflowNode } from "dflow";
- *
- * const Sum: DflowNode = {
- *   kind: "sum",
- *   inputs: [Dflow.input("number"), Dflow.input("number")];
- *   outputs: [Dflow.output("number")];
- *   run(a: number, b: number) {
- *     return a + b;
- *   }
- * }
- * ```
- *
- */
+/** Defines a block of code: it can have inputs and outputs. */
 export type DflowNode = {
   kind: string;
   run(..._args: DflowArray): unknown | Promise<unknown>;
@@ -226,26 +209,6 @@ export class Dflow {
     return nodeIds.sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
   }
 
-  /** Delete node or link with given id. */
-  delete(id: string) {
-    // Delete node.
-    if (this.#kinds.delete(id)) {
-      // Delete functions or output data, if any.
-      this.#runs.delete(id);
-      this.#outputs.delete(id);
-      // Delete all links connected to node.
-      for (const [linkId, link] of this.#links.entries())
-        if (link[0] === id || link[2] === id) this.delete(linkId);
-    }
-    // Delete link.
-    const link = this.#links.get(id);
-    if (!link) return;
-    this.#links.delete(id);
-    // Disconnect target input.
-    const targetInput = this.#inputs.get(link[2])?.[link[3]];
-    if (targetInput) targetInput.source = undefined;
-  }
-
   /** Create a new node. Returns node id. */
   node(kind: string, wantedId?: string): string {
     const nodeDef = this.#nodeDefinitions.get(kind);
@@ -294,10 +257,27 @@ export class Dflow {
     return id;
   }
 
-  /**
-   * Create a new data node. Returns node id.
-   * @remarks If value is not a valid `DflowData`, it will be set to `undefined`.
-   */
+  /** Delete node or link with given id. */
+  delete(id: string) {
+    // Delete node.
+    if (this.#kinds.delete(id)) {
+      // Delete functions or output data, if any.
+      this.#runs.delete(id);
+      this.#outputs.delete(id);
+      // Delete all links connected to node.
+      for (const [linkId, link] of this.#links.entries())
+        if (link[0] === id || link[2] === id) this.delete(linkId);
+    }
+    // Delete link.
+    const link = this.#links.get(id);
+    if (!link) return;
+    this.#links.delete(id);
+    // Disconnect target input.
+    const targetInput = this.#inputs.get(link[2])?.[link[3]];
+    if (targetInput) targetInput.source = undefined;
+  }
+
+  /** Create a new data node. Returns node id. */
   data(value: DflowData, wantedId?: string): string {
     const id = this.#newId(this.#kinds, "n", wantedId);
     this.#kinds.set(id, "data");
@@ -311,10 +291,7 @@ export class Dflow {
     return id;
   }
 
-  /**
-   * Create a new link and connect two nodes. Returns link id.
-   * If source or target position is omitted, then it defaults to `0`.
-   */
+  /** Create a new link and connect two nodes. Returns link id. */
   link(
     source: string | [nodeId: string, position: number],
     target: string | [nodeId: string, position: number],
@@ -449,7 +426,7 @@ export class Dflow {
   }
 
   /**
-   * `Dflow.input()` is a helper to define inputs.
+   * Helper to define inputs.
    *
    * @example Input with `number` type.
    *
@@ -498,16 +475,11 @@ export class Dflow {
   }
 
   /**
-   * `Dflow.output()` is a helper to define outputs.
+   * Helper to define outputs.
    *
    * @example
    *
    * ```ts
-   * const MathPI: DflowNode = {
-   *   kind: "mathPI",
-   *   outputs: [Dflow.output("number", { name: "π" })],
-   *   run: () => Math.PI
-   * }
    * ```
    *
    * @example Named output with `number` type.

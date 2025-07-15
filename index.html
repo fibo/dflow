@@ -6,37 +6,114 @@
     <title>dflow</title>
     <link rel="icon" href="data:image/x-icon;base64,AA" />
     <meta name="description" content="A minimal Dataflow programming engine" />
-    <link rel="stylesheet" href="./docs/style.css" />
+    <link rel="stylesheet" href="./docs/style.css">
   </head>
   <body>
     <header>
       <h1>dflow</h1>
 
-      <blockquote>
+      <p class="description">
         A minimal <em>Dataflow programming</em> engine
-      </blockquote>
+      </p>
+
+      <div>
+        <h2>Features</h2>
+
+        <dl>
+          <dt>Expressive and simple API</dt>
+          <dt>It is easy to create nodes.</dt>
+          <dt>Written in TypeScript.</dt>
+          <dd>Whole implementation is in this <a href="https://github.com/fibo/dflow/blob/main/dflow.ts">dflow.ts</a> file. It is roughly 4kb once minified.</dd>
+        </dl>
+      </div>
     </header>
-
-    <section>
-      <h2>Features</h2>
-
-      <ul>
-        <li>Expressive and simple API</li>
-        <li>It is easy to create nodes.</li>
-        <li>Written in TypeScript. Whole implementation is in this <a href="https://github.com/fibo/dflow/blob/main/dflow.ts">dflow.ts</a> file. Transpiled and minified it is around 4kb.</li>
-      </ul>
-    </section>
 
     <section>
       <h2>API</h2>
 
-      <h3>Types</h3>
+      <p class="description">A <code>Dflow</code> represents a program as an executable graph.<p>
+      <p>A graph can contain <em>nodes</em> and <em>links</em>. Nodes are executed, sorted by their connections.</p>
 
-      <h4>DflowNode</h4>
+      <h3 id="constructor">Constructor</h3>
 
-      <p>
-      <code>DflowNode</code> represents a block of code: it can have inputs and outputs.
+      <p><code>Dflow</code> constructor requires a list of node definitions.</p>
+
+      <pre><code>
+import { Dflow, type DflowNode } from "dflow";
+
+const helloWorld: DflowNode = {
+  kind: "hello",
+  run: () => console.log("Hello, World!")
+}
+
+const dflow = new Dflow([helloWorld]);
+      </code></pre>
+
+      <h3 id="methods">Methods</h3>
+
+      <h4 class="code">dflow.node()</h4>
+
+      <p class="description">Create a new node. Returns node id.</p>
+
+      <h4 class="code">dflow.link()</h4>
+
+      <p class="description">Create a new link and connect two nodes. Returns link id.</p>
+
+      <p>If source or target position is omitted, then it defaults to <code>0</code> i.e. the <em>first position</em>.
       </p>
+
+      <h4 class="code">dflow.data()</h4>
+
+      <p class="description">Create a new data node. Returns node id.</p>
+
+      <p>If value is not a valid <code>DflowData</code>, it will be set to <code>undefined</code>.</p>
+
+      <h4 class="code">dflow.delete()</h4>
+
+      <h4 class="code">dflow.run()</h4>
+
+      <p class="description">Execute all nodes, sorted by their connections.</p>
+
+      <h3>Getters</h3>
+
+      <h4 class="code">dflow.graph</h4>
+
+      <h4 class="code">dflow.error</h4>
+
+      <h4 class="code">dflow.out</h4>
+
+      <h3 id="static-methods">Static methods</h3>
+
+      <h4 class="code">Dflow.input()</h4>
+
+      <p class="description">Helper to define inputs.</p>
+
+      <h4 class="code">Dflow.output()</h4>
+
+      <p class="description">Helper to define outputs.</p>
+
+      <p>Define an output named π (PI) for a constant node</p>
+      <pre><code>
+const MathPI: DflowNode = {
+  kind: "mathPI",
+  outputs: [Dflow.output("number", { name: "π" })],
+  run: () => Math.PI
+}
+      </code></pre>
+
+      <h3 id="types">Types</h3>
+
+      <h4 class="code">DflowData</h4>
+
+      <p>Includes JSON data types and <code>undefined</code></p>
+
+      <h4 class="code">DflowLink</h4>
+
+      <p>Connects two nodes in the graph.</p>
+
+      <h4 class="code">DflowNode</h4>
+
+      <p>Defines a block of code: it can have inputs and outputs.</p>
 
       <pre><code>
 import { Dflow, type DflowNode } from "dflow";
@@ -45,17 +122,11 @@ const Sum: DflowNode = {
   kind: "sum",
   inputs: [Dflow.input("number"), Dflow.input("number")];
   outputs: [Dflow.output("number")];
-  run: (a: number, b: number) {
+  run(a: number, b: number) {
     return a + b;
   }
 }
       </code></pre>
-
-      <h3>Instance methods</h3>
-
-      <h4>dflow.node()</h4>
-
-      <h4>dflow.link()</h4>
     </section>
 
     <footer>
