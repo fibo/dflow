@@ -16,9 +16,9 @@
     "check_types": "tsc",
     "emitDeclarations": "tsc --project tsconfig.build.json",
     "esbuild": "esbuild dflow.ts --minify --outfile=dflow.js",
-    "example:async-nodes": "node examples/async-nodes.js",
-    "example:context": "node --env-file .typescript.env examples/context.ts",
-    "example:usage": "node --env-file .typescript.env examples/usage.ts",
+    "example:async-nodes": "node docs/examples/async-nodes.js",
+    "example:context": "node --env-file .typescript.env docs/examples/context.ts",
+    "example:usage": "node --env-file .typescript.env docs/examples/usage.ts",
     "install_precommit_hook": "echo '#!/bin/sh\nnpm test && npm run prettier--check && npm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
     "prettier": "prettier --write .",
     "prettier--check": "prettier --check .",
@@ -27,7 +27,7 @@
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
     "test": "npm run test:dflow && npm run test:nodes",
     "test:dflow": "node --test --env-file .typescript.env dflow_test.ts",
-    "test:nodes": "node --test --env-file .typescript.env examples/nodes/*_test.ts"
+    "test:nodes": "node --test --env-file .typescript.env docs/examples/nodes/*_test.ts"
   },
   "repository": {
     "type": "git",

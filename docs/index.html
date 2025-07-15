@@ -39,6 +39,20 @@
     </header>
 
     <section>
+      <h2>How it works</h2>
+
+      <p>A <strong>node</strong> is a block of code that can have <em>inputs</em> and <em>outputs</em>.
+
+      <p>A <strong>link</strong> connects an <em>input</em> to an <em>output</em>.
+
+      <p>
+      A <strong>graph</strong> represents a program.
+      It can contain <em>nodes</em> and <em>links</em>.
+      Nodes are executed, sorted by their connections.
+      </p>
+    </section>
+
+    <section>
       <h2>API</h2>
 
       <p class="description">A <code>Dflow</code> represents a program as an executable graph.<p>
@@ -70,24 +84,24 @@ dflow.run()
 
       <h3 id="methods">Methods</h3>
 
-      <h4 class="code">dflow.node()</h4>
+      <h4 class="code">dflow.node(kind)</h4>
 
       <p class="description">Create a new node. Returns node id.</p>
 
-      <h4 class="code">dflow.link()</h4>
+      <h4 class="code">dflow.link(source, target)</h4>
 
       <p class="description">Create a new link and connect two nodes. Returns link id.</p>
 
       <p>If source or target position is omitted, then it defaults to <code>0</code> i.e. the <em>first position</em>.
       </p>
 
-      <h4 class="code">dflow.data()</h4>
+      <h4 class="code">dflow.data(value)</h4>
 
       <p class="description">Create a new data node. Returns node id.</p>
 
       <p>If value is not a valid <code>DflowData</code>, it will be set to <code>undefined</code>.</p>
 
-      <h4 class="code">dflow.delete()</h4>
+      <h4 class="code">dflow.delete(itemId)</h4>
 
       <h4 class="code">dflow.run()</h4>
 
@@ -97,9 +111,28 @@ dflow.run()
 
       <h4 class="code">dflow.graph</h4>
 
+      <p class="description">Dflow graph contains nodes and links.</p>
+
+      <p>A <code>DflowGraph</code> has the following attributes</p>
+
+      <dl>
+        <dt><code>node: Record&lt;string, string%gt;</code></dt>
+        <dd></dd>
+
+        <dt><code>link: Record&lt;string, <a href="#dflowlink">DflowLink</a>%gt;</code></dt>
+        <dd></dd>
+
+        <dt><code>data: Record&lt;string, <a href="#dflowdata">DflowData</a>%gt;</code></dt>
+        <dd></dd>
+      </dl>
+
       <h4 class="code">dflow.error</h4>
 
+      <p class="description">Get error messages from last run, indexed by node id.</p>
+
       <h4 class="code">dflow.out</h4>
+
+      <p class="description">Get output data of last run, indexed by node id.</p>
 
       <h3 id="static-methods">Static methods</h3>
 
@@ -112,6 +145,8 @@ dflow.run()
       <p class="description">Helper to define outputs.</p>
 
       <p>Define an output named π (PI) for a constant node</p>
+
+<!-- ./examples/nodes/math.ts -->
       <pre><code>
 const MathPI: DflowNode = {
   kind: "mathPI",
@@ -122,17 +157,17 @@ const MathPI: DflowNode = {
 
       <h3 id="types">Types</h3>
 
-      <h4 class="code">DflowData</h4>
+      <h4 id="dflowdata" class="code">DflowData</h4>
 
-      <p>Includes JSON data types and <code>undefined</code></p>
+      <p class="description">Includes JSON data types and <code>undefined</code></p>
 
-      <h4 class="code">DflowLink</h4>
+      <h4 id="dflowlink" class="code">DflowLink</h4>
 
-      <p>Connects two nodes in the graph.</p>
+      <p class="description">Connects two nodes in the graph.</p>
 
       <h4 class="code">DflowNode</h4>
 
-      <p>Defines a block of code: it can have inputs and outputs.</p>
+      <p class="description">Defines a block of code: it can have inputs and outputs.</p>
 
       <pre><code>
 import { Dflow, type DflowNode } from "dflow";

@@ -2,19 +2,13 @@
 
 > A minimal [Dataflow programming][dataflow-wikipedia] engine
 
-## Installation
-
-With [npm](https://npmjs.org/) do
-
-```sh
-npm install dflow
-```
+[Documentation](https://fibo.github.io/dflow)
 
 ## How it works
 
 ### What is a Dflow graph
 
-A **node** represents a block of code: it can have **inputs** and **outputs**.
+A **node** is a block of code that can have _inputs_ and _outputs_.
 
 A **link** connects an input to an output.
 
@@ -38,7 +32,7 @@ An **output** can be connected to multiple inputs, and hold a **data** value tha
 
 **NOTA BENE**: it is supposed that you implement your own nodes, for example node `addition` could be implemented using bigint or some floating point library, according to your needs.
 
-An example of nodes implementing basic JavaScript features can be found in [examples/nodes](https://github.com/fibo/dflow/tree/main/examples/nodes).
+An example of nodes implementing basic JavaScript features can be found in [docs/examples/nodes](https://github.com/fibo/dflow/tree/main/docs/examples/nodes).
 
 ## Usage
 
@@ -106,12 +100,8 @@ dflow.link(sinNodeId, consoleLogNodeId);
 dflow.run();
 ```
 
-A graph can be executed asynchronously with `await dflow.run()`: see [async nodes example](https://github.com/fibo/dflow/blob/main/examples/async-nodes.js).
+A graph can be executed asynchronously with `await dflow.run()`: see [async nodes example](https://github.com/fibo/dflow/blob/main/docs/examples/async-nodes.js).
 
-Available examples are listed [here](https://github.com/fibo/dflow/blob/main/examples).
-
-## License
-
-[MIT](https://fibo.github.io/mit-license)
+Available examples are listed [here](https://github.com/fibo/dflow/blob/main/docs/examples).
 
 [dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"

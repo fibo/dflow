@@ -2,17 +2,17 @@ import { Dflow, type DflowArray, type DflowNode } from "dflow";
 
 const { input, output } = Dflow;
 
+const MathPI: DflowNode = {
+  kind: "Math.PI",
+  outputs: [Dflow.output("number", { name: "π" })],
+  run: () => Math.PI
+};
+
 const MathAbs: DflowNode = {
   kind: "Math.abs",
   inputs: [input("number")],
   outputs: [output("number")],
   run: Math.abs
-};
-
-const MathPI: DflowNode = {
-  kind: "Math.PI",
-  outputs: [output("number", { name: "π" })],
-  run: () => Math.PI
 };
 
 const dynamicMathNodes = ["cos", "sin", "round"].map((method) => ({
