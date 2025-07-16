@@ -12,7 +12,7 @@ test("arrayAt", () => {
   const nodeKind = "arrayAt";
   for (const { input1, input2, output } of [
     { input1: ["a"], input2: 0, output: "a" },
-    // TODO { input1: ["a"], input2: 1, output: undefined },
+    { input1: ["a"], input2: 1, output: undefined },
     { input1: ["a", true], input2: 1, output: true },
     { input1: ["a", true, 42], input2: -1, output: 42 }
   ])

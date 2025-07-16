@@ -1,8 +1,12 @@
 import { test } from "node:test";
 import { strict as assert } from "node:assert";
 
-import { Dflow } from "./dflow.ts";
-import type { DflowDataType, DflowNode } from "./dflow.ts";
+import {
+  Dflow,
+  type DflowData,
+  type DflowDataType,
+  type DflowNode
+} from "./dflow.ts";
 
 const { input, output } = Dflow;
 
@@ -80,21 +84,6 @@ function sample01() {
   return { dflow, nodeId1, nodeId2, linkId1 };
 }
 
-test("Dflow.inferDataType()", () => {
-  [
-    { input: arr, output: ["array"] },
-    { input: bool, output: ["boolean"] },
-    { input: num, output: ["number"] },
-    { input: NaN, output: [] },
-    { input: null, output: ["null"] },
-    { input: obj, output: ["object"] },
-    { input: str, output: ["string"] },
-    { input: undefined, output: [] }
-  ].forEach(({ input, output }) => {
-    assert.deepEqual(Dflow.inferDataType(input).join(), output.join());
-  });
-});
-
 test("Dflow.isArray()", () => {
   assert.deepEqual(Dflow.isArray(arr), true);
   assert.deepEqual(Dflow.isArray(bool), false);
@@ -144,6 +133,21 @@ test("Dflow.isObject()", () => {
   assert.deepEqual(Dflow.isObject({ foo: { bar: [{ quz: true }] } }), true);
   // bad nested object
   assert.deepEqual(Dflow.isObject({ foo: [1], bar: { quz: () => {} } }), false);
+});
+
+test("Dflow.isData()", () => {
+  const testData: Array<{ input: unknown; output: boolean }> = [
+    { input: arr, output: true },
+    { input: bool, output: true },
+    { input: num, output: true },
+    { input: NaN, output: false },
+    { input: null, output: true },
+    { input: obj, output: true },
+    { input: str, output: true },
+    { input: undefined, output: false }
+  ];
+  for (const { input, output } of testData)
+    assert.equal(Dflow.isData(input), output);
 });
 
 test("Dflow.isValidData()", () => {
@@ -386,6 +390,45 @@ test("dflow.data()", () => {
   });
 });
 
+test("dflow.data() infers type and validates input", () => {
+  const testData: {
+    input: unknown;
+    output: {
+      data: DflowData;
+      types: DflowDataType[];
+    };
+  }[] = [
+    { input: arr, output: { data: arr, types: ["array"] } },
+    { input: bool, output: { data: bool, types: ["boolean"] } },
+    { input: num, output: { data: num, types: ["number"] } },
+    { input: NaN, output: { data: undefined, types: [] } },
+    { input: null, output: { data: null, types: ["null"] } },
+    { input: obj, output: { data: obj, types: ["object"] } },
+    { input: str, output: { data: str, types: ["string"] } },
+    { input: undefined, output: { data: undefined, types: [] } }
+  ];
+  for (const {
+    input,
+    output: { data, types }
+  } of testData) {
+    const dflow = new Dflow([
+      {
+        kind: "test",
+        inputs: [Dflow.input(types)],
+        run: () => {}
+      }
+    ]);
+    const dataNodeId = dflow.data(input);
+    const testNodeId = dflow.node("test");
+    const linkId = dflow.link(dataNodeId, testNodeId);
+    assert.deepEqual(dflow.graph.link, {
+      [linkId]: [dataNodeId, 0, testNodeId, 0]
+    });
+    dflow.run();
+    assert.deepEqual(dflow.out[dataNodeId][0], data);
+  }
+});
+
 test("dflow.delete(nodeId)", () => {
   const { dflow, nodeId1 } = sample01();
   dflow.delete(nodeId1);
@@ -404,12 +447,12 @@ test("dflow.delete(linkId)", () => {
   assert.equal(Object.keys(dflow.graph.node).length, 2);
 });
 
-test("Dflow.canConnect()", () => {
-  const testCases: {
+test("dflow.canConnect()", () => {
+  const testCases: Array<{
     sourceTypes: DflowDataType[];
     targetTypes: DflowDataType[];
     expected: boolean;
-  }[] = [
+  }> = [
     // Every source can connect to a target with same type.
     ...dataTypes.map((dataType) => ({
       sourceTypes: [dataType],
@@ -457,7 +500,24 @@ test("Dflow.canConnect()", () => {
     { sourceTypes: ["null"], targetTypes: ["string"], expected: false }
   ];
 
-  testCases.forEach(({ sourceTypes, targetTypes, expected }) => {
-    assert.deepEqual(Dflow.canConnect(sourceTypes, targetTypes), expected);
-  });
+  for (const { sourceTypes, targetTypes, expected } of testCases) {
+    const dflow = new Dflow([
+      {
+        kind: "testIn",
+        inputs: [Dflow.input(targetTypes)],
+        run: () => {}
+      },
+      {
+        kind: "testOut",
+        outputs: [Dflow.output(sourceTypes)],
+        run: () => {}
+      }
+    ]);
+    const sourceNodeId = dflow.node("testOut");
+    const targetNodeId = dflow.node("testIn");
+    assert.equal(
+      dflow.canConnect([sourceNodeId, 0, targetNodeId, 0]),
+      expected
+    );
+  }
 });

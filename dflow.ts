@@ -63,13 +63,6 @@ export type DflowInput = {
 };
 
 /**
- * @internal `_DflowInput` is a reference to a `_DflowOutput` source, if connected.
- */
-type _DflowInput = Pick<DflowInput, "types" | "optional"> & {
-  source?: _DflowOutput;
-};
-
-/**
  * Defines a node output.
  *
  * @example
@@ -83,12 +76,6 @@ export type DflowOutput = {
   name?: string;
   /** An output can be connected to an input only if the data types match. */
   types: DflowDataType[];
-};
-
-/** @internal `_DflowOutput` holds the output data of a node. */
-type _DflowOutput = Pick<DflowOutput, "types"> & {
-  data: DflowData;
-  clear(): void;
 };
 
 // DflowNode
@@ -106,9 +93,9 @@ export type DflowNode = {
 // ////////////////////////////////////////////////////////////////////
 
 export type DflowGraph = {
-  /** Nodes: key is node id, value is node kind. */
+  /** Key is node id, value is node kind. */
   node: Record<string, string>;
-  /** Links: key is link id. */
+  /** Key is link id. */
   link: Record<string, DflowLink>;
   /** Data nodes: key is node id, value is data. */
   data: Record<string, DflowData>;
@@ -120,7 +107,7 @@ export type DflowGraph = {
  * Nodes are executed, sorted by their connections.
  */
 export class Dflow {
-  /** Dflow node definitions indexed by node kind. */
+  /** Node definitions indexed by node kind. */
   #nodeDefinitions: Map<string, DflowNode> = new Map();
 
   /** Node kinds indexed by node id. */
@@ -136,10 +123,27 @@ export class Dflow {
   #errors: Map<string, string> = new Map();
 
   /** Node inputs indexed by node id. */
-  #inputs: Map<string, _DflowInput[]> = new Map();
+  #inputs: Map<
+    string,
+    Array<
+      DflowInput & {
+        source?: {
+          data: DflowData;
+        };
+      }
+    >
+  > = new Map();
 
   /** Node outputs indexed by node id. */
-  #outputs: Map<string, _DflowOutput[]> = new Map();
+  #outputs: Map<
+    string,
+    Array<
+      DflowOutput & {
+        data: DflowData;
+        clear(): void;
+      }
+    >
+  > = new Map();
 
   readonly context: Record<string, unknown>;
 
@@ -209,6 +213,34 @@ export class Dflow {
     return nodeIds.sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
   }
 
+  /** Check that source types are compatible with target types. */
+  canConnect([
+    sourceNodeId,
+    sourcePosition,
+    targetNodeId,
+    targetPosition
+  ]: DflowLink): boolean {
+    const sourceNodeKind = this.#kinds.get(sourceNodeId);
+    const targetNodeKind = this.#kinds.get(targetNodeId);
+    if (!sourceNodeKind || !targetNodeKind) return false;
+    // Input types are stored in node definitions.
+    const targetNodeDef = this.#nodeDefinitions.get(targetNodeKind);
+    const targetTypes = targetNodeDef?.inputs?.[targetPosition].types;
+    if (!targetTypes) return false;
+    // Output types are stored in output items.
+    const sourceOutput = this.#outputs.get(sourceNodeId)?.[sourcePosition];
+    if (!sourceOutput) return false;
+    const sourceTypes = sourceOutput.types;
+
+    // If source can have any type or
+    // target can have any type,
+    // then source and target are compatible.
+    if (sourceTypes.length === 0 || targetTypes.length === 0) return true;
+
+    // Check if target accepts some of the `dataType` source can have.
+    return targetTypes.some((dataType) => sourceTypes.includes(dataType));
+  }
+
   /** Create a new node. Returns node id. */
   node(kind: string, wantedId?: string): string {
     const nodeDef = this.#nodeDefinitions.get(kind);
@@ -217,12 +249,12 @@ export class Dflow {
     const id = this.#newId(this.#kinds, "n", wantedId);
 
     // Inputs.
-    const inputs: _DflowInput[] = [];
+    const inputs = [];
     for (const input of nodeDef.inputs ?? []) inputs.push({ ...input });
     this.#inputs.set(id, inputs);
 
     // Outputs.
-    const outputs: _DflowOutput[] = [];
+    const outputs = [];
     for (const { types } of nodeDef.outputs ?? []) {
       let data: DflowData;
       outputs.push({
@@ -278,16 +310,20 @@ export class Dflow {
   }
 
   /** Create a new data node. Returns node id. */
-  data(value: DflowData, wantedId?: string): string {
+  data(value: unknown, wantedId?: string): string {
     const id = this.#newId(this.#kinds, "n", wantedId);
     this.#kinds.set(id, "data");
-    this.#outputs.set(id, [
-      {
-        data: Dflow.isData(value) ? value : undefined,
-        types: Dflow.inferDataType(value),
-        clear() {}
-      }
-    ]);
+    const data = Dflow.isData(value) ? value : undefined;
+    // Infer data type
+    let types: DflowDataType[] = [];
+    if (data === null) types = ["null"];
+    if (typeof data === "boolean") types = ["boolean"];
+    if (typeof data === "string") types = ["string"];
+    if (Dflow.isNumber(data)) types = ["number"];
+    if (Dflow.isArray(data)) types = ["array"];
+    if (Dflow.isObject(data)) types = ["object"];
+    // Set output.
+    this.#outputs.set(id, [{ data, clear() {}, types }]);
     return id;
   }
 
@@ -304,11 +340,18 @@ export class Dflow {
     const targetNodeId = typeof target === "string" ? target : target[0];
     const targetPosition = typeof target === "string" ? 0 : target[1];
 
-    const sourceOutput = this.#outputs.get(sourceNodeId)?.[sourcePosition];
-    const targetInput = this.#inputs.get(targetNodeId)?.[targetPosition];
-
-    if (sourceOutput && targetInput) {
-      if (Dflow.canConnect(sourceOutput.types, targetInput.types)) {
+    if (
+      this.canConnect([
+        sourceNodeId,
+        sourcePosition,
+        targetNodeId,
+        targetPosition
+      ])
+    ) {
+      const sourceOutput = this.#outputs.get(sourceNodeId)?.[sourcePosition];
+      const targetInput = this.#inputs.get(targetNodeId)?.[targetPosition];
+      if (sourceOutput && targetInput) {
+        // Create link.
         this.#links.set(id, [
           sourceNodeId,
           sourcePosition,
@@ -477,11 +520,6 @@ export class Dflow {
   /**
    * Helper to define outputs.
    *
-   * @example
-   *
-   * ```ts
-   * ```
-   *
    * @example Named output with `number` type.
    *
    * ```ts
@@ -496,30 +534,6 @@ export class Dflow {
       types: typeof typing === "string" ? [typing] : typing,
       ...rest
     };
-  }
-
-  /** Check that source types are compatible with target types. */
-  static canConnect(
-    sourceTypes: DflowDataType[],
-    targetTypes: DflowDataType[]
-  ) {
-    // If source can have any type or
-    // target can have any type,
-    // then source and target are compatible.
-    if (sourceTypes.length === 0 || targetTypes.length === 0) return true;
-    // Check if target accepts some of the `dataType` source can have.
-    return targetTypes.some((dataType) => sourceTypes.includes(dataType));
-  }
-
-  /** Infer `DflowDataType` of given argument. */
-  static inferDataType(arg: unknown): DflowDataType[] {
-    if (arg === null) return ["null"];
-    if (typeof arg === "boolean") return ["boolean"];
-    if (typeof arg === "string") return ["string"];
-    if (Dflow.isNumber(arg)) return ["number"];
-    if (Dflow.isArray(arg)) return ["array"];
-    if (Dflow.isObject(arg)) return ["object"];
-    return [];
   }
 
   /**
