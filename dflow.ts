@@ -50,13 +50,13 @@ export type DflowLink = [
 export type DflowInput = {
   /** Ignored by Dflow, but could be used by UI. */
   name?: string;
-  /** An output can be connected to an input only if the data types match. */
+  /** An input can be connected to an output only if the data types match. */
   types: DflowDataType[];
   /**
    * Any input is **required** by default, i.e. not optional.
-   * If an input is not `optional` and it has no data,
+   * If an input is not optional and it has no data,
    * then its node will not be executed.
-   * If an input is `optional`,
+   * If an input is optional,
    * then its node will be executed even if the input has no data.
    */
   optional?: boolean;
@@ -84,9 +84,9 @@ export type DflowOutput = {
 /** Defines a block of code: it can have inputs and outputs. */
 export type DflowNode = {
   kind: string;
-  run(..._args: DflowArray): unknown | Promise<unknown>;
   inputs?: DflowInput[];
   outputs?: DflowOutput[];
+  run(..._args: DflowArray): unknown | Promise<unknown>;
 };
 
 // Dflow

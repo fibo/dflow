@@ -113,7 +113,7 @@ dflow.run()
 
       <p class="description">Dflow graph contains nodes and links.</p>
 
-      <p>A <code>DflowGraph</code> has the following attributes</p>
+      <p>A <code>DflowGraph</code> has the following attributes:</p>
 
       <dl>
         <dt><code>node: Record<span>&lt;<span>string, string<span>&gt;</span></code></dt>
@@ -161,6 +161,58 @@ const MathPI: DflowNode = {
 
       <p class="description">Includes JSON data types and <code>undefined</code></p>
 
+      <p>The <code>DflowData</code> can be one of the following:</p>
+
+      <ul>
+        <li><code>undefined</code></li>
+        <li><code>null</code></li>
+        <li><code>boolean</code></li>
+        <li><code>number</code></li>
+        <li><code>string</code></li>
+        <li><code>DflowArray</code></li>
+        <li><code>DflowObject</code></li>
+      </ul>
+
+      <h4 id="dflowdatatype" class="code">DflowDataType</h4>
+
+      <p>The <code>DflowDataType</code> is a <em>literal type</em>; it can be one of the following:</p>
+
+      <ul>
+        <li><code>"null"</code></li>
+        <li><code>"boolean"</code></li>
+        <li><code>"number"</code></li>
+        <li><code>"string"</code></li>
+        <li><code>"array"</code></li>
+        <li><code>"object"</code></li>
+      </ul>
+
+      <h4 id="dflowinput" class="code">DflowInput</h4>
+
+      <p>A <code>DflowInput</code> has the following attributes:</p>
+
+      <dl>
+        <dt><code>name?: string</code></dt>
+        <dd>Ignored by Dflow, but could be used by UI.</dd>
+
+        <dt><code>types: <a href="#dflowdatatype">DflowDataType[]</a></code></dt>
+        <dd>An input can be connected to an output only if the data types match.</dd>
+
+        <dt><code>optional?: boolean</code></dt>
+        <dd>Any input is <strong>required</strong> by default, i.e. not optional. If an input is not optional and it has no data, then its node will not be executed. If an input is optional, then its node will be executed even if the input has no data.</dd>
+      </dl>
+
+      <h4 id="dflowoutput" class="code">DflowOutput</h4>
+
+      <p>A <code>DflowOutput</code> has the following attributes:</p>
+
+      <dl>
+        <dt><code>name?: string</code></dt>
+        <dd>Ignored by Dflow, but could be used by UI.</dd>
+
+        <dt><code>types: <a href="#dflowdatatype">DflowDataType[]</a></code></dt>
+        <dd>An output can be connected to an input only if the data types match.</dd>
+      </dl>
+
       <h4 id="dflowlink" class="code">DflowLink</h4>
 
       <p class="description">Connects two nodes in the graph.</p>
@@ -168,6 +220,22 @@ const MathPI: DflowNode = {
       <h4 class="code">DflowNode</h4>
 
       <p class="description">Defines a block of code: it can have inputs and outputs.</p>
+
+      <p>A <code>DflowNode</code> has the following attributes:</p>
+
+      <dl>
+        <dt><code>kind: string</code></dt>
+        <dd></dd>
+
+        <dt><code>inputs?: DflowInput</code></dt>
+        <dd></dd>
+
+        <dt><code>outputs?: DflowOutput</code></dt>
+        <dd></dd>
+
+        <dt><code>run()</code></dt>
+        <dd></dd>
+      </dl>
 
       <p>Define a "sum" node.</p>
 
