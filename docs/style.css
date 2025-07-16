@@ -84,7 +84,7 @@ header {
 pre {
   overflow: scroll;
   margin: 1em 0;
-  padding: 0 0.5em;
+  padding: 0.5em 0 0.5em 1em;
   background: #fff9db;
 }
 code, .code {

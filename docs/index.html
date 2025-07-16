@@ -116,14 +116,14 @@ dflow.run()
       <p>A <code>DflowGraph</code> has the following attributes</p>
 
       <dl>
-        <dt><code>node: Record&lt;string, string%gt;</code></dt>
-        <dd></dd>
+        <dt><code>node: Record<span>&lt;<span>string, string<span>&gt;</span></code></dt>
+        <dd>Key is node <em>id</em>, value is node <em>kind</em></dd>
 
-        <dt><code>link: Record&lt;string, <a href="#dflowlink">DflowLink</a>%gt;</code></dt>
-        <dd></dd>
+        <dt><code>link: Record<span>&lt;</span>string, <a href="#dflowlink">DflowLink</a><span>&gt;</span></code></dt>
+        <dd>Key is link <em>id</em></dd>
 
-        <dt><code>data: Record&lt;string, <a href="#dflowdata">DflowData</a>%gt;</code></dt>
-        <dd></dd>
+        <dt><code>data: Record<span>&lt;</span>string, <a href="#dflowdata">DflowData</a><span>&gt;</span></code></dt>
+        <dd>Data nodes: key is node <em>id</em>, value is node <em>kind</em></dd>
       </dl>
 
       <h4 class="code">dflow.error</h4>
@@ -169,6 +169,8 @@ const MathPI: DflowNode = {
 
       <p class="description">Defines a block of code: it can have inputs and outputs.</p>
 
+      <p>Define a "sum" node.</p>
+
       <pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
@@ -186,5 +188,14 @@ const Sum: DflowNode = {
     <footer>
       Dflow license is <a href="https://github.com/fibo/dflow/blob/main/LICENSE">MIT</a>
     </footer>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        // Trim whitespace from code snippets.
+        document.querySelectorAll('pre > code').forEach(
+          elem => elem.textContent = elem.textContent.trim()
+        );
+      });
+    </script>
   </body>
 </html>
