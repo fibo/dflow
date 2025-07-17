@@ -435,7 +435,7 @@ export class Dflow {
   }
 
   /**
-   * Dflow graph contains nodes and links.
+   * A graph contains nodes and links.
    */
   get graph(): DflowGraph {
     const node: DflowGraph["node"] = {};

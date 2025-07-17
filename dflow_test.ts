@@ -342,6 +342,13 @@ test("dflow.node()", () => {
     link: {},
     data: {}
   });
+
+  assert.throws(
+    () => {
+      dflow.node("kind not found");
+    },
+    { message: "Cannot create node" }
+  );
 });
 
 test("dflow.link()", () => {
@@ -354,7 +361,7 @@ test("dflow.link()", () => {
 
   assert.throws(
     () => {
-      dflow.link("not found 1", nodeId2);
+      dflow.link("node not found", nodeId2);
     },
     { message: "Cannot create link" }
   );

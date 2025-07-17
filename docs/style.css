@@ -1,116 +1,148 @@
 :root {
-  --font-family: "Fira Code VF", monospace;
-  --black: #011235; /* Fibonacci sequence :) */
-  --white: #feedca; /* Fibonacci sequence reversed :))) */
-  --link: #ff6347;
+  --font-family: Oxanium, sans-serif;
+  --font-family-mono: "Fira Code VF", monospace;
+  --text: #011235; /* Fibonacci sequence :) */
+  --background: #feedca; /* Fibonacci sequence reversed :))) */
+  --link: hsl(17, 71%, 50%);
+  --code-background: #fff9db;
+  --left-space: 1.68rem;
+  --margin-text: 1rem 0 1rem var(--left-space);
+}
+@media (max-width: 678px) {
+  :root {
+    --left-space: 0.68rem;
+  }
+}
+
+/** Oxanium Variable Font */
+@font-face {
+  font-family: "Oxanium";
+  src: url("./fonts/Oxanium-VariableFont_wght.ttf") format("truetype");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 /** Fira Code Variable Font */
 @font-face {
   font-family: "Fira Code VF";
   src: url("./fonts/FiraCode-VF.woff2") format("woff2-variations");
-
   font-weight: 300 700;
   font-style: normal;
+  font-display: swap;
+}
+
+/** Fira Code Variable Font */
+@font-face {
+  font-family: "Fira Code VF";
+  src: url("./fonts/FiraCode-VF.woff2") format("woff2-variations");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 html {
   font-size: 17px;
   font-family: var(--font-family);
-  font-feature-settings: "calt" 1;
-  color: var(--black);
-  background: var(--white);
+  color: var(--text);
+  background: var(--background);
 }
 
 *, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  padding: 0;
   overflow-x: hidden;
 }
 
 *::selection {
-  color: var(--white);
-  background: var(--black);
+  color: var(--background);
+  background: hsl(217, 71%, 17%);
 }
 
 a, a:visited, a:link, a:active, a:hover, a:focus {
+  text-decoration: underline;
   color: var(--link);
   outline-color: var(--link);
+  transition: all 0.2s ease-in-out;
+}
+a:active, a:hover, a:focus {
+  text-decoration: none;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  margin: 1.68em 0 1em 0.5rem;
-}
-
-h1 {
-  font-weight: 800;
-  font-size: 3em;
-}
-
-h2 {
   font-weight: 700;
-  font-size: 2rem;
+  margin-top: 1.2em;
+  margin-left: var(--left-space);
 }
-h3 {
-  font-weight: 600;
-  font-size: 1.68rem;
-}
-h4, h5, h6 {
-  font-weight: 600;
-  font-size: 1.4rem;
-}
+h1 { font-size: 4rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 2rem; }
+h4, h5, h6 { font-size: 1.5rem; }
 
 p {
   max-width: 71ch;
-  margin: 1rem 0 1rem 0.5rem;
+  margin: var(--margin-text);
 }
 
 .description {
-  font-size: 1.2em;
-  margin: 1em 0 1em 0.68em;
+  font-family: var(--font-family-mono);
+  padding-left: 1rem;
+  margin-bottom: 1.68rem;
+  font-weight: 50;
 }
+@media (max-width: 678px) { .description { padding-left: 0.68rem; }}
 
 header {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  max-width: 792px;
 }
 
 pre {
   overflow: scroll;
   margin: 1em 0;
-  padding: 0.5em 0 0.5em 1em;
-  background: #fff9db;
+  padding: 0.5em 0 0.5em var(--left-space);
+  background: var(--code-background);
 }
-code, .code {
-  font-family: var(--font-family);
-  font-weight: 500;
+code {
+  font-family: var(--font-family-mono);
+  font-feature-settings: "calt" 1;
 }
 
 dl {
-  margin: 0;
-  padding: 1em;
-  line-height: 1.5;
+  margin-left: var(--left-space);
+  margin: var(--margin-text);
 }
 dt {
   font-weight: 500;
-  margin: 0.5em 0;
+  line-height: 1.7;
 }
 dd {
-  margin: 0 0 0 1.68em;
+  padding-left: 1.68rem;
+  line-height: 1.5;
+}
+@media (max-width: 678px) { dd { padding-left: 0.68rem; }}
+
+ul {
+  margin-left: var(--left-space);
+  padding-left: 1rem;
+  list-style: inside;
 }
 
 .links {
   user-select: none;
-  margin: 0.5rem;
   display: flex;
   gap: 0.25rem;
+  margin: 2.5rem 0 0 var(--left-space);
+  justify-content: center;
 }
+@media (max-width: 678px) { .links {
+}}
 .links a {
   text-decoration: none;
   color: transparent;
@@ -134,8 +166,10 @@ dd {
   height: 2.25rem;
 }
 
+
 footer {
-  padding: 1rem;
+  padding: 1rem 0 1rem var(--left-space);
   font-size: 0.75em;
+  background: #f8e0b5;
 }
 

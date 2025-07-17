@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>dflow</title>
+    <title>Dflow</title>
     <link rel="icon" href="data:image/x-icon;base64,AA" />
     <meta name="description" content="A minimal Dataflow programming engine" />
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
     <header>
-      <h1>dflow</h1>
+      <h1>Dflow</h1>
 
       <p class="description">
         A minimal <em>Dataflow programming</em> engine
@@ -55,7 +55,8 @@
     <section>
       <h2>API</h2>
 
-      <p class="description">A <code>Dflow</code> represents a program as an executable graph.<p>
+      <p class="description">A <code>Dflow</code> represents a program as an executable graph.</p>
+
       <p>A graph can contain <em>nodes</em> and <em>links</em>. Nodes are executed, sorted by their connections.</p>
 
       <h3 id="constructor">Constructor</h3>
@@ -84,34 +85,36 @@ dflow.run()
 
       <h3 id="methods">Methods</h3>
 
-      <h4 class="code">dflow.node(kind)</h4>
+      <h4>dflow.node(kind)</h4>
 
       <p class="description">Create a new node. Returns node id.</p>
 
-      <h4 class="code">dflow.link(source, target)</h4>
+      <h4>dflow.link(source, target)</h4>
 
       <p class="description">Create a new link and connect two nodes. Returns link id.</p>
 
       <p>If source or target position is omitted, then it defaults to <code>0</code> i.e. the <em>first position</em>.
       </p>
 
-      <h4 class="code">dflow.data(value)</h4>
+      <h4>dflow.data(value)</h4>
 
       <p class="description">Create a new data node. Returns node id.</p>
 
       <p>If value is not a valid <code>DflowData</code>, it will be set to <code>undefined</code>.</p>
 
-      <h4 class="code">dflow.delete(itemId)</h4>
-
-      <h4 class="code">dflow.run()</h4>
+      <h4>dflow.run()</h4>
 
       <p class="description">Execute all nodes, sorted by their connections.</p>
 
+      <h4>dflow.delete(itemId)</h4>
+
+      <p class="description">Delete node or link with given id.</p>
+
       <h3>Getters</h3>
 
-      <h4 class="code">dflow.graph</h4>
+      <h4>dflow.graph</h4>
 
-      <p class="description">Dflow graph contains nodes and links.</p>
+      <p class="description">A graph contains nodes and links.</p>
 
       <p>A <code>DflowGraph</code> has the following attributes:</p>
 
@@ -126,21 +129,21 @@ dflow.run()
         <dd>Data nodes: key is node <em>id</em>, value is node <em>kind</em></dd>
       </dl>
 
-      <h4 class="code">dflow.error</h4>
+      <h4>dflow.error</h4>
 
       <p class="description">Get error messages from last run, indexed by node id.</p>
 
-      <h4 class="code">dflow.out</h4>
+      <h4>dflow.out</h4>
 
       <p class="description">Get output data of last run, indexed by node id.</p>
 
       <h3 id="static-methods">Static methods</h3>
 
-      <h4 class="code">Dflow.input()</h4>
+      <h4>Dflow.input()</h4>
 
       <p class="description">Helper to define inputs.</p>
 
-      <h4 class="code">Dflow.output()</h4>
+      <h4>Dflow.output()</h4>
 
       <p class="description">Helper to define outputs.</p>
 
@@ -157,7 +160,7 @@ const MathPI: DflowNode = {
 
       <h3 id="types">Types</h3>
 
-      <h4 id="dflowdata" class="code">DflowData</h4>
+      <h4 id="dflowdata">DflowData</h4>
 
       <p class="description">Includes JSON data types and <code>undefined</code></p>
 
@@ -173,7 +176,7 @@ const MathPI: DflowNode = {
         <li><code>DflowObject</code></li>
       </ul>
 
-      <h4 id="dflowdatatype" class="code">DflowDataType</h4>
+      <h4 id="dflowdatatype">DflowDataType</h4>
 
       <p>The <code>DflowDataType</code> is a <em>literal type</em>; it can be one of the following:</p>
 
@@ -186,7 +189,7 @@ const MathPI: DflowNode = {
         <li><code>"object"</code></li>
       </ul>
 
-      <h4 id="dflowinput" class="code">DflowInput</h4>
+      <h4 id="dflowinput">DflowInput</h4>
 
       <p>A <code>DflowInput</code> has the following attributes:</p>
 
@@ -201,7 +204,7 @@ const MathPI: DflowNode = {
         <dd>Any input is <strong>required</strong> by default, i.e. not optional. If an input is not optional and it has no data, then its node will not be executed. If an input is optional, then its node will be executed even if the input has no data.</dd>
       </dl>
 
-      <h4 id="dflowoutput" class="code">DflowOutput</h4>
+      <h4 id="dflowoutput">DflowOutput</h4>
 
       <p>A <code>DflowOutput</code> has the following attributes:</p>
 
@@ -213,11 +216,11 @@ const MathPI: DflowNode = {
         <dd>An output can be connected to an input only if the data types match.</dd>
       </dl>
 
-      <h4 id="dflowlink" class="code">DflowLink</h4>
+      <h4 id="dflowlink">DflowLink</h4>
 
       <p class="description">Connects two nodes in the graph.</p>
 
-      <h4 class="code">DflowNode</h4>
+      <h4>DflowNode</h4>
 
       <p class="description">Defines a block of code: it can have inputs and outputs.</p>
 
@@ -227,13 +230,13 @@ const MathPI: DflowNode = {
         <dt><code>kind: string</code></dt>
         <dd></dd>
 
-        <dt><code>inputs?: DflowInput</code></dt>
+        <dt><code>inputs?: DflowInput[]</code></dt>
         <dd></dd>
 
-        <dt><code>outputs?: DflowOutput</code></dt>
+        <dt><code>outputs?: DflowOutput[]</code></dt>
         <dd></dd>
 
-        <dt><code>run()</code></dt>
+        <dt><code>run(inputs): outputs</code></dt>
         <dd></dd>
       </dl>
 
