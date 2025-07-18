@@ -22,18 +22,6 @@ An **input** is just a reference to its connected output, if any.
 
 An **output** can be connected to multiple inputs, and hold a **data** value that can be `undefined` or any value that can be serialized into JSON.
 
-## Features
-
-- Implemented in TypeScript.
-- Expressive and simple API.
-- A graph can be saved as a JSON file. It can be then loaded and executed.
-- It is easy to create nodes: just create a `DflowNode` object, define its inputs and outputs and the `run()` function.
-- Minimal internal type system: it is possible to connect an output of type `T` to an input of type `U`, if and only if `U` includes `T`.
-
-**NOTA BENE**: it is supposed that you implement your own nodes, for example node `addition` could be implemented using bigint or some floating point library, according to your needs.
-
-An example of nodes implementing basic JavaScript features can be found in [docs/examples/nodes](https://github.com/fibo/dflow/tree/main/docs/examples/nodes).
-
 ## Usage
 
 This is a graph that will compute `sin(π / 2) = 1` and print the result.

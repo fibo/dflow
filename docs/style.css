@@ -75,6 +75,7 @@ a:active, a:hover, a:focus {
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
+  line-height: 1.4;
   margin-top: 1.2em;
   margin-left: var(--left-space);
 }
@@ -85,6 +86,7 @@ h4, h5, h6 { font-size: 1.5rem; }
 
 p {
   max-width: 71ch;
+  line-height: 1.7;
   margin: var(--margin-text);
 }
 
@@ -168,8 +170,10 @@ ul {
 
 
 footer {
-  padding: 1rem 0 1rem var(--left-space);
+  margin-top: 5rem;
   font-size: 0.75em;
   background: #f8e0b5;
+  box-shadow: inset 1px 1px 7px 0px rgb(217 117 0 / 71%);
+  text-align: center;
 }
 

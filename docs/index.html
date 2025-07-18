@@ -30,11 +30,19 @@
         <h2>Features</h2>
 
         <dl>
-          <dt>Expressive and simple API.</dt>
-          <dt>It is easy to create nodes.</dt>
-          <dt>Written in TypeScript.</dt>
+          <dt>Expressive and simple API</dt>
+
+          <dt>It is easy to create nodes</dt>
+
+          <dt>Written in TypeScript</dt>
           <dd>Whole implementation is in this <a href="https://github.com/fibo/dflow/blob/main/dflow.ts">dflow.ts</a> file. It is roughly 4kb once minified.</dd>
+
+          <dt>Minimal type system</dt>
+          <dd>It is possible to connect an output to an input only if the <a href="#dflowdatatype">data types</a> are matching.</dd>
         </dl>
+
+        <p>Notice that you must implement your own nodes. For example a node <em>"addition"</em> could be implemented using <code>BigInt</code> or some <em>arbitrary-precision</em> library, according to your needs. You can find example nodes implementing basic JavaScript features in the <a href="https://github.com/fibo/dflow/tree/main/docs/examples/nodes">examples/nodes/ folder</a>.
+        </p>
       </div>
     </header>
 
