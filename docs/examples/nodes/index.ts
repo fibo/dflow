@@ -8,6 +8,7 @@ import objectNodes from "./object.ts";
 import operatorNodes from "./operator.ts";
 import stringNodes from "./string.ts";
 
+// This file is imported by ../../../tests/nodes/utils.ts
 export const nodeDefinitions = [
   ...arrayNodes,
   ...conditionalNodes,

@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { newDflow } from "./_test-utils.ts";
+import { newDflow } from "./utils.ts";
 
 test("newDate", () => {
   const dflow = newDflow();

@@ -5,7 +5,7 @@ import {
   testOneInTwoOut,
   testThreeInOneOut,
   testTwoInOneOut
-} from "./_test-utils.ts";
+} from "./utils.ts";
 
 test("arrayAt", () => {
   const dflow = newDflow();

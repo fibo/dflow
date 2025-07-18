@@ -1,5 +1,5 @@
 import { test } from "node:test";
-import { newDflow, testOneInOneOut } from "./_test-utils.ts";
+import { newDflow, testOneInOneOut } from "./utils.ts";
 
 test("isFinite", () => {
   const dflow = newDflow();

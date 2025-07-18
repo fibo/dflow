@@ -1,86 +1,101 @@
-import { Dflow, type DflowData, type DflowNode } from "../../../dflow.ts";
+import { Dflow, type DflowNode } from "../../../dflow.ts";
 
 const { input, output } = Dflow;
-
-const Addition: DflowNode = {
-  kind: "addition",
-  inputs: [input("number"), input("number")],
-  outputs: [output("number")],
-  run(a: number, b: number) {
-    return a + b;
-  }
-};
-
-const Division: DflowNode = {
-  kind: "division",
-  inputs: [input("number"), input("number")],
-  outputs: [output("number")],
-  run(a: number, b: number) {
-    if (b) return a / b;
-  }
-};
 
 const Equality: DflowNode = {
   kind: "equality",
   inputs: [input(), input()],
   outputs: [output("boolean")],
-  run(a: DflowData, b: DflowData) {
-    return a == b;
-  }
+  run: (a: unknown, b: unknown) => a == b
 };
 
-const LessThan: DflowNode = {
-  kind: "lessThan",
-  inputs: [input("number"), input("number")],
-  outputs: [output("boolean")],
-  run(a: number, b: number) {
-    return a < b;
-  }
+const binaryOperatorInputs = [
+  input(["number", "string"]),
+  input(["number", "string"])
+];
+
+const coerceBinaryOperatorArgs = (a: number | string, b: number | string) => {
+  const aNum = Number(a);
+  const bNum = Number(b);
+  return {
+    aNum,
+    bNum,
+    areValid: Dflow.isNumber(aNum) && Dflow.isNumber(bNum)
+  };
 };
 
-const GreaterThan: DflowNode = {
-  kind: "greaterThan",
-  inputs: [input("number"), input("number")],
-  outputs: [output("boolean")],
-  run(a: number, b: number) {
-    return a > b;
-  }
-};
-
-const Inequality: DflowNode = {
-  kind: "inequality",
-  inputs: [input(), input()],
-  outputs: [output("boolean")],
-  run(a: DflowData, b: DflowData) {
-    return a != b;
-  }
-};
-
-const Multiplication: DflowNode = {
-  kind: "multiplication",
-  inputs: [input("number"), input("number")],
+const Addition: DflowNode = {
+  kind: "addition",
+  inputs: binaryOperatorInputs,
   outputs: [output("number")],
-  run(a: number, b: number) {
-    return a * b;
+  run(a: number | string, b: number | string) {
+    const { areValid, aNum, bNum } = coerceBinaryOperatorArgs(a, b);
+    if (!areValid) return;
+    return aNum + bNum;
   }
 };
 
 const Subtraction: DflowNode = {
   kind: "subtraction",
-  inputs: [input("number"), input("number")],
+  inputs: binaryOperatorInputs,
   outputs: [output("number")],
-  run(a: number, b: number) {
-    return a - b;
+  run(a: number | string, b: number | string) {
+    const { areValid, aNum, bNum } = coerceBinaryOperatorArgs(a, b);
+    if (!areValid) return;
+    return aNum - bNum;
+  }
+};
+
+const Multiplication: DflowNode = {
+  kind: "multiplication",
+  inputs: binaryOperatorInputs,
+  outputs: [output("number")],
+  run(a: number | string, b: number | string) {
+    const { areValid, aNum, bNum } = coerceBinaryOperatorArgs(a, b);
+    if (!areValid) return;
+    return aNum * bNum;
+  }
+};
+
+const Division: DflowNode = {
+  kind: "division",
+  inputs: binaryOperatorInputs,
+  outputs: [output("number")],
+  run(a: number | string, b: number | string) {
+    const { areValid, aNum, bNum } = coerceBinaryOperatorArgs(a, b);
+    if (!areValid) return;
+    if (bNum) return aNum / bNum;
+  }
+};
+
+const LessThan: DflowNode = {
+  kind: "lessThan",
+  inputs: binaryOperatorInputs,
+  outputs: [output("boolean")],
+  run(a: number | string, b: number | string) {
+    const { areValid, aNum, bNum } = coerceBinaryOperatorArgs(a, b);
+    if (!areValid) return;
+    return aNum < bNum;
+  }
+};
+
+const GreaterThan: DflowNode = {
+  kind: "greaterThan",
+  inputs: binaryOperatorInputs,
+  outputs: [output("boolean")],
+  run(a: number | string, b: number | string) {
+    const { areValid, aNum, bNum } = coerceBinaryOperatorArgs(a, b);
+    if (!areValid) return;
+    return aNum > bNum;
   }
 };
 
 export default [
-  Addition,
-  Division,
   Equality,
-  GreaterThan,
-  LessThan,
-  Inequality,
+  Addition,
+  Subtraction,
   Multiplication,
-  Subtraction
+  Division,
+  GreaterThan,
+  LessThan
 ];

@@ -26,8 +26,8 @@
     "preversion": "npm run build",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
     "test": "npm run test:dflow && npm run test:nodes",
-    "test:dflow": "node --test --env-file .typescript.env dflow_test.ts",
-    "test:nodes": "node --test --env-file .typescript.env docs/examples/nodes/*_test.ts"
+    "test:dflow": "node --test --env-file .typescript.env tests/dflow_test.ts",
+    "test:nodes": "node --test --env-file .typescript.env tests/nodes/*_test.ts"
   },
   "repository": {
     "type": "git",

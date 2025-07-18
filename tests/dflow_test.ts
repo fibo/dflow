@@ -6,7 +6,7 @@ import {
   type DflowData,
   type DflowDataType,
   type DflowNode
-} from "./dflow.ts";
+} from "../dflow.ts";
 
 const { input, output } = Dflow;
 

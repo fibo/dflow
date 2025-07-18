@@ -1,5 +1,5 @@
 import { test } from "node:test";
-import { newDflow, testOneInOneOut, testThreeInOneOut } from "./_test-utils.ts";
+import { newDflow, testOneInOneOut, testThreeInOneOut } from "./utils.ts";
 
 test("stringLength", () => {
   const dflow = newDflow();

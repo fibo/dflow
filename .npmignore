@@ -2,8 +2,7 @@
 .prettierignore
 .typescript.env
 dflow.ts
-dflow_test.ts
 tsconfig.build.json
 tsconfig.json
 docs/
-examples/
+tests/

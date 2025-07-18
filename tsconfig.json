@@ -18,5 +18,5 @@
     }
   },
   "exclude": ["./node_modules"],
-  "include": ["dflow.js", "dflow.d.ts", "dflow.ts", "dflow_test.ts", "docs/"]
+  "include": ["dflow.ts", "docs/", "tests/"]
 }

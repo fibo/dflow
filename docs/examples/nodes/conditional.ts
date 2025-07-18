@@ -2,7 +2,7 @@ import { Dflow, type DflowData, type DflowNode } from "../../../dflow.ts";
 
 const { input, output } = Dflow;
 
-const NodeIf: DflowNode = {
+const If: DflowNode = {
   kind: "if",
   inputs: [
     input([], { name: "condition" }),
@@ -15,4 +15,4 @@ const NodeIf: DflowNode = {
   }
 };
 
-export default [NodeIf];
+export default [If];

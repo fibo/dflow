@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { type DflowData } from "../../../dflow.ts";
-import { newDflow } from "./_test-utils.ts";
+import { type DflowData } from "../../dflow.ts";
+import { newDflow } from "./utils.ts";
 
 function testConditionalIf(
   input1: DflowData,
