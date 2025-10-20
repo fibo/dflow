@@ -27,3 +27,13 @@ To run a TypeScript file you can do something like this:
 ```sh
 node --env-file .typescript.env ./examples/doc-snippets/helloWorld.ts
 ```
+
+## Build
+
+Once done with [Requirements](#requirements) to build the project, just run:
+
+```sh
+npm run build
+```
+
+It will generate dflow.js which is a minified bundle and dflow.d.ts (TypeScript definitions) in the package root folder.

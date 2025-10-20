@@ -32,15 +32,6 @@
   font-display: swap;
 }
 
-/** Fira Code Variable Font */
-@font-face {
-  font-family: "Fira Code VF";
-  src: url("./fonts/FiraCode-VF.woff2") format("woff2-variations");
-  font-weight: 300 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 html {
   font-size: 17px;
   font-family: var(--font-family);
@@ -143,8 +134,6 @@ ul {
   margin: 2.5rem 0 0 var(--left-space);
   justify-content: center;
 }
-@media (max-width: 678px) { .links {
-}}
 .links a {
   text-decoration: none;
   color: transparent;
@@ -172,6 +161,7 @@ ul {
 footer {
   margin-top: 5rem;
   font-size: 0.75em;
+  padding: 2rem 1rem;
   background: #f8e0b5;
   box-shadow: inset 1px 1px 7px 0px rgb(217 117 0 / 71%);
   text-align: center;

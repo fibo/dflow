@@ -1,5 +1,3 @@
-// Keep in sync with README.md file.
-
 import { Dflow, type DflowNode } from "dflow";
 
 const { input, output } = Dflow;

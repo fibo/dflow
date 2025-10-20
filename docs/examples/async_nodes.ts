@@ -6,20 +6,12 @@ const SumNode = {
   kind: "Sum",
   inputs: [input(["number"]), input(["number"])],
   outputs: [output(["number"])],
-  /**
-   * @param {number} a
-   * @param {number} b
-   */
-  run(a, b) {
+  run(a: number, b: number) {
     return a + b;
   }
 };
 
-/**
- * @param {number} timeout
- * @returns {Promise<void>}
- */
-function sleep(timeout) {
+function sleep(timeout: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve();

@@ -49,29 +49,168 @@
     <section>
       <h2>How it works</h2>
 
-      <p>A <strong>node</strong> is a block of code that can have <em>inputs</em> and <em>outputs</em>.
+      <p>
+      A <strong>node</strong> is a block of code that can have <em>inputs</em> and <em>outputs</em>.
+      </p>
 
-      <p>A <strong>link</strong> connects an <em>input</em> to an <em>output</em>.
+      <p>
+      A <strong>link</strong> connects an <em>input</em> to an <em>output</em>.
+      </p>
 
       <p>
       A <strong>graph</strong> represents a program.
       It can contain <em>nodes</em> and <em>links</em>.
       Nodes are executed, sorted by their connections.
       </p>
+
+      <p>
+      An <strong>input</strong> is just a reference to its connected output, if any.
+      </p>
+
+      <p>
+      An <strong>output</strong> can be connected to multiple inputs, and hold a **data** value that can be <code>undefined</code> or any value that can be serialized into JSON.
+      </p>
+    </section>
+
+    <section>
+      <h2>Usage</h2>
+
+      <p>
+      You can run the following examples via npm scripts: see <a href="https://github.com/fibo/dflow/tree/main/docs/examples">examples folder</a> to follow instructions.
+      </p>
+
+      <p>
+      This is a graph that will compute <code>sin(π / 2) = 1</code> and print the result.
+      </p>
+
+<!-- START file:docs/examples/usage.ts -->
+      <pre><code>
+import { Dflow, type DflowNode } from "dflow";
+
+const { input, output } = Dflow;
+
+const MathSin: DflowNode = {
+  kind: "mathSin",
+  inputs: [input("number")],
+  outputs: [output("number")],
+  run(input: number) {
+    return Math.sin(input);
+  }
+};
+
+const ConsoleLog: DflowNode = {
+  kind: "consoleLog",
+  inputs: [input()],
+  run(input: unknown) {
+    console.log(input);
+  }
+};
+
+// Create a Dflow instance with the given nodes.
+const dflow = new Dflow([MathSin, ConsoleLog]);
+
+// Create nodes.
+const sinNodeId = dflow.node("mathSin");
+const consoleLogNodeId = dflow.node("consoleLog");
+
+// Create a data node.
+// It will create an instance of a node with kind "data"
+// This is a special node, which is built-in into every Dflow instance.
+const numNodeId = dflow.data(Math.PI / 2);
+
+// Connect numNode to sinNode and sinNode to consoleLog
+dflow.link(numNodeId, sinNodeId);
+dflow.link(sinNodeId, consoleLogNodeId);
+
+// run graph
+dflow.run();
+      </code></pre>
+<!-- END file:docs/examples/usage.ts -->
+
+      <p>
+      You can also run async nodes.
+      </p>
+
+<!-- START file:docs/examples/async_nodes.ts -->
+      <pre><code>
+import { Dflow } from "dflow";
+
+const { input, output } = Dflow;
+
+const SumNode = {
+  kind: "Sum",
+  inputs: [input(["number"]), input(["number"])],
+  outputs: [output(["number"])],
+  run(a: number, b: number) {
+    return a + b;
+  }
+};
+
+function sleep(timeout: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, timeout);
+  });
+}
+
+const SleepNode = {
+  kind: "Sleep",
+  async run() {
+    const timeout = 500;
+    console.info("sleep node start", `(will sleep ${timeout} ms) zZz`);
+    await sleep(timeout);
+    console.info("sleep node end");
+  }
+};
+
+async function runGraph() {
+  const dflow = new Dflow([SumNode, SleepNode]);
+
+  // Create two nodes, num and sum.
+
+  const numNodeId = dflow.data(21);
+  const sumNodeId = dflow.node(SumNode.kind, "sum");
+
+  // Connect nodes.
+  dflow.link(numNodeId, [sumNodeId, 0]);
+  dflow.link(numNodeId, [sumNodeId, 1]);
+
+  // Add also an async node.
+  dflow.node(SleepNode.kind);
+
+  // Run graph asynchronously.
+  await dflow.run();
+
+  // The id "sum" was passed as `wantedId` on SumNode .
+  const result = dflow.out.sum[0];
+  if (result !== 42) console.error("Unexpected result", result);
+}
+
+runGraph();
+      </code></pre>
+<!-- END file:docs/examples/async_nodes.ts -->
+
     </section>
 
     <section>
       <h2>API</h2>
 
-      <p class="description">A <code>Dflow</code> represents a program as an executable graph.</p>
+      <p class="description">
+      A <code>Dflow</code> represents a program as an executable graph.
+      </p>
 
-      <p>A graph can contain <em>nodes</em> and <em>links</em>. Nodes are executed, sorted by their connections.</p>
+      <p>
+      A graph can contain <em>nodes</em> and <em>links</em>. Nodes are executed, sorted by their connections.
+      </p>
 
       <h3 id="constructor">Constructor</h3>
 
-      <p><code>Dflow</code> constructor requires a list of node definitions.</p>
+      <p>
+      <code>Dflow</code> constructor requires a list of node definitions.
+      </p>
 
-<!-- ./snippets/helloWorld.ts -->
+<!-- START file:docs/snippets/helloWorld.ts -->
       <pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
@@ -90,41 +229,59 @@ dflow.node("hello")
 // Run the dflow graph.
 dflow.run()
       </code></pre>
+<!-- END file:docs/snippets/helloWorld.ts -->
 
       <h3 id="methods">Methods</h3>
 
       <h4>dflow.node(kind)</h4>
 
-      <p class="description">Create a new node. Returns node id.</p>
+      <p class="description">
+      Create a new node. Returns node id.
+      </p>
 
       <h4>dflow.link(source, target)</h4>
 
-      <p class="description">Create a new link and connect two nodes. Returns link id.</p>
+      <p class="description">
+      Create a new link and connect two nodes. Returns link id.
+      </p>
 
-      <p>If source or target position is omitted, then it defaults to <code>0</code> i.e. the <em>first position</em>.
+      <p>
+      If source or target position is omitted, then it defaults to <code>0</code> i.e. the <em>first position</em>.
       </p>
 
       <h4>dflow.data(value)</h4>
 
-      <p class="description">Create a new data node. Returns node id.</p>
+      <p class="description">
+      Create a new data node. Returns node id.
+      </p>
 
-      <p>If value is not a valid <code>DflowData</code>, it will be set to <code>undefined</code>.</p>
+      <p>
+      If value is not a valid <code>DflowData</code>, it will be set to <code>undefined</code>.
+      </p>
 
       <h4>dflow.run()</h4>
 
-      <p class="description">Execute all nodes, sorted by their connections.</p>
+      <p class="description">
+      Execute all nodes, sorted by their connections.
+      </p>
 
       <h4>dflow.delete(itemId)</h4>
 
-      <p class="description">Delete node or link with given id.</p>
+      <p class="description">
+      Delete node or link with given id.
+      </p>
 
       <h3>Getters</h3>
 
       <h4>dflow.graph</h4>
 
-      <p class="description">A graph contains nodes and links.</p>
+      <p class="description">
+      A graph contains nodes and links.
+      </p>
 
-      <p>A <code>DflowGraph</code> has the following attributes:</p>
+      <p>
+      A <code>DflowGraph</code> has the following attributes:
+      </p>
 
       <dl>
         <dt><code>node: Record<span>&lt;<span>string, string<span>&gt;</span></code></dt>
@@ -139,23 +296,33 @@ dflow.run()
 
       <h4>dflow.error</h4>
 
-      <p class="description">Get error messages from last run, indexed by node id.</p>
+      <p class="description">
+      Get error messages from last run, indexed by node id.
+      </p>
 
       <h4>dflow.out</h4>
 
-      <p class="description">Get output data of last run, indexed by node id.</p>
+      <p class="description">
+      Get output data of last run, indexed by node id.
+      </p>
 
       <h3 id="static-methods">Static methods</h3>
 
       <h4>Dflow.input()</h4>
 
-      <p class="description">Helper to define inputs.</p>
+      <p class="description">
+      Helper to define inputs.
+      </p>
 
       <h4>Dflow.output()</h4>
 
-      <p class="description">Helper to define outputs.</p>
+      <p class="description">
+      Helper to define outputs.
+      </p>
 
-      <p>Define an output named π (PI) for a constant node</p>
+      <p>
+      Define an output named π (PI) for a constant node
+      </p>
 
 <!-- ./examples/nodes/math.ts -->
       <pre><code>
@@ -170,9 +337,13 @@ const MathPI: DflowNode = {
 
       <h4 id="dflowdata">DflowData</h4>
 
-      <p class="description">Includes JSON data types and <code>undefined</code></p>
+      <p class="description">
+      Includes JSON data types and <code>undefined</code>
+      </p>
 
-      <p>The <code>DflowData</code> can be one of the following:</p>
+      <p>
+      The <code>DflowData</code> can be one of the following:
+      </p>
 
       <ul>
         <li><code>undefined</code></li>
@@ -186,7 +357,9 @@ const MathPI: DflowNode = {
 
       <h4 id="dflowdatatype">DflowDataType</h4>
 
-      <p>The <code>DflowDataType</code> is a <em>literal type</em>; it can be one of the following:</p>
+      <p>
+      The <code>DflowDataType</code> is a <em>literal type</em>; it can be one of the following:
+      </p>
 
       <ul>
         <li><code>"null"</code></li>
@@ -199,7 +372,9 @@ const MathPI: DflowNode = {
 
       <h4 id="dflowinput">DflowInput</h4>
 
-      <p>A <code>DflowInput</code> has the following attributes:</p>
+      <p>
+      A <code>DflowInput</code> has the following attributes:
+      </p>
 
       <dl>
         <dt><code>name?: string</code></dt>
@@ -214,7 +389,9 @@ const MathPI: DflowNode = {
 
       <h4 id="dflowoutput">DflowOutput</h4>
 
-      <p>A <code>DflowOutput</code> has the following attributes:</p>
+      <p>
+      A <code>DflowOutput</code> has the following attributes:
+      </p>
 
       <dl>
         <dt><code>name?: string</code></dt>
@@ -226,13 +403,19 @@ const MathPI: DflowNode = {
 
       <h4 id="dflowlink">DflowLink</h4>
 
-      <p class="description">Connects two nodes in the graph.</p>
+      <p class="description">
+      Connects two nodes in the graph.
+      </p>
 
       <h4>DflowNode</h4>
 
-      <p class="description">Defines a block of code: it can have inputs and outputs.</p>
+      <p class="description">
+      Defines a block of code: it can have inputs and outputs.
+      </p>
 
-      <p>A <code>DflowNode</code> has the following attributes:</p>
+      <p>
+      A <code>DflowNode</code> has the following attributes:
+      </p>
 
       <dl>
         <dt><code>kind: string</code></dt>
@@ -248,7 +431,9 @@ const MathPI: DflowNode = {
         <dd></dd>
       </dl>
 
-      <p>Define a "sum" node.</p>
+      <p>
+      Define a "sum" node.
+      </p>
 
       <pre><code>
 import { Dflow, type DflowNode } from "dflow";
@@ -265,7 +450,7 @@ const Sum: DflowNode = {
     </section>
 
     <footer>
-      Dflow license is <a href="https://github.com/fibo/dflow/blob/main/LICENSE">MIT</a>
+      Dflow license is <a href="https://fibo.github.io/mit-license/">MIT</a>
     </footer>
 
     <script>

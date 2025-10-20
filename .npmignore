@@ -1,6 +1,5 @@
 .github/
 .prettierignore
-.typescript.env
 dflow.ts
 tsconfig.build.json
 tsconfig.json
