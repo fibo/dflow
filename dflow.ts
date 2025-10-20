@@ -186,10 +186,10 @@ export class Dflow {
     nodeConnections: Array<{ sourceId: string; targetId: string }>
   ): number {
     const parentsNodeIds = nodeConnections
-      .filter(({ targetId }) => nodeId === targetId)
+      .filter(({ targetId }) => nodeId == targetId)
       .map(({ sourceId }) => sourceId);
     // A node with no parent as level zero.
-    if (parentsNodeIds.length === 0) return 0;
+    if (!parentsNodeIds.length) return 0;
     // Otherwise its level is the max level of its parents plus one.
     let maxLevel = 0;
     for (const parentNodeId of parentsNodeIds)
@@ -235,7 +235,7 @@ export class Dflow {
     // If source can have any type or
     // target can have any type,
     // then source and target are compatible.
-    if (sourceTypes.length === 0 || targetTypes.length === 0) return true;
+    if (!sourceTypes.length || !targetTypes.length) return true;
 
     // Check if target accepts some of the `dataType` source can have.
     return targetTypes.some((dataType) => sourceTypes.includes(dataType));
@@ -268,11 +268,11 @@ export class Dflow {
         set data(arg: unknown) {
           if (
             // Has any type and `arg` is some valid data...
-            (types.length === 0 && Dflow.isData(arg)) ||
+            (!types.length && Dflow.isData(arg)) ||
             // ... or output type corresponds to `arg` type.
             (types.includes("null") && arg === null) ||
-            (types.includes("boolean") && typeof arg === "boolean") ||
-            (types.includes("string") && typeof arg === "string") ||
+            (types.includes("boolean") && typeof arg == "boolean") ||
+            (types.includes("string") && typeof arg == "string") ||
             (types.includes("number") && Dflow.isNumber(arg)) ||
             (types.includes("object") && Dflow.isObject(arg)) ||
             (types.includes("array") && Dflow.isArray(arg))
@@ -298,7 +298,7 @@ export class Dflow {
       this.#outputs.delete(id);
       // Delete all links connected to node.
       for (const [linkId, link] of this.#links.entries())
-        if (link[0] === id || link[2] === id) this.delete(linkId);
+        if (link[0] == id || link[2] == id) this.delete(linkId);
     }
     // Delete link.
     const link = this.#links.get(id);
@@ -317,8 +317,8 @@ export class Dflow {
     // Infer data type
     let types: DflowDataType[] = [];
     if (data === null) types = ["null"];
-    if (typeof data === "boolean") types = ["boolean"];
-    if (typeof data === "string") types = ["string"];
+    if (typeof data == "boolean") types = ["boolean"];
+    if (typeof data == "string") types = ["string"];
     if (Dflow.isNumber(data)) types = ["number"];
     if (Dflow.isArray(data)) types = ["array"];
     if (Dflow.isObject(data)) types = ["object"];
@@ -335,10 +335,10 @@ export class Dflow {
   ): string {
     const id = this.#newId(this.#links, "l", wantedId);
 
-    const sourceNodeId = typeof source === "string" ? source : source[0];
-    const sourcePosition = typeof source === "string" ? 0 : source[1];
-    const targetNodeId = typeof target === "string" ? target : target[0];
-    const targetPosition = typeof target === "string" ? 0 : target[1];
+    const sourceNodeId = typeof source == "string" ? source : source[0];
+    const sourcePosition = typeof source == "string" ? 0 : source[1];
+    const targetNodeId = typeof target == "string" ? target : target[0];
+    const targetPosition = typeof target == "string" ? 0 : target[1];
 
     if (
       this.canConnect([
@@ -379,7 +379,7 @@ export class Dflow {
     for (const nodeId of this.#sortedNodesIds()) {
       const kind = this.#kinds.get(nodeId)!;
 
-      if (kind === "data") continue;
+      if (kind == "data") continue;
 
       const run = this.#runs.get(nodeId)!;
 
@@ -406,10 +406,10 @@ export class Dflow {
       const inputData = nodeInputs.map((input) => input.source?.data);
       let result: unknown;
       try {
-        if (run.constructor.name === "Function") {
+        if (run.constructor.name == "Function") {
           result = run(...inputData);
         }
-        if (run.constructor.name === "AsyncFunction") {
+        if (run.constructor.name == "AsyncFunction") {
           result = await run(...inputData);
         }
       } catch (err) {
@@ -427,7 +427,7 @@ export class Dflow {
         continue;
       }
       // Copy result into node .
-      if (numOutputs === 1) nodeOutputs[0].data = result;
+      if (numOutputs == 1) nodeOutputs[0].data = result;
       if (numOutputs > 1)
         for (let position = 0; position < numOutputs; position++)
           nodeOutputs[position].data = (result as DflowArray)[position];
@@ -441,7 +441,7 @@ export class Dflow {
     const node: DflowGraph["node"] = {};
     const data: DflowGraph["data"] = {};
     for (const [id, kind] of this.#kinds.entries()) {
-      if (kind === "data")
+      if (kind == "data")
         data[id] = this.#outputs.get(id)?.[0]?.data as DflowData;
       node[id] = kind;
     }
@@ -512,7 +512,7 @@ export class Dflow {
     rest?: Omit<DflowInput, "types">
   ): DflowInput {
     return {
-      types: typeof typing === "string" ? [typing] : typing,
+      types: typeof typing == "string" ? [typing] : typing,
       ...rest
     };
   }
@@ -531,7 +531,7 @@ export class Dflow {
     rest?: Omit<DflowOutput, "types">
   ): DflowOutput {
     return {
-      types: typeof typing === "string" ? [typing] : typing,
+      types: typeof typing == "string" ? [typing] : typing,
       ...rest
     };
   }
@@ -550,7 +550,7 @@ export class Dflow {
    */
   static isObject(arg: unknown): arg is DflowObject {
     return (
-      typeof arg === "object" &&
+      typeof arg == "object" &&
       arg !== null &&
       !Array.isArray(arg) &&
       Object.values(arg).every(Dflow.isData)
@@ -559,7 +559,7 @@ export class Dflow {
 
   /** Type guard for a valid number, i.e. finite and not `NaN`. */
   static isNumber(arg: unknown): arg is number {
-    return typeof arg === "number" && !isNaN(arg) && Number.isFinite(arg);
+    return typeof arg == "number" && !isNaN(arg) && Number.isFinite(arg);
   }
 
   /** Type guard for `DflowData`. */
@@ -567,8 +567,8 @@ export class Dflow {
     if (arg === undefined) return false;
     return (
       arg === null ||
-      typeof arg === "boolean" ||
-      typeof arg === "string" ||
+      typeof arg == "boolean" ||
+      typeof arg == "string" ||
       Dflow.isNumber(arg) ||
       Dflow.isObject(arg) ||
       Dflow.isArray(arg)
@@ -577,19 +577,19 @@ export class Dflow {
 
   /** Validate that data belongs to some of given types. */
   static isValidData(types: DflowDataType[], data: unknown) {
-    if (types.length === 0) return data === undefined || Dflow.isData(data);
+    if (!types.length) return data === undefined || Dflow.isData(data);
     return types.some((dataType) =>
-      dataType === "null"
+      dataType == "null"
         ? data === null
-        : dataType === "boolean"
-          ? typeof data === "boolean"
-          : dataType === "string"
-            ? typeof data === "string"
-            : dataType === "number"
+        : dataType == "boolean"
+          ? typeof data == "boolean"
+          : dataType == "string"
+            ? typeof data == "string"
+            : dataType == "number"
               ? Dflow.isNumber(data)
-              : dataType === "object"
+              : dataType == "object"
                 ? Dflow.isObject(data)
-                : dataType === "array"
+                : dataType == "array"
                   ? Dflow.isArray(data)
                   : false
     );

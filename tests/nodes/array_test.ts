@@ -90,7 +90,7 @@ test("arraySlice", () => {
     {
       input1: ["ant", "bison", "camel", "duck", "elephant"],
       input2: 2,
-      input3: undefined,
+      // input3: undefined,
       output: ["camel", "duck", "elephant"]
     },
     {

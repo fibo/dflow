@@ -88,11 +88,7 @@ const ArraySlice: DflowNode = {
   ],
   outputs: [output("array")],
   run(array: DflowArray, start: number, end?: number) {
-    if (typeof end === "number") {
-      return array.slice(start, end);
-    } else {
-      return array.slice(start);
-    }
+    return array.slice(start, end);
   }
 };
 
