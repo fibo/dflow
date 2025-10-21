@@ -27,7 +27,7 @@ export type DflowDataType =
   | "array"
   | "object";
 
-// Inputs, outputs and links.
+// Inputs, outputs, links and nodes.
 // ////////////////////////////////////////////////////////////////////
 
 /** Connects two nodes in the graph. */
@@ -77,9 +77,6 @@ export type DflowOutput = {
   /** An output can be connected to an input only if the data types match. */
   types: DflowDataType[];
 };
-
-// DflowNode
-// ////////////////////////////////////////////////////////////////////
 
 /** Defines a block of code: it can have inputs and outputs. */
 export type DflowNode = {
@@ -434,9 +431,7 @@ export class Dflow {
     }
   }
 
-  /**
-   * A graph contains nodes and links.
-   */
+  /** A graph contains nodes and links. */
   get graph(): DflowGraph {
     const node: DflowGraph["node"] = {};
     const data: DflowGraph["data"] = {};
@@ -506,6 +501,8 @@ export class Dflow {
    * ```ts
    * Dflow.input([], { name: "foo" })
    * ```
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.input} for more examples.
    */
   static input(
     typing: DflowDataType | DflowDataType[] = [],
@@ -523,8 +520,10 @@ export class Dflow {
    * @example Named output with `number` type.
    *
    * ```ts
-   * Dflow.output("number", { name: "amount" })
+   * Dflow.output("number", { name: "count" })
    * ```
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.output} for more examples.
    */
   static output(
     typing: DflowDataType | DflowDataType[] = [],

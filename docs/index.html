@@ -207,10 +207,10 @@ runGraph();
       <h3 id="constructor">Constructor</h3>
 
       <p>
-      <code>Dflow</code> constructor requires a list of node definitions.
+      <code>Dflow</code> constructor requires a list of node definitions which is an <code>Array<<a href="#dflownode">DflowNode</a>></code>.
       </p>
 
-<!-- START file:docs/snippets/helloWorld.ts -->
+<!-- START file:docs/examples/snippets/helloWorld.ts -->
       <pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
@@ -229,7 +229,7 @@ dflow.node("hello")
 // Run the dflow graph.
 dflow.run()
       </code></pre>
-<!-- END file:docs/snippets/helloWorld.ts -->
+<!-- END file:docs/examples/snippets/helloWorld.ts -->
 
       <h3 id="methods">Methods</h3>
 
@@ -308,20 +308,20 @@ dflow.run()
 
       <h3 id="static-methods">Static methods</h3>
 
-      <h4>Dflow.input()</h4>
+      <h4 id="dflow.input">Dflow.input()</h4>
 
       <p class="description">
       Helper to define inputs.
       </p>
 
-      <h4>Dflow.output()</h4>
+      <h4 id="dflow.output">Dflow.output()</h4>
 
       <p class="description">
       Helper to define outputs.
       </p>
 
       <p>
-      Define an output named π (PI) for a constant node
+      Define an output named <code>π</code> (PI) for a constant node
       </p>
 
 <!-- ./examples/nodes/math.ts -->
@@ -370,6 +370,14 @@ const MathPI: DflowNode = {
         <li><code>"object"</code></li>
       </ul>
 
+      <p>
+      Both <code>DflowInput</code> and <code>DflowOutput</code> have a <code>types: DflowDataType[]</code> attribute which is used to check if they can be connected.
+      </p>
+
+      <p>
+      A special case is when <code>types</code> is an empty array. In this case, the input or output can accept <strong>any</strong> data type.
+      </p>
+
       <h4 id="dflowinput">DflowInput</h4>
 
       <p>
@@ -407,7 +415,7 @@ const MathPI: DflowNode = {
       Connects two nodes in the graph.
       </p>
 
-      <h4>DflowNode</h4>
+      <h4 id="dflownode">DflowNode</h4>
 
       <p class="description">
       Defines a block of code: it can have inputs and outputs.

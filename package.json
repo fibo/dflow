@@ -18,7 +18,7 @@
     "esbuild": "esbuild dflow.ts --minify --outfile=dflow.js",
     "example:async_nodes": "node docs/examples/async_nodes.ts",
     "example:context": "node docs/examples/context.ts",
-    "example:hello_world": "node docs/examples/hello_world.ts",
+    "example:hello_world": "node docs/examples/snippets/hello_world.ts",
     "example:usage": "node docs/examples/usage.ts",
     "install_precommit_hook": "echo '#!/bin/sh\nnpm test && npm run prettier--check && npm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
     "prettier": "prettier --write .",

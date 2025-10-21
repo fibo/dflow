@@ -75,8 +75,11 @@ h2 { font-size: 2.5rem; }
 h3 { font-size: 2rem; }
 h4, h5, h6 { font-size: 1.5rem; }
 
-p {
+p, dl {
   max-width: 71ch;
+}
+
+p {
   line-height: 1.7;
   margin: var(--margin-text);
 }
@@ -159,7 +162,7 @@ ul {
 
 
 footer {
-  margin-top: 5rem;
+  margin-top: 25vh;
   font-size: 0.75em;
   padding: 2rem 1rem;
   background: #f8e0b5;

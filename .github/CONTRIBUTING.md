@@ -30,7 +30,7 @@ node --env-file .typescript.env ./examples/doc-snippets/helloWorld.ts
 
 ## Build
 
-Once done with [Requirements](#requirements) to build the project, just run:
+To build everything, once done with [Requirements](#requirements) just run:
 
 ```sh
 npm run build
