@@ -18,20 +18,18 @@ const ArrayAt: DflowNode = {
 
 const ArrayIncludes: DflowNode = {
   kind: "arrayIncludes",
-  inputs: [
-    input("array", { name: "array" }),
-    input("string", { name: "element" })
-  ],
+  inputs: [input("array"), input("string", { name: "element" })],
   outputs: [output("boolean")],
   run(array: DflowArray, element: string) {
     return array.includes(element);
   }
 };
 
+// START snippet
 const ArrayJoin: DflowNode = {
   kind: "arrayJoin",
   inputs: [
-    input("array", { name: "array" }),
+    input("array"),
     input("string", { name: "separator", optional: true })
   ],
   outputs: [output("string")],
@@ -39,6 +37,7 @@ const ArrayJoin: DflowNode = {
     return array.join(separator);
   }
 };
+// END snippet
 
 const ArrayLength: DflowNode = {
   kind: "arrayLength",

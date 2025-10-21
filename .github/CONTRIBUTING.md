@@ -2,6 +2,11 @@
 
 ## Requirements
 
+By design, dflow has no dependencies.
+
+However, it has few development dependencies you need to build it or to contribute to it.
+If you just want to build to run examples and already have recent `esbuild` and `typescript` installed globally, you can skip this step.
+
 With [npm](https://www.npmjs.com/) install the following packages **without saving**:
 
 ```sh
