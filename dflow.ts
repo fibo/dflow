@@ -5,6 +5,8 @@
 
 /**
  * Includes JSON data types and `undefined`.
+ *
+ * @see {@link https://fibo.github.io/dflow/#dflowdata}
  */
 export type DflowData =
   | undefined
@@ -19,6 +21,11 @@ export type DflowObject = { [Key in string]: DflowData };
 
 export type DflowArray = DflowData[];
 
+/**
+ * Dflow data types represent values that can be serialized as JSON.
+ *
+ * @see {@link https://fibo.github.io/dflow/#dflowdatatype}
+ */
 export type DflowDataType =
   | "null"
   | "boolean"
@@ -30,7 +37,11 @@ export type DflowDataType =
 // Inputs, outputs, links and nodes.
 // ////////////////////////////////////////////////////////////////////
 
-/** Connects two nodes in the graph. */
+/**
+ * Connects two nodes in the graph.
+ *
+ * @see {@link https://fibo.github.io/dflow/#dflowlink}
+ */
 export type DflowLink = [
   sourceNodeId: string,
   sourcePosition: number,
@@ -46,6 +57,8 @@ export type DflowLink = [
  * ```json
  * { "name": "label", "types": ["string"] }
  * ```
+ *
+ * @see {@link https://fibo.github.io/dflow/#dflowinput}
  */
 export type DflowInput = {
   /** Ignored by Dflow, but could be used by UI. */
@@ -53,11 +66,10 @@ export type DflowInput = {
   /** An input can be connected to an output only if the data types match. */
   types: DflowDataType[];
   /**
-   * Any input is **required** by default, i.e. not optional.
-   * If an input is not optional and it has no data,
+   * An input is **required** by default.
+   * If it is not connected or the data passed is not valid according to its types,
    * then its node will not be executed.
-   * If an input is optional,
-   * then its node will be executed even if the input has no data.
+   * If an input is **optional** the checks are skipped.
    */
   optional?: boolean;
 };
@@ -70,6 +82,8 @@ export type DflowInput = {
  * ```json
  * { "name": "sum", "types": ["number"] }
  * ```
+ *
+ * @see {@link https://fibo.github.io/dflow/#dflowoutput}
  */
 export type DflowOutput = {
   /** Ignored by Dflow, but could be used by UI. */
@@ -78,7 +92,11 @@ export type DflowOutput = {
   types: DflowDataType[];
 };
 
-/** Defines a block of code: it can have inputs and outputs. */
+/**
+ * Defines a block of code: it can have inputs and outputs.
+ *
+ * @see {@link https://fibo.github.io/dflow/#dflownode}
+ */
 export type DflowNode = {
   kind: string;
   inputs?: DflowInput[];
@@ -102,6 +120,8 @@ export type DflowGraph = {
  * A `Dflow` represents a program as an executable graph.
  * A graph can contain nodes and links.
  * Nodes are executed, sorted by their connections.
+ *
+ * @see {@link https://fibo.github.io/dflow/#api}
  */
 export class Dflow {
   /** Node definitions indexed by node kind. */
@@ -142,19 +162,51 @@ export class Dflow {
     >
   > = new Map();
 
+  /**
+   * Dflow context is bound to every node at runtime,
+   * hence it is accessible via `this` inside node `run`.
+   *
+   * @example
+   *
+   * ```ts
+   * type Context = {
+   *   foo: string;
+   * }
+   *
+   * const node: DflowNode & Partial<Context> = {
+   *   kind: "example",
+   *   run() {
+   *     console.log(this.foo)
+   *   }
+   * }
+   *
+   * const dflow = new Dflow([node])
+   * dflow.context.foo = "bar"
+   * dflow.run() // Outputs "bar"
+   * ```
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.context}
+   */
   readonly context: Record<string, unknown>;
 
   /**
-   * Optional error logger. Output should go to STDERR.
+   * Optional error logger.
    *
    * @example
    *
    * ```ts
    * dflow.ERR = console.error
    * ```
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.err}
    */
   ERR?: (...data: any[]) => void;
 
+  /**
+   * Dflow constructor requires a list of node definitions which is an `Array<DflowNode>`.
+   *
+   * @see {@link https://fibo.github.io/dflow/#constructor}
+   */
   constructor(nodeDefinitions: Array<DflowNode>) {
     // Add given node definitions, followed by builtin nodes.
     for (const nodeDefinition of nodeDefinitions)
@@ -227,18 +279,20 @@ export class Dflow {
     // Output types are stored in output items.
     const sourceOutput = this.#outputs.get(sourceNodeId)?.[sourcePosition];
     if (!sourceOutput) return false;
-    const sourceTypes = sourceOutput.types;
-
-    // If source can have any type or
-    // target can have any type,
+    // If source can have any type or target can have any type,
     // then source and target are compatible.
-    if (!sourceTypes.length || !targetTypes.length) return true;
-
+    if (!sourceOutput.types.length || !targetTypes.length) return true;
     // Check if target accepts some of the `dataType` source can have.
-    return targetTypes.some((dataType) => sourceTypes.includes(dataType));
+    return targetTypes.some((dataType) =>
+      sourceOutput.types.includes(dataType)
+    );
   }
 
-  /** Create a new node. Returns node id. */
+  /**
+   * Create a new node. Returns node id.
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.node}
+   */
   node(kind: string, wantedId?: string): string {
     const nodeDef = this.#nodeDefinitions.get(kind);
     if (!nodeDef) throw new Error("Cannot create node", { cause: { kind } });
@@ -286,7 +340,11 @@ export class Dflow {
     return id;
   }
 
-  /** Delete node or link with given id. */
+  /**
+   * Delete node or link with given id.
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.delete}
+   */
   delete(id: string) {
     // Delete node.
     if (this.#kinds.delete(id)) {
@@ -306,7 +364,11 @@ export class Dflow {
     if (targetInput) targetInput.source = undefined;
   }
 
-  /** Create a new data node. Returns node id. */
+  /**
+   * Create a new data node. Returns node id.
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.data}
+   */
   data(value: unknown, wantedId?: string): string {
     const id = this.#newId(this.#kinds, "n", wantedId);
     this.#kinds.set(id, "data");
@@ -324,7 +386,11 @@ export class Dflow {
     return id;
   }
 
-  /** Create a new link and connect two nodes. Returns link id. */
+  /**
+   * Create a new link and connect two nodes. Returns link id.
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.link}
+   */
   link(
     source: string | [nodeId: string, position: number],
     target: string | [nodeId: string, position: number],
@@ -368,7 +434,11 @@ export class Dflow {
     throw error;
   }
 
-  /** Execute all nodes, sorted by their connections. */
+  /**
+   * Execute all nodes, sorted by their connections.
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.run}
+   */
   async run(): Promise<void> {
     // Reset errors.
     this.#errors.clear();
@@ -431,7 +501,11 @@ export class Dflow {
     }
   }
 
-  /** A graph contains nodes and links. */
+  /**
+   * A graph contains nodes and links.
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.graph}
+   */
   get graph(): DflowGraph {
     const node: DflowGraph["node"] = {};
     const data: DflowGraph["data"] = {};
@@ -447,12 +521,20 @@ export class Dflow {
     };
   }
 
-  /** Get error messages from last run, indexed by node id. */
+  /**
+   * Get error messages from last run, indexed by node id.
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.error}
+   */
   get error(): Record<string, string> {
     return Object.fromEntries(this.#errors.entries());
   }
 
-  /** Get output data of last run, indexed by node id. */
+  /**
+   * Get output data of last run, indexed by node id.
+   *
+   * @see {@link https://fibo.github.io/dflow/#dflow.out}
+   */
   get out(): Record<string, DflowArray> {
     const out: Record<string, DflowArray> = {};
     for (const nodeId of this.#kinds.keys()) {
@@ -466,40 +548,10 @@ export class Dflow {
   /**
    * Helper to define inputs.
    *
-   * @example Input with `number` type.
-   *
-   * ```ts
-   * Dflow.input("number")
-   * ```
-   *
-   * @example Optional `number` input.
-   *
-   * ```ts
-   * Dflow.input("number", { optional: true })
-   * ```
-   *
-   * @example Input that accepts both `number` and `string` type.
-   *
-   * ```ts
-   * Dflow.input(["number", "string"])
-   * ```
-   *
-   * @example Input with any type.
-   *
-   * ```ts
-   * Dflow.input()
-   * ```
-   *
    * @example Input with type `array` and name.
    *
    * ```ts
    * Dflow.input("array", { name: "list" })
-   * ```
-   *
-   * @example Input with any type and named "foo".
-   *
-   * ```ts
-   * Dflow.input([], { name: "foo" })
    * ```
    *
    * @see {@link https://fibo.github.io/dflow/#dflow.input} for more examples.
@@ -517,7 +569,7 @@ export class Dflow {
   /**
    * Helper to define outputs.
    *
-   * @example Named output with `number` type.
+   * @example Output with type `number` type and named "count".
    *
    * ```ts
    * Dflow.output("number", { name: "count" })

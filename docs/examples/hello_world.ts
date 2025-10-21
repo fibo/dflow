@@ -1,16 +1,16 @@
-// Sync with README.md example
-import { Dflow } from "dflow";
+import { Dflow, type DflowNode } from "dflow";
 
-const helloWorld = {
-  kind: "helloWorld",
-  run() {
-    console.log("Hello, World!");
-  }
+// Node definition.
+const helloWorld: DflowNode = {
+  kind: "hello",
+  run: () => console.log("Hello, World!")
 };
 
-// Create a Dflow instance.
+// Create a dflow instance.
 const dflow = new Dflow([helloWorld]);
-// Create a helloWorld node.
-dflow.node("helloWorld");
-// run graph
+
+// Add a node to the graph.
+dflow.node("hello");
+
+// Run the dflow graph.
 dflow.run();

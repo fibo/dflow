@@ -30,21 +30,38 @@
         <h2>Features</h2>
 
         <dl>
-          <dt>Expressive and simple API</dt>
-
-          <dt>It is easy to create nodes</dt>
-
           <dt>Written in TypeScript</dt>
           <dd>Whole implementation is in this <a href="https://github.com/fibo/dflow/blob/main/dflow.ts">dflow.ts</a> file. It is roughly 4kb once minified.</dd>
 
           <dt>Minimal type system</dt>
           <dd>It is possible to connect an output to an input only if the <a href="#dflowdatatype">data types</a> are matching.</dd>
-        </dl>
 
-        <p>Notice that you must implement your own nodes. For example a node <em>"addition"</em> could be implemented using <code>BigInt</code> or some <em>arbitrary-precision</em> library, according to your needs. You can find example nodes implementing basic JavaScript features in the <a href="https://github.com/fibo/dflow/tree/main/docs/examples/nodes">examples/nodes/ folder</a>.
-        </p>
+          <dt>It is easy to create nodes</dt>
+          <dd>See how to create a <a href="#dflownode"><code>DlowNode</code> here</a>.</dd>
+        </dl>
       </div>
     </header>
+
+<!-- START file:docs/examples/hello_world.ts -->
+<pre><code>
+import { Dflow, type DflowNode } from "dflow";
+
+// Node definition.
+const helloWorld: DflowNode = {
+  kind: "hello",
+  run: () => console.log("Hello, World!")
+};
+
+// Create a dflow instance.
+const dflow = new Dflow([helloWorld]);
+
+// Add a node to the graph.
+dflow.node("hello");
+
+// Run the dflow graph.
+dflow.run();
+</code></pre>
+<!-- END snippet -->
 
     <section>
       <h2>How it works</h2>
@@ -58,32 +75,40 @@
       </p>
 
       <p>
-      A <strong>graph</strong> represents a program.
-      It can contain <em>nodes</em> and <em>links</em>.
-      Nodes are executed, sorted by their connections.
-      </p>
-
-      <p>
       An <strong>input</strong> is just a reference to its connected output, if any.
       </p>
 
       <p>
-      An <strong>output</strong> can be connected to multiple inputs, and hold a **data** value that can be <code>undefined</code> or any value that can be serialized into JSON.
+      An <strong>output</strong> can be connected to multiple inputs, and holds a <strong>data</strong> value that can be <code>undefined</code> or any value that can be serialized into JSON.
       </p>
+
+      <p>
+      A <strong>graph</strong> represents a program.
+      It can contain <em>nodes</em> and <em>links</em>.
+      </p>
+
+      <dl>
+        <dt>Nodes are sorted by their connected links.</dt>
+        <dd>Nodes with no input links are executed first. Then, nodes connected to them are executed, and so on.</dd>
+
+        <dt>Nodes are executed only if input data is valid.</dt>
+        <dd>If a node has an input that is not connected or the data passed to it is <code>undefined</code> or it does not correspond to input data types, then the node will <strong>not</strong> be executed.</dd>
+      </dl>
     </section>
 
     <section>
       <h2>Usage</h2>
 
       <p>
-      You can run the following examples via npm scripts: see <a href="https://github.com/fibo/dflow/tree/main/docs/examples">examples folder</a> to follow instructions.
+      You can run the following examples via npm scripts. See the <a href="https://github.com/fibo/dflow/tree/main/docs/examples">examples folder</a> for detailed instructions.
       </p>
 
       <p>
-      This is a graph that will compute <code>sin(π / 2) = 1</code> and print the result.
+      This graph computes <code>sin(π / 2) = 1</code> and prints the result.
       </p>
 
-<!-- START file:docs/examples/usage.ts --> <pre><code>
+<!-- START file:docs/examples/usage.ts -->
+<pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
 const { input, output } = Dflow;
@@ -123,19 +148,20 @@ dflow.link(sinNodeId, consoleLogNodeId);
 
 // run graph
 dflow.run();
-
-</code></pre> <!-- END file:docs/examples/usage.ts -->
+</code></pre>
+<!-- END snippet -->
 
       <p>
-      You can also run async nodes.
+      You can also run async nodes. Notice the <code>SleepNode</code> below has an <code>async run()</code> method and the graph is executed with <code>await dflow.run()</code>.
       </p>
 
-<!-- START file:docs/examples/async_nodes.ts --> <pre><code>
-import { Dflow } from "dflow";
+<!-- START file:docs/examples/async_nodes.ts -->
+<pre><code>
+import { Dflow, type DflowNode } from "dflow";
 
 const { input, output } = Dflow;
 
-const SumNode = {
+const SumNode: DflowNode = {
   kind: "Sum",
   inputs: [input(["number"]), input(["number"])],
   outputs: [output(["number"])],
@@ -152,7 +178,7 @@ function sleep(timeout: number): Promise<void> {
   });
 }
 
-const SleepNode = {
+const SleepNode: DflowNode = {
   kind: "Sleep",
   async run() {
     const timeout = 500;
@@ -168,7 +194,7 @@ async function runGraph() {
   // Create two nodes, num and sum.
 
   const numNodeId = dflow.data(21);
-  const sumNodeId = dflow.node(SumNode.kind, "sum");
+  const sumNodeId = dflow.node(SumNode.kind);
 
   // Connect nodes.
   dflow.link(numNodeId, [sumNodeId, 0]);
@@ -180,19 +206,21 @@ async function runGraph() {
   // Run graph asynchronously.
   await dflow.run();
 
-  // The id "sum" was passed as `wantedId` on SumNode .
-  const result = dflow.out.sum[0];
-  if (result !== 42) console.error("Unexpected result", result);
+  // Get the result of the sum node.
+  const result = dflow.out[sumNodeId][0];
+  if (result !== 42) throw new Error("Unexpected result");
 }
 
-runGraph();
-
-</code></pre> <!-- END file:docs/examples/async_nodes.ts -->
+await runGraph();
+// sleep node start (will sleep 500 ms) zZz
+// sleep node end
+</code></pre>
+<!-- END snippet -->
 
     </section>
 
     <section>
-      <h2>API</h2>
+      <h2 id="api">API</h2>
 
       <p class="description">
       A <code>Dflow</code> represents a program as an executable graph.
@@ -205,28 +233,8 @@ runGraph();
       <h3 id="constructor">Constructor</h3>
 
       <p>
-      <code>Dflow</code> constructor requires a list of node definitions which is an <code>Array<<a href="#dflownode">DflowNode</a>></code>.
+      <code>Dflow</code> constructor requires a list of node definitions which is an <code>Array&lt;<a href="#dflownode">DflowNode</a>&gt;</code>.
       </p>
-
-<!-- START file:docs/examples/snippets/hello_world.ts --> <pre><code>
-import { Dflow, type DflowNode } from "dflow";
-
-// Node definition.
-const helloWorld: DflowNode = {
-  kind: "hello",
-  run: () => console.log("Hello, World!")
-};
-
-// Create a dflow instance.
-const dflow = new Dflow([helloWorld]);
-
-// Add a node to the graph.
-dflow.node("hello");
-
-// Run the dflow graph.
-dflow.run();
-
-</code></pre> <!-- END file:docs/examples/snippets/hello_world.ts -->
 
       <h3 id="methods">Methods</h3>
 
@@ -236,17 +244,25 @@ dflow.run();
       Create a new node. Returns node id.
       </p>
 
-      <h4>dflow.link(source, target)</h4>
+      <h4 id="dflow.link">dflow.link(source, target)</h4>
 
       <p class="description">
       Create a new link and connect two nodes. Returns link id.
       </p>
 
       <p>
-      If source or target position is omitted, then it defaults to <code>0</code> i.e. the <em>first position</em>.
+      The source and target arguments can be either:
       </p>
 
-      <h4>dflow.data(value)</h4>
+      <dl>
+        <dt>An array <code>[nodeId, position]</code></dt>
+        <dd>The source node id and the output position <em>or</em> the target node id and the input position</dd>
+
+        <dt>A <code>string</code></dt>
+        <dd>The source or target node id. The position defaults then to <code>0</code> i.e. the <em>first one</em></dd>
+      </dl>
+
+      <h4 id="dflow.data">dflow.data(value)</h4>
 
       <p class="description">
       Create a new data node. Returns node id.
@@ -256,48 +272,61 @@ dflow.run();
       If value is not a valid <code>DflowData</code>, it will be set to <code>undefined</code>.
       </p>
 
-      <h4>dflow.run()</h4>
+      <h4 id="dflow.run">dflow.run()</h4>
 
       <p class="description">
       Execute all nodes, sorted by their connections.
       </p>
 
-      <h4>dflow.delete(itemId)</h4>
+      <p>
+      Notice that the <code>run</code> method is <strong>async</strong> and returns a <code>Promise&lt;void&gt;</code>. In general you should call it with <code>await dflow.run()</code> but if no node in the graph is async, then you can just call it with <code>dflow.run()</code>.
+      </p>
+
+      <h4 id="dflow.delete">dflow.delete(itemId)</h4>
 
       <p class="description">
       Delete node or link with given id.
       </p>
 
+      <p>
+      The <code>itemId</code> argument can be either a node id or a link id.
+      If it is a node id, then all links connected to that node will be deleted as well as the outputs related to that node.
+      </p>
+
       <h3>Getters</h3>
 
-      <h4>dflow.graph</h4>
+      <h4 id="dflow.graph">dflow.graph</h4>
 
       <p class="description">
       A graph contains nodes and links.
       </p>
 
       <p>
-      A <code>DflowGraph</code> has the following attributes:
+      A <code>DflowGraph</code> can be serialized into JSON so it can be saved and loaded by a <code>Dflow</code> instance.
+      </p>
+
+      <p>
+      It has the following attributes:
       </p>
 
       <dl>
-        <dt><code>node: Record<span>&lt;<span>string, string<span>&gt;</span></code></dt>
+        <dt><code>node: Record<span></span>&lt;<span>string, string<span>&gt;</span></code></dt>
         <dd>Key is node <em>id</em>, value is node <em>kind</em></dd>
 
-        <dt><code>link: Record<span>&lt;</span>string, <a href="#dflowlink">DflowLink</a><span>&gt;</span></code></dt>
+        <dt><code>link: Record<span></span>&lt;</span>string, <a href="#dflowlink">DflowLink</a><span>&gt;</span></code></dt>
         <dd>Key is link <em>id</em></dd>
 
-        <dt><code>data: Record<span>&lt;</span>string, <a href="#dflowdata">DflowData</a><span>&gt;</span></code></dt>
+        <dt><code>data: Record<span></span>&lt;</span>string, <a href="#dflowdata">DflowData</a><span>&gt;</span></code></dt>
         <dd>Data nodes: key is node <em>id</em>, value is node <em>kind</em></dd>
       </dl>
 
-      <h4>dflow.error</h4>
+      <h4 id="dflow.error">dflow.error</h4>
 
       <p class="description">
       Get error messages from last run, indexed by node id.
       </p>
 
-      <h4>dflow.out</h4>
+      <h4 id="dflow.out">dflow.out</h4>
 
       <p class="description">
       Get output data of last run, indexed by node id.
@@ -305,30 +334,101 @@ dflow.run();
 
       <h3 id="static-methods">Static methods</h3>
 
-      <h4 id="dflow.input">Dflow.input()</h4>
+      <h4 id="dflow.input">Dflow.input(typing, options?)</h4>
 
       <p class="description">
       Helper to define inputs.
       </p>
 
-      <h4 id="dflow.output">Dflow.output()</h4>
+      <p>
+      It is supposed to be used inside a node definition.
+      For example, define an input string named <code>message</code>.
+      </p>
+
+<!-- START file:docs/examples/snippets/print.ts -->
+<pre><code>
+const Print: DflowNode = {
+  kind: "print",
+  inputs: [Dflow.input("string", { name: "message" })],
+  run: (message: string) => {
+    console.log(message);
+  }
+};
+</code></pre>
+<!-- END snippet -->
+
+      <p>
+      Input with <code>number</code> type.
+      </p>
+
+      <pre><code>
+Dflow.input("number")
+      </code></pre>
+
+      <p>
+      Input that accepts both <code>number</code> and <code>string</code> type.
+      </p>
+
+      <pre><code>
+Dflow.input(["number", "string"])
+      </code></pre>
+
+      <p>
+      Input with type <code>array</code> and name.
+      </p>
+
+      <pre><code>
+Dflow.input("array", { name: "list" })
+      </code></pre>
+
+      <p>
+       Input that accepts any type.
+      </p>
+
+      <pre><code>
+Dflow.input()
+      </code></pre>
+
+      <p>
+      Input with any type and named "foo".
+      </p>
+
+      <pre><code>
+Dflow.input([], { name: "foo" })
+      </code></pre>
+
+      <p>
+      Optional <code>number</code> input.
+      </p>
+
+      <pre><code>
+Dflow.input("number", { optional: true })
+      </code></pre>
+
+      <h4 id="dflow.output">Dflow.output(typing, options?)</h4>
 
       <p class="description">
       Helper to define outputs.
       </p>
 
       <p>
-      Define an output named <code>π</code> (PI) for a constant node
+      The signature is similar to <a href="#dflow.input"><code>Dflow.input()</code></a> except for the <code>optional</code> parameter, which is not needed for outputs.
       </p>
 
-<!-- ./examples/nodes/math.ts -->
-      <pre><code>
+      <p>
+      It is supposed to be used inside a node definition.
+      For example, define a number output named <code>π</code> (PI).
+      </p>
+
+<!-- START file:docs/examples/snippets/mathPI.ts -->
+<pre><code>
 const MathPI: DflowNode = {
   kind: "mathPI",
   outputs: [Dflow.output("number", { name: "π" })],
   run: () => Math.PI
-}
-      </code></pre>
+};
+</code></pre>
+<!-- END snippet -->
 
       <h3 id="types">Types</h3>
 
@@ -352,7 +452,14 @@ const MathPI: DflowNode = {
         <li><code>DflowObject</code></li>
       </ul>
 
+      <p>
+      Where <code>DflowArray</code> is just an array of <code>DflowData</code> and <code>DflowObject</code> is an object with string keys and <code>DflowData</code> values.
+      </p>
+
       <h4 id="dflowdatatype">DflowDataType</h4>
+      <p>
+      Dflow data types represent values that can be serialized as JSON.
+      </p>
 
       <p>
       The <code>DflowDataType</code> is a <em>literal type</em>; it can be one of the following:
@@ -377,6 +484,14 @@ const MathPI: DflowNode = {
 
       <h4 id="dflowinput">DflowInput</h4>
 
+      <p class="description">
+      Defines a node input.
+      </p>
+
+      <p>
+      You can use <a href="#dflow.input"><code>Dflow.input()</code></a> helper to create them.
+      </p>
+
       <p>
       A <code>DflowInput</code> has the following attributes:
       </p>
@@ -389,10 +504,18 @@ const MathPI: DflowNode = {
         <dd>An input can be connected to an output only if the data types match.</dd>
 
         <dt><code>optional?: boolean</code></dt>
-        <dd>Any input is <strong>required</strong> by default, i.e. not optional. If an input is not optional and it has no data, then its node will not be executed. If an input is optional, then its node will be executed even if the input has no data.</dd>
+        <dd>An input is <strong>required</strong> by default. If it is not connected or the data passed is not valid according to its types, then its node will not be executed. If an input is <strong>optional</strong> the data checks are skipped.</dd>
       </dl>
 
       <h4 id="dflowoutput">DflowOutput</h4>
+
+      <p class="description">
+      Defines a node output.
+      </p>
+
+      <p>
+      You can use <a href="#dflow.output"><code>Dflow.output()</code></a> helper to create them.
+      </p>
 
       <p>
       A <code>DflowOutput</code> has the following attributes:
@@ -412,10 +535,40 @@ const MathPI: DflowNode = {
       Connects two nodes in the graph.
       </p>
 
+      <p>
+      A <code>DflowLink</code> is a list with four elements:
+      </p>
+
+      <dl>
+        <dt><code>sourceNodeId: string</code></dt>
+        <dd>The id of output node</dd>
+
+        <dt><code>sourcePosition: number</code></dt>
+        <dd>it defaults to <code>0</code> if not provided in <code>dflow.link()</code></dd>
+
+        <dt><code>targetNodeId: string</code></dt>
+        <dd>The id of input node</dd>
+
+        <dt><code>targetPosition: number</code></dt>
+        <dd>it defaults to <code>0</code> if not provided in <code>dflow.link()</code></dd>
+      </dl>
+
       <h4 id="dflownode">DflowNode</h4>
 
       <p class="description">
       Defines a block of code: it can have inputs and outputs.
+      </p>
+
+      <p>
+      Dflow does not provide a set of pre-defined nodes. You must implement your own nodes.
+      </p>
+
+      <p>
+      For example, a node <em>"addition"</em> could be implemented using <code>BigInt</code> or some <em>arbitrary-precision</em> library, according to your needs... but it is as easy as creating a function. Basically, a node is an object with a <code>run</code> method and a few metadata properties.
+      </p>
+
+      <p>
+      See the <a href="https://github.com/fibo/dflow/tree/main/docs/examples/nodes">examples/nodes folder</a>: it contains few node definitions used by dflow tests.
       </p>
 
       <p>
@@ -437,21 +590,198 @@ const MathPI: DflowNode = {
       </dl>
 
       <p>
-      Define a "sum" node.
+      When you define a set of nodes, you may want to start the file with something like this:
       </p>
 
-      <pre><code>
+<pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
-const Sum: DflowNode = {
-  kind: "sum",
-  inputs: [Dflow.input("number"), Dflow.input("number")];
-  outputs: [Dflow.output("number")];
-  run(a: number, b: number) {
-    return a + b;
+const { input, output } = Dflow;
+</code></pre>
+
+      <p>
+      So you have the <code>DflowNode</code> type that can help you define nodes and the <code>input</code> and <code>output</code> helpers to define inputs and outputs.
+      </p>
+
+      <p>
+      This is a node that implements <code>Array.prototype.join()</code> so its first input is an array and it has an optional second input for the separator, which defaults to a comma.
+      </p>
+
+<!-- START file:docs/examples/nodes/array.ts -->
+<pre><code>
+const ArrayJoin: DflowNode = {
+  kind: "arrayJoin",
+  inputs: [
+    input("array"),
+    input("string", { name: "separator", optional: true })
+  ],
+  outputs: [output("string")],
+  run(array: DflowArray, separator: string | undefined) {
+    return array.join(separator);
+  }
+};
+</code></pre>
+<!-- END snippet -->
+
+      <p>
+      First of all, the <code>name</code> attribute of inputs and outputs is optional and ignored by Dflow.
+      It could be used by a UI to show meaningful names. So there is no need to match the input names with the <code>run</code> method arguments.
+      </p>
+
+      <p>
+      Notice that the <code>run</code> method arguments are typed according to the inputs definition.
+      You can import <code>DflowArray</code> type from <code>dflow</code> package to type the first argument.
+      The second argument is either a string or undefined, because the input is marked as an optional string.
+      </p>
+
+      <p>
+      It is recommended to just use the types defined by <code><a href="#dflowdata">DflowData</a></code>.
+      This is the thing: the node above will run only if the first input is connected to an output that produces an array and the second input is either not connected or connected to an output that produces a string.
+      </p>
+
+      <p>
+      It is also recommended to not type the return value, just let TypeScript infer it.
+      </p>
+
+      <p>
+      Here is an example of nodes generated from the <code>Math</code> global.
+      </p>
+
+<!-- START file:docs/examples/dynamic_math_nodes.ts -->
+<pre><code>
+import { Dflow } from "dflow";
+
+// Generate Dflow nodes for all Math properties and functions.
+
+const mathNodes = Object.getOwnPropertyNames(Math).map((key) => {
+  // @ts-expect-error: expression of type 'string' can't be used to index type 'Math'
+  const item = Math[key];
+
+  const kind = `Math.${key}`;
+  const outputs = [Dflow.output("number")];
+
+  // If the item is a number, create a node that outputs that number.
+  if (typeof item === "number") {
+    return {
+      kind,
+      outputs,
+      run: () => item
+    };
+  }
+
+  // If the item is a function, wrap in in the run method.
+  if (typeof item === "function") {
+    return {
+      kind,
+      // Get the number of inputs from the function's length property.
+      inputs: Array(item.length).fill(Dflow.input("number")),
+      outputs,
+      run: (...args: number[]) => {
+        return item(...args);
+      }
+    };
+  }
+  // Not needed, just to make TS happy.
+  throw new Error(`Unsupported Math property: ${key}`);
+});
+
+// Create a Dflow instance with the generated node definitions.
+const dflow = new Dflow(mathNodes);
+
+// Compute Math.trunc(Math.E)
+const nodeId1 = dflow.node("Math.E");
+const nodeId2 = dflow.node("Math.trunc");
+dflow.link(nodeId1, nodeId2);
+
+dflow.run();
+
+console.log(dflow.out);
+// { n0: [ 2.718281828459045 ], n1: [ 2 ] }
+</code></pre>
+<!-- END snippet -->
+
+      <h3>Miscellanea</h3>
+
+      <h4 id="dflow.context">dflow.context</h4>
+
+      <p class="description">
+        Dflow context is bound to every node at runtime, hence it is accessible via <code>this</code> inside node <code>run</code>.
+      </p>
+
+<!-- START file:docs/examples/context.ts -->
+<pre><code>
+// Create a host with an API context.
+import { Dflow, type DflowNode } from "dflow";
+
+// Add an API client to the context.
+// A Dflow context is a Record<string, unknown> that will be bound to nodes at runtime.
+
+type Context = {
+  apiClient: ApiClient;
+};
+
+// Of course this is a dummy API client.
+class ApiClient {
+  apiKey: string;
+
+  constructor(apiKey: ApiClient["apiKey"]) {
+    this.apiKey = apiKey;
+  }
+
+  async fetchSomeData(
+    payload: string
+  ): Promise<{ status: string; payload: string }> {
+    return await Promise.resolve({ status: "SUCCESS", payload });
   }
 }
-      </code></pre>
+
+// This nodes uses the apiClient from the context...
+const CustomNode: DflowNode = {
+  kind: "Custom",
+  inputs: [Dflow.input("string")],
+  outputs: [Dflow.output("object")],
+  // ... notice that we specify the type of `this` via the
+  //
+  //     this: Context
+  //
+  // argument on the run method.
+  async run(this: Context, data: string) {
+    const result = await this.apiClient.fetchSomeData(data);
+    return result;
+  }
+};
+
+// Create a Dflow instance and add the context.
+const dflow = new Dflow([CustomNode]);
+dflow.context.apiClient = new ApiClient("s3cret");
+
+const nodeId = dflow.node(CustomNode.kind);
+const dataId = dflow.data("foo");
+dflow.link(dataId, nodeId);
+
+await dflow.run();
+
+const result = dflow.out[nodeId][0] as { status: string; payload: string };
+
+if (!result || result.status !== "SUCCESS" || result.payload !== "foo")
+  console.error("Unexpected result:", result);
+else console.info(result.status);
+</code></pre>
+<!-- END snippet -->
+
+      <h4 id="dflow.err">dflow.ERR</h4>
+
+      <p class="description">
+      Optional error logger.
+      </p>
+
+      <p>
+      By default, Dflow does not log errors. For example to send errors to <code>STDERR</code>, you can do:
+      </p>
+
+<pre><code>
+dflow.ERR = console.error;
+</code></pre>
     </section>
 
     <footer>

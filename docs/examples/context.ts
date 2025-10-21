@@ -1,6 +1,14 @@
 // Create a host with an API context.
 import { Dflow, type DflowNode } from "dflow";
 
+// Add an API client to the context.
+// A Dflow context is a Record<string, unknown> that will be bound to nodes at runtime.
+
+type Context = {
+  apiClient: ApiClient;
+};
+
+// Of course this is a dummy API client.
 class ApiClient {
   apiKey: string;
 
@@ -15,33 +23,34 @@ class ApiClient {
   }
 }
 
-type Context = {
-  apiClient: ApiClient;
-};
-
+// This nodes uses the apiClient from the context...
 const CustomNode: DflowNode = {
   kind: "Custom",
+  inputs: [Dflow.input("string")],
   outputs: [Dflow.output("object")],
-  async run() {
-    const apiClient = (this as unknown as Context).apiClient;
-    const result = await apiClient.fetchSomeData("foo");
+  // ... notice that we specify the type of `this` via the
+  //
+  //     this: Context
+  //
+  // argument on the run method.
+  async run(this: Context, data: string) {
+    const result = await this.apiClient.fetchSomeData(data);
     return result;
   }
 };
 
-async function contextExample() {
-  const dflow = new Dflow([CustomNode]);
+// Create a Dflow instance and add the context.
+const dflow = new Dflow([CustomNode]);
+dflow.context.apiClient = new ApiClient("s3cret");
 
-  dflow.context.apiClient = new ApiClient("s3cret");
+const nodeId = dflow.node(CustomNode.kind);
+const dataId = dflow.data("foo");
+dflow.link(dataId, nodeId);
 
-  const nodeId = dflow.node(CustomNode.kind);
+await dflow.run();
 
-  await dflow.run();
+const result = dflow.out[nodeId][0] as { status: string; payload: string };
 
-  const result = dflow.out[nodeId][0] as { status: string; payload: string };
-  if (!result || result.status !== "SUCCESS" || result.payload !== "foo")
-    console.error("Unexpected result:", result);
-  else console.info(result.status);
-}
-
-contextExample();
+if (!result || result.status !== "SUCCESS" || result.payload !== "foo")
+  console.error("Unexpected result:", result);
+else console.info(result.status);

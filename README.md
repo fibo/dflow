@@ -16,6 +16,8 @@ npm install dflow
 
 Try this in your HTML page
 
+<!-- START file:tests/importmap_dflow_unpkg_cdn.html -->
+
 ```html
 <script type="importmap">
   { "imports": { "dflow": "https://unpkg.com/dflow" } }
@@ -42,11 +44,17 @@ Try this in your HTML page
 </script>
 ```
 
+<!-- END snippet -->
+
 ## Usage
 
 See:
 
 - [Documentation](https://fibo.github.io/dflow)
 - [Examples](https://github.com/fibo/dflow/tree/main/docs/examples)
+
+## License
+
+[MIT](http://fibo.github.io/mit-license)
 
 [dataflow-wikipedia]: http://en.wikipedia.org/wiki/Dataflow_programming "Dataflow programming"

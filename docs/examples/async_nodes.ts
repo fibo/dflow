@@ -1,8 +1,8 @@
-import { Dflow } from "dflow";
+import { Dflow, type DflowNode } from "dflow";
 
 const { input, output } = Dflow;
 
-const SumNode = {
+const SumNode: DflowNode = {
   kind: "Sum",
   inputs: [input(["number"]), input(["number"])],
   outputs: [output(["number"])],
@@ -19,7 +19,7 @@ function sleep(timeout: number): Promise<void> {
   });
 }
 
-const SleepNode = {
+const SleepNode: DflowNode = {
   kind: "Sleep",
   async run() {
     const timeout = 500;
@@ -35,7 +35,7 @@ async function runGraph() {
   // Create two nodes, num and sum.
 
   const numNodeId = dflow.data(21);
-  const sumNodeId = dflow.node(SumNode.kind, "sum");
+  const sumNodeId = dflow.node(SumNode.kind);
 
   // Connect nodes.
   dflow.link(numNodeId, [sumNodeId, 0]);
@@ -47,9 +47,11 @@ async function runGraph() {
   // Run graph asynchronously.
   await dflow.run();
 
-  // The id "sum" was passed as `wantedId` on SumNode .
-  const result = dflow.out.sum[0];
-  if (result !== 42) console.error("Unexpected result", result);
+  // Get the result of the sum node.
+  const result = dflow.out[sumNodeId][0];
+  if (result !== 42) throw new Error("Unexpected result");
 }
 
-runGraph();
+await runGraph();
+// sleep node start (will sleep 500 ms) zZz
+// sleep node end

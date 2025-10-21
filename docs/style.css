@@ -55,12 +55,17 @@ body {
 }
 
 a, a:visited, a:link, a:active, a:hover, a:focus {
-  text-decoration: underline;
   color: var(--link);
   outline-color: var(--link);
-  transition: all 0.2s ease-in-out;
+  font-weight: 500;
 }
-a:active, a:hover, a:focus {
+a, a:visited, a:link {
+  text-decoration: none;
+}
+a:active, a:hover {
+  text-decoration: underline;
+}
+a:focus {
   text-decoration: none;
 }
 
@@ -85,10 +90,9 @@ p {
 }
 
 .description {
-  font-family: var(--font-family-mono);
   padding-left: 1rem;
   margin-bottom: 1.68rem;
-  font-weight: 50;
+  font-weight: 400;
 }
 @media (max-width: 678px) { .description { padding-left: 0.68rem; }}
 

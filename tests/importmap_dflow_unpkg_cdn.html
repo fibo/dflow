@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dflow on unpkg CDN</title>
+    <link rel="icon" href="data:image/x-icon;base64,AA" />
+  </head>
+  <body>
+    <!-- START snippet -->
+<script type="importmap">
+  { "imports": { "dflow": "https://unpkg.com/dflow" } }
+</script>
+
+<script type="module">
+  import { Dflow } from "dflow";
+
+  const helloWorld = {
+    kind: "helloWorld",
+    run() {
+      console.log("Hello, World!");
+    }
+  };
+
+  // Create a Dflow instance passing the node defined above.
+  const dflow = new Dflow([helloWorld]);
+
+  // Create a helloWorld node.
+  dflow.node("helloWorld");
+
+  // run graph
+  dflow.run();
+</script>
+    <!-- END snippet -->
+  </body>
+</html>
