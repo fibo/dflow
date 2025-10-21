@@ -83,8 +83,7 @@
       This is a graph that will compute <code>sin(π / 2) = 1</code> and print the result.
       </p>
 
-<!-- START file:docs/examples/usage.ts -->
-      <pre><code>
+<!-- START file:docs/examples/usage.ts --> <pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
 const { input, output } = Dflow;
@@ -124,15 +123,14 @@ dflow.link(sinNodeId, consoleLogNodeId);
 
 // run graph
 dflow.run();
-      </code></pre>
-<!-- END file:docs/examples/usage.ts -->
+
+</code></pre> <!-- END file:docs/examples/usage.ts -->
 
       <p>
       You can also run async nodes.
       </p>
 
-<!-- START file:docs/examples/async_nodes.ts -->
-      <pre><code>
+<!-- START file:docs/examples/async_nodes.ts --> <pre><code>
 import { Dflow } from "dflow";
 
 const { input, output } = Dflow;
@@ -188,8 +186,8 @@ async function runGraph() {
 }
 
 runGraph();
-      </code></pre>
-<!-- END file:docs/examples/async_nodes.ts -->
+
+</code></pre> <!-- END file:docs/examples/async_nodes.ts -->
 
     </section>
 
@@ -210,26 +208,25 @@ runGraph();
       <code>Dflow</code> constructor requires a list of node definitions which is an <code>Array<<a href="#dflownode">DflowNode</a>></code>.
       </p>
 
-<!-- START file:docs/examples/snippets/helloWorld.ts -->
-      <pre><code>
+<!-- START file:docs/examples/snippets/hello_world.ts --> <pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
 // Node definition.
 const helloWorld: DflowNode = {
   kind: "hello",
   run: () => console.log("Hello, World!")
-}
+};
 
 // Create a dflow instance.
 const dflow = new Dflow([helloWorld]);
 
 // Add a node to the graph.
-dflow.node("hello")
+dflow.node("hello");
 
 // Run the dflow graph.
-dflow.run()
-      </code></pre>
-<!-- END file:docs/examples/snippets/helloWorld.ts -->
+dflow.run();
+
+</code></pre> <!-- END file:docs/examples/snippets/hello_world.ts -->
 
       <h3 id="methods">Methods</h3>
 

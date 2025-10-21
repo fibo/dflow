@@ -1,11 +1,7 @@
 # dflow examples
 
-First you need dflow.js bundle in the package root folder. You can build it with something like:
-
-```sh
-npm install esbuild --no-save
-npm run esbuild
-```
+First you need to build the project. It requires just two `npm` commands,
+see [how to build](../../.github/CONTRIBUTING.md#build) for instructions.
 
 Then you can run examples via an npm script:
 

@@ -12,7 +12,7 @@
     "url": "https://fibo.github.io"
   },
   "scripts": {
-    "build": "npm run emitDeclarations && npm run esbuild",
+    "build": "npm run emitDeclarations && npm run esbuild && npm run inject_doc_snippets",
     "check_types": "tsc",
     "emitDeclarations": "tsc --project tsconfig.build.json",
     "esbuild": "esbuild dflow.ts --minify --outfile=dflow.js",
@@ -20,6 +20,7 @@
     "example:context": "node docs/examples/context.ts",
     "example:hello_world": "node docs/examples/snippets/hello_world.ts",
     "example:usage": "node docs/examples/usage.ts",
+    "inject_doc_snippets": "node docs/examples/inject_doc_snippets.ts",
     "install_precommit_hook": "echo '#!/bin/sh\nnpm test && npm run prettier--check && npm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
     "prettier": "prettier --write .",
     "prettier--check": "prettier --check .",

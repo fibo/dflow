@@ -8,32 +8,24 @@ With [npm](https://www.npmjs.com/) install the following packages **without savi
 npm install esbuild prettier typescript @types/node --no-save
 ```
 
-## Contributing
+## Build
+
+To build everything, once done with requirements above, just run:
+
+```sh
+npm run build
+```
+
+It will:
+
+- generate dflow.js which is a minified bundle
+- emit TypeScript declarations in dflow.d.ts
+- inject snippets in documentation files
+
+## Commit hook
 
 If you want to push code to GitHub repo, please install the commit hook
 
 ```sh
 npm run install_precommit_hook
 ```
-
-See also _example_ scripts listed [here](./examples/README.md).
-
-## Running tests
-
-Just launch `npm test`.
-
-To run a TypeScript file you can do something like this:
-
-```sh
-node --env-file .typescript.env ./examples/doc-snippets/helloWorld.ts
-```
-
-## Build
-
-To build everything, once done with [Requirements](#requirements) just run:
-
-```sh
-npm run build
-```
-
-It will generate dflow.js which is a minified bundle and dflow.d.ts (TypeScript definitions) in the package root folder.
