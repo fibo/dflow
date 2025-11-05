@@ -200,7 +200,7 @@ export class Dflow {
    *
    * @see {@link https://fibo.github.io/dflow/#dflow.err}
    */
-  ERR?: (...data: any[]) => void;
+  ERR?: (arg: any) => void;
 
   /**
    * Dflow constructor requires a list of node definitions which is an `Array<DflowNode>`.
@@ -482,8 +482,10 @@ export class Dflow {
       } catch (err) {
         this.ERR?.(err);
         // Store error message and clear node outputs.
-        const message = err instanceof Error ? err.message : String(err);
-        this.#errors.set(nodeId, message);
+        this.#errors.set(
+          nodeId,
+          err instanceof Error ? err.message : String(err)
+        );
         nodeOutputs.forEach((output) => output.clear());
         continue;
       }

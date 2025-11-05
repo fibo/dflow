@@ -61,7 +61,7 @@ const SleepNode: DflowNode = {
 };
 
 const ErrorNode: DflowNode = {
-  kind: "Opsss",
+  kind: "Error",
   inputs: [input("boolean", { name: "shouldThrow" })],
   run(shouldThrow: boolean) {
     if (shouldThrow) throw new Error("Opsss");
@@ -305,7 +305,7 @@ test("dflow.run()", async () => {
 
 test("dflow.run() with error", () => {
   const dflow = new Dflow(nodeDefinitions1);
-  const nodeId1 = dflow.node("Opsss");
+  const nodeId1 = dflow.node("Error");
   // First run, it will not throw.
   dflow.run();
   assert.equal(dflow.error[nodeId1], undefined);

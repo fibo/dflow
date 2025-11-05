@@ -782,6 +782,10 @@ else console.info(result.status);
 <pre><code>
 dflow.ERR = console.error;
 </code></pre>
+
+      <p>
+      The logger must be a function that accepts a <strong>single</strong> argument of <code>any</code> type. Usually it will be an <code>Error</code> object but it could be anything that can be thrown by a node, for example a <code>string</code>.
+      </p>
     </section>
 
     <footer>
