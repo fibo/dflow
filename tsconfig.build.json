@@ -3,6 +3,8 @@
     "allowImportingTsExtensions": false,
     "declaration": true,
     "emitDeclarationOnly": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "noEmit": false,
     "outDir": ".",
     "removeComments": false

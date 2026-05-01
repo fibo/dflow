@@ -5,13 +5,14 @@
     "checkJs": true,
     "erasableSyntaxOnly": true,
     "lib": ["dom", "es2023"],
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
     "target": "es2023",
+    "types": ["node"],
     "useUnknownInCatchVariables": true,
     "paths": {
       "dflow": ["./dflow.ts"]
