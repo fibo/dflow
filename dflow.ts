@@ -295,7 +295,13 @@ export class Dflow {
    */
   node(kind: string, wantedId?: string): string {
     const nodeDef = this.#nodeDefinitions.get(kind);
-    if (!nodeDef) throw new Error("Cannot create node", { cause: { kind } });
+    if (!nodeDef) {
+      const error = new Error("Cannot create node", {
+        cause: `Unknown kind ${kind}`
+      });
+      this.ERR?.(error);
+      throw error;
+    }
 
     const id = this.#newId(this.#kinds, "n", wantedId);
 
@@ -428,7 +434,7 @@ export class Dflow {
     }
 
     const error = new Error("Cannot create link", {
-      cause: { source, target }
+      cause: `Source ${source} can't connect to target ${target}`
     });
     this.ERR?.(error);
     throw error;
