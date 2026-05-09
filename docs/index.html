@@ -255,11 +255,11 @@ await runGraph();
       </p>
 
       <dl>
-        <dt>An array <code>[nodeId, position]</code></dt>
-        <dd>The source node id and the output position <em>or</em> the target node id and the input position</dd>
+        <dt>An array <code>[nodeId, index]</code></dt>
+        <dd>The source node id and the output index <b>or</b> the target node id and the input index</dd>
 
         <dt>A <code>string</code></dt>
-        <dd>The source or target node id. The position defaults then to <code>0</code> i.e. the <em>first one</em></dd>
+        <dd>The source or target node id. The index defaults to <code>0</code> i.e. the <em>first one</em></dd>
       </dl>
 
       <h4 id="dflow.data">dflow.data(value)</h4>
@@ -543,13 +543,13 @@ const MathPI: DflowNode = {
         <dt><code>sourceNodeId: string</code></dt>
         <dd>The id of output node</dd>
 
-        <dt><code>sourcePosition: number</code></dt>
+        <dt><code>sourceOutputIndex: number</code></dt>
         <dd>it defaults to <code>0</code> if not provided in <code>dflow.link()</code></dd>
 
         <dt><code>targetNodeId: string</code></dt>
         <dd>The id of input node</dd>
 
-        <dt><code>targetPosition: number</code></dt>
+        <dt><code>targetInputIndex: number</code></dt>
         <dd>it defaults to <code>0</code> if not provided in <code>dflow.link()</code></dd>
       </dl>
 

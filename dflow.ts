@@ -44,9 +44,9 @@ export type DflowDataType =
  */
 export type DflowLink = [
   sourceNodeId: string,
-  sourcePosition: number,
+  sourceOutputIndex: number,
   targetNodeId: string,
-  targetPosition: number
+  targetInputIndex: number
 ];
 
 /**
@@ -265,19 +265,19 @@ export class Dflow {
   /** Check that source types are compatible with target types. */
   canConnect([
     sourceNodeId,
-    sourcePosition,
+    sourceOutputIndex,
     targetNodeId,
-    targetPosition
+    targetInputIndex
   ]: DflowLink): boolean {
     const sourceNodeKind = this.#kinds.get(sourceNodeId);
     const targetNodeKind = this.#kinds.get(targetNodeId);
     if (!sourceNodeKind || !targetNodeKind) return false;
     // Input types are stored in node definitions.
     const targetNodeDef = this.#nodeDefinitions.get(targetNodeKind);
-    const targetTypes = targetNodeDef?.inputs?.[targetPosition].types;
+    const targetTypes = targetNodeDef?.inputs?.[targetInputIndex].types;
     if (!targetTypes) return false;
     // Output types are stored in output items.
-    const sourceOutput = this.#outputs.get(sourceNodeId)?.[sourcePosition];
+    const sourceOutput = this.#outputs.get(sourceNodeId)?.[sourceOutputIndex];
     if (!sourceOutput) return false;
     // If source can have any type or target can have any type,
     // then source and target are compatible.
@@ -398,34 +398,34 @@ export class Dflow {
    * @see {@link https://fibo.github.io/dflow/#dflow.link}
    */
   link(
-    source: string | [nodeId: string, position: number],
-    target: string | [nodeId: string, position: number],
+    source: string | [nodeId: string, index: number],
+    target: string | [nodeId: string, index: number],
     wantedId?: string
   ): string {
     const id = this.#newId(this.#links, "l", wantedId);
 
     const sourceNodeId = typeof source == "string" ? source : source[0];
-    const sourcePosition = typeof source == "string" ? 0 : source[1];
+    const sourceOutputIndex = typeof source == "string" ? 0 : source[1];
     const targetNodeId = typeof target == "string" ? target : target[0];
-    const targetPosition = typeof target == "string" ? 0 : target[1];
+    const targetInputIndex = typeof target == "string" ? 0 : target[1];
 
     if (
       this.canConnect([
         sourceNodeId,
-        sourcePosition,
+        sourceOutputIndex,
         targetNodeId,
-        targetPosition
+        targetInputIndex
       ])
     ) {
-      const sourceOutput = this.#outputs.get(sourceNodeId)?.[sourcePosition];
-      const targetInput = this.#inputs.get(targetNodeId)?.[targetPosition];
+      const sourceOutput = this.#outputs.get(sourceNodeId)?.[sourceOutputIndex];
+      const targetInput = this.#inputs.get(targetNodeId)?.[targetInputIndex];
       if (sourceOutput && targetInput) {
         // Create link.
         this.#links.set(id, [
           sourceNodeId,
-          sourcePosition,
+          sourceOutputIndex,
           targetNodeId,
-          targetPosition
+          targetInputIndex
         ]);
         // Connect target input to source output.
         targetInput.source = sourceOutput;
@@ -504,8 +504,8 @@ export class Dflow {
       // Copy result into node .
       if (numOutputs == 1) nodeOutputs[0].data = result;
       if (numOutputs > 1)
-        for (let position = 0; position < numOutputs; position++)
-          nodeOutputs[position].data = (result as DflowArray)[position];
+        for (let index = 0; index < numOutputs; index++)
+          nodeOutputs[index].data = (result as DflowArray)[index];
     }
   }
 
