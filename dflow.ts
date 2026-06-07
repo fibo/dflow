@@ -34,6 +34,46 @@ export type DflowDataType =
   | "array"
   | "object";
 
+const isUndefined = (arg: unknown) => arg === undefined;
+
+const isNull = (arg: unknown): arg is null => arg === null;
+
+const isBoolean = (arg: unknown): arg is boolean => typeof arg === "boolean";
+
+const isString = (arg: unknown): arg is string => typeof arg === "string";
+
+const isNumber = (arg: unknown): arg is number =>
+  typeof arg == "number" && !isNaN(arg) && Number.isFinite(arg);
+
+const isArray = (arg: unknown): arg is DflowArray =>
+  Array.isArray(arg) && arg.every(isData);
+
+const isObject = (arg: unknown): arg is DflowObject =>
+  typeof arg == "object" &&
+  !isNull(arg) &&
+  !Array.isArray(arg) &&
+  Object.values(arg).every(isData);
+
+const validators: Record<DflowDataType, (data: unknown) => data is DflowData> =
+  {
+    null: isNull,
+    boolean: isBoolean,
+    string: isString,
+    number: isNumber,
+    object: isObject,
+    array: isArray
+  };
+
+const isData = (arg: unknown): arg is Exclude<DflowData, undefined> => {
+  if (isUndefined(arg)) return false;
+  return Object.values(validators).some((isValid) => isValid(arg));
+};
+
+const isValidData = (types: DflowDataType[], data: unknown) => {
+  if (!types.length) return isUndefined(data) || isData(data);
+  return types.some((dataType) => validators[dataType]?.(data));
+};
+
 // Inputs, outputs, links and nodes.
 // ////////////////////////////////////////////////////////////////////
 
@@ -215,6 +255,9 @@ export class Dflow {
     this.context = {};
   }
 
+  // Dflow private methods
+  // //////////////////////////////////////////////////////////////////
+
   /** Helper to generate an id unique in its scope. */
   #newId(
     itemMap: Map<string, unknown>,
@@ -261,6 +304,9 @@ export class Dflow {
       levelOf[nodeId] = this.#levelOfNode(nodeId, nodeConnections);
     return nodeIds.sort((a, b) => (levelOf[a] <= levelOf[b] ? -1 : 1));
   }
+
+  // Dflow public methods
+  // //////////////////////////////////////////////////////////////////
 
   /** Check that source types are compatible with target types. */
   canConnect([
@@ -325,16 +371,11 @@ export class Dflow {
         set data(arg: unknown) {
           if (
             // Has any type and `arg` is some valid data...
-            (!types.length && Dflow.isData(arg)) ||
+            (!types.length && isData(arg)) ||
             // ... or output type corresponds to `arg` type.
-            (types.includes("null") && arg === null) ||
-            (types.includes("boolean") && typeof arg == "boolean") ||
-            (types.includes("string") && typeof arg == "string") ||
-            (types.includes("number") && Dflow.isNumber(arg)) ||
-            (types.includes("object") && Dflow.isObject(arg)) ||
-            (types.includes("array") && Dflow.isArray(arg))
+            types.some((type) => validators[type](arg))
           )
-            data = arg;
+            data = arg as DflowData;
         }
       });
     }
@@ -378,15 +419,15 @@ export class Dflow {
   data(value: unknown, wantedId?: string): string {
     const id = this.#newId(this.#kinds, "n", wantedId);
     this.#kinds.set(id, "data");
-    const data = Dflow.isData(value) ? value : undefined;
+    const data = isData(value) ? value : undefined;
     // Infer data type
     let types: DflowDataType[] = [];
-    if (data === null) types = ["null"];
-    if (typeof data == "boolean") types = ["boolean"];
-    if (typeof data == "string") types = ["string"];
-    if (Dflow.isNumber(data)) types = ["number"];
-    if (Dflow.isArray(data)) types = ["array"];
-    if (Dflow.isObject(data)) types = ["object"];
+    for (const [type, isValid] of Object.entries(validators)) {
+      if (isValid(data)) {
+        types = [type as DflowDataType];
+        break;
+      }
+    }
     // Set output.
     this.#outputs.set(id, [{ data, clear() {}, types }]);
     return id;
@@ -404,10 +445,10 @@ export class Dflow {
   ): string {
     const id = this.#newId(this.#links, "l", wantedId);
 
-    const sourceNodeId = typeof source == "string" ? source : source[0];
-    const sourceOutputIndex = typeof source == "string" ? 0 : source[1];
-    const targetNodeId = typeof target == "string" ? target : target[0];
-    const targetInputIndex = typeof target == "string" ? 0 : target[1];
+    const sourceNodeId = isString(source) ? source : source[0];
+    const sourceOutputIndex = isString(source) ? 0 : source[1];
+    const targetNodeId = isString(target) ? target : target[0];
+    const targetInputIndex = isString(target) ? 0 : target[1];
 
     if (
       this.canConnect([
@@ -464,9 +505,9 @@ export class Dflow {
       let inputsDataAreValid = true;
       for (const { source, types, optional } of nodeInputs) {
         // Ignore optional inputs with no data.
-        if (optional && source?.data === undefined) continue;
+        if (optional && isUndefined(source?.data)) continue;
         // Validate input data.
-        if (Dflow.isValidData(types, source?.data)) continue;
+        if (isValidData(types, source?.data)) continue;
         // Some input is not valid.
         inputsDataAreValid = false;
       }
@@ -488,16 +529,13 @@ export class Dflow {
       } catch (err) {
         this.ERR?.(err);
         // Store error message and clear node outputs.
-        this.#errors.set(
-          nodeId,
-          err instanceof Error ? err.message : String(err)
-        );
+        this.#errors.set(nodeId, err instanceof Error ? err.message : `${err}`);
         nodeOutputs.forEach((output) => output.clear());
         continue;
       }
       // If result is undefined or not a valid Dflow data,
       // then clear the node outputs.
-      if (result === undefined || !Dflow.isData(result)) {
+      if (isUndefined(result) || !isData(result)) {
         nodeOutputs.forEach((output) => output.clear());
         continue;
       }
@@ -508,6 +546,9 @@ export class Dflow {
           nodeOutputs[index].data = (result as DflowArray)[index];
     }
   }
+
+  // Dflow getters
+  // //////////////////////////////////////////////////////////////////
 
   /**
    * A graph contains nodes and links.
@@ -553,6 +594,9 @@ export class Dflow {
     return out;
   }
 
+  // Dflow static methods
+  // //////////////////////////////////////////////////////////////////
+
   /**
    * Helper to define inputs.
    *
@@ -569,7 +613,7 @@ export class Dflow {
     rest?: Omit<DflowInput, "types">
   ): DflowInput {
     return {
-      types: typeof typing == "string" ? [typing] : typing,
+      types: isString(typing) ? [typing] : typing,
       ...rest
     };
   }
@@ -590,7 +634,7 @@ export class Dflow {
     rest?: Omit<DflowOutput, "types">
   ): DflowOutput {
     return {
-      types: typeof typing == "string" ? [typing] : typing,
+      types: isString(typing) ? [typing] : typing,
       ...rest
     };
   }
@@ -600,7 +644,7 @@ export class Dflow {
    * It checks recursively that every element is some `DflowData`.
    */
   static isArray(arg: unknown): arg is DflowArray {
-    return Array.isArray(arg) && arg.every(Dflow.isData);
+    return isArray(arg);
   }
 
   /**
@@ -608,49 +652,21 @@ export class Dflow {
    * It checks recursively that every value is some `DflowData`.
    */
   static isObject(arg: unknown): arg is DflowObject {
-    return (
-      typeof arg == "object" &&
-      arg !== null &&
-      !Array.isArray(arg) &&
-      Object.values(arg).every(Dflow.isData)
-    );
+    return isObject(arg);
   }
 
   /** Type guard for a valid number, i.e. finite and not `NaN`. */
   static isNumber(arg: unknown): arg is number {
-    return typeof arg == "number" && !isNaN(arg) && Number.isFinite(arg);
+    return isNumber(arg);
   }
 
   /** Type guard for `DflowData`. */
   static isData(arg: unknown): arg is Exclude<DflowData, undefined> {
-    if (arg === undefined) return false;
-    return (
-      arg === null ||
-      typeof arg == "boolean" ||
-      typeof arg == "string" ||
-      Dflow.isNumber(arg) ||
-      Dflow.isObject(arg) ||
-      Dflow.isArray(arg)
-    );
+    return isData(arg);
   }
 
   /** Validate that data belongs to some of given types. */
   static isValidData(types: DflowDataType[], data: unknown) {
-    if (!types.length) return data === undefined || Dflow.isData(data);
-    return types.some((dataType) =>
-      dataType == "null"
-        ? data === null
-        : dataType == "boolean"
-          ? typeof data == "boolean"
-          : dataType == "string"
-            ? typeof data == "string"
-            : dataType == "number"
-              ? Dflow.isNumber(data)
-              : dataType == "object"
-                ? Dflow.isObject(data)
-                : dataType == "array"
-                  ? Dflow.isArray(data)
-                  : false
-    );
+    return isValidData(types, data);
   }
 }
