@@ -284,6 +284,21 @@ await runGraph();
       Notice that the <code>run</code> method is <strong>async</strong> and returns a <code>Promise&lt;void&gt;</code>. In general you should call it with <code>await dflow.run()</code> but if no node in the graph is async, then you can just call it with <code>dflow.run()</code>.
       </p>
 
+      <p>
+      It is also <strong>strongly recommended</strong> to wrap it in a try/catch block, otherwise it will trigger an <code>unhandledrejection</code> event. In case of errors it will throw an <code>AggregateError</code>. Additional information is available via <a href="dflow.error"><code>dflow.error</code></a>. For instance, you can do something like the following.
+      </p>
+
+      <pre><code>
+try {
+  await dflow.run();
+} catch (aggregatedError) {
+  console.error(dflow.error);
+  for (const error of aggregatedError.errors) {
+    console.error(error);
+  }
+}
+      </code></pre>
+
       <h4 id="dflow.delete">dflow.delete(itemId)</h4>
 
       <p class="description">

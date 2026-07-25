@@ -303,23 +303,34 @@ test("dflow.run()", async () => {
   assert.deepEqual(dflow.out[sumNodeId], [4]);
 });
 
-test("dflow.run() with error", () => {
+test("dflow.run() with error", async () => {
   const dflow = new Dflow(nodeDefinitions1);
   const nodeId1 = dflow.node("Error");
   // First run, it will not throw.
-  dflow.run();
+  await dflow.run();
   assert.equal(dflow.error[nodeId1], undefined);
   const nodeId2 = dflow.data(true);
   const linkId = dflow.link(nodeId2, nodeId1);
   // Second time, it will throw an error.
-  dflow.run();
+  try {
+    await dflow.run();
+  } catch (aggregatedError) {
+    // Check aggregated error.
+    assert.ok(aggregatedError instanceof AggregateError);
+    assert.ok(aggregatedError.errors.length === 1);
+    const error = aggregatedError.errors[0];
+    assert.ok(error instanceof Error);
+    assert.equal(error.message, "Opsss");
+  }
   assert.equal(dflow.error[nodeId1], "Opsss");
   // Third time will throw an error, and show a message.
   dflow.ERR = (error) => {
     assert.equal(error.message, "Opsss");
     console.info("Error logged ✅");
   };
-  dflow.run();
+  try {
+    await dflow.run();
+  } catch {}
   // This time, it will not throw.
   dflow.delete(linkId);
   dflow.run();

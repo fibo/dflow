@@ -34,13 +34,17 @@ export type DflowDataType =
   | "array"
   | "object";
 
-const isUndefined = (arg: unknown) => arg === undefined;
+const isUndefined = (arg: unknown) =>
+  arg === undefined;
 
-const isNull = (arg: unknown): arg is null => arg === null;
+const isNull = (arg: unknown): arg is null =>
+  arg === null;
 
-const isBoolean = (arg: unknown): arg is boolean => typeof arg === "boolean";
+const isBoolean = (arg: unknown): arg is boolean =>
+  typeof arg === "boolean";
 
-const isString = (arg: unknown): arg is string => typeof arg === "string";
+const isString = (arg: unknown): arg is string =>
+  typeof arg === "string";
 
 const isNumber = (arg: unknown): arg is number =>
   typeof arg == "number" && !isNaN(arg) && Number.isFinite(arg);
@@ -156,6 +160,10 @@ export type DflowGraph = {
   data: Record<string, DflowData>;
 };
 
+const stringifyError = (arg: unknown) => arg instanceof Error ?
+  `${arg.message}${arg.cause ? ` cause: ${arg.cause}` : ''}` :
+  `${arg}`;
+
 /**
  * A `Dflow` represents a program as an executable graph.
  * A graph can contain nodes and links.
@@ -230,14 +238,7 @@ export class Dflow {
    *
    * @see {@link https://fibo.github.io/dflow/#dflow.err}
    */
-  ERR: (arg: any) => void = (arg) => {
-    if (arg instanceof Error) {
-      if (arg.cause)
-        console.error(arg.message, 'cause:', arg.cause);
-      else
-        console.error(arg.message);
-    } else console.error(arg);
-  };
+  ERR: (arg: any) => void = (arg) => console.error(stringifyError(arg));
 
   /**
    * Dflow constructor requires a list of node definitions which is an `Array<DflowNode>`.
@@ -481,11 +482,25 @@ export class Dflow {
   /**
    * Execute all nodes, sorted by their connections.
    *
+   * @example
+   *
+   * ```ts
+   * try {
+   *   await dflow.run();
+   * } catch (aggregatedError) {
+   *   console.error(dflow.error);
+   *   for (const error of aggregatedError.errors) {
+   *     console.error(error);
+   *   }
+   * }
+   * ```
+   *
    * @see {@link https://fibo.github.io/dflow/#dflow.run}
    */
   async run(): Promise<void> {
     // Reset errors.
     this.#errors.clear();
+    const errors: Array<unknown> = [];
     // Loop over nodeIds sorted by graph hierarchy.
     for (const nodeId of this.#sortedNodesIds()) {
       const kind = this.#kinds.get(nodeId)!;
@@ -526,7 +541,8 @@ export class Dflow {
       } catch (error) {
         this.ERR(error);
         // Store error message and clear node outputs.
-        this.#errors.set(nodeId, error instanceof Error ? error.message : `${error}`);
+        this.#errors.set(nodeId, stringifyError(error));
+        errors.push(error);
         nodeOutputs.forEach((output) => output.clear());
         continue;
       }
@@ -542,6 +558,8 @@ export class Dflow {
         for (let index = 0; index < numOutputs; index++)
           nodeOutputs[index].data = (result as DflowArray)[index];
     }
+    if (errors.length)
+      throw new AggregateError(errors);
   }
 
   // Dflow getters
