@@ -180,9 +180,7 @@ export class Dflow {
   #errors: Map<string, string> = new Map();
 
   /** Node inputs indexed by node id. */
-  #inputs: Map<
-    string,
-    Array<
+  #inputs: Map<string, Array<
       DflowInput & {
         source?: {
           data: DflowData;
@@ -192,9 +190,7 @@ export class Dflow {
   > = new Map();
 
   /** Node outputs indexed by node id. */
-  #outputs: Map<
-    string,
-    Array<
+  #outputs: Map<string, Array<
       DflowOutput & {
         data: DflowData;
         clear(): void;
@@ -230,17 +226,18 @@ export class Dflow {
   readonly context: Record<string, unknown>;
 
   /**
-   * Optional error logger.
-   *
-   * @example
-   *
-   * ```ts
-   * dflow.ERR = console.error
-   * ```
+   * Error logger.
    *
    * @see {@link https://fibo.github.io/dflow/#dflow.err}
    */
-  ERR?: (arg: any) => void;
+  ERR: (arg: any) => void = (arg) => {
+    if (arg instanceof Error) {
+      if (arg.cause)
+        console.error(arg.message, 'cause:', arg.cause);
+      else
+        console.error(arg.message);
+    } else console.error(arg);
+  };
 
   /**
    * Dflow constructor requires a list of node definitions which is an `Array<DflowNode>`.
@@ -345,7 +342,7 @@ export class Dflow {
       const error = new Error("Cannot create node", {
         cause: `Unknown kind ${kind}`
       });
-      this.ERR?.(error);
+      this.ERR(error);
       throw error;
     }
 
@@ -477,7 +474,7 @@ export class Dflow {
     const error = new Error("Cannot create link", {
       cause: `Source ${source} can't connect to target ${target}`
     });
-    this.ERR?.(error);
+    this.ERR(error);
     throw error;
   }
 
@@ -526,10 +523,10 @@ export class Dflow {
         if (run.constructor.name == "AsyncFunction") {
           result = await run(...inputData);
         }
-      } catch (err) {
-        this.ERR?.(err);
+      } catch (error) {
+        this.ERR(error);
         // Store error message and clear node outputs.
-        this.#errors.set(nodeId, err instanceof Error ? err.message : `${err}`);
+        this.#errors.set(nodeId, error instanceof Error ? error.message : `${error}`);
         nodeOutputs.forEach((output) => output.clear());
         continue;
       }

@@ -776,7 +776,7 @@ else console.info(result.status);
       </p>
 
       <p>
-      By default, Dflow does not log errors. For example to send errors to <code>STDERR</code>, you can do:
+      By default, Dflow logs errors on one line, only error message and cause. To output also error stack trace to <code>STDERR</code>, you can do:
       </p>
 
 <pre><code>
@@ -784,7 +784,7 @@ dflow.ERR = console.error;
 </code></pre>
 
       <p>
-      The logger must be a function that accepts a <strong>single</strong> argument of <code>any</code> type. Usually it will be an <code>Error</code> object but it could be anything that can be thrown by a node, for example a <code>string</code>.
+      You can also use a custom logger. It must be a function that accepts a <strong>single</strong> argument of <code>any</code> type. Usually it will be an <code>Error</code> object but it could be anything that can be thrown, for example a <code>string</code>.
       </p>
     </section>
 
