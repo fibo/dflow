@@ -12,10 +12,8 @@
     "url": "https://fibo.github.io"
   },
   "scripts": {
-    "build": "npm run emitDeclarations && npm run esbuild && npm run inject_doc_snippets",
+    "build": "npm run tsc:build && npm run inject_doc_snippets",
     "check_types": "tsc",
-    "emitDeclarations": "tsc --project tsconfig.build.json",
-    "esbuild": "esbuild dflow.ts --minify --outfile=dflow.js",
     "example:async_nodes": "node docs/examples/async_nodes.ts",
     "example:context": "node docs/examples/context.ts",
     "example:dynamic_math_nodes": "node docs/examples/dynamic_math_nodes.ts",
@@ -23,14 +21,15 @@
     "example:usage": "node docs/examples/usage.ts",
     "inject_doc_snippets": "node docs/examples/inject_doc_snippets.ts",
     "install_precommit_hook": "echo '#!/bin/sh\nnpm test && npm run prettier--check && npm run check_types && npm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
+    "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
+    "prebuild": "npm run check_types",
     "prettier": "prettier --write .",
     "prettier--check": "prettier --check .",
-    "prebuild": "npm run check_types",
     "preversion": "npm run build",
-    "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
     "test": "npm run test:dflow && npm run test:nodes",
     "test:dflow": "node --test tests/dflow_test.ts",
-    "test:nodes": "node --test tests/nodes/*_test.ts"
+    "test:nodes": "node --test tests/nodes/*_test.ts",
+    "tsc:build": "tsc --project tsconfig.build.json"
   },
   "repository": {
     "type": "git",

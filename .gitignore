@@ -6,4 +6,5 @@ npm-debug.log
 
 # generated files
 dflow.d.ts
+dflow.d.ts.map
 dflow.js
