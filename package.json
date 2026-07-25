@@ -26,7 +26,8 @@
     "test": "npm run test:dflow && npm run test:nodes",
     "test:dflow": "node --test tests/dflow_test.ts",
     "test:nodes": "node --test tests/nodes/*_test.ts",
-    "tsc:build": "tsc --project tsconfig.build.json"
+    "tsc:build": "tsc --build tsconfig.build.json",
+    "tsc:clean": "tsc --build --clean tsconfig.build.json"
   },
   "repository": {
     "type": "git",

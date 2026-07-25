@@ -6,7 +6,8 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noEmit": false,
-    "outDir": "."
+    "outDir": ".",
+		"tsBuildInfoFile": "${configDir}/.tsconfig.tsbuildinfo"
   },
   "extends": "./tsconfig.json",
   "exclude": ["dflow.js", "dflow.d.ts", "docs/", "tests/"],

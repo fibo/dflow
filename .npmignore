@@ -1,4 +1,5 @@
 .editorconfig
+.tsconfig.tsbuildinfo
 .github/
 docs/
 tests/

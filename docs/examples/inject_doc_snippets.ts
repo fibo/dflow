@@ -30,25 +30,17 @@ type DocumentationFile = {
   surroundEnd: string;
 };
 
-const snippetSurroundHtml = {
-  surroundStart: "<pre><code>",
-  surroundEnd: "</code></pre>"
-};
-
 const documentationFiles: DocumentationFile[] = [
   {
     relativePath: "README.md",
-    surroundStart: "\n```html",
+    surroundStart: "\n```ts",
     surroundEnd: "```\n"
   },
   {
     relativePath: join("docs", "index.html"),
-    ...snippetSurroundHtml
+    surroundStart: "<pre><code>",
+    surroundEnd: "</code></pre>"
   },
-  {
-    relativePath: join("tests", "test_dflow_on_unpkg_cdn.html"),
-    ...snippetSurroundHtml
-  }
 ];
 
 const { input, output } = Dflow;
@@ -163,7 +155,7 @@ const injectSnippetsNode: DflowNode = {
   }
 };
 
-// Create a dflow instance with node definied above.
+// Create a dflow instance with node defined above.
 const dflow = new Dflow([
   filepathNode,
   inputContentNode,

@@ -37,6 +37,7 @@ html {
   font-family: var(--font-family);
   color: var(--text);
   background: var(--background);
+  scrollbar-gutter: stable;
 }
 
 *, *::before, *::after {

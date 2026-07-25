@@ -1,13 +1,15 @@
-import { Dflow, type DflowNode } from "dflow";
+import { Dflow, type DflowNode } from "../../dflow.ts";
 
-// Node definition.
+// Define a node.
 const helloWorld: DflowNode = {
   kind: "hello",
   run: () => console.log("Hello, World!")
 };
 
+const nodeDefinitions = [helloWorld];
+
 // Create a dflow instance.
-const dflow = new Dflow([helloWorld]);
+const dflow = new Dflow(nodeDefinitions);
 
 // Add a node to the graph.
 dflow.node("hello");
