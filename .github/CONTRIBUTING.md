@@ -10,7 +10,7 @@ If you just want to build to run examples and already have recent `typescript` i
 With [npm](https://www.npmjs.com/) install the following packages **without saving**:
 
 ```sh
-npm install prettier typescript @types/node --no-save
+npm install typescript @types/node --no-save
 ```
 
 ## Build

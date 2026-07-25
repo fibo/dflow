@@ -1,7 +1,7 @@
+.editorconfig
 .github/
-.prettierignore
-dflow.ts
-tsconfig.build.json
-tsconfig.json
 docs/
 tests/
+dflow.ts
+tsconfig.json
+tsconfig.build.json

@@ -20,11 +20,8 @@
     "example:hello_world": "node docs/examples/hello_world.ts",
     "example:usage": "node docs/examples/usage.ts",
     "inject_doc_snippets": "node docs/examples/inject_doc_snippets.ts",
-    "install_precommit_hook": "echo '#!/bin/sh\nnpm test && npm run prettier--check && npm run check_types && npm run build\n' > .git/hooks/pre-commit; chmod +x .git/hooks/pre-commit",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
     "prebuild": "npm run check_types",
-    "prettier": "prettier --write .",
-    "prettier--check": "prettier --check .",
     "preversion": "npm run build",
     "test": "npm run test:dflow && npm run test:nodes",
     "test:dflow": "node --test tests/dflow_test.ts",
@@ -38,8 +35,5 @@
   "keywords": [
     "dataflow",
     "dataflow-programming"
-  ],
-  "prettier": {
-    "trailingComma": "none"
-  }
+  ]
 }
