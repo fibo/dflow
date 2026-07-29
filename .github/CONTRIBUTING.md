@@ -27,10 +27,3 @@ It will:
 - Emit TypeScript declarations in `dflow.d.ts`.
 - Inject snippets in documentation files.
 
-## Commit hook
-
-If you want to push code to GitHub repo, please install the commit hook
-
-```sh
-npm run install_precommit_hook
-```

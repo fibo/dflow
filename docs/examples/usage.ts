@@ -28,7 +28,7 @@ const consoleLogNodeId = dflow.node("consoleLog");
 
 // Create a data node.
 // It will create an instance of a node with kind "data"
-// This is a special node, which is built-in into every Dflow instance.
+// This is a special node, which is built into every Dflow instance.
 const numNodeId = dflow.data(Math.PI / 2);
 
 // Connect numNode to sinNode and sinNode to consoleLog

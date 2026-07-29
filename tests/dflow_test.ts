@@ -295,7 +295,7 @@ test("dflow.run()", async () => {
   dflow.link(["num", 0], [sumNodeId, 0]);
   dflow.link(["num", 0], [sumNodeId, 1]);
 
-  // Add also an async node.
+  // Also add an async node.
   dflow.node("Sleep");
 
   await dflow.run();
@@ -323,7 +323,7 @@ test("dflow.run() with error", async () => {
     assert.equal(error.message, "Opsss");
   }
   assert.equal(dflow.error[nodeId1], "Opsss");
-  // Third time will throw an error, and show a message.
+  // The third time, it will throw an error and show a message.
   dflow.ERR = (error) => {
     assert.equal(error.message, "Opsss");
     console.info("Error logged ✅");
@@ -342,7 +342,7 @@ test("dflow.node()", () => {
 
   // Create a node.
   const nodeId1 = dflow.node("Identity");
-  // Create node with id.
+  // Create a node with an id.
   dflow.node("Identity", "node2");
 
   assert.deepEqual(dflow.graph, {
@@ -379,13 +379,13 @@ test("dflow.link()", () => {
 });
 
 test("dflow.data()", () => {
-  // Data node is builtin, pass an empty node definitions list.
+  // The data node is built-in; pass an empty node definitions list.
   const dflow = new Dflow([]);
 
   // Create a data node.
   const nodeId1 = dflow.data("Hello, World!");
 
-  // Create a data node with id.
+  // Create a data node with an id.
   dflow.data(42, "TheAnswer");
 
   assert.deepEqual(dflow.graph, {

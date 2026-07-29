@@ -269,7 +269,7 @@ export class Dflow {
 
   /**
    * Every node has a level in the graph, given by its connections.
-   * Nodes with no parent has level zero.
+   * Nodes with no parent have level zero.
    */
   #levelOfNode(
     nodeId: string,
@@ -278,7 +278,7 @@ export class Dflow {
     const parentsNodeIds = nodeConnections
       .filter(({ targetId }) => nodeId == targetId)
       .map(({ sourceId }) => sourceId);
-    // A node with no parent as level zero.
+    // A node with no parent has level zero.
     if (!parentsNodeIds.length) return 0;
     // Otherwise its level is the max level of its parents plus one.
     let maxLevel = 0;
@@ -513,7 +513,7 @@ export class Dflow {
       const nodeOutputs = this.#outputs.get(nodeId) ?? [];
       const numOutputs = nodeOutputs.length;
 
-      // Check if inputs data are valid.
+      // Check if input data is valid.
       let inputsDataAreValid = true;
       for (const { source, types, optional } of nodeInputs) {
         // Ignore optional inputs with no data.
@@ -546,13 +546,13 @@ export class Dflow {
         nodeOutputs.forEach((output) => output.clear());
         continue;
       }
-      // If result is undefined or not a valid Dflow data,
+      // If result is undefined or not valid Dflow data,
       // then clear the node outputs.
       if (isUndefined(result) || !isData(result)) {
         nodeOutputs.forEach((output) => output.clear());
         continue;
       }
-      // Copy result into node .
+      // Copy result into node outputs.
       if (numOutputs == 1) nodeOutputs[0].data = result;
       if (numOutputs > 1)
         for (let index = 0; index < numOutputs; index++)
@@ -636,7 +636,7 @@ export class Dflow {
   /**
    * Helper to define outputs.
    *
-   * @example Output with type `number` type and named "count".
+   * @example Output with type `number` and named "count".
    *
    * ```ts
    * Dflow.output("number", { name: "count" })

@@ -26,7 +26,7 @@ test("Not", () => {
     testOneInOneOut(dflow, nodeKind, input, output);
 });
 
-test("NullishCoaleshing", () => {
+test("NullishCoalescing", () => {
   const dflow = newDflow();
   const nodeKind = "??";
   for (const {

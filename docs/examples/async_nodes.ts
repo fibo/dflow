@@ -41,7 +41,7 @@ async function runGraph() {
   dflow.link(numNodeId, [sumNodeId, 0]);
   dflow.link(numNodeId, [sumNodeId, 1]);
 
-  // Add also an async node.
+  // Also add an async node.
   dflow.node(SleepNode.kind);
 
   // Run graph asynchronously.

@@ -31,13 +31,13 @@
 
         <dl>
           <dt>Written in TypeScript</dt>
-          <dd>Whole implementation is in this <a href="https://github.com/fibo/dflow/blob/main/dflow.ts">dflow.ts</a> file. It is roughly 4kb once minified.</dd>
+          <dd>The whole implementation is in this <a href="https://github.com/fibo/dflow/blob/main/dflow.ts">dflow.ts</a> file. It is roughly 4kb once minified.</dd>
 
           <dt>Minimal type system</dt>
           <dd>It is possible to connect an output to an input only if the <a href="#dflowdatatype">data types</a> are matching.</dd>
 
           <dt>It is easy to create nodes</dt>
-          <dd>See how to create a <a href="#dflownode"><code>DlowNode</code> here</a>.</dd>
+          <dd>See how to create a <a href="#dflownode"><code>DflowNode</code> here</a>.</dd>
         </dl>
       </div>
     </header>
@@ -99,7 +99,7 @@ dflow.run();
     </section>
 
     <section>
-      <h2>Usage</h2>
+      <h2 id="usage">Usage</h2>
 
       <p>
       You can run the following examples via npm scripts. See the <a href="https://github.com/fibo/dflow/tree/main/docs/examples">examples folder</a> for detailed instructions.
@@ -141,7 +141,7 @@ const consoleLogNodeId = dflow.node("consoleLog");
 
 // Create a data node.
 // It will create an instance of a node with kind "data"
-// This is a special node, which is built-in into every Dflow instance.
+// This is a special node, which is built into every Dflow instance.
 const numNodeId = dflow.data(Math.PI / 2);
 
 // Connect numNode to sinNode and sinNode to consoleLog
@@ -202,7 +202,7 @@ async function runGraph() {
   dflow.link(numNodeId, [sumNodeId, 0]);
   dflow.link(numNodeId, [sumNodeId, 1]);
 
-  // Add also an async node.
+  // Also add an async node.
   dflow.node(SleepNode.kind);
 
   // Run graph asynchronously.
@@ -281,23 +281,21 @@ await runGraph();
       </p>
 
       <p>
-      Notice that the <code>run</code> method is <strong>async</strong> and returns a <code>Promise&lt;void&gt;</code>. In general you should call it with <code>await dflow.run()</code> but if no node in the graph is async, then you can just call it with <code>dflow.run()</code>.
-      </p>
-
-      <p>
-      It is also <strong>strongly recommended</strong> to wrap it in a try/catch block, otherwise it will trigger an <code>unhandledrejection</code> event. In case of errors it will throw an <code>AggregateError</code>. Additional information is available via <a href="dflow.error"><code>dflow.error</code></a>. For instance, you can do something like the following.
+      The <code>run</code> method is <strong>async</strong> and returns a <code>Promise&lt;void&gt;</code>. It should be launched with <code>await dflow.run()</code>.
+      It is also <strong>strongly recommended</strong> to wrap it in a try/catch block, otherwise it may trigger an <code>unhandledrejection</code> event.
       </p>
 
       <pre><code>
 try {
   await dflow.run();
-} catch (aggregatedError) {
-  console.error(dflow.error);
-  for (const error of aggregatedError.errors) {
-    console.error(error);
-  }
+} catch (error) {
+  // Here `error` should be an instance of `AggregateError`.
 }
       </code></pre>
+
+      <p>
+      In case of errors it will throw an <code>AggregateError</code>. Additional information is available via <a href="dflow.error"><code>dflow.error</code></a> getter.
+      </p>
 
       <h4 id="dflow.delete">dflow.delete(itemId)</h4>
 
@@ -515,7 +513,7 @@ const MathPI: DflowNode = {
 
       <dl>
         <dt><code>name?: string</code></dt>
-        <dd>Ignored by Dflow, but could be used by UI.</dd>
+        <dd>Ignored by Dflow, but could be used by a UI.</dd>
 
         <dt><code>types: <a href="#dflowdatatype">DflowDataType[]</a></code></dt>
         <dd>An input can be connected to an output only if the data types match.</dd>
@@ -540,7 +538,7 @@ const MathPI: DflowNode = {
 
       <dl>
         <dt><code>name?: string</code></dt>
-        <dd>Ignored by Dflow, but could be used by UI.</dd>
+        <dd>Ignored by Dflow, but could be used by a UI.</dd>
 
         <dt><code>types: <a href="#dflowdatatype">DflowDataType[]</a></code></dt>
         <dd>An output can be connected to an input only if the data types match.</dd>
@@ -558,13 +556,13 @@ const MathPI: DflowNode = {
 
       <dl>
         <dt><code>sourceNodeId: string</code></dt>
-        <dd>The id of output node</dd>
+        <dd>The id of the output node</dd>
 
         <dt><code>sourceOutputIndex: number</code></dt>
         <dd>it defaults to <code>0</code> if not provided in <code>dflow.link()</code></dd>
 
         <dt><code>targetNodeId: string</code></dt>
-        <dd>The id of input node</dd>
+        <dd>The id of the input node</dd>
 
         <dt><code>targetInputIndex: number</code></dt>
         <dd>it defaults to <code>0</code> if not provided in <code>dflow.link()</code></dd>
@@ -686,7 +684,7 @@ const mathNodes = Object.getOwnPropertyNames(Math).map((key) => {
     };
   }
 
-  // If the item is a function, wrap in in the run method.
+  // If the item is a function, wrap it in the run method.
   if (typeof item === "function") {
     return {
       kind,
@@ -752,7 +750,7 @@ class ApiClient {
   }
 }
 
-// This nodes uses the apiClient from the context...
+// This node uses the apiClient from the context...
 const CustomNode: DflowNode = {
   kind: "Custom",
   inputs: [Dflow.input("string")],

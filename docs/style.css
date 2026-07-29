@@ -58,7 +58,6 @@ body {
 a, a:visited, a:link, a:active, a:hover, a:focus {
   color: var(--link);
   outline-color: var(--link);
-  font-weight: 500;
 }
 a, a:visited, a:link {
   text-decoration: none;
@@ -93,7 +92,7 @@ p {
 .description {
   padding-left: 1rem;
   margin-bottom: 1.68rem;
-  font-weight: 400;
+  font-weight: 500;
 }
 @media (max-width: 678px) { .description { padding-left: 0.68rem; }}
 
@@ -120,7 +119,6 @@ dl {
   margin: var(--margin-text);
 }
 dt {
-  font-weight: 500;
   line-height: 1.7;
 }
 dd {

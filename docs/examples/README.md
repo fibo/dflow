@@ -1,6 +1,6 @@
 # dflow examples
 
-First you need to build the project. It requires just two `npm` commands,
+First you need to build the project. It requires just two `npm` commands;
 see [how to build](../../.github/CONTRIBUTING.md#build) for instructions.
 
 Then you can run examples via an npm script:

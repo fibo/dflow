@@ -7,16 +7,16 @@ See:
 - [Documentation](https://fibo.github.io/dflow)
 - [Examples](https://github.com/fibo/dflow/tree/main/docs/examples)
 
-## Hello World
+## Usage
 
-You can run this "Hello World" by cloning [dflow repository](https://github.com/fibo/dflow) and launching
+You can run the "Hello World" example described below by cloning [dflow repository](https://github.com/fibo/dflow) and launching
 
 ```sh
 npm run example:hello_world
 ```
 
-Basically it defines a single `DflowNode` that outputs "Hello, World!"
-and creates a _dflow_ instance that run it.
+It defines a single `DflowNode` that outputs "Hello, World!"
+and creates a _dflow_ instance that runs it.
 
 <!-- START file:docs/examples/hello_world.ts -->
 
@@ -42,6 +42,19 @@ dflow.run();
 ```
 
 <!-- END snippet -->
+
+> [!IMPORTANT]
+> The recommended way to run a graph is with `await`, wrapped in a try/catch block.
+
+```ts
+try {
+  await dflow.run();
+} catch (error) {
+  // Here `error` should be an instance of `AggregateError`.
+}
+```
+
+More examples available in the documentation, see [the "Usage" section](https://fibo.github.io/dflow/#usage).
 
 ## License
 

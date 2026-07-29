@@ -18,7 +18,7 @@ const mathNodes = Object.getOwnPropertyNames(Math).map((key) => {
     };
   }
 
-  // If the item is a function, wrap in in the run method.
+  // If the item is a function, wrap it in the run method.
   if (typeof item === "function") {
     return {
       kind,

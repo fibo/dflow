@@ -23,7 +23,7 @@ class ApiClient {
   }
 }
 
-// This nodes uses the apiClient from the context...
+// This node uses the apiClient from the context...
 const CustomNode: DflowNode = {
   kind: "Custom",
   inputs: [Dflow.input("string")],
