@@ -7,5 +7,4 @@ npm-debug.log
 # generated files
 .tsconfig.tsbuildinfo
 dflow.d.ts
-dflow.d.ts.map
 dflow.js
