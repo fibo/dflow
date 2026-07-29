@@ -2,7 +2,7 @@
   "name": "dflow",
   "description": "A minimal Dataflow programming engine",
   "type": "module",
-  "version": "0.44.0",
+  "version": "0.45.0",
   "types": "./dflow.d.ts",
   "exports": "./dflow.js",
   "license": "MIT",
