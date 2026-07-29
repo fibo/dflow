@@ -58,23 +58,24 @@ const isObject = (arg: unknown): arg is DflowObject =>
   !Array.isArray(arg) &&
   Object.values(arg).every(isData);
 
-const validators: Record<DflowDataType, (data: unknown) => data is DflowData> =
-  {
-    null: isNull,
-    boolean: isBoolean,
-    string: isString,
-    number: isNumber,
-    object: isObject,
-    array: isArray
-  };
+const validators: Record<DflowDataType, (data: unknown) => data is DflowData> = {
+  null: isNull,
+  boolean: isBoolean,
+  string: isString,
+  number: isNumber,
+  object: isObject,
+  array: isArray
+};
 
 const isData = (arg: unknown): arg is Exclude<DflowData, undefined> => {
-  if (isUndefined(arg)) return false;
+  if (isUndefined(arg))
+    return false;
   return Object.values(validators).some((isValid) => isValid(arg));
 };
 
 const isValidData = (types: DflowDataType[], data: unknown) => {
-  if (!types.length) return isUndefined(data) || isData(data);
+  if (!types.length)
+    return isUndefined(data) || isData(data);
   return types.some((dataType) => validators[dataType]?.(data));
 };
 
@@ -189,22 +190,20 @@ export class Dflow {
 
   /** Node inputs indexed by node id. */
   #inputs: Map<string, Array<
-      DflowInput & {
-        source?: {
-          data: DflowData;
-        };
-      }
-    >
-  > = new Map();
+    DflowInput & {
+      source?: {
+        data: DflowData;
+      };
+    }
+  >> = new Map();
 
   /** Node outputs indexed by node id. */
   #outputs: Map<string, Array<
-      DflowOutput & {
-        data: DflowData;
-        clear(): void;
-      }
-    >
-  > = new Map();
+    DflowOutput & {
+      data: DflowData;
+      clear(): void;
+    }
+  >> = new Map();
 
   /**
    * Dflow context is bound to every node at runtime,
@@ -220,13 +219,13 @@ export class Dflow {
    * const node: DflowNode & Partial<Context> = {
    *   kind: "example",
    *   run() {
-   *     console.log(this.foo)
+   *     console.log(this.foo);
    *   }
    * }
    *
-   * const dflow = new Dflow([node])
-   * dflow.context.foo = "bar"
-   * dflow.run() // Outputs "bar"
+   * const dflow = new Dflow([node]);
+   * dflow.context.foo = "bar";
+   * dflow.run() // Outputs "bar";
    * ```
    *
    * @see {@link https://fibo.github.io/dflow/#dflow.context}
@@ -262,7 +261,8 @@ export class Dflow {
     prefix: string,
     wantedId?: string
   ): string {
-    if (wantedId && !itemMap.has(wantedId)) return wantedId;
+    if (wantedId && !itemMap.has(wantedId))
+      return wantedId;
     const id = `${prefix}${itemMap.size}`;
     return itemMap.has(id) ? this.#newId(itemMap, prefix) : id;
   }
@@ -279,7 +279,8 @@ export class Dflow {
       .filter(({ targetId }) => nodeId == targetId)
       .map(({ sourceId }) => sourceId);
     // A node with no parent has level zero.
-    if (!parentsNodeIds.length) return 0;
+    if (!parentsNodeIds.length)
+      return 0;
     // Otherwise its level is the max level of its parents plus one.
     let maxLevel = 0;
     for (const parentNodeId of parentsNodeIds)
@@ -319,16 +320,19 @@ export class Dflow {
     // Input types are stored in node definitions.
     const targetNodeDef = this.#nodeDefinitions.get(targetNodeKind);
     const targetTypes = targetNodeDef?.inputs?.[targetInputIndex].types;
-    if (!targetTypes) return false;
+    if (!targetTypes)
+      return false;
     // Output types are stored in output items.
     const sourceOutput = this.#outputs.get(sourceNodeId)?.[sourceOutputIndex];
-    if (!sourceOutput) return false;
+    if (!sourceOutput)
+      return false;
     // If source can have any type or target can have any type,
     // then source and target are compatible.
-    if (!sourceOutput.types.length || !targetTypes.length) return true;
+    if (!sourceOutput.types.length || !targetTypes.length)
+      return true;
     // Check if target accepts some of the `dataType` source can have.
-    return targetTypes.some((dataType) =>
-      sourceOutput.types.includes(dataType)
+    return targetTypes.some(
+      (dataType) => sourceOutput.types.includes(dataType)
     );
   }
 
@@ -340,9 +344,7 @@ export class Dflow {
   node(kind: string, wantedId?: string): string {
     const nodeDef = this.#nodeDefinitions.get(kind);
     if (!nodeDef) {
-      const error = new Error("Cannot create node", {
-        cause: `Unknown kind ${kind}`
-      });
+      const error = new Error("Cannot create node", { cause: `Unknown kind "${kind}"` });
       this.ERR(error);
       throw error;
     }
@@ -398,15 +400,18 @@ export class Dflow {
       this.#outputs.delete(id);
       // Delete all links connected to node.
       for (const [linkId, link] of this.#links.entries())
-        if (link[0] == id || link[2] == id) this.delete(linkId);
+        if (link[0] == id || link[2] == id)
+          this.delete(linkId);
     }
     // Delete link.
     const link = this.#links.get(id);
-    if (!link) return;
+    if (!link)
+      return;
     this.#links.delete(id);
     // Disconnect target input.
     const targetInput = this.#inputs.get(link[2])?.[link[3]];
-    if (targetInput) targetInput.source = undefined;
+    if (targetInput)
+      targetInput.source = undefined;
   }
 
   /**
@@ -448,14 +453,12 @@ export class Dflow {
     const targetNodeId = isString(target) ? target : target[0];
     const targetInputIndex = isString(target) ? 0 : target[1];
 
-    if (
-      this.canConnect([
-        sourceNodeId,
-        sourceOutputIndex,
-        targetNodeId,
-        targetInputIndex
-      ])
-    ) {
+    if (this.canConnect([
+      sourceNodeId,
+      sourceOutputIndex,
+      targetNodeId,
+      targetInputIndex
+    ])) {
       const sourceOutput = this.#outputs.get(sourceNodeId)?.[sourceOutputIndex];
       const targetInput = this.#inputs.get(targetNodeId)?.[targetInputIndex];
       if (sourceOutput && targetInput) {
@@ -487,11 +490,8 @@ export class Dflow {
    * ```ts
    * try {
    *   await dflow.run();
-   * } catch (aggregatedError) {
-   *   console.error(dflow.error);
-   *   for (const error of aggregatedError.errors) {
-   *     console.error(error);
-   *   }
+   * } catch (error) {
+   *   // Here `error` should be an instance of `AggregateError`.
    * }
    * ```
    *
@@ -505,7 +505,8 @@ export class Dflow {
     for (const nodeId of this.#sortedNodesIds()) {
       const kind = this.#kinds.get(nodeId)!;
 
-      if (kind == "data") continue;
+      if (kind == "data")
+        continue;
 
       const run = this.#runs.get(nodeId)!;
 
@@ -517,9 +518,11 @@ export class Dflow {
       let inputsDataAreValid = true;
       for (const { source, types, optional } of nodeInputs) {
         // Ignore optional inputs with no data.
-        if (optional && isUndefined(source?.data)) continue;
+        if (optional && isUndefined(source?.data))
+          continue;
         // Validate input data.
-        if (isValidData(types, source?.data)) continue;
+        if (isValidData(types, source?.data))
+          continue;
         // Some input is not valid.
         inputsDataAreValid = false;
       }
@@ -532,12 +535,10 @@ export class Dflow {
       const inputData = nodeInputs.map((input) => input.source?.data);
       let result: unknown;
       try {
-        if (run.constructor.name == "Function") {
+        if (run.constructor.name == "Function")
           result = run(...inputData);
-        }
-        if (run.constructor.name == "AsyncFunction") {
+        else if (run.constructor.name == "AsyncFunction")
           result = await run(...inputData);
-        }
       } catch (error) {
         this.ERR(error);
         // Store error message and clear node outputs.
@@ -553,7 +554,8 @@ export class Dflow {
         continue;
       }
       // Copy result into node outputs.
-      if (numOutputs == 1) nodeOutputs[0].data = result;
+      if (numOutputs == 1)
+        nodeOutputs[0].data = result;
       if (numOutputs > 1)
         for (let index = 0; index < numOutputs; index++)
           nodeOutputs[index].data = (result as DflowArray)[index];
@@ -604,7 +606,8 @@ export class Dflow {
     for (const nodeId of this.#kinds.keys()) {
       const outputs = this.#outputs.get(nodeId)!;
       out[nodeId] = [];
-      for (const output of outputs) out[nodeId].push(output.data);
+      for (const output of outputs)
+        out[nodeId].push(output.data);
     }
     return out;
   }
