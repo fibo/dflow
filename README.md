@@ -9,19 +9,14 @@ See:
 
 ## Usage
 
-You can run the "Hello World" example described below by cloning [dflow repository](https://github.com/fibo/dflow) and launching
+Let's start with an "Hello World!".
 
-```sh
-npm run example:hello_world
-```
-
-It defines a single `DflowNode` that outputs "Hello, World!"
-and creates a _dflow_ instance that runs it.
+Define a single `DflowNode` that outputs to the console and create a _dflow_ instance that runs it.
 
 <!-- START file:docs/examples/hello_world.ts -->
 
 ```ts
-import { Dflow, type DflowNode } from "../../dflow.ts";
+import { Dflow, type DflowNode } from "dflow";
 
 // Define a node.
 const helloWorld: DflowNode = {

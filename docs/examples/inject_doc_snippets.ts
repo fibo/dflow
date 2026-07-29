@@ -3,7 +3,6 @@
 //
 //    npm run inject_doc_snippets
 //
-// It is using Dflow just for fun.
 // It is used to build documentation files by injecting code snippets.
 // It looks for markers in the documentation files like:
 //

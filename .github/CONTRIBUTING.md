@@ -2,7 +2,7 @@
 
 ## Requirements
 
-By design, dflow has no dependencies.
+By design, _Dflow_ has no dependencies.
 
 However, it has few development dependencies you need to build it or to contribute to it.
 If you just want to build to run examples and already have recent `typescript` installed globally, you can skip this step.
@@ -27,3 +27,14 @@ It will:
 - Emit TypeScript declarations in `dflow.d.ts`.
 - Inject snippets in documentation files.
 
+## Examples
+
+Once built following instructions above, you can run examples via an npm script:
+
+| Command                              | Source file                                                       |
+| ------------------------------------ | ----------------------------------------------------------------- |
+| `npm run example:hello_world`        | [hello_world.ts](../docs/examples/hello_world.ts)                 |
+| `npm run example:usage`              | [usage.ts](../docs/examples/usage.ts)                             |
+| `npm run example:async_nodes`        | [async_nodes.ts](../docs/examples/async_nodes.ts)                 |
+| `npm run example:dynamic_math_nodes` | [dynamic_math_nodes.ts](../docs/examples/dynamic_math_nodes.ts)   |
+| `npm run example:context`            | [context.ts](../docs/examples/context.ts)                         |
