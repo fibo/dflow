@@ -42,7 +42,7 @@
       </div>
     </header>
 
-<!-- START file:docs/examples/hello_world.ts -->
+<!-- START snippet {"file":"examples/hello_world.ts","surround":"<pre><code>"} -->
 <pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
@@ -63,7 +63,7 @@ dflow.node("hello");
 // Run the dflow graph.
 dflow.run();
 </code></pre>
-<!-- END snippet -->
+<!-- END snippet {"surround":"</code></pre>"} -->
 
     <section>
       <h2>How it works</h2>
@@ -109,7 +109,7 @@ dflow.run();
       This graph computes <code>sin(π / 2) = 1</code> and prints the result.
       </p>
 
-<!-- START file:docs/examples/usage.ts -->
+<!-- START snippet {"file":"examples/usage.ts","surround":"<pre><code>"} -->
 <pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
@@ -151,13 +151,13 @@ dflow.link(sinNodeId, consoleLogNodeId);
 // run graph
 dflow.run();
 </code></pre>
-<!-- END snippet -->
+<!-- END snippet {"surround":"</code></pre>"} -->
 
       <p>
       You can also run async nodes. Notice the <code>SleepNode</code> below has an <code>async run()</code> method and the graph is executed with <code>await dflow.run()</code>.
       </p>
 
-<!-- START file:docs/examples/async_nodes.ts -->
+<!-- START snippet {"file":"examples/async_nodes.ts","surround":"<pre><code>"} -->
 <pre><code>
 import { Dflow, type DflowNode } from "dflow";
 
@@ -217,7 +217,7 @@ await runGraph();
 // sleep node start (will sleep 500 ms) zZz
 // sleep node end
 </code></pre>
-<!-- END snippet -->
+<!-- END snippet {"surround":"</code></pre>"} -->
 
     </section>
 
@@ -360,7 +360,7 @@ try {
       For example, define an input string named <code>message</code>.
       </p>
 
-<!-- START file:docs/examples/snippets/print.ts -->
+<!-- START snippet {"file":"examples/snippets/print.ts","surround":"<pre><code>"} -->
 <pre><code>
 const Print: DflowNode = {
   kind: "print",
@@ -370,7 +370,7 @@ const Print: DflowNode = {
   }
 };
 </code></pre>
-<!-- END snippet -->
+<!-- END snippet {"surround":"</code></pre>"} -->
 
       <p>
       Input with <code>number</code> type.
@@ -435,7 +435,7 @@ Dflow.input("number", { optional: true })
       For example, define a number output named <code>π</code> (PI).
       </p>
 
-<!-- START file:docs/examples/snippets/mathPI.ts -->
+<!-- START snippet {"file":"examples/snippets/mathPI.ts","surround":"<pre><code>"} -->
 <pre><code>
 const MathPI: DflowNode = {
   kind: "mathPI",
@@ -443,7 +443,7 @@ const MathPI: DflowNode = {
   run: () => Math.PI
 };
 </code></pre>
-<!-- END snippet -->
+<!-- END snippet {"surround":"</code></pre>"} -->
 
       <h3 id="types">Types</h3>
 
@@ -622,7 +622,7 @@ const { input, output } = Dflow;
       This is a node that implements <code>Array.prototype.join()</code> so its first input is an array and it has an optional second input for the separator, which defaults to a comma.
       </p>
 
-<!-- START file:docs/examples/nodes/array.ts -->
+<!-- START snippet {"file":"examples/nodes/array.ts","surround":"<pre><code>"} -->
 <pre><code>
 const ArrayJoin: DflowNode = {
   kind: "arrayJoin",
@@ -636,7 +636,7 @@ const ArrayJoin: DflowNode = {
   }
 };
 </code></pre>
-<!-- END snippet -->
+<!-- END snippet {"surround":"</code></pre>"} -->
 
       <p>
       First of all, the <code>name</code> attribute of inputs and outputs is optional and ignored by Dflow.
@@ -662,7 +662,7 @@ const ArrayJoin: DflowNode = {
       Here is an example of nodes generated from the <code>Math</code> global.
       </p>
 
-<!-- START file:docs/examples/dynamic_math_nodes.ts -->
+<!-- START snippet {"file":"examples/dynamic_math_nodes.ts","surround":"<pre><code>"} -->
 <pre><code>
 import { Dflow } from "dflow";
 
@@ -713,7 +713,7 @@ dflow.run();
 console.log(dflow.out);
 // { n0: [ 2.718281828459045 ], n1: [ 2 ] }
 </code></pre>
-<!-- END snippet -->
+<!-- END snippet {"surround":"</code></pre>"} -->
 
       <h3>Miscellanea</h3>
 
@@ -723,7 +723,7 @@ console.log(dflow.out);
         Dflow context is bound to every node at runtime, hence it is accessible via <code>this</code> inside node <code>run</code>.
       </p>
 
-<!-- START file:docs/examples/context.ts -->
+<!-- START snippet {"file":"examples/context.ts","surround":"<pre><code>"} -->
 <pre><code>
 // Create a host with an API context.
 import { Dflow, type DflowNode } from "dflow";
@@ -782,7 +782,7 @@ if (!result || result.status !== "SUCCESS" || result.payload !== "foo")
   console.error("Unexpected result:", result);
 else console.info(result.status);
 </code></pre>
-<!-- END snippet -->
+<!-- END snippet {"surround":"</code></pre>"} -->
 
       <h4 id="dflow.err">dflow.ERR</h4>
 

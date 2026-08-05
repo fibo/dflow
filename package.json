@@ -19,7 +19,7 @@
     "example:dynamic_math_nodes": "node docs/examples/dynamic_math_nodes.ts",
     "example:hello_world": "node docs/examples/hello_world.ts",
     "example:usage": "node docs/examples/usage.ts",
-    "inject_doc_snippets": "node docs/examples/inject_doc_snippets.ts",
+    "inject_doc_snippets": "codinj .",
     "postversion": "git push origin v${npm_package_version}; git push origin main; npm publish",
     "prebuild": "npm run check_types",
     "preversion": "npm run build",
@@ -36,5 +36,10 @@
   "keywords": [
     "dataflow",
     "dataflow-programming"
-  ]
+  ],
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "codinj": "^0.1.1",
+    "typescript": "^7.0.2"
+  }
 }
